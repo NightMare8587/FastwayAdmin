@@ -6,5 +6,96 @@
     android:layout_height="match_parent"
     tools:context=".Login.MainActivity">
 
+    <EditText
+        android:id="@+id/nameLogin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="28dp"
+        android:background="@drawable/input"
+        android:ems="10"
+        android:hint="Enter Full Name"
+        android:inputType="textPersonName"
+        android:padding="12dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/emailLogin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/input"
+        android:ems="10"
+        android:hint="Enter Email Address"
+        android:inputType="textEmailAddress"
+        android:padding="12dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/nameLogin" />
+
+    <com.hbb20.CountryCodePicker
+        android:id="@+id/ccp"
+        android:layout_width="137dp"
+        android:layout_height="47dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="9dp"
+        android:layout_marginEnd="10dp"
+        app:layout_constraintEnd_toStartOf="@+id/phoneNumber"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/emailLogin" />
+
+    <EditText
+        android:id="@+id/phoneNumber"
+        android:layout_width="209dp"
+        android:layout_height="53dp"
+        android:layout_marginTop="9dp"
+        android:background="@drawable/input"
+        android:ems="10"
+        android:hint="Enter Phone Number"
+        android:inputType="number"
+        android:padding="12dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/emailLogin" />
+
+    <EditText
+        android:id="@+id/codeSent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="29dp"
+        android:background="@drawable/input"
+        android:ems="10"
+        android:enabled="false"
+        android:hint="Enter 6 digit code"
+        android:inputType="numberSigned"
+        android:padding="12dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/phoneNumber" />
+
+    <Button
+        android:id="@+id/startVerification"
+        android:layout_width="232dp"
+        android:layout_height="56dp"
+        android:layout_marginTop="33dp"
+        android:background="@drawable/input"
+        android:text="Send Verification Code"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/codeSent" />
+
+    <Button
+        android:id="@+id/verifyVerification"
+        android:layout_width="243dp"
+        android:layout_height="55dp"
+        android:layout_marginStart="160dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginEnd="163dp"
+        android:background="@drawable/input"
+        android:text="Verify Verification Code"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/startVerification" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
