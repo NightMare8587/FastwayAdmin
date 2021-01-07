@@ -4,6 +4,113 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Info">
+    tools:context=".Info.Info">
+
+    <EditText
+        android:id="@+id/nameOfRestaurant"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:background="@drawable/input"
+        android:ems="10"
+        android:hint="Enter Name of Restaurant"
+        android:inputType="textPersonName"
+        android:padding="15dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/AddressOfRestaurant"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="11dp"
+        android:background="@drawable/input"
+        android:ems="10"
+        android:hint="Address Of Restaurant"
+        android:inputType="textMultiLine|textPersonName"
+        android:padding="15dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/nameOfRestaurant" />
+
+    <EditText
+        android:id="@+id/pincodeRestaurant"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="11dp"
+        android:background="@drawable/input"
+        android:ems="10"
+        android:hint="Enter Pin Code"
+        android:inputType="number"
+        android:padding="15dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/AddressOfRestaurant" />
+
+    <EditText
+        android:id="@+id/nearbyPlace"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="11dp"
+        android:background="@drawable/input"
+        android:ems="10"
+        android:gravity="start|top"
+        android:hint="Enter Nearby Place"
+        android:inputType="textMultiLine"
+        android:padding="15dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/pincodeRestaurant" />
+
+    <com.hbb20.CountryCodePicker
+        android:id="@+id/codePicker"
+        android:layout_width="137dp"
+        android:layout_height="47dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="11dp"
+        android:layout_marginEnd="10dp"
+        app:layout_constraintEnd_toStartOf="@+id/contactNumber"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/nearbyPlace" />
+
+    <EditText
+        android:id="@+id/contactNumber"
+        android:layout_width="209dp"
+        android:layout_height="53dp"
+        android:layout_marginTop="11dp"
+        android:background="@drawable/input"
+        android:ems="10"
+        android:hint="Enter Contact Number"
+        android:inputType="number"
+        android:padding="12dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/nearbyPlace" />
+
+    <Button
+        android:id="@+id/proceed"
+        android:layout_width="201dp"
+        android:layout_height="52dp"
+        android:layout_marginTop="62dp"
+        android:background="@drawable/input"
+        android:text="Proceed"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/contactNumber" />
+
+    <ProgressBar
+        android:id="@+id/checkingData"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="182dp"
+        android:layout_height="225dp"
+        android:layout_marginBottom="55dp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
