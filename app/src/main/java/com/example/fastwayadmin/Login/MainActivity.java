@@ -81,17 +81,19 @@ public class MainActivity extends AppCompatActivity {
                     codeSent.setError("invalid code");
                     return;
                 }
-
-                Toast.makeText(MainActivity.this, credential.getSmsCode(), Toast.LENGTH_SHORT).show();
-                if(codeSent.getText().toString().equals(credential.getSmsCode())){
-                    Toast.makeText(MainActivity.this, "Verified", Toast.LENGTH_SHORT).show();
-                    DatabaseAdmin user = new DatabaseAdmin(name,email,number);
-                    reference.child("Users").child(loginAuth.getUid()+"").setValue(user);
-                    startActivity(new Intent(MainActivity.this, Info.class));
-                    finish();
-                }else{
-                    Toast.makeText(MainActivity.this, "Invalid code", Toast.LENGTH_SHORT).show();
-                }
+              credential = PhoneAuthProvider.getCredential(verId,codeSent.getText().toString());
+                loginAuth.signInWithCredential(credential).addOnCompleteListener(MainActivity.this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if(task.isSuccessful()){
+                            Toast.makeText(MainActivity.this, "Login Successfully", Toast.LENGTH_SHORT).show();
+                            DatabaseAdmin user = new DatabaseAdmin(name,email,number);
+                            reference.child("Admin").child(loginAuth.getUid()+"").setValue(user);
+                            startActivity(new Intent(MainActivity.this,Info.class));
+                            finish();
+                        }
+                    }
+                });
             }
         });
     }
@@ -120,7 +122,7 @@ public class MainActivity extends AppCompatActivity {
                     public void onCodeSent(@NonNull String s, @NonNull PhoneAuthProvider.ForceResendingToken forceResendingToken) {
                         verId = s;
                         myToken = forceResendingToken;
-                        credential = PhoneAuthProvider.getCredential(s,forceResendingToken.toString());
+
 
                     }
                 }).build();
