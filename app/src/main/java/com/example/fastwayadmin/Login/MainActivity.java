@@ -194,7 +194,8 @@ public class MainActivity extends AppCompatActivity {
     private void checkPermissions() {
         if(ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
             ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},1);
-        }
+        }else
+            createLocationRequest();
     }
 
     private void startPhoneNumberVerification(String number) {
