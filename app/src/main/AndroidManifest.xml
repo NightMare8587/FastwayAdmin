@@ -3,6 +3,8 @@
     package="com.example.fastwayadmin">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
 
     <application
         android:allowBackup="true"
@@ -11,7 +13,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
-        <activity android:name=".HomeScreen"></activity>
+        <activity android:name=".Info.GetLocation"></activity>
+        <activity android:name=".HomeScreen" />
         <activity android:name=".Info.Info" />
         <activity android:name=".SplashScreen">
             <intent-filter>

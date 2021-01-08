@@ -15,6 +15,8 @@ import android.widget.Toast;
 
 import com.example.fastwayadmin.HomeScreen;
 import com.example.fastwayadmin.R;
+import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.SupportMapFragment;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -31,19 +33,20 @@ public class Info extends AppCompatActivity {
     FirebaseAuth infoAuth;
     DatabaseReference infoRef;
     String name,address,nearby,pin,number;
-    ProgressBar progressBar;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_info);
         initialise();
-        progressBar.setVisibility(View.VISIBLE);
+
         infoRef.child("Restaurants").addListenerForSingleValueEvent(new ValueEventListener() {
            @Override
            public void onDataChange(@NonNull DataSnapshot snapshot) {
                if(snapshot.child(infoAuth.getUid()).exists()){
-                   startActivity(new Intent(Info.this,HomeScreen.class));
-                    progressBar.setVisibility(View.INVISIBLE);
+                   startActivity(new Intent(Info.this,GetLocation.class));
+
                    finish();
                }
            }
@@ -106,6 +109,6 @@ public class Info extends AppCompatActivity {
         proceed = findViewById(R.id.proceed);
         codePicker = findViewById(R.id.codePicker);
         contactNumber = findViewById(R.id.contactNumber);
-        progressBar = findViewById(R.id.checkingData);
+
     }
 }
