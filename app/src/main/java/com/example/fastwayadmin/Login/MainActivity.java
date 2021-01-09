@@ -85,8 +85,6 @@ public class MainActivity extends AppCompatActivity {
             finish();
         }
 
-
-
         startVerification.setOnClickListener(new View.OnClickListener() {
             @SuppressLint("SetTextI18n")
             @Override

@@ -25,6 +25,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.hbb20.CountryCodePicker;
 
+import java.util.Objects;
+
 public class Info extends AppCompatActivity {
 
     EditText nameOfRestaurant,AddressOfRestaurant,nearbyPlace,pinCode,contactNumber;
@@ -44,7 +46,7 @@ public class Info extends AppCompatActivity {
         infoRef.child("Restaurants").addListenerForSingleValueEvent(new ValueEventListener() {
            @Override
            public void onDataChange(@NonNull DataSnapshot snapshot) {
-               if(snapshot.child(infoAuth.getUid()).exists()){
+               if(snapshot.child(Objects.requireNonNull(infoAuth.getUid())).exists()){
                    startActivity(new Intent(Info.this,GetLocation.class));
 
                    finish();
