@@ -47,7 +47,7 @@ public class Info extends AppCompatActivity {
            @Override
            public void onDataChange(@NonNull DataSnapshot snapshot) {
                if(snapshot.child(Objects.requireNonNull(infoAuth.getUid())).exists()){
-                   startActivity(new Intent(Info.this, GetLocation.class));
+                   startActivity(new Intent(Info.this, HomeScreen.class));
 
                    finish();
                }
