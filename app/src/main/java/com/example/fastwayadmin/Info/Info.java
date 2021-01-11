@@ -13,6 +13,7 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.example.fastwayadmin.GetLocation;
 import com.example.fastwayadmin.HomeScreen;
 import com.example.fastwayadmin.R;
 import com.google.android.gms.maps.MapView;
@@ -36,7 +37,6 @@ public class Info extends AppCompatActivity {
     DatabaseReference infoRef;
     String name,address,nearby,pin,number;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,7 +47,7 @@ public class Info extends AppCompatActivity {
            @Override
            public void onDataChange(@NonNull DataSnapshot snapshot) {
                if(snapshot.child(Objects.requireNonNull(infoAuth.getUid())).exists()){
-                   startActivity(new Intent(Info.this,GetLocation.class));
+                   startActivity(new Intent(Info.this, GetLocation.class));
 
                    finish();
                }
