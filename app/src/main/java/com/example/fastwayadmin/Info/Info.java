@@ -36,7 +36,7 @@ public class Info extends AppCompatActivity {
     FirebaseAuth infoAuth;
     DatabaseReference infoRef;
     String name,address,nearby,pin,number;
-
+    ProgressBar progressBar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,10 +47,12 @@ public class Info extends AppCompatActivity {
            @Override
            public void onDataChange(@NonNull DataSnapshot snapshot) {
                if(snapshot.child(Objects.requireNonNull(infoAuth.getUid())).exists()){
+                   progressBar.setVisibility(View.INVISIBLE);
                    startActivity(new Intent(Info.this, HomeScreen.class));
-
                    finish();
                }
+
+               progressBar.setVisibility(View.INVISIBLE);
            }
            @Override
            public void onCancelled(@NonNull DatabaseError error) {
@@ -111,6 +113,6 @@ public class Info extends AppCompatActivity {
         proceed = findViewById(R.id.proceed);
         codePicker = findViewById(R.id.codePicker);
         contactNumber = findViewById(R.id.contactNumber);
-
+        progressBar = findViewById(R.id.progressBar);
     }
 }

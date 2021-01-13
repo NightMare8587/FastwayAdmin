@@ -8,8 +8,11 @@ import androidx.fragment.app.FragmentManager;
 
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.widget.Toast;
 
+import com.example.fastwayadmin.NavFrags.AccountFrag;
 import com.example.fastwayadmin.NavFrags.HomeFrag;
+import com.example.fastwayadmin.NavFrags.MenuFrag;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class HomeScreen extends AppCompatActivity {
@@ -28,7 +31,15 @@ public class HomeScreen extends AppCompatActivity {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()){
-
+                    case R.id.home:
+                        manager.beginTransaction().replace(R.id.homescreen,new HomeFrag()).commit();
+                        break;
+                    case R.id.menu:
+                        manager.beginTransaction().replace(R.id.homescreen,new MenuFrag()).commit();
+                        break;
+                    case R.id.account:
+                        manager.beginTransaction().replace(R.id.homescreen, new AccountFrag()).commit();
+                        break;
                 }
                 return true;
             }
