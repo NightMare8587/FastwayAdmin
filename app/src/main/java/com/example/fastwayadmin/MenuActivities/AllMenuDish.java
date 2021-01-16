@@ -8,7 +8,6 @@ import android.view.View;
 import android.widget.ProgressBar;
 
 import com.example.fastwayadmin.R;
-import com.example.fastwayadmin.SearchDish;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -26,7 +25,7 @@ public class AllMenuDish extends AppCompatActivity {
         search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(getApplicationContext(), SearchDish.class));
+//                startActivity(new Intent(getApplicationContext(), SearchDish.class));
             }
         });
     }
