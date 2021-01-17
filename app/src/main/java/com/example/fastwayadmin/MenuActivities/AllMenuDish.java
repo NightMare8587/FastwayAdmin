@@ -25,7 +25,7 @@ public class AllMenuDish extends AppCompatActivity {
         search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                startActivity(new Intent(getApplicationContext(), SearchDish.class));
+                startActivity(new Intent(getApplicationContext(), CreateDish.class));
             }
         });
     }

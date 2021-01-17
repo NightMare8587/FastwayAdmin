@@ -25,7 +25,7 @@
         android:layout_marginEnd="29dp"
         android:layout_marginBottom="29dp"
         android:clickable="true"
-        android:src="@android:drawable/ic_menu_search"
+        android:src="@drawable/ic_baseline_add_24"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
