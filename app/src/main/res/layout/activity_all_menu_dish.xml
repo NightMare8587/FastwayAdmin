@@ -42,6 +42,7 @@
         app:layout_constraintVertical_bias="0.369" />
 
     <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/dishRecycler"
         android:layout_width="414dp"
         android:layout_height="673dp"
         app:layout_constraintEnd_toEndOf="parent"

@@ -33,10 +33,6 @@ public class CreateDish extends AppCompatActivity {
                     nameOfDish.setError("Invalid Name");
                     nameOfDish.requestFocus();
                     return;
-                }else if(halfPlate.length() == 0){
-                    halfPlate.setError("Invalid input");
-                    halfPlate.requestFocus();
-                    return;
                 }else if(fullPlate.length() == 0){
                     fullPlate.setError("Invalid input");
                     fullPlate.requestFocus();
@@ -55,7 +51,7 @@ public class CreateDish extends AppCompatActivity {
     private void addToDatabase(String name, String half, String full) {
         DishInfo info = new DishInfo(name,half,full);
         try {
-            dish.child("Restaurants").child(dishAuth.getUid()).child("List of Dish").setValue(info);
+            dish.child("Restaurants").child(dishAuth.getUid()).child("List of Dish").child(name).setValue(info);
             Toast.makeText(this, "Dish Added Successfully", Toast.LENGTH_SHORT).show();
         }catch (Exception e){
             Toast.makeText(this, "Something went Wrong!!!!!", Toast.LENGTH_SHORT).show();

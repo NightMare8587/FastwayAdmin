@@ -1,29 +1,70 @@
 package com.example.fastwayadmin.MenuActivities;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
+import com.example.fastwayadmin.DishInfo;
+import com.example.fastwayadmin.DishView;
 import com.example.fastwayadmin.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class AllMenuDish extends AppCompatActivity {
     DatabaseReference allMenu;
     FloatingActionButton search;
     FirebaseAuth menuAuth;
     DatabaseReference menuRef;
+    RecyclerView recyclerView;
     ProgressBar loading;
+    List<String> names = new ArrayList<String>();
+    List<String> fullPrice = new ArrayList<String>();
+    List<String> halfPrice = new ArrayList<String>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_all_menu_dish);
         initialise();
+        names.clear();
+        halfPrice.clear();
+        fullPrice.clear();
+        menuRef.child(menuAuth.getUid()).child("List of Dish").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(!snapshot.exists()){
+                    Toast.makeText(AllMenuDish.this, "Empty!! Add Some Dish", Toast.LENGTH_SHORT).show();
+                    loading.setVisibility(View.INVISIBLE);
+                }else{
+                    for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                        names.add(dataSnapshot.child("name").getValue().toString());
+                        halfPrice.add(dataSnapshot.child("half").getValue().toString());
+                        fullPrice.add(dataSnapshot.child("full").getValue().toString());
+                    }
+                }
+                loading.setVisibility(View.INVISIBLE);
+                recyclerView.setAdapter(new DishView(names,fullPrice,halfPrice));
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
 
         search.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -39,5 +80,7 @@ public class AllMenuDish extends AppCompatActivity {
         loading = findViewById(R.id.loading);
         menuAuth = FirebaseAuth.getInstance();
         menuRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants");
+        recyclerView = findViewById(R.id.dishRecycler);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
     }
 }
