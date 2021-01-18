@@ -9,12 +9,15 @@ import android.widget.ProgressBar;
 
 import com.example.fastwayadmin.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 public class AllMenuDish extends AppCompatActivity {
     DatabaseReference allMenu;
     FloatingActionButton search;
+    FirebaseAuth menuAuth;
+    DatabaseReference menuRef;
     ProgressBar loading;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,5 +37,7 @@ public class AllMenuDish extends AppCompatActivity {
         allMenu = FirebaseDatabase.getInstance().getReference().getRoot();
         search = (FloatingActionButton)findViewById(R.id.floatingActionButton2);
         loading = findViewById(R.id.loading);
+        menuAuth = FirebaseAuth.getInstance();
+        menuRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants");
     }
 }

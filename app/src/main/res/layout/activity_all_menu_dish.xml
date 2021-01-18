@@ -41,4 +41,11 @@
         app:layout_constraintTop_toBottomOf="@+id/AllMenuDish"
         app:layout_constraintVertical_bias="0.369" />
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_width="414dp"
+        android:layout_height="673dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/AllMenuDish" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
