@@ -31,6 +31,7 @@ public class AllMenuDish extends AppCompatActivity {
     FirebaseAuth menuAuth;
     DatabaseReference menuRef;
     RecyclerView recyclerView;
+    String dish;
     ProgressBar loading;
     List<String> names = new ArrayList<String>();
     List<String> fullPrice = new ArrayList<String>();
@@ -43,7 +44,7 @@ public class AllMenuDish extends AppCompatActivity {
         names.clear();
         halfPrice.clear();
         fullPrice.clear();
-        menuRef.child(menuAuth.getUid()).child("List of Dish").addListenerForSingleValueEvent(new ValueEventListener() {
+        menuRef.child(menuAuth.getUid()).child("List of Dish").child(dish).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(!snapshot.exists()){
@@ -69,9 +70,13 @@ public class AllMenuDish extends AppCompatActivity {
         search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(getApplicationContext(), CreateDish.class));
+                Intent intent = new Intent(getApplicationContext(),CreateDish.class);
+                intent.putExtra("Dish",getIntent().getStringExtra("Dish"));
+                startActivity(intent);
             }
         });
+
+
     }
 
     private void initialise() {
@@ -82,5 +87,6 @@ public class AllMenuDish extends AppCompatActivity {
         menuRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants");
         recyclerView = findViewById(R.id.dishRecycler);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        dish = getIntent().getStringExtra("Dish");
     }
 }

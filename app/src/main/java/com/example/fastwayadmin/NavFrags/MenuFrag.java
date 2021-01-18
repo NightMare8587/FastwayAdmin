@@ -38,7 +38,54 @@ public class MenuFrag extends Fragment {
         mainCourse.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(getActivity(), AllMenuDish.class));
+                Intent intent = new Intent(getActivity(),AllMenuDish.class);
+                intent.putExtra("Dish","Main Course");
+                startActivity(intent);
+            }
+        });
+
+        breads.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getActivity(),AllMenuDish.class);
+                intent.putExtra("Dish","Breads");
+                startActivity(intent);
+            }
+        });
+
+        snacks.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getActivity(),AllMenuDish.class);
+                intent.putExtra("Dish","Snacks");
+                startActivity(intent);
+            }
+        });
+
+        deserts.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getActivity(),AllMenuDish.class);
+                intent.putExtra("Dish","Deserts");
+                startActivity(intent);
+            }
+        });
+
+        sweets.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getActivity(),AllMenuDish.class);
+                intent.putExtra("Dish","Sweets");
+                startActivity(intent);
+            }
+        });
+
+        drinks.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getActivity(),AllMenuDish.class);
+                intent.putExtra("Dish","Drinks");
+                startActivity(intent);
             }
         });
     }

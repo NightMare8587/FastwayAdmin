@@ -19,6 +19,7 @@ public class CreateDish extends AppCompatActivity {
     FirebaseAuth dishAuth;
     DatabaseReference dish;
     Button createDish;
+    String menuType;
     String name,half,full;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +52,7 @@ public class CreateDish extends AppCompatActivity {
     private void addToDatabase(String name, String half, String full) {
         DishInfo info = new DishInfo(name,half,full);
         try {
-            dish.child("Restaurants").child(dishAuth.getUid()).child("List of Dish").child(name).setValue(info);
+            dish.child("Restaurants").child(dishAuth.getUid()).child("List of Dish").child(menuType).child(name).setValue(info);
             Toast.makeText(this, "Dish Added Successfully", Toast.LENGTH_SHORT).show();
         }catch (Exception e){
             Toast.makeText(this, "Something went Wrong!!!!!", Toast.LENGTH_SHORT).show();
@@ -67,5 +68,6 @@ public class CreateDish extends AppCompatActivity {
         createDish = findViewById(R.id.saveDishInfo);
         dishAuth = FirebaseAuth.getInstance();
         dish = FirebaseDatabase.getInstance().getReference().getRoot();
+        menuType = getIntent().getStringExtra("Dish");
     }
 }
