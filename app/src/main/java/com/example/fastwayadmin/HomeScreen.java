@@ -13,6 +13,7 @@ import android.widget.Toast;
 import com.example.fastwayadmin.NavFrags.AccountFrag;
 import com.example.fastwayadmin.NavFrags.HomeFrag;
 import com.example.fastwayadmin.NavFrags.MenuFrag;
+import com.example.fastwayadmin.NavFrags.TablesFrag;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class HomeScreen extends AppCompatActivity {
@@ -39,6 +40,9 @@ public class HomeScreen extends AppCompatActivity {
                         break;
                     case R.id.account:
                         manager.beginTransaction().replace(R.id.homescreen, new AccountFrag()).commit();
+                        break;
+                    case R.id.tables:
+                        manager.beginTransaction().replace(R.id.homescreen,new TablesFrag()).commit();
                         break;
                 }
                 return true;

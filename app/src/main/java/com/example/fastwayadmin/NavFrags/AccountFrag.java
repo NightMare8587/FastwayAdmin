@@ -1,5 +1,6 @@
 package com.example.fastwayadmin.NavFrags;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -12,6 +13,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
@@ -99,9 +101,24 @@ public class AccountFrag extends Fragment {
         logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                accountAuth.signOut();
-                startActivity(new Intent(getActivity(), MainActivity.class));
-                Objects.requireNonNull(getActivity()).finish();
+                AlertDialog.Builder builder = new AlertDialog.Builder(Objects.requireNonNull(getActivity()));
+                builder.setTitle("Sign Out")
+                        .setMessage("Are you sure wanna sign out")
+                        .setPositiveButton("yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                accountAuth.signOut();
+                                startActivity(new Intent(getActivity(), MainActivity.class));
+                                Objects.requireNonNull(getActivity()).finish();
+                            }
+                        })
+                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialogInterface.dismiss();
+                            }
+                        }).create();
+               builder.show();
             }
         });
     }
