@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -28,6 +29,7 @@ import java.util.List;
 public class AllMenuDish extends AppCompatActivity {
     DatabaseReference allMenu;
     FloatingActionButton search;
+    SwipeRefreshLayout swipeRefreshLayout;
     FirebaseAuth menuAuth;
     DatabaseReference menuRef;
     RecyclerView recyclerView;
@@ -58,7 +60,7 @@ public class AllMenuDish extends AppCompatActivity {
                     }
                 }
                 loading.setVisibility(View.INVISIBLE);
-                recyclerView.setAdapter(new DishView(names,fullPrice,halfPrice));
+                recyclerView.setAdapter(new DishView(names,fullPrice,halfPrice,dish));
             }
 
             @Override
@@ -76,6 +78,40 @@ public class AllMenuDish extends AppCompatActivity {
             }
         });
 
+        Toast.makeText(this, "Swipe down to refresh if new dish added", Toast.LENGTH_SHORT).show();
+
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                names.clear();
+                halfPrice.clear();
+                fullPrice.clear();
+                menuRef.child(menuAuth.getUid()).child("List of Dish").child(dish).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if(!snapshot.exists()){
+                            Toast.makeText(AllMenuDish.this, "Empty!! Add Some Dish", Toast.LENGTH_SHORT).show();
+                            loading.setVisibility(View.INVISIBLE);
+                        }else{
+                            for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                                names.add(dataSnapshot.child("name").getValue().toString());
+                                halfPrice.add(dataSnapshot.child("half").getValue().toString());
+                                fullPrice.add(dataSnapshot.child("full").getValue().toString());
+                            }
+                        }
+                        loading.setVisibility(View.INVISIBLE);
+                        swipeRefreshLayout.setRefreshing(false);
+                        recyclerView.setAdapter(new DishView(names,fullPrice,halfPrice,dish));
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+
+            }
+        });
 
     }
 
@@ -88,5 +124,6 @@ public class AllMenuDish extends AppCompatActivity {
         recyclerView = findViewById(R.id.dishRecycler);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         dish = getIntent().getStringExtra("Dish");
+        swipeRefreshLayout = findViewById(R.id.swipe);
     }
 }

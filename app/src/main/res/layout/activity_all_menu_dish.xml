@@ -25,7 +25,7 @@
         android:layout_marginEnd="29dp"
         android:layout_marginBottom="29dp"
         android:clickable="true"
-        android:src="@drawable/ic_baseline_add_24"
+        app:srcCompat="@drawable/ic_baseline_add_24"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
@@ -41,12 +41,21 @@
         app:layout_constraintTop_toBottomOf="@+id/AllMenuDish"
         app:layout_constraintVertical_bias="0.369" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/dishRecycler"
-        android:layout_width="414dp"
-        android:layout_height="673dp"
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipe"
+        android:layout_width="413dp"
+        android:layout_height="674dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/AllMenuDish" />
+        app:layout_constraintTop_toBottomOf="@+id/AllMenuDish">
 
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/dishRecycler"
+            android:layout_width="414dp"
+            android:layout_height="673dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/AllMenuDish" />
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
