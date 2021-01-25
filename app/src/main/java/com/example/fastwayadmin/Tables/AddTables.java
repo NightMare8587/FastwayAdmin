@@ -35,6 +35,8 @@ import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 
+import java.util.Objects;
+
 public class AddTables extends AppCompatActivity {
 
     EditText tableNumber;
@@ -71,7 +73,8 @@ public class AddTables extends AppCompatActivity {
                     return;
                 }
                 tableClass tableClass = new tableClass(numberOfSeats.getText().toString());
-                tableRef.child("Restaurants").child(tableAuth.getUid()).child("Tables").child("Hello").setValue(tableClass)
+                tableRef.child("Restaurants").child(Objects.requireNonNull(Objects.requireNonNull(tableAuth.getCurrentUser()).getUid())).child("Tables").child(tableNumber.getText().toString())
+                        .setValue(tableClass)
                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {

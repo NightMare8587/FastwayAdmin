@@ -4,6 +4,6 @@ public class tableClass {
     public String numSeats;
 
     public tableClass(String seats){
-        seats = numSeats;
+        numSeats = seats;
     }
 }

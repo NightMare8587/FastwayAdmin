@@ -14,6 +14,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.Objects;
+
 public class CreateDish extends AppCompatActivity {
     EditText nameOfDish,halfPlate,fullPlate;
     FirebaseAuth dishAuth;
@@ -52,7 +54,7 @@ public class CreateDish extends AppCompatActivity {
     private void addToDatabase(String name, String half, String full) {
         DishInfo info = new DishInfo(name,half,full);
         try {
-            dish.child("Restaurants").child(dishAuth.getUid()).child("List of Dish").child(menuType).child(name).setValue(info);
+            dish.child("Restaurants").child(Objects.requireNonNull(dishAuth.getUid())).child("List of Dish").child(menuType).child(name).setValue(info);
             Toast.makeText(this, "Dish Added Successfully", Toast.LENGTH_SHORT).show();
         }catch (Exception e){
             Toast.makeText(this, "Something went Wrong!!!!!", Toast.LENGTH_SHORT).show();
