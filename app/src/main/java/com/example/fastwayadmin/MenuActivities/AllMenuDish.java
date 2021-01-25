@@ -12,8 +12,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.example.fastwayadmin.DishInfo;
-import com.example.fastwayadmin.DishView;
+import com.example.fastwayadmin.Dish.DishView;
 import com.example.fastwayadmin.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;

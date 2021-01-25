@@ -1,4 +1,4 @@
-package com.example.fastwayadmin;
+package com.example.fastwayadmin.Dish;
 
 public class DishInfo {
     public String name,half,full;

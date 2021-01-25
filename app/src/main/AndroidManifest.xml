@@ -19,7 +19,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
-        <activity android:name=".AddTables"></activity>
+        <activity android:name=".Tables.AddTables"></activity>
         <activity android:name=".MenuActivities.CreateDish" />
         <activity android:name=".MenuActivities.AllMenuDish" />
         <!--

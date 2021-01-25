@@ -11,7 +11,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
-import com.example.fastwayadmin.AddTables;
+import com.example.fastwayadmin.Tables.AddTables;
 import com.example.fastwayadmin.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
