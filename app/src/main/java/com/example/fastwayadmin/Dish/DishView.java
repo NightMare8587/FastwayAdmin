@@ -1,6 +1,8 @@
 package com.example.fastwayadmin.Dish;
 
 import android.content.DialogInterface;
+import android.net.Uri;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +18,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +28,7 @@ public class DishView extends RecyclerView.Adapter<DishView.DishAdapter> {
     List<String> half = new ArrayList<String>();
     FirebaseAuth auth;
     DatabaseReference ref;
+    String main = "https://pixabay.com/api/?";
     String type;
     public DishView(List<String> names,List<String> full,List<String> half,String type){
         this.fullPrice = full;
@@ -49,6 +53,16 @@ public class DishView extends RecyclerView.Adapter<DishView.DishAdapter> {
         }else{
             holder.available.setText("Half Plate Not Available");
         }
+
+//        Uri uri =  Uri.parse(main)
+//                .buildUpon()
+//                .appendQueryParameter("key","20026873-a33ddc46878d2d8c75280a432")
+//                .appendQueryParameter("q",names.get(position))
+//                .appendQueryParameter("image_type","photo")
+//                .build();
+//
+//        Log.i("info",uri.toString());
+//
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override

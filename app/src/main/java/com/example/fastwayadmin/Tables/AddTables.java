@@ -30,6 +30,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
@@ -53,6 +55,8 @@ public class AddTables extends AppCompatActivity {
     Button generateQrCode;
     FirebaseAuth tableAuth;
     DatabaseReference tableRef;
+    FirebaseStorage storage;
+    StorageReference reference;
     ImageView imageView;
     ProgressBar progressBar;
     @Override
@@ -78,6 +82,7 @@ public class AddTables extends AppCompatActivity {
                 dir.mkdirs();
                 String fileName = String.format("Table " + tableNumber.getText().toString() + ".jpg", "Table " + tableNumber.getText().toString());
                 File outFile = new File(dir, fileName);
+
                 try {
                     outStream = new FileOutputStream(outFile);
                 } catch (FileNotFoundException e) {
@@ -95,6 +100,7 @@ public class AddTables extends AppCompatActivity {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+         
 
                 Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
                 intent.setData(Uri.fromFile(outFile));
@@ -106,11 +112,11 @@ public class AddTables extends AppCompatActivity {
                 String directoryPath = android.os.Environment.getExternalStorageDirectory().toString();
 
                 try {
-                    PdfWriter.getInstance(document, new FileOutputStream(directoryPath + "/Table " + tableNumber.getText().toString() +".pdf")); //  Change pdf's name.
+                    PdfWriter.getInstance(document, new FileOutputStream(directoryPath + "/Table " + tableNumber.getText().toString() +".pdf")); //  Change pdf name.
                 } catch (DocumentException e) {
-                    e.printStackTrace();
+                    Toast.makeText(AddTables.this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                 } catch (FileNotFoundException e) {
-                    e.printStackTrace();
+                    Toast.makeText(AddTables.this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                 }
 
                 document.open();
@@ -119,9 +125,9 @@ public class AddTables extends AppCompatActivity {
                 try {
                     image = Image.getInstance(directoryPath + "/Table " + tableNumber.getText().toString() + ".jpg");
                 } catch (BadElementException e) {
-                    e.printStackTrace();
+                    Toast.makeText(AddTables.this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    Toast.makeText(AddTables.this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                 }
 
                 float scaler = ((document.getPageSize().getWidth() - document.leftMargin()
@@ -132,7 +138,7 @@ public class AddTables extends AppCompatActivity {
                 try {
                     document.add(image);
                 } catch (DocumentException e) {
-                    e.printStackTrace();
+                    Toast.makeText(AddTables.this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                 }
                 document.close();
             }
@@ -189,6 +195,7 @@ public class AddTables extends AppCompatActivity {
                 } catch (WriterException e) {
                     e.printStackTrace();
                 }
+
             }
         });
     }
@@ -231,5 +238,7 @@ public class AddTables extends AppCompatActivity {
         imageView = findViewById(R.id.img_result_qr);
         tableRef = FirebaseDatabase.getInstance().getReference().getRoot();
         progressBar = findViewById(R.id.checkBar);
+        storage = FirebaseStorage.getInstance();
+        reference = storage.getReference();
     }
 }
