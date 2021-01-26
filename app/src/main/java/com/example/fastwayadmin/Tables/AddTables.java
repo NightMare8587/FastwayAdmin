@@ -2,11 +2,15 @@ package com.example.fastwayadmin.Tables;
 
 import android.Manifest;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -22,19 +26,24 @@ import androidx.core.content.ContextCompat;
 import com.example.fastwayadmin.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
+import com.itextpdf.text.BadElementException;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Image;
+import com.itextpdf.text.pdf.PdfWriter;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Objects;
 
 public class AddTables extends AppCompatActivity {
@@ -56,6 +65,78 @@ public class AddTables extends AppCompatActivity {
                 requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},1);
             }
         }
+
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                BitmapDrawable draw = (BitmapDrawable) imageView.getDrawable();
+                Bitmap bitmap = draw.getBitmap();
+
+                FileOutputStream outStream = null;
+                File sdCard = Environment.getExternalStorageDirectory();
+                File dir = new File(sdCard.getAbsolutePath());
+                dir.mkdirs();
+                String fileName = String.format("Table " + tableNumber.getText().toString() + ".jpg", "Table " + tableNumber.getText().toString());
+                File outFile = new File(dir, fileName);
+                try {
+                    outStream = new FileOutputStream(outFile);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outStream);
+                try {
+                    assert outStream != null;
+                    outStream.flush();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    outStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+                intent.setData(Uri.fromFile(outFile));
+                sendBroadcast(intent);
+                Toast.makeText(AddTables.this, "Image and PDF saved in Root directory. Check your Internal Storage", Toast.LENGTH_SHORT).show();
+
+                Document document = new Document();
+
+                String directoryPath = android.os.Environment.getExternalStorageDirectory().toString();
+
+                try {
+                    PdfWriter.getInstance(document, new FileOutputStream(directoryPath + "/Table " + tableNumber.getText().toString() +".pdf")); //  Change pdf's name.
+                } catch (DocumentException e) {
+                    e.printStackTrace();
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+
+                document.open();
+
+                Image image = null;  // Change image's name and extension.
+                try {
+                    image = Image.getInstance(directoryPath + "/Table " + tableNumber.getText().toString() + ".jpg");
+                } catch (BadElementException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                float scaler = ((document.getPageSize().getWidth() - document.leftMargin()
+                        - document.rightMargin() - 0) / image.getWidth()) * 100; // 0 means you have no indentation. If you have any, change it.
+                image.scalePercent(scaler);
+                image.setAlignment(Image.ALIGN_CENTER | Image.ALIGN_TOP);
+
+                try {
+                    document.add(image);
+                } catch (DocumentException e) {
+                    e.printStackTrace();
+                }
+                document.close();
+            }
+        });
 
         generateQrCode.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -139,12 +220,7 @@ public class AddTables extends AppCompatActivity {
                 builder.show();
             }
         }
-        imageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
 
-            }
-        });
     }
 
     private void initialise() {
