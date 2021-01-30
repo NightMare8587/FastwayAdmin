@@ -159,7 +159,7 @@ public class AddTables extends AppCompatActivity {
                     progressBar.setVisibility(View.INVISIBLE);
                     return;
                 }
-                tableClass tableClass = new tableClass(numberOfSeats.getText().toString());
+                tableClass tableClass = new tableClass(numberOfSeats.getText().toString(),tableNumber.getText().toString());
                 tableRef.child("Restaurants").child(Objects.requireNonNull(Objects.requireNonNull(tableAuth.getCurrentUser()).getUid())).child("Tables").child(tableNumber.getText().toString())
                         .setValue(tableClass)
                         .addOnCompleteListener(new OnCompleteListener<Void>() {

@@ -1,24 +1,23 @@
 package com.example.fastwayadmin.Dish;
 
 import android.content.DialogInterface;
-import android.net.Uri;
-import android.util.Log;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.fastwayadmin.MenuActivities.EditMenu;
 import com.example.fastwayadmin.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,7 +66,10 @@ public class DishView extends RecyclerView.Adapter<DishView.DishAdapter> {
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(view.getContext(), "Item Clicked", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(view.getContext(), EditMenu.class);
+                intent.putExtra("type",type);
+                intent.putExtra("dish",names.get(position));
+                view.getContext().startActivity(intent);
             }
         });
 
@@ -101,6 +103,7 @@ public class DishView extends RecyclerView.Adapter<DishView.DishAdapter> {
         });
     }
 
+
     @Override
     public int getItemCount() {
         return names.size();
@@ -110,6 +113,7 @@ public class DishView extends RecyclerView.Adapter<DishView.DishAdapter> {
         TextView name,price,available;
         public DishAdapter(@NonNull View itemView) {
             super(itemView);
+
             name = itemView.findViewById(R.id.DishName);
             price = itemView.findViewById(R.id.pricePfDish);
             available = itemView.findViewById(R.id.availableOr);

@@ -2,8 +2,11 @@ package com.example.fastwayadmin.Tables;
 
 public class tableClass {
     public String numSeats;
-
-    public tableClass(String seats){
+    public String status;
+    public String tableNum;
+    public tableClass(String seats,String num){
         numSeats = seats;
+        status = "available";
+        tableNum = num;
     }
 }
