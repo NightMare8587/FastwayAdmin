@@ -17,6 +17,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.fastwayadmin.Info.Info;
@@ -55,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
     FirebaseAuth loginAuth;
     LocationRequest locationRequest;
     String verId;
+    TextView alreadyHaveAccount;
     PhoneAuthProvider.ForceResendingToken myToken;
     EditText fullName,emailAddress,phoneNumber,codeSent;
     CountryCodePicker ccp;
@@ -73,6 +75,12 @@ public class MainActivity extends AppCompatActivity {
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
         checkPermissions();
 
+        alreadyHaveAccount.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(getApplicationContext(),AlreadyHavAccount.class));
+            }
+        });
         if(currentUser != null){
             startActivity(new Intent(getApplicationContext(),Info.class));
             finish();
@@ -238,6 +246,7 @@ public class MainActivity extends AppCompatActivity {
         loginAuth = FirebaseAuth.getInstance();
         fullName = findViewById(R.id.nameLogin);
         emailAddress = findViewById(R.id.emailLogin);
+        alreadyHaveAccount = findViewById(R.id.alreadyHavingAccount);
         phoneNumber = findViewById(R.id.phoneNumber);
         ccp = findViewById(R.id.ccp);
         codeSent = findViewById(R.id.codeSent);

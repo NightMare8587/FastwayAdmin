@@ -19,7 +19,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
-        <activity android:name=".MenuActivities.EditMenu"></activity>
+        <activity android:name=".Login.AlreadyHavAccount"></activity>
+        <activity android:name=".MenuActivities.EditMenu" />
         <activity android:name=".Tables.AddTables" />
         <activity android:name=".MenuActivities.CreateDish" />
         <activity android:name=".MenuActivities.AllMenuDish" />
