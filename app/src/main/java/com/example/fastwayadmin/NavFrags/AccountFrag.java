@@ -111,6 +111,8 @@ public class AccountFrag extends Fragment {
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 accountRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants");
                                 accountRef.child(accountAuth.getUid()).removeValue();
+                                accountRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin");
+                                accountRef.child(accountAuth.getUid()).removeValue();
                                 accountAuth.signOut();
                                 mUser.delete();
                                 startActivity(new Intent(getActivity(), MainActivity.class));
