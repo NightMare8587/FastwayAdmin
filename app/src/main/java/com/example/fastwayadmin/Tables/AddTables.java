@@ -180,7 +180,7 @@ public class AddTables extends AppCompatActivity {
 
                 QRCodeWriter writer = new QRCodeWriter();
                 try {
-                    BitMatrix bitMatrix = writer.encode(tableNumber.getText().toString(), BarcodeFormat.QR_CODE, 512, 512);
+                    BitMatrix bitMatrix = writer.encode(tableAuth.getUid() + "," + tableNumber.getText().toString(), BarcodeFormat.QR_CODE, 512, 512);
                     int width = bitMatrix.getWidth();
                     int height = bitMatrix.getHeight();
                     Bitmap bmp = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
