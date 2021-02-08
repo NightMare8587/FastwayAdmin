@@ -145,7 +145,7 @@ public class AddTables extends AppCompatActivity {
                     Toast.makeText(AddTables.this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                 }
                 document.close();
-                reference.child(tableAuth.getUid()+"/"+tableNumber.getText().toString()+"/");
+
                 imageView.setDrawingCacheEnabled(true);
                 imageView.buildDrawingCache();
                 Bitmap map = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
@@ -153,7 +153,7 @@ public class AddTables extends AppCompatActivity {
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
                 byte[] data = baos.toByteArray();
 
-                UploadTask uploadTask = reference.putBytes(data);
+                UploadTask uploadTask = reference.child(tableAuth.getUid()+"/"+tableNumber.getText().toString()).putBytes(data);
                 uploadTask.addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception exception) {
@@ -166,7 +166,6 @@ public class AddTables extends AppCompatActivity {
                         // ...
                     }
                 });
-
             }
         });
 
