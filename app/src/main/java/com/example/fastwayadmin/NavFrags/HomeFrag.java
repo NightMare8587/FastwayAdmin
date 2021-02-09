@@ -31,8 +31,6 @@ import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
-import com.pusher.pushnotifications.PushNotifications;
 
 import java.util.Objects;
 
@@ -50,9 +48,6 @@ public class HomeFrag extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         homeBar = view.findViewById(R.id.homeFragBar);
-        FirebaseAuth auth = FirebaseAuth.getInstance();
-        PushNotifications.start(getActivity(), "1e91fe67-eb5a-4fd4-90ab-8f2178b3273d");
-        PushNotifications.addDeviceInterest(auth.getUid());
         if(ContextCompat.checkSelfPermission(Objects.requireNonNull(getActivity()),Manifest.permission.CAMERA) + ContextCompat.checkSelfPermission(getActivity(),Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
             requestPermissions(new String[]{Manifest.permission.CAMERA,Manifest.permission.ACCESS_COARSE_LOCATION},1);
         }else
