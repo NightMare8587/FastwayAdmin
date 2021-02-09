@@ -15,11 +15,14 @@ import com.example.fastwayadmin.NavFrags.HomeFrag;
 import com.example.fastwayadmin.NavFrags.MenuFrag;
 import com.example.fastwayadmin.NavFrags.TablesFrag;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 public class HomeScreen extends AppCompatActivity {
     Toolbar toolbar;
     BottomNavigationView bottomNavigationView;
     FragmentManager manager;
+    FirebaseAuth auth;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,7 +54,9 @@ public class HomeScreen extends AppCompatActivity {
     }
 
     private void initialise() {
+        auth = FirebaseAuth.getInstance();
         bottomNavigationView = (BottomNavigationView)findViewById(R.id.bottomNav);
         manager = getSupportFragmentManager();
+        FirebaseMessaging.getInstance().subscribeToTopic(auth.getUid());
     }
 }
