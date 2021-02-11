@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -20,6 +19,7 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class DishView extends RecyclerView.Adapter<DishView.DishAdapter> {
     List<String> names = new ArrayList<String>();
@@ -82,7 +82,7 @@ public class DishView extends RecyclerView.Adapter<DishView.DishAdapter> {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                auth = FirebaseAuth.getInstance();
-                               ref = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(auth.getUid());
+                               ref = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid()));
                                ref.child("List of Dish").child(type).child(names.get(position)).removeValue();
                                 fullPrice.remove(position);
                                 names.remove(position);
