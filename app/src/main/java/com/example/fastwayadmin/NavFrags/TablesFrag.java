@@ -29,6 +29,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class TablesFrag extends Fragment {
     Toolbar tableBar;
@@ -55,8 +56,9 @@ public class TablesFrag extends Fragment {
         layout = view.findViewById(R.id.tableRefreshLayout);
         table = view.findViewById(R.id.tableRecyclerView);
         table.setLayoutManager(new LinearLayoutManager(view.getContext()));
+        Toast.makeText(getActivity(), "Swipe down to refresh", Toast.LENGTH_SHORT).show();
         tableAuth = FirebaseAuth.getInstance();
-        tableRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(tableAuth.getUid()).child("Tables");
+        tableRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(tableAuth.getUid())).child("Tables");
         tableNumber.clear();
         status.clear();
         tableRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -64,7 +66,7 @@ public class TablesFrag extends Fragment {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.exists()){
                     for(DataSnapshot dataSnapshot : snapshot.getChildren()){
-                        tableNumber.add(dataSnapshot.child("tableNum").getValue().toString());
+                        tableNumber.add(Objects.requireNonNull(dataSnapshot.child("tableNum").getValue()).toString());
                         status.add(dataSnapshot.child("status").getValue().toString());
                     }
                     table.setAdapter(new TableView(tableNumber,status));
@@ -79,43 +81,35 @@ public class TablesFrag extends Fragment {
 
             }
         });
-        addTable.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(getActivity(), AddTables.class));
-            }
-        });
+        addTable.setOnClickListener(view1 -> startActivity(new Intent(getActivity(), AddTables.class)));
 
-        layout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                loading.setVisibility(View.VISIBLE);
-                tableNumber.clear();
-                status.clear();
-                tableRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if(snapshot.exists()){
-                            for(DataSnapshot dataSnapshot : snapshot.getChildren()){
-                                tableNumber.add(dataSnapshot.child("tableNum").getValue().toString());
-                                status.add(dataSnapshot.child("status").getValue().toString());
-                            }
-                            table.setAdapter(new TableView(tableNumber,status));
-                        }else{
-                            Toast.makeText(view.getContext(), "Add Some Tables!!!", Toast.LENGTH_SHORT).show();
+        layout.setOnRefreshListener(() -> {
+            loading.setVisibility(View.VISIBLE);
+            tableNumber.clear();
+            status.clear();
+            tableRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if(snapshot.exists()){
+                        for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                            tableNumber.add(Objects.requireNonNull(dataSnapshot.child("tableNum").getValue()).toString());
+                            status.add(dataSnapshot.child("status").getValue().toString());
                         }
-                        loading.setVisibility(View.INVISIBLE);
+                        table.setAdapter(new TableView(tableNumber,status));
+                    }else{
+                        Toast.makeText(view.getContext(), "Add Some Tables!!!", Toast.LENGTH_SHORT).show();
                     }
+                    loading.setVisibility(View.INVISIBLE);
+                }
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
 
-                    }
-                });
+                }
+            });
 
-                layout.setRefreshing(false);
-                loading.setVisibility(View.INVISIBLE);
-            }
+            layout.setRefreshing(false);
+            loading.setVisibility(View.INVISIBLE);
         });
     }
 }

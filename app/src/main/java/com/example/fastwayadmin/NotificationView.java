@@ -46,6 +46,7 @@ public class NotificationView extends RecyclerView.Adapter<NotificationView.Data
          super(itemView);
          title = itemView.findViewById(R.id.notiTitle);
          message = itemView.findViewById(R.id.notiMessage);
+
      }
  }
 }

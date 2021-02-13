@@ -50,8 +50,10 @@ public class NotificationActivity extends AppCompatActivity {
                         titleList.add(Objects.requireNonNull(dataSnapshot.child("title").getValue()).toString());
                         messageList.add(Objects.requireNonNull(dataSnapshot.child("message").getValue()).toString());
                     }
-                    recyclerView.setAdapter(new NotificationView(titleList,messageList));
-
+//                    recyclerView.setAdapter(new NotificationView(titleList,messageList));
+                    NotificationView notificationView = new NotificationView(titleList,messageList);
+                    recyclerView.setAdapter(notificationView);
+                    notificationView.notifyDataSetChanged();
                 }
             }
 
