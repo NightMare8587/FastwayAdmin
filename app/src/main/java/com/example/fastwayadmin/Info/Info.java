@@ -99,7 +99,7 @@ public class Info extends AppCompatActivity {
     private void createChildForRestaurant() {
         InfoRestaurant infoRestaurant = new InfoRestaurant(name,address,pin,number,nearby);
         infoRef.child("Restaurants").child(infoAuth.getUid()).setValue(infoRestaurant);
-        startActivity(new Intent(Info.this, HomeScreen.class));
+        startActivity(new Intent(Info.this, MapsActivity.class));
         finish();
     }
 
