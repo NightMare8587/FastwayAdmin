@@ -60,7 +60,6 @@ public class MainActivity extends AppCompatActivity {
     PhoneAuthProvider.ForceResendingToken myToken;
     EditText fullName,emailAddress,phoneNumber,codeSent;
     CountryCodePicker ccp;
-
     Button startVerification,verifyCode;
     DatabaseReference reference;
     String name,email,number;
