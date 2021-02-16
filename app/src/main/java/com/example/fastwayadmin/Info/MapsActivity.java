@@ -125,16 +125,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         locationRequest.setInterval(600000);
         locationRequest.setFastestInterval(600000);
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
                 .addLocationRequest(locationRequest);
-
         client = LocationServices.getFusedLocationProviderClient(this);
         client.requestLocationUpdates(locationRequest,mLocationCallback, Looper.myLooper());
-
         SettingsClient client = LocationServices.getSettingsClient(this);
         Task<LocationSettingsResponse> task = client.checkLocationSettings(builder.build());
-
         task.addOnCompleteListener(new OnCompleteListener<LocationSettingsResponse>() {
             @Override
             public void onComplete(Task<LocationSettingsResponse> task) {
@@ -142,7 +138,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     LocationSettingsResponse response = task.getResult(ApiException.class);
                     // All location settings are satisfied. The client can initialize location
                     // requests here.
-
                 } catch (ApiException exception) {
                     switch (exception.getStatusCode()) {
                         case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
