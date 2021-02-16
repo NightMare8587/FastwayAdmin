@@ -6,6 +6,8 @@ import androidx.fragment.app.FragmentActivity;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Looper;
@@ -40,6 +42,8 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
@@ -50,6 +54,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     LocationRequest locationRequest;
     EditText editText;
     ImageButton imageButton;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,6 +90,32 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             createLocationRequest();
                     }
                 });
+            }
+        });
+
+        imageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                List<Address> addressList = null;
+                if(editText.length() == 0){
+                    editText.requestFocus();
+                    editText.setError("Field can't be Empty");
+                }
+
+                String location = editText.getText().toString();
+                Geocoder geocoder = new Geocoder(getApplicationContext());
+                try {
+                    addressList = geocoder.getFromLocationName(location, 1);
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                Address address = addressList.get(0);
+                LatLng current = new LatLng(address.getLatitude(),address.getLongitude());
+                mMap.clear();
+                mMap.addMarker(new MarkerOptions().position(current).title("Current Location"));
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(current,15));
             }
         });
     }
