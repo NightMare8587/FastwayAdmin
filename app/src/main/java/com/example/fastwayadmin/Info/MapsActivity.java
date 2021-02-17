@@ -12,10 +12,12 @@ import android.location.Location;
 import android.os.Bundle;
 import android.os.Looper;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import com.example.fastwayadmin.HomeScreen;
 import com.example.fastwayadmin.Login.MainActivity;
 import com.example.fastwayadmin.R;
 import com.google.android.gms.common.api.ApiException;
@@ -41,6 +43,9 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.io.IOException;
 import java.util.List;
@@ -54,13 +59,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     LocationRequest locationRequest;
     EditText editText;
     ImageButton imageButton;
-
+    FirebaseAuth auth;
+    DatabaseReference ref;
+    Button proceed;
+    Double latitude,longitude;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+        auth = FirebaseAuth.getInstance();
+        ref = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants");
         editText = findViewById(R.id.searchRestuarantinMap);
+        proceed = findViewById(R.id.proceedToSaveLatLong);
         imageButton = findViewById(R.id.searchButtonInMap);
         locationRequest = LocationRequest.create();
         createLocationRequest();
@@ -94,6 +105,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
 
 
+        proceed.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                RestLocation restLocation = new RestLocation(String.valueOf(latitude),String.valueOf(longitude));
+                ref.child(auth.getUid()).child("location").setValue(restLocation);
+                startActivity(new Intent(getApplicationContext(), HomeScreen.class));
+                finish();
+            }
+        });
 
         imageButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -176,6 +196,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Location mLastLocation = locationResult.getLastLocation();
            if(mLastLocation != null){
                mMap.clear();
+               latitude = mLastLocation.getLatitude();
+               longitude = mLastLocation.getLongitude();
                LatLng current = new LatLng(mLastLocation.getLatitude(),mLastLocation.getLongitude());
                mMap.addMarker(new MarkerOptions().title("Current position").position(current));
                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(current,15));
@@ -201,6 +223,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onMapClick(LatLng latLng) {
                 mMap.clear();
+                latitude = latLng.latitude;
+                longitude = latLng.longitude;
                 mMap.addMarker(new MarkerOptions().title("Current Position").position(latLng));
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng,15));
             }
@@ -230,9 +254,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onSuccess(Location location) {
                 if(location != null){
-                    Toast.makeText(MapsActivity.this, "Not null", Toast.LENGTH_SHORT).show();
-                }else
-                    Toast.makeText(MapsActivity.this, "Null", Toast.LENGTH_SHORT).show();
+                    latitude = location.getLatitude();
+                    longitude = location.getLongitude();
+                }
+
             }
         });
     }

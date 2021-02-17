@@ -17,6 +17,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -56,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
     FirebaseAuth loginAuth;
     LocationRequest locationRequest;
     String verId;
+    ProgressBar wait;
     TextView alreadyHaveAccount;
     PhoneAuthProvider.ForceResendingToken myToken;
     EditText fullName,emailAddress,phoneNumber,codeSent;
@@ -86,6 +88,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         startVerification.setOnClickListener(new View.OnClickListener() {
+
             @SuppressLint("SetTextI18n")
             @Override
             public void onClick(View view) {
@@ -102,6 +105,7 @@ public class MainActivity extends AppCompatActivity {
                     phoneNumber.setError("Enter valid number");
                     return;
                 }
+                wait.setVisibility(View.VISIBLE);
                 name = fullName.getText().toString();
                 email = emailAddress.getText().toString();
                 number = ccp.getSelectedCountryCodeWithPlus() + phoneNumber.getText().toString() + "";
@@ -120,6 +124,7 @@ public class MainActivity extends AppCompatActivity {
                 if(codeSent.length() <= 5){
                     codeSent.requestFocus();
                     codeSent.setError("invalid code");
+                    wait.setVisibility(View.INVISIBLE);
                     return;
                 }
               credential = PhoneAuthProvider.getCredential(verId,codeSent.getText().toString());
@@ -130,6 +135,7 @@ public class MainActivity extends AppCompatActivity {
                             Toast.makeText(MainActivity.this, "Login Successfully", Toast.LENGTH_SHORT).show();
                             DatabaseAdmin user = new DatabaseAdmin(name,email,number);
                             reference.child("Admin").child(loginAuth.getUid()+"").setValue(user);
+                            wait.setVisibility(View.INVISIBLE);
                             startActivity(new Intent(MainActivity.this,Info.class));
                             finish();
                         }
@@ -231,6 +237,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if(task.isSuccessful()){
+                    wait.setVisibility(View.INVISIBLE);
                     Toast.makeText(MainActivity.this, "Login Successfully", Toast.LENGTH_SHORT).show();
                     DatabaseAdmin user = new DatabaseAdmin(name,email,number);
                     reference.child("Admin").child(loginAuth.getUid()+"").setValue(user);
@@ -243,6 +250,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void initialise() {
         loginAuth = FirebaseAuth.getInstance();
+        wait = findViewById(R.id.waitItsLoading);
         fullName = findViewById(R.id.nameLogin);
         emailAddress = findViewById(R.id.emailLogin);
         alreadyHaveAccount = findViewById(R.id.alreadyHavingAccount);
