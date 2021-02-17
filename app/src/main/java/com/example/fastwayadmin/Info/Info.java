@@ -60,7 +60,6 @@ public class Info extends AppCompatActivity {
            }
        });
 
-
         proceed.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
