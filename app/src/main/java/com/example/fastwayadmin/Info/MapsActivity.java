@@ -93,6 +93,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
+
+
         imageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -194,6 +196,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         client = LocationServices.getFusedLocationProviderClient(this);
+
+        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                mMap.clear();
+                mMap.addMarker(new MarkerOptions().title("Current Position").position(latLng));
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng,15));
+            }
+        });
 
         client.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
             @Override
