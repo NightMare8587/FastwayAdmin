@@ -2,22 +2,40 @@
 
 package com.example.fastwayadmin.MenuActivities;
 
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.android.volley.Request;
 import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.fastwayadmin.R;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 //import com.fatsecret.platform.services.android.Request;
 
 public class SearchYourDish extends AppCompatActivity {
-
+    List<String> names= new ArrayList<>();
+    List<String> image= new ArrayList<>();
     RecyclerView recyclerView;
     ImageButton imageButton;
     EditText editText;
@@ -35,27 +53,56 @@ public class SearchYourDish extends AppCompatActivity {
                     editText.requestFocus();
                     return;
                 }
-//                RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
-//                String URL = "https://api.spoonacular.com/recipes/search?query=" + editText.getText().toString() + "&number=30&apiKey=5a66f064be3c46a9af435708f3a56476";
-//
-//                JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, URL, null, new Response.Listener<JSONObject>() {
-//                    @Override
-//                    public void onResponse(JSONObject response) {
-//                        Log.i("info",URL);
-//                        Toast.makeText(SearchYourDish.this, URL+"", Toast.LENGTH_SHORT).show();
-//                    }
-//                }, new Response.ErrorListener() {
-//                    @Override
-//                    public void onErrorResponse(VolleyError error) {
-//                        Toast.makeText(SearchYourDish.this, "error", Toast.LENGTH_SHORT).show();
-//                    }
-//                });
 
-                String key = "e7b6015ed2d6410696ef9f3f84bbfc64";
-                String secret = "49447fef5ef94ea2b23069c6b89f4147";
-                String query = editText.getText().toString();
-                RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
+                try {
+                    final String RECIPE_BASE_URL = "https://api.edamam.com/search";
+                    final String APP_ID_PARAM = "app_id";
+                    final String APP_ID = "04c24719";
+                    final String APP_KEY_PARAM = "app_key";
+                    final String APP_KEY = "a195329edc4e34a3765c756828657bcc"; // PUT YOUR API KEY HERE !!!
+                    final String APP_INGREDIENTS_PARAM = "q";
+                    RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
+                    Uri uri = Uri.parse(RECIPE_BASE_URL).buildUpon()
+                            .appendQueryParameter(APP_INGREDIENTS_PARAM,editText.getText().toString())
+                            .appendQueryParameter(APP_ID_PARAM,APP_ID)
+                            .appendQueryParameter(APP_KEY_PARAM,APP_KEY).build();
 
+                    URL url = new URL(uri.toString());
+                    Log.i("info",url.toString());
+
+                    JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url.toString(), null, new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                           Log.i("info", String.valueOf(response.names()));
+                            try {
+                                JSONArray jsonObject = response.getJSONArray("hits");
+                                Log.i("info", String.valueOf(jsonObject.length()));
+                                for(int i=0;i<jsonObject.length();i++){
+                                    JSONObject object = jsonObject.getJSONObject(i);
+                                    JSONObject object1 = object.getJSONObject("recipe");
+                                    Log.i("dish",object1.getString("label"));
+                                    names.add(object1.getString("label"));
+                                    image.add(object1.getString("image"));
+                                }
+
+                                recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+                                recyclerView.setAdapter(new DisplayDish(names,image));
+
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+
+                        }
+                    });
+
+                    requestQueue.add(jsonObjectRequest);
+                }catch (Exception e){
+
+                }
 
             }
         });
