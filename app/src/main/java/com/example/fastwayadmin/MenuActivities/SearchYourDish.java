@@ -75,6 +75,8 @@ public class SearchYourDish extends AppCompatActivity {
                         public void onResponse(JSONObject response) {
                            Log.i("info", String.valueOf(response.names()));
                             try {
+                                names.clear();
+                                image.clear();
                                 JSONArray jsonObject = response.getJSONArray("hits");
                                 Log.i("info", String.valueOf(jsonObject.length()));
                                 for(int i=0;i<jsonObject.length();i++){
