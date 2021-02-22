@@ -117,9 +117,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         proceed.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ref = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants");
-                RestLocation restLocation = new RestLocation(String.valueOf(latitude),String.valueOf(longitude));
-                ref.child(Objects.requireNonNull(auth.getUid())).child("location").setValue(restLocation);
                 startActivity(new Intent(getApplicationContext(), HomeScreen.class));
                 finish();
             }
