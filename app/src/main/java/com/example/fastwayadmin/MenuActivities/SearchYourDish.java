@@ -8,6 +8,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -36,6 +38,7 @@ import java.util.List;
 public class SearchYourDish extends AppCompatActivity {
     List<String> names= new ArrayList<>();
     List<String> image= new ArrayList<>();
+    ProgressBar progressBar;
     RecyclerView recyclerView;
     ImageButton imageButton;
     EditText editText;
@@ -55,6 +58,7 @@ public class SearchYourDish extends AppCompatActivity {
                 }
 
                 try {
+                    progressBar.setVisibility(View.VISIBLE);
                     final String RECIPE_BASE_URL = "https://api.edamam.com/search";
                     final String APP_ID_PARAM = "app_id";
                     final String APP_ID = "04c24719";
@@ -87,23 +91,26 @@ public class SearchYourDish extends AppCompatActivity {
                                     image.add(object1.getString("image"));
                                 }
 
+                                progressBar.setVisibility(View.INVISIBLE);
                                 recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
                                 recyclerView.setAdapter(new DisplayDish(names,image));
 
                             } catch (JSONException e) {
-                                e.printStackTrace();
+                                Toast.makeText(SearchYourDish.this, e.getLocalizedMessage()+"", Toast.LENGTH_SHORT).show();
                             }
                         }
                     }, new Response.ErrorListener() {
                         @Override
                         public void onErrorResponse(VolleyError error) {
-
+                            progressBar.setVisibility(View.INVISIBLE);
+                            Toast.makeText(SearchYourDish.this, error.getLocalizedMessage()+"", Toast.LENGTH_SHORT).show();
                         }
                     });
 
                     requestQueue.add(jsonObjectRequest);
                 }catch (Exception e){
-
+                    progressBar.setVisibility(View.INVISIBLE);
+                    Toast.makeText(SearchYourDish.this, e.getLocalizedMessage()+"", Toast.LENGTH_SHORT).show();
                 }
 
             }
@@ -118,5 +125,6 @@ public class SearchYourDish extends AppCompatActivity {
         recyclerView = findViewById(R.id.searchActivityRecyclerView);
         imageButton = findViewById(R.id.searchDatabaseButton);
         editText = findViewById(R.id.DishNameToSearch);
+        progressBar = findViewById(R.id.searchDishLoading);
     }
 }

@@ -36,6 +36,7 @@ public class DisplayDish extends RecyclerView.Adapter<DisplayDish.Adapter> {
 
     @Override
     public void onBindViewHolder(@NonNull Adapter holder, int position) {
+        
         holder.name.setText(names.get(position));
         Picasso.get().load(image.get(position)).centerCrop().resize(100,100).into(holder.imageView);
     }
