@@ -33,6 +33,7 @@ public class DisplayDish extends RecyclerView.Adapter<DisplayDish.Adapter> {
     List<String> image = new ArrayList<>();
     FirebaseAuth auth;
     DatabaseReference reference;
+    AlertDialog dialog;
 
     public DisplayDish(List<String> names,List<String> image){
         this.image = image;
@@ -85,14 +86,16 @@ public class DisplayDish extends RecyclerView.Adapter<DisplayDish.Adapter> {
                         String type = preferences.getString("Type","");
                         CreateDishClass createDishClass = new CreateDishClass(holder.name.getText().toString(),image.get(position),halfPlate.getText().toString(),fullPlate.getText().toString());
                         reference.child("List of Dish").child(type).child(holder.name.getText().toString()).setValue(createDishClass);
-                        Toast.makeText(context, "Dish added Successfully. Click anywhere to exit", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, "Dish added Successfully", Toast.LENGTH_SHORT).show();
+                        dialog.dismiss();
                     }
                 });
 
                 builder.setView(linearLayout);
-                builder.create();
+                dialog = builder.create();
                 builder.setCancelable(true);
                 builder.show();
+
             }
         });
     }
