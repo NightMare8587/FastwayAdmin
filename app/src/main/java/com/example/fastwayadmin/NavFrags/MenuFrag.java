@@ -1,6 +1,8 @@
 package com.example.fastwayadmin.NavFrags;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,6 +40,10 @@ public class MenuFrag extends Fragment {
         mainCourse.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                SharedPreferences preferences = view.getContext().getSharedPreferences("DishType", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = preferences.edit();
+                editor.putString("Type","Main Course");
+                editor.apply();
                 Intent intent = new Intent(getActivity(),AllMenuDish.class);
                 intent.putExtra("Dish","Main Course");
                 startActivity(intent);
@@ -47,6 +53,10 @@ public class MenuFrag extends Fragment {
         breads.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                SharedPreferences preferences = view.getContext().getSharedPreferences("DishType", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = preferences.edit();
+                editor.putString("Type","Breads");
+                editor.apply();
                 Intent intent = new Intent(getActivity(),AllMenuDish.class);
                 intent.putExtra("Dish","Breads");
                 startActivity(intent);
@@ -56,6 +66,10 @@ public class MenuFrag extends Fragment {
         snacks.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                SharedPreferences preferences = view.getContext().getSharedPreferences("DishType", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = preferences.edit();
+                editor.putString("Type","Snacks");
+                editor.apply();
                 Intent intent = new Intent(getActivity(),AllMenuDish.class);
                 intent.putExtra("Dish","Snacks");
                 startActivity(intent);
@@ -65,6 +79,10 @@ public class MenuFrag extends Fragment {
         deserts.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                SharedPreferences preferences = view.getContext().getSharedPreferences("DishType", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = preferences.edit();
+                editor.putString("Type","Deserts");
+                editor.apply();
                 Intent intent = new Intent(getActivity(),AllMenuDish.class);
                 intent.putExtra("Dish","Deserts");
                 startActivity(intent);
@@ -74,6 +92,10 @@ public class MenuFrag extends Fragment {
         sweets.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                SharedPreferences preferences = view.getContext().getSharedPreferences("DishType", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = preferences.edit();
+                editor.putString("Type","Sweets");
+                editor.apply();
                 Intent intent = new Intent(getActivity(),AllMenuDish.class);
                 intent.putExtra("Dish","Sweets");
                 startActivity(intent);
@@ -83,6 +105,10 @@ public class MenuFrag extends Fragment {
         drinks.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                SharedPreferences preferences = view.getContext().getSharedPreferences("DishType", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = preferences.edit();
+                editor.putString("Type","Drinks");
+                editor.apply();
                 Intent intent = new Intent(getActivity(),AllMenuDish.class);
                 intent.putExtra("Dish","Drinks");
                 startActivity(intent);

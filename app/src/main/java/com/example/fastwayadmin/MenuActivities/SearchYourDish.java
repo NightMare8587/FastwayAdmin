@@ -36,7 +36,7 @@ import java.util.List;
 //import com.fatsecret.platform.services.android.Request;
 
 public class SearchYourDish extends AppCompatActivity {
-    List<String> names= new ArrayList<>();
+    List<String> names  = new ArrayList<>();
     List<String> image= new ArrayList<>();
     ProgressBar progressBar;
     RecyclerView recyclerView;
