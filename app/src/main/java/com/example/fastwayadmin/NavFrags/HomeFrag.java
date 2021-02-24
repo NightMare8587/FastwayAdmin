@@ -33,13 +33,19 @@ import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.onesignal.OneSignal;
+import com.pusher.pushnotifications.PushNotifications;
 
 import java.util.Objects;
 
 public class HomeFrag extends Fragment {
     Toolbar homeBar;
+    FirebaseAuth auth;
     LocationRequest locationRequest;
     ImageButton notificationButton;
+    private static final String ONESIGNAL_APP_ID = "ab2fe89e-f096-4627-abaa-6254d40ae5a6";
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -50,12 +56,13 @@ public class HomeFrag extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         homeBar = view.findViewById(R.id.homeFragBar);
+        auth = FirebaseAuth.getInstance();
+        FirebaseMessaging.getInstance().subscribeToTopic(auth.getUid());
         notificationButton = view.findViewById(R.id.notificationButton);
         notificationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(getActivity(), NotificationActivity.class));
-
             }
         });
         if(ContextCompat.checkSelfPermission(Objects.requireNonNull(getActivity()),Manifest.permission.CAMERA) + ContextCompat.checkSelfPermission(getActivity(),Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){

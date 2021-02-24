@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 
 import com.example.fastwayadmin.Login.MainActivity;
+import com.example.fastwayadmin.NavFrags.HomeFrag;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -35,6 +36,7 @@ public class FirebaseNotification extends FirebaseMessagingService {
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
         if (remoteMessage.getNotification() != null) {
+
             // Since the notification is received directly from
             // FCM, the title and the body can be fetched
             // directly as below.
