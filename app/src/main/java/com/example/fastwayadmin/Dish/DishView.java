@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -16,6 +17,7 @@ import com.example.fastwayadmin.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,15 +27,17 @@ public class DishView extends RecyclerView.Adapter<DishView.DishAdapter> {
     List<String> names = new ArrayList<String>();
     List<String> fullPrice = new ArrayList<String>();
     List<String> half = new ArrayList<String>();
+    List<String> image = new ArrayList<>();
     FirebaseAuth auth;
     DatabaseReference ref;
     String main = "https://pixabay.com/api/?";
     String type;
-    public DishView(List<String> names,List<String> full,List<String> half,String type){
+    public DishView(List<String> names,List<String> full,List<String> half,String type,List<String> image){
         this.fullPrice = full;
         this.half = half;
         this.names = names;
         this.type = type;
+        this.image = image;
     }
     @NonNull
     @Override
@@ -47,6 +51,7 @@ public class DishView extends RecyclerView.Adapter<DishView.DishAdapter> {
     public void onBindViewHolder(@NonNull DishAdapter holder, int position) {
         holder.name.setText(names.get(position));
         holder.price.setText(fullPrice.get(position));
+        Picasso.get().load(image.get(position)).centerCrop().resize(100,100).into(holder.imageView);
         if(!half.get(position).isEmpty()){
             holder.available.setText("Half Plate Available");
         }else{
@@ -111,9 +116,11 @@ public class DishView extends RecyclerView.Adapter<DishView.DishAdapter> {
 
     public static class DishAdapter extends RecyclerView.ViewHolder {
         TextView name,price,available;
+        ImageView imageView;
+
         public DishAdapter(@NonNull View itemView) {
             super(itemView);
-
+            imageView = itemView.findViewById(R.id.displayDishImage);
             name = itemView.findViewById(R.id.DishName);
             price = itemView.findViewById(R.id.pricePfDish);
             available = itemView.findViewById(R.id.availableOr);

@@ -36,6 +36,7 @@ public class AllMenuDish extends AppCompatActivity {
     String dish;
     ProgressBar loading;
     List<String> names = new ArrayList<String>();
+    List<String> image = new ArrayList<>();
     List<String> fullPrice = new ArrayList<String>();
     List<String> halfPrice = new ArrayList<String>();
     @Override
@@ -45,6 +46,7 @@ public class AllMenuDish extends AppCompatActivity {
         initialise();
         names.clear();
         halfPrice.clear();
+        image.clear();
         fullPrice.clear();
         menuRef.child(Objects.requireNonNull(menuAuth.getUid())).child("List of Dish").child(dish).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -57,10 +59,11 @@ public class AllMenuDish extends AppCompatActivity {
                         names.add(dataSnapshot.child("name").getValue().toString());
                         halfPrice.add(dataSnapshot.child("half").getValue().toString());
                         fullPrice.add(dataSnapshot.child("full").getValue().toString());
+                        image.add(dataSnapshot.child("image").getValue().toString());
                     }
                 }
                 loading.setVisibility(View.INVISIBLE);
-                recyclerView.setAdapter(new DishView(names,fullPrice,halfPrice,dish));
+                recyclerView.setAdapter(new DishView(names,fullPrice,halfPrice,dish,image));
             }
 
             @Override
@@ -86,6 +89,7 @@ public class AllMenuDish extends AppCompatActivity {
                 names.clear();
                 halfPrice.clear();
                 fullPrice.clear();
+                image.clear();
                 menuRef.child(menuAuth.getUid()).child("List of Dish").child(dish).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -97,11 +101,12 @@ public class AllMenuDish extends AppCompatActivity {
                                 names.add(dataSnapshot.child("name").getValue().toString());
                                 halfPrice.add(dataSnapshot.child("half").getValue().toString());
                                 fullPrice.add(dataSnapshot.child("full").getValue().toString());
+                                image.add(dataSnapshot.child("image").getValue().toString());
                             }
                         }
                         loading.setVisibility(View.INVISIBLE);
                         swipeRefreshLayout.setRefreshing(false);
-                        recyclerView.setAdapter(new DishView(names,fullPrice,halfPrice,dish));
+                        recyclerView.setAdapter(new DishView(names,fullPrice,halfPrice,dish,image));
                     }
 
                     @Override

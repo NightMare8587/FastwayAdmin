@@ -35,8 +35,6 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.messaging.FirebaseMessaging;
-import com.onesignal.OneSignal;
-import com.pusher.pushnotifications.PushNotifications;
 
 import java.util.Objects;
 
@@ -45,7 +43,7 @@ public class HomeFrag extends Fragment {
     FirebaseAuth auth;
     LocationRequest locationRequest;
     ImageButton notificationButton;
-    private static final String ONESIGNAL_APP_ID = "ab2fe89e-f096-4627-abaa-6254d40ae5a6";
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {

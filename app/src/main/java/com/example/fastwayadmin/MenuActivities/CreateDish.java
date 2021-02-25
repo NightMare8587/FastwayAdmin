@@ -1,8 +1,15 @@
 package com.example.fastwayadmin.MenuActivities;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
+import android.Manifest;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
@@ -23,7 +30,7 @@ public class CreateDish extends AppCompatActivity {
     EditText nameOfDish,halfPlate,fullPlate;
     FirebaseAuth dishAuth;
     DatabaseReference dish;
-    Button createDish;
+    Button createDish,chooseImage;
     FloatingActionButton floatingActionButton;
     String menuType;
     String name,half,full;
@@ -43,6 +50,16 @@ public class CreateDish extends AppCompatActivity {
                 startActivity(new Intent(getApplicationContext(),SearchYourDish.class));
             }
         });
+
+        chooseImage.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.M)
+            @Override
+            public void onClick(View view) {
+                CheckPermission();
+//               showDialogBox();
+            }
+        });
+
         createDish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -65,6 +82,38 @@ public class CreateDish extends AppCompatActivity {
         });
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    private void CheckPermission() {
+        if(ContextCompat.checkSelfPermission(CreateDish.this, Manifest.permission.CAMERA) + ContextCompat.checkSelfPermission(CreateDish.this
+        ,Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+            requestPermissions(new String[]{Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE},1);
+        }else
+            showDialogBox();
+    }
+
+    private void showDialogBox() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Choose Image").setMessage("Select Any One Option")
+                .setPositiveButton("Search Online", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+                }).setNegativeButton("Take Photo", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+            }
+        }).setNeutralButton("Choose From Storage", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+            }
+        }).create();
+
+        builder.show();
+    }
+
     private void addToDatabase(String name, String half, String full) {
         DishInfo info = new DishInfo(name,half,full);
         try {
@@ -77,6 +126,19 @@ public class CreateDish extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(requestCode == 1){
+            if(grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                Toast.makeText(this, "Permission Granted", Toast.LENGTH_SHORT).show();
+                showDialogBox();
+            }else{
+                Toast.makeText(this, "Permission Denied", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
     private void initialise() {
         nameOfDish = findViewById(R.id.dishName);
         halfPlate = findViewById(R.id.halfPlatePrice);
@@ -86,5 +148,6 @@ public class CreateDish extends AppCompatActivity {
         dishAuth = FirebaseAuth.getInstance();
         dish = FirebaseDatabase.getInstance().getReference().getRoot();
         menuType = getIntent().getStringExtra("Dish");
+        chooseImage = findViewById(R.id.chooseImageForFood);
     }
 }
