@@ -23,10 +23,14 @@ import android.widget.Toast;
 
 import com.example.fastwayadmin.Dish.DishInfo;
 import com.example.fastwayadmin.R;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,10 +40,12 @@ public class CreateDish extends AppCompatActivity {
     EditText nameOfDish,halfPlate,fullPlate;
     FirebaseAuth dishAuth;
     DatabaseReference dish;
+    StorageReference storageReference;
     Button createDish,chooseImage;
     FloatingActionButton floatingActionButton;
     String menuType;
     String name,half,full;
+    Uri imageUri = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -111,13 +117,7 @@ public class CreateDish extends AppCompatActivity {
                 Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE); //IMAGE CAPTURE CODE
                 startActivityForResult(intent, 0);
             }
-        }).setNeutralButton("Choose From Storage", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-
-            }
         }).create();
-
         builder.show();
     }
 
@@ -152,7 +152,21 @@ public class CreateDish extends AppCompatActivity {
 
         if (requestCode == 0 && resultCode == RESULT_OK) {
             Toast.makeText(this, "Done", Toast.LENGTH_SHORT).show();
+            imageUri = data.getData();
+            startPostingImage(imageUri);
         }
+    }
+
+    private void startPostingImage(Uri imageUri) {
+        storageReference.child(dishAuth.getUid());
+        storageReference.putFile(imageUri).addOnSuccessListener(this, new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                Toast.makeText(CreateDish.this, "Uploaded", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
     }
 
     private void initialise() {
@@ -165,5 +179,6 @@ public class CreateDish extends AppCompatActivity {
         dish = FirebaseDatabase.getInstance().getReference().getRoot();
         menuType = getIntent().getStringExtra("Dish");
         chooseImage = findViewById(R.id.chooseImageForFood);
+        storageReference = FirebaseStorage.getInstance().getReference();
     }
 }
