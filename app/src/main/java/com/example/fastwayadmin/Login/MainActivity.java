@@ -30,6 +30,11 @@ import com.example.fastwayadmin.R;
 //import com.google.android.gms.location.LocationSettingsRequest;
 //import com.google.android.gms.location.LocationSettingsResponse;
 //import com.google.android.gms.location.SettingsClient;
+import com.github.ybq.android.spinkit.SpinKitView;
+import com.github.ybq.android.spinkit.sprite.Sprite;
+import com.github.ybq.android.spinkit.style.DoubleBounce;
+import com.github.ybq.android.spinkit.style.RotatingPlane;
+import com.github.ybq.android.spinkit.style.Wave;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.LocationRequest;
@@ -59,8 +64,8 @@ public class MainActivity extends AppCompatActivity {
     FirebaseAuth loginAuth;
     LocationRequest locationRequest;
     String verId;
-    ProgressBar wait;
-    TextView alreadyHaveAccount;
+//    ProgressBar wait;
+    SpinKitView spinKitView;
     PhoneAuthProvider.ForceResendingToken myToken;
     EditText fullName,emailAddress,phoneNumber,codeSent;
     CountryCodePicker ccp;
@@ -70,24 +75,23 @@ public class MainActivity extends AppCompatActivity {
     PhoneAuthCredential credential;
     FirebaseUser currentUser;
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initialise();
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        Sprite bounce = new Wave();
+        spinKitView.setColor(R.color.teal_200);
+        spinKitView.setIndeterminateDrawable(bounce);
+
         checkPermissions();
 
-        alreadyHaveAccount.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(getApplicationContext(),AlreadyHavAccount.class));
-            }
-        });
-        if(currentUser != null){
-            startActivity(new Intent(getApplicationContext(),Info.class));
-            finish();
-        }
+//        if(currentUser != null){
+//            startActivity(new Intent(getApplicationContext(),Info.class));
+//            finish();
+//        }
 
         startVerification.setOnClickListener(new View.OnClickListener() {
 
@@ -107,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
                     phoneNumber.setError("Enter valid number");
                     return;
                 }
-                wait.setVisibility(View.VISIBLE);
+//                wait.setVisibility(View.VISIBLE);
                 name = fullName.getText().toString();
                 email = emailAddress.getText().toString();
                 number = ccp.getSelectedCountryCodeWithPlus() + phoneNumber.getText().toString() + "";
@@ -126,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
                 if(codeSent.length() <= 5){
                     codeSent.requestFocus();
                     codeSent.setError("invalid code");
-                    wait.setVisibility(View.INVISIBLE);
+//                    wait.setVisibility(View.INVISIBLE);
                     return;
                 }
               credential = PhoneAuthProvider.getCredential(verId,codeSent.getText().toString());
@@ -137,7 +141,7 @@ public class MainActivity extends AppCompatActivity {
                             Toast.makeText(MainActivity.this, "Login Successfully", Toast.LENGTH_SHORT).show();
                             DatabaseAdmin user = new DatabaseAdmin(name,email,number);
                             reference.child("Admin").child(loginAuth.getUid()+"").setValue(user);
-                            wait.setVisibility(View.INVISIBLE);
+//                            wait.setVisibility(View.INVISIBLE);
                             startActivity(new Intent(MainActivity.this,Info.class));
                             finish();
                         }
@@ -243,7 +247,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if(task.isSuccessful()){
-                    wait.setVisibility(View.INVISIBLE);
+//                    wait.setVisibility(View.INVISIBLE);
                     Toast.makeText(MainActivity.this, "Login Successfully", Toast.LENGTH_SHORT).show();
                     DatabaseAdmin user = new DatabaseAdmin(name,email,number);
                     reference.child("Admin").child(loginAuth.getUid()+"").setValue(user);
@@ -256,12 +260,12 @@ public class MainActivity extends AppCompatActivity {
 
     private void initialise() {
         loginAuth = FirebaseAuth.getInstance();
-        wait = findViewById(R.id.waitItsLoading);
+//        wait = findViewById(R.id.waitItsLoading);
         fullName = findViewById(R.id.nameLogin);
         emailAddress = findViewById(R.id.emailLogin);
-        alreadyHaveAccount = findViewById(R.id.alreadyHavingAccount);
         phoneNumber = findViewById(R.id.phoneNumber);
         ccp = findViewById(R.id.ccp);
+        spinKitView = findViewById(R.id.spinKit);
         codeSent = findViewById(R.id.codeSent);
         startVerification = findViewById(R.id.startVerification);
         verifyCode = findViewById(R.id.verifyVerification);
