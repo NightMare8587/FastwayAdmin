@@ -17,6 +17,8 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -63,9 +65,11 @@ public class MainActivity extends AppCompatActivity {
 
     FirebaseAuth loginAuth;
     LocationRequest locationRequest;
+    protected boolean isProgressShowing = false;
     String verId;
+    ViewGroup group;
 //    ProgressBar wait;
-    SpinKitView spinKitView;
+//    SpinKitView spinKitView;
     PhoneAuthProvider.ForceResendingToken myToken;
     EditText fullName,emailAddress,phoneNumber,codeSent;
     CountryCodePicker ccp;
@@ -82,16 +86,16 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         initialise();
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
-        Sprite bounce = new Wave();
-        spinKitView.setColor(R.color.teal_200);
-        spinKitView.setIndeterminateDrawable(bounce);
-
+//        Sprite bounce = new Wave();
+//        spinKitView.setColor(R.color.teal_200);
+//        spinKitView.setIndeterminateDrawable(bounce);
         checkPermissions();
 
-//        if(currentUser != null){
-//            startActivity(new Intent(getApplicationContext(),Info.class));
-//            finish();
-//        }
+
+        if(currentUser != null){
+            startActivity(new Intent(getApplicationContext(),Info.class));
+            finish();
+        }
 
         startVerification.setOnClickListener(new View.OnClickListener() {
 
@@ -111,6 +115,7 @@ public class MainActivity extends AppCompatActivity {
                     phoneNumber.setError("Enter valid number");
                     return;
                 }
+                showProgress();
 //                wait.setVisibility(View.VISIBLE);
                 name = fullName.getText().toString();
                 email = emailAddress.getText().toString();
@@ -141,6 +146,7 @@ public class MainActivity extends AppCompatActivity {
                             Toast.makeText(MainActivity.this, "Login Successfully", Toast.LENGTH_SHORT).show();
                             DatabaseAdmin user = new DatabaseAdmin(name,email,number);
                             reference.child("Admin").child(loginAuth.getUid()+"").setValue(user);
+                            hideProgress();
 //                            wait.setVisibility(View.INVISIBLE);
                             startActivity(new Intent(MainActivity.this,Info.class));
                             finish();
@@ -149,6 +155,22 @@ public class MainActivity extends AppCompatActivity {
                 });
             }
         });
+    }
+
+    private void hideProgress() {
+
+        View v = this.findViewById(android.R.id.content).getRootView();
+        ViewGroup viewGroup = (ViewGroup) v;
+        viewGroup.removeView(group);
+        isProgressShowing = false;
+    }
+
+    private void showProgress() {
+        isProgressShowing = true;
+        group = (ViewGroup) getLayoutInflater().inflate(R.layout.progress_layour,null);
+        View v = this.findViewById(android.R.id.content).getRootView();
+        ViewGroup viewGroup = (ViewGroup) v;
+        viewGroup.addView(group);
     }
 
     private void createLocationRequest() {
@@ -228,6 +250,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onVerificationFailed(@NonNull FirebaseException e) {
                         Toast.makeText(MainActivity.this, e.getLocalizedMessage()+"", Toast.LENGTH_SHORT).show();
+                        hideProgress();
                         verifyCode.setVisibility(View.INVISIBLE);
                         startVerification.setVisibility(View.VISIBLE);
                     }
@@ -247,6 +270,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if(task.isSuccessful()){
+                    hideProgress();
 //                    wait.setVisibility(View.INVISIBLE);
                     Toast.makeText(MainActivity.this, "Login Successfully", Toast.LENGTH_SHORT).show();
                     DatabaseAdmin user = new DatabaseAdmin(name,email,number);
@@ -265,7 +289,7 @@ public class MainActivity extends AppCompatActivity {
         emailAddress = findViewById(R.id.emailLogin);
         phoneNumber = findViewById(R.id.phoneNumber);
         ccp = findViewById(R.id.ccp);
-        spinKitView = findViewById(R.id.spinKit);
+//        spinKitView = findViewById(R.id.spinKit);
         codeSent = findViewById(R.id.codeSent);
         startVerification = findViewById(R.id.startVerification);
         verifyCode = findViewById(R.id.verifyVerification);

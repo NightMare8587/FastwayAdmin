@@ -1,23 +1,17 @@
 package com.example.fastwayadmin.Info;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ProgressBar;
-import android.widget.Toast;
 
-import com.example.fastwayadmin.GetLocation;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.example.fastwayadmin.HomeScreen;
 import com.example.fastwayadmin.R;
-import com.google.android.gms.maps.MapView;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -32,27 +26,31 @@ public class Info extends AppCompatActivity {
 
     EditText nameOfRestaurant,AddressOfRestaurant,nearbyPlace,pinCode,contactNumber;
     Button proceed;
+    ViewGroup group;
+    protected boolean isProgressShowing = false;
     CountryCodePicker codePicker;
     FirebaseAuth infoAuth;
     DatabaseReference infoRef;
     String name,address,nearby,pin,number;
-    ProgressBar progressBar;
+//    ProgressBar progressBar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_info);
         initialise();
+        showProgress();
 
         infoRef.child("Restaurants").addListenerForSingleValueEvent(new ValueEventListener() {
            @Override
            public void onDataChange(@NonNull DataSnapshot snapshot) {
                if(snapshot.child(Objects.requireNonNull(infoAuth.getUid())).exists()){
-                   progressBar.setVisibility(View.INVISIBLE);
+//                   progressBar.setVisibility(View.INVISIBLE);
+                   hideProgress();
                    startActivity(new Intent(Info.this, HomeScreen.class));
                    finish();
                }
 
-               progressBar.setVisibility(View.INVISIBLE);
+//               progressBar.setVisibility(View.INVISIBLE);
            }
            @Override
            public void onCancelled(@NonNull DatabaseError error) {
@@ -95,9 +93,24 @@ public class Info extends AppCompatActivity {
         });
     }
 
+    private void hideProgress() {
+        View v = this.findViewById(android.R.id.content).getRootView();
+        ViewGroup viewGroup = (ViewGroup) v;
+        viewGroup.removeView(group);
+        isProgressShowing = false;
+    }
+
+    private void showProgress() {
+        isProgressShowing = true;
+        group = (ViewGroup) getLayoutInflater().inflate(R.layout.progress_layour,null);
+        View v = this.findViewById(android.R.id.content).getRootView();
+        ViewGroup viewGroup = (ViewGroup) v;
+        viewGroup.addView(group);
+    }
+
     private void createChildForRestaurant() {
         InfoRestaurant infoRestaurant = new InfoRestaurant(name,address,pin,number,nearby);
-        infoRef.child("Restaurants").child(infoAuth.getUid()).setValue(infoRestaurant);
+        infoRef.child("Restaurants").child(Objects.requireNonNull(infoAuth.getUid())).setValue(infoRestaurant);
         startActivity(new Intent(Info.this, MapsActivity.class));
         finish();
     }
@@ -112,6 +125,6 @@ public class Info extends AppCompatActivity {
         proceed = findViewById(R.id.proceed);
         codePicker = findViewById(R.id.codePicker);
         contactNumber = findViewById(R.id.contactNumber);
-        progressBar = findViewById(R.id.progressBar);
+//        progressBar = findViewById(R.id.progressBar);
     }
 }

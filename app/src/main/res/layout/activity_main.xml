@@ -123,17 +123,6 @@
 <!--        app:layout_constraintTop_toTopOf="parent"-->
 <!--        app:layout_constraintVertical_bias="0.371" />-->
 
-    <com.github.ybq.android.spinkit.SpinKitView
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:id="@+id/spinKit"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:SpinKit_Color="@color/teal_200"
-        app:layout_constraintStart_toStartOf="parent"
-        style="@style/SpinKitView.Wave"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.378" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
