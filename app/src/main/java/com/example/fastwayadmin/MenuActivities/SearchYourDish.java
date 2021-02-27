@@ -1,5 +1,3 @@
-
-
 package com.example.fastwayadmin.MenuActivities;
 
 import android.net.Uri;
