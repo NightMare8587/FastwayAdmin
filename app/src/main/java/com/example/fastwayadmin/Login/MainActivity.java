@@ -33,6 +33,8 @@ import com.google.android.gms.location.LocationSettingsStates;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseException;
 import com.google.firebase.auth.AuthResult;
@@ -43,8 +45,12 @@ import com.google.firebase.auth.PhoneAuthOptions;
 import com.google.firebase.auth.PhoneAuthProvider;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.hbb20.CountryCodePicker;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 //import com.google.android.gms.location.LocationRequest;
@@ -59,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
     LocationRequest locationRequest;
     protected boolean isProgressShowing = false;
     String verId;
+    FirebaseFirestore db =  FirebaseFirestore.getInstance();
     ViewGroup group;
 //    ProgressBar wait;
 //    SpinKitView spinKitView;
@@ -84,10 +91,11 @@ public class MainActivity extends AppCompatActivity {
         checkPermissions();
 
 
-//        if(currentUser != null){
-//            startActivity(new Intent(getApplicationContext(),Info.class));
-//            finish();
-//        }
+        if(currentUser != null){
+            startActivity(new Intent(getApplicationContext(),Info.class));
+            finish();
+        }
+
 
         startVerification.setOnClickListener(new View.OnClickListener() {
 
@@ -136,8 +144,23 @@ public class MainActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if(task.isSuccessful()){
                             Toast.makeText(MainActivity.this, "Login Successfully", Toast.LENGTH_SHORT).show();
+                            Map<String,Object> map = new HashMap<>();
+                            map.put("name",name);
+                            map.put("email",email);
                             DatabaseAdmin user = new DatabaseAdmin(name,email,number);
                             reference.child("Admin").child(loginAuth.getUid()+"").setValue(user);
+                            db.collection(loginAuth.getUid()).document("info")
+                                    .set(map).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    Toast.makeText(MainActivity.this, "Data Uploaded Successfully", Toast.LENGTH_SHORT).show();
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Toast.makeText(MainActivity.this, "Something went wrong", Toast.LENGTH_SHORT).show();
+                                }
+                            });
                             hideProgress();
 //                            wait.setVisibility(View.INVISIBLE);
                             startActivity(new Intent(MainActivity.this,Info.class));
@@ -263,9 +286,24 @@ public class MainActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if(task.isSuccessful()){
                     hideProgress();
+                    Map<String,Object> map = new HashMap<>();
+                    map.put("name",name);
+                    map.put("email",email);
 //                    wait.setVisibility(View.INVISIBLE);
                     Toast.makeText(MainActivity.this, "Login Successfully", Toast.LENGTH_SHORT).show();
                     DatabaseAdmin user = new DatabaseAdmin(name,email,number);
+                    db.collection(Objects.requireNonNull(loginAuth.getUid())).document("info")
+                            .set(map).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Toast.makeText(MainActivity.this, "Data Uploaded Successfully", Toast.LENGTH_SHORT).show();
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Toast.makeText(MainActivity.this, e.getLocalizedMessage()+"", Toast.LENGTH_SHORT).show();
+                        }
+                    });
                     reference.child("Admin").child(loginAuth.getUid()+"").setValue(user);
                     startActivity(new Intent(MainActivity.this, Info.class));
                     finish();
