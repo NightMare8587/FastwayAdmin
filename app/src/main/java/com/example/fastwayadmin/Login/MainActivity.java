@@ -84,10 +84,10 @@ public class MainActivity extends AppCompatActivity {
         checkPermissions();
 
 
-        if(currentUser != null){
-            startActivity(new Intent(getApplicationContext(),Info.class));
-            finish();
-        }
+//        if(currentUser != null){
+//            startActivity(new Intent(getApplicationContext(),Info.class));
+//            finish();
+//        }
 
         startVerification.setOnClickListener(new View.OnClickListener() {
 
