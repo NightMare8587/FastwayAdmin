@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
@@ -21,6 +22,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import com.crowdfire.cfalertdialog.CFAlertDialog;
 import com.example.fastwayadmin.Info.Info;
 import com.example.fastwayadmin.R;
 import com.github.ybq.android.spinkit.SpinKitView;
@@ -54,6 +56,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
+import dmax.dialog.SpotsDialog;
+
 //import com.google.android.gms.location.LocationRequest;
 //import com.google.android.gms.location.LocationServices;
 //import com.google.android.gms.location.LocationSettingsRequest;
@@ -64,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
 
     FirebaseAuth loginAuth;
     LocationRequest locationRequest;
+    SpotsDialog.Builder alert;
     protected boolean isProgressShowing = false;
     String verId;
     FirebaseFirestore db =  FirebaseFirestore.getInstance();
@@ -114,15 +119,37 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }
 
-//                wait.setVisibility(View.VISIBLE);
-                name = fullName.getText().toString();
-                email = emailAddress.getText().toString();
-                number = ccp.getSelectedCountryCodeWithPlus() + phoneNumber.getText().toString() + "";
-                spinKitView.setVisibility(View.VISIBLE);
-                codeSent.setEnabled(true);
-                startVerification.setVisibility(View.INVISIBLE);
-                verifyCode.setVisibility(View.VISIBLE);
-                startPhoneNumberVerification(number);
+                CFAlertDialog.Builder builder = new CFAlertDialog.Builder(MainActivity.this)
+                        .setDialogStyle(CFAlertDialog.CFAlertStyle.ALERT)
+                        .setTitle("Confirmation")
+                        .setMessage("Do you wanna continue with this number " + phoneNumber.getText().toString())
+                        .addButton("Yes", Color.BLACK,Color.LTGRAY, CFAlertDialog.CFAlertActionStyle.POSITIVE, CFAlertDialog.CFAlertActionAlignment.JUSTIFIED,
+                                ((dialogInterface, i) -> {
+                                    name = fullName.getText().toString();
+                                    email = emailAddress.getText().toString();
+                                    number = ccp.getSelectedCountryCodeWithPlus() + phoneNumber.getText().toString() + "";
+                                    spinKitView.setVisibility(View.VISIBLE);
+                                    codeSent.setEnabled(true);
+                                    startVerification.setVisibility(View.INVISIBLE);
+                                    verifyCode.setVisibility(View.VISIBLE);
+                                    startPhoneNumberVerification(number);
+                                     alert = new SpotsDialog.Builder()
+                                             .setContext(MainActivity.this)
+                                             .setMessage("Verifying Number")
+                                             .setCancelable(false);
+
+                                     alert.build().show();
+
+                                    dialogInterface.dismiss();
+                                }))
+                        .addButton("No",Color.BLACK,Color.YELLOW, CFAlertDialog.CFAlertActionStyle.POSITIVE, CFAlertDialog.CFAlertActionAlignment.JUSTIFIED
+                        ,((dialogInterface, i) -> {
+                                    phoneNumber.requestFocus();
+                                    dialogInterface.dismiss();
+                                }));
+
+                builder.show();
+
             }
         });
 
