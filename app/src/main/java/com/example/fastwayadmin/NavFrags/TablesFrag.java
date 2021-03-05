@@ -36,8 +36,6 @@ import java.util.Objects;
 public class TablesFrag extends Fragment {
     Toolbar tableBar;
     FloatingActionButton addTable;
-    ViewGroup group;
-    protected boolean isProgressShowing = false;
     FirebaseAuth tableAuth;
     SwipeRefreshLayout layout;
     DatabaseReference tableRef;
@@ -55,7 +53,7 @@ public class TablesFrag extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         tableBar = view.findViewById(R.id.tableBar);
-        showProgress();
+
         addTable = view.findViewById(R.id.addTables);
         layout = view.findViewById(R.id.tableRefreshLayout);
         table = view.findViewById(R.id.tableRecyclerView);
@@ -73,7 +71,7 @@ public class TablesFrag extends Fragment {
                         tableNumber.add(Objects.requireNonNull(dataSnapshot.child("tableNum").getValue()).toString());
                         status.add(dataSnapshot.child("status").getValue().toString());
                     }
-                    hideProgress();
+
                     table.setAdapter(new TableView(tableNumber,status));
                 }else{
                     Toast.makeText(view.getContext(), "Add Some Tables!!!", Toast.LENGTH_SHORT).show();
@@ -117,18 +115,6 @@ public class TablesFrag extends Fragment {
 
         });
     }
-    private void hideProgress() {
-        View v = Objects.requireNonNull(getActivity()).findViewById(android.R.id.content).getRootView();
-        ViewGroup viewGroup = (ViewGroup) v;
-        viewGroup.removeView(group);
-        isProgressShowing = false;
-    }
 
-    private void showProgress() {
-        isProgressShowing = true;
-        group = (ViewGroup) getLayoutInflater().inflate(R.layout.progress_layour,null);
-        View v = Objects.requireNonNull(getActivity()).findViewById(android.R.id.content).getRootView();
-        ViewGroup viewGroup = (ViewGroup) v;
-        viewGroup.addView(group);
-    }
+
 }

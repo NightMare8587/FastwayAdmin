@@ -23,6 +23,7 @@ import androidx.core.content.ContextCompat;
 
 import com.example.fastwayadmin.Info.Info;
 import com.example.fastwayadmin.R;
+import com.github.ybq.android.spinkit.SpinKitView;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.LocationRequest;
@@ -68,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
     FirebaseFirestore db =  FirebaseFirestore.getInstance();
     ViewGroup group;
 //    ProgressBar wait;
-//    SpinKitView spinKitView;
+    SpinKitView spinKitView;
     PhoneAuthProvider.ForceResendingToken myToken;
     EditText fullName,emailAddress,phoneNumber,codeSent;
     CountryCodePicker ccp;
@@ -89,13 +90,10 @@ public class MainActivity extends AppCompatActivity {
 //        spinKitView.setColor(R.color.teal_200);
 //        spinKitView.setIndeterminateDrawable(bounce);
         checkPermissions();
-
-
-        if(currentUser != null){
-            startActivity(new Intent(getApplicationContext(),Info.class));
-            finish();
-        }
-
+//        if(currentUser != null){
+//            startActivity(new Intent(getApplicationContext(),Info.class));
+//            finish();
+//        }
 
         startVerification.setOnClickListener(new View.OnClickListener() {
 
@@ -115,12 +113,12 @@ public class MainActivity extends AppCompatActivity {
                     phoneNumber.setError("Enter valid number");
                     return;
                 }
-                showProgress();
+
 //                wait.setVisibility(View.VISIBLE);
                 name = fullName.getText().toString();
                 email = emailAddress.getText().toString();
                 number = ccp.getSelectedCountryCodeWithPlus() + phoneNumber.getText().toString() + "";
-
+                spinKitView.setVisibility(View.VISIBLE);
                 codeSent.setEnabled(true);
                 startVerification.setVisibility(View.INVISIBLE);
                 verifyCode.setVisibility(View.VISIBLE);
@@ -161,7 +159,7 @@ public class MainActivity extends AppCompatActivity {
                                     Toast.makeText(MainActivity.this, "Something went wrong", Toast.LENGTH_SHORT).show();
                                 }
                             });
-                            hideProgress();
+
 //                            wait.setVisibility(View.INVISIBLE);
                             startActivity(new Intent(MainActivity.this,Info.class));
                             finish();
@@ -172,21 +170,6 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void hideProgress() {
-
-        View v = this.findViewById(android.R.id.content).getRootView();
-        ViewGroup viewGroup = (ViewGroup) v;
-        viewGroup.removeView(group);
-        isProgressShowing = false;
-    }
-
-    private void showProgress() {
-        isProgressShowing = true;
-        group = (ViewGroup) getLayoutInflater().inflate(R.layout.progress_layour,null);
-        View v = this.findViewById(android.R.id.content).getRootView();
-        ViewGroup viewGroup = (ViewGroup) v;
-        viewGroup.addView(group);
-    }
 
     private void createLocationRequest() {
          locationRequest = LocationRequest.create();
@@ -258,6 +241,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onVerificationCompleted(@NonNull PhoneAuthCredential phoneAuthCredential) {
                         Toast.makeText(MainActivity.this, "Code sent", Toast.LENGTH_SHORT).show();
+                        spinKitView.setVisibility(View.INVISIBLE);
                         credential = phoneAuthCredential;
                         signInWithPhoneAuthCredentials(phoneAuthCredential);
                     }
@@ -265,7 +249,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onVerificationFailed(@NonNull FirebaseException e) {
                         Toast.makeText(MainActivity.this, e.getLocalizedMessage()+"", Toast.LENGTH_SHORT).show();
-                        hideProgress();
+                        spinKitView.setVisibility(View.INVISIBLE);
                         verifyCode.setVisibility(View.INVISIBLE);
                         startVerification.setVisibility(View.VISIBLE);
                     }
@@ -285,7 +269,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if(task.isSuccessful()){
-                    hideProgress();
+
                     Map<String,Object> map = new HashMap<>();
                     map.put("name",name);
                     map.put("email",email);
@@ -304,6 +288,7 @@ public class MainActivity extends AppCompatActivity {
                             Toast.makeText(MainActivity.this, e.getLocalizedMessage()+"", Toast.LENGTH_SHORT).show();
                         }
                     });
+
                     reference.child("Admin").child(loginAuth.getUid()+"").setValue(user);
                     startActivity(new Intent(MainActivity.this, Info.class));
                     finish();
@@ -317,6 +302,7 @@ public class MainActivity extends AppCompatActivity {
 //        wait = findViewById(R.id.waitItsLoading);
         fullName = findViewById(R.id.nameLogin);
         emailAddress = findViewById(R.id.emailLogin);
+        spinKitView = findViewById(R.id.spinKit);
         phoneNumber = findViewById(R.id.phoneNumber);
         ccp = findViewById(R.id.ccp);
 //        spinKitView = findViewById(R.id.spinKit);
@@ -324,6 +310,8 @@ public class MainActivity extends AppCompatActivity {
         startVerification = findViewById(R.id.startVerification);
         verifyCode = findViewById(R.id.verifyVerification);
         reference = FirebaseDatabase.getInstance().getReference().getRoot();
+        spinKitView.setVisibility(View.INVISIBLE);
+
     }
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {

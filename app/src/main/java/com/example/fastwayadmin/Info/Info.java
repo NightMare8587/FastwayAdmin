@@ -38,14 +38,13 @@ public class Info extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_info);
         initialise();
-        showProgress();
 
         infoRef.child("Restaurants").addListenerForSingleValueEvent(new ValueEventListener() {
            @Override
            public void onDataChange(@NonNull DataSnapshot snapshot) {
                if(snapshot.child(Objects.requireNonNull(infoAuth.getUid())).exists()){
 //                   progressBar.setVisibility(View.INVISIBLE);
-                   hideProgress();
+
                    startActivity(new Intent(Info.this, HomeScreen.class));
                    finish();
                }
@@ -93,20 +92,6 @@ public class Info extends AppCompatActivity {
         });
     }
 
-    private void hideProgress() {
-        View v = this.findViewById(android.R.id.content).getRootView();
-        ViewGroup viewGroup = (ViewGroup) v;
-        viewGroup.removeView(group);
-        isProgressShowing = false;
-    }
-
-    private void showProgress() {
-        isProgressShowing = true;
-        group = (ViewGroup) getLayoutInflater().inflate(R.layout.progress_layour,null);
-        View v = this.findViewById(android.R.id.content).getRootView();
-        ViewGroup viewGroup = (ViewGroup) v;
-        viewGroup.addView(group);
-    }
 
     private void createChildForRestaurant() {
         InfoRestaurant infoRestaurant = new InfoRestaurant(name,address,pin,number,nearby);
