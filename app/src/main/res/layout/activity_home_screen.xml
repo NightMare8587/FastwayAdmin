@@ -20,15 +20,62 @@
         app:layout_constraintTop_toTopOf="parent"
         app:title="Home" />
 
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottomNav"
-        android:layout_width="408dp"
-        android:layout_height="56dp"
-        android:background="@color/purple_200"
-        app:itemTextColor="@color/teal_700"
+
+    <com.gauravk.bubblenavigation.BubbleNavigationConstraintView
+        android:id="@+id/top_navigation_constraint"
+        android:layout_width="match_parent"
+        android:layout_height="65dp"
+        android:background="@color/white"
+        android:elevation="4dp"
+        android:backgroundTint="@color/teal_700"
+        android:padding="12dp"
+        app:bnc_mode="spread"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
-        app:layout_constraintStart_toStartOf="parent"
-        app:menu="@menu/menu" />
+        <com.gauravk.bubblenavigation.BubbleToggleView
+            android:id="@+id/homeButtonNav"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:bt_active="true"
+            app:bt_colorActive="@color/teal_200"
+            app:bt_colorInactive="@color/browser_actions_bg_grey"
+            app:bt_icon="@drawable/ic_baseline_home_24"
+            app:bt_title="Home"
+            app:bt_titlePadding="@dimen/title_padding" />
+        <com.gauravk.bubblenavigation.BubbleToggleView
+            android:id="@+id/MenuNavButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:bt_active="true"
+            app:bt_colorActive="@color/teal_200"
+            app:bt_colorInactive="@color/browser_actions_bg_grey"
+            app:bt_icon="@drawable/ic_baseline_fastfood_24"
+            app:bt_title="Menu"
+            app:bt_titlePadding="@dimen/title_padding" />
+        <com.gauravk.bubblenavigation.BubbleToggleView
+            android:id="@+id/tableNavButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:bt_active="true"
+            app:bt_colorActive="@color/teal_200"
+            app:bt_colorInactive="@color/browser_actions_bg_grey"
+            app:bt_icon="@drawable/ic_baseline_restaurant_menu_24"
+            app:bt_title="Tables"
+            app:bt_titlePadding="@dimen/title_padding" />
+        <com.gauravk.bubblenavigation.BubbleToggleView
+            android:id="@+id/infoButtonNav"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:bt_active="true"
+            app:bt_colorActive="@color/teal_200"
+            app:bt_colorInactive="@color/browser_actions_bg_grey"
+            app:bt_icon="@drawable/ic_baseline_home_24"
+            app:bt_title="Info"
+            app:bt_titlePadding="@dimen/title_padding" />
+        
+        <!-- Add more child items here - max upto 5 -->
+
+    </com.gauravk.bubblenavigation.BubbleNavigationConstraintView>
 </androidx.constraintlayout.widget.ConstraintLayout>

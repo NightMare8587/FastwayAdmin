@@ -15,13 +15,14 @@ import com.example.fastwayadmin.NavFrags.AccountFrag;
 import com.example.fastwayadmin.NavFrags.HomeFrag;
 import com.example.fastwayadmin.NavFrags.MenuFrag;
 import com.example.fastwayadmin.NavFrags.TablesFrag;
+import com.gauravk.bubblenavigation.BubbleNavigationConstraintView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 public class HomeScreen extends AppCompatActivity {
     Toolbar toolbar;
-    BottomNavigationView bottomNavigationView;
+    BubbleNavigationConstraintView bubble;
     FragmentManager manager;
     FirebaseAuth auth;
     @Override
@@ -33,47 +34,28 @@ public class HomeScreen extends AppCompatActivity {
         initialise();
 
         manager.beginTransaction().replace(R.id.homescreen,new HomeFrag()).commit();
-        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                switch (item.getItemId()){
-                    case R.id.home:
-                        manager.beginTransaction().replace(R.id.homescreen,new HomeFrag()).commit();
-                        break;
-                    case R.id.menu:
-                        manager.beginTransaction().replace(R.id.homescreen,new MenuFrag()).commit();
-                        break;
-                    case R.id.account:
-                        manager.beginTransaction().replace(R.id.homescreen, new AccountFrag()).commit();
-                        break;
-                    case R.id.tables:
-                        manager.beginTransaction().replace(R.id.homescreen,new TablesFrag()).commit();
-                        break;
-                }
-                return true;
-            }
-        });
+
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.notification,menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        int id = item.getItemId();
-
-        if(id == R.id.notification)
-            Toast.makeText(this, "Button Clicked", Toast.LENGTH_SHORT).show();
-
-        return super.onOptionsItemSelected(item);
-    }
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        getMenuInflater().inflate(R.menu.notification,menu);
+//        return true;
+//    }
+//
+//    @Override
+//    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+//        int id = item.getItemId();
+//
+//        if(id == R.id.notification)
+//            Toast.makeText(this, "Button Clicked", Toast.LENGTH_SHORT).show();
+//
+//        return super.onOptionsItemSelected(item);
+//    }
 
     private void initialise() {
         auth = FirebaseAuth.getInstance();
-        bottomNavigationView = (BottomNavigationView)findViewById(R.id.bottomNav);
+        bubble = findViewById(R.id.top_navigation_constraint);
         manager = getSupportFragmentManager();
         FirebaseMessaging.getInstance().subscribeToTopic(auth.getUid());
     }
