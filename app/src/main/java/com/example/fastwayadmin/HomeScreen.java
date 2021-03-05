@@ -40,8 +40,20 @@ public class HomeScreen extends AppCompatActivity {
         bubble.setNavigationChangeListener(new BubbleNavigationChangeListener() {
             @Override
             public void onNavigationChanged(View view, int position) {
-                if(position == 2)
-                    Toast.makeText(HomeScreen.this, "Yes", Toast.LENGTH_SHORT).show();
+                switch (position){
+                    case 0:
+                        manager.beginTransaction().replace(R.id.homescreen,new HomeFrag()).commit();
+                        break;
+                    case 1:
+                        manager.beginTransaction().replace(R.id.homescreen,new MenuFrag()).commit();
+                        break;
+                    case 2:
+                        manager.beginTransaction().replace(R.id.homescreen,new TablesFrag()).commit();
+                        break;
+                    case 3:
+                        manager.beginTransaction().replace(R.id.homescreen,new AccountFrag()).commit();
+                        break;
+                }
             }
         });
     }
