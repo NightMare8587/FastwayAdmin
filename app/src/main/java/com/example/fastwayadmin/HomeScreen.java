@@ -9,6 +9,7 @@ import androidx.fragment.app.FragmentManager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.example.fastwayadmin.NavFrags.AccountFrag;
@@ -16,6 +17,7 @@ import com.example.fastwayadmin.NavFrags.HomeFrag;
 import com.example.fastwayadmin.NavFrags.MenuFrag;
 import com.example.fastwayadmin.NavFrags.TablesFrag;
 import com.gauravk.bubblenavigation.BubbleNavigationConstraintView;
+import com.gauravk.bubblenavigation.listener.BubbleNavigationChangeListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -35,23 +37,30 @@ public class HomeScreen extends AppCompatActivity {
 
         manager.beginTransaction().replace(R.id.homescreen,new HomeFrag()).commit();
 
+        bubble.setNavigationChangeListener(new BubbleNavigationChangeListener() {
+            @Override
+            public void onNavigationChanged(View view, int position) {
+                if(position == 2)
+                    Toast.makeText(HomeScreen.this, "Yes", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        getMenuInflater().inflate(R.menu.notification,menu);
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-//        int id = item.getItemId();
-//
-//        if(id == R.id.notification)
-//            Toast.makeText(this, "Button Clicked", Toast.LENGTH_SHORT).show();
-//
-//        return super.onOptionsItemSelected(item);
-//    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.notification,menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+
+        if(id == R.id.notification)
+            Toast.makeText(this, "Button Clicked", Toast.LENGTH_SHORT).show();
+
+        return super.onOptionsItemSelected(item);
+    }
 
     private void initialise() {
         auth = FirebaseAuth.getInstance();

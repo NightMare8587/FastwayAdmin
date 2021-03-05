@@ -25,13 +25,15 @@
         android:id="@+id/top_navigation_constraint"
         android:layout_width="match_parent"
         android:layout_height="65dp"
+        android:layout_marginBottom="0dp"
         android:background="@color/white"
-        android:elevation="4dp"
         android:backgroundTint="@color/teal_700"
+        android:elevation="4dp"
         android:padding="12dp"
         app:bnc_mode="spread"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent">
 
         <com.gauravk.bubblenavigation.BubbleToggleView
@@ -44,6 +46,7 @@
             app:bt_icon="@drawable/ic_baseline_home_24"
             app:bt_title="Home"
             app:bt_titlePadding="@dimen/title_padding" />
+
         <com.gauravk.bubblenavigation.BubbleToggleView
             android:id="@+id/MenuNavButton"
             android:layout_width="wrap_content"
@@ -54,6 +57,7 @@
             app:bt_icon="@drawable/ic_baseline_fastfood_24"
             app:bt_title="Menu"
             app:bt_titlePadding="@dimen/title_padding" />
+
         <com.gauravk.bubblenavigation.BubbleToggleView
             android:id="@+id/tableNavButton"
             android:layout_width="wrap_content"
@@ -64,18 +68,18 @@
             app:bt_icon="@drawable/ic_baseline_restaurant_menu_24"
             app:bt_title="Tables"
             app:bt_titlePadding="@dimen/title_padding" />
-        <com.gauravk.bubblenavigation.BubbleToggleView
-            android:id="@+id/infoButtonNav"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:bt_active="true"
-            app:bt_colorActive="@color/teal_200"
-            app:bt_colorInactive="@color/browser_actions_bg_grey"
-            app:bt_icon="@drawable/ic_baseline_home_24"
-            app:bt_title="Info"
-            app:bt_titlePadding="@dimen/title_padding" />
+                <com.gauravk.bubblenavigation.BubbleToggleView
+                    android:id="@+id/infoButtonNav"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:bt_active="true"
+                    app:bt_colorActive="@color/teal_200"
+                    app:bt_colorInactive="@color/browser_actions_bg_grey"
+                    app:bt_icon="@drawable/ic_baseline_account_circle_24"
+                    app:bt_title="Info"
+                    app:bt_titlePadding="@dimen/title_padding" />
 
-        <!-- Add more child items here - max upto 5 -->
+         Add more child items here - max upto 5
 
     </com.gauravk.bubblenavigation.BubbleNavigationConstraintView>
 </androidx.constraintlayout.widget.ConstraintLayout>
