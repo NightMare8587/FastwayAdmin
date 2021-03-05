@@ -74,7 +74,7 @@
             app:bt_icon="@drawable/ic_baseline_home_24"
             app:bt_title="Info"
             app:bt_titlePadding="@dimen/title_padding" />
-        
+
         <!-- Add more child items here - max upto 5 -->
 
     </com.gauravk.bubblenavigation.BubbleNavigationConstraintView>
