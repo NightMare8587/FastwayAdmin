@@ -17,8 +17,10 @@ import androidx.fragment.app.Fragment;
 import com.example.fastwayadmin.MenuActivities.AllMenuDish;
 import com.example.fastwayadmin.R;
 
+import mehdi.sakout.fancybuttons.FancyButton;
+
 public class MenuFrag extends Fragment {
-    Button mainCourse,breads,snacks,deserts,sweets,drinks;
+    FancyButton mainCourse,breads,snacks,deserts,sweets,drinks;
     Toolbar menuBar;
     @Nullable
     @Override
@@ -37,18 +39,18 @@ public class MenuFrag extends Fragment {
         sweets = view.findViewById(R.id.Sweets);
         drinks = view.findViewById(R.id.Drinks);
 
-        mainCourse.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                SharedPreferences preferences = view.getContext().getSharedPreferences("DishType", Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = preferences.edit();
-                editor.putString("Type","Main Course");
-                editor.apply();
-                Intent intent = new Intent(getActivity(),AllMenuDish.class);
-                intent.putExtra("Dish","Main Course");
-                startActivity(intent);
-            }
-        });
+//        mainCourse.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                SharedPreferences preferences = view.getContext().getSharedPreferences("DishType", Context.MODE_PRIVATE);
+//                SharedPreferences.Editor editor = preferences.edit();
+//                editor.putString("Type","Main Course");
+//                editor.apply();
+//                Intent intent = new Intent(getActivity(),AllMenuDish.class);
+//                intent.putExtra("Dish","Main Course");
+//                startActivity(intent);
+//            }
+//        });
 
         breads.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -111,6 +111,6 @@ public class Info extends AppCompatActivity {
         codePicker = findViewById(R.id.codePicker);
         contactNumber = findViewById(R.id.contactNumber);
 //        progressBar = findViewById(R.id.progressBar);
-        
+
     }
 }

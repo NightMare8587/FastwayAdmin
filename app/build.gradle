@@ -80,5 +80,7 @@ dependencies {
 
     // bottom nav
     implementation 'com.gauravk.bubblenavigation:bubblenavigation:1.0.7'
+    implementation 'com.github.medyo:fancybuttons:1.9.1'
+
 
 }
