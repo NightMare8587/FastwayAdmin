@@ -10,7 +10,6 @@ import android.widget.EditText;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.c.progress_dialog.BlackProgressDialog;
 import com.example.fastwayadmin.HomeScreen;
 import com.example.fastwayadmin.R;
 import com.google.firebase.auth.FirebaseAuth;
@@ -22,8 +21,6 @@ import com.google.firebase.database.ValueEventListener;
 import com.hbb20.CountryCodePicker;
 
 import java.util.Objects;
-
-import dmax.dialog.SpotsDialog;
 
 public class Info extends AppCompatActivity {
 
@@ -48,7 +45,6 @@ public class Info extends AppCompatActivity {
            public void onDataChange(@NonNull DataSnapshot snapshot) {
                if(snapshot.child(Objects.requireNonNull(infoAuth.getUid())).exists()){
 //                   progressBar.setVisibility(View.INVISIBLE);
-
                    startActivity(new Intent(Info.this, HomeScreen.class));
                    finish();
                }
@@ -115,6 +111,6 @@ public class Info extends AppCompatActivity {
         codePicker = findViewById(R.id.codePicker);
         contactNumber = findViewById(R.id.contactNumber);
 //        progressBar = findViewById(R.id.progressBar);
-
+        
     }
 }
