@@ -5,14 +5,14 @@ plugins {
 }
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
     buildToolsVersion "30.0.3"
 
 
     defaultConfig {
         applicationId "com.example.fastwayadmin"
-        minSdkVersion 19
-        targetSdkVersion 29
+        minSdkVersion 21
+        targetSdkVersion 30
         versionCode 1
         multiDexEnabled true
         versionName "1.0"
@@ -76,6 +76,7 @@ dependencies {
     // alert dialog
     implementation 'com.crowdfire.cfalertdialog:cfalertdialog:1.1.0'
     implementation 'com.github.d-max:spots-dialog:1.1@aar'
+
 
     // bottom nav
     implementation 'com.gauravk.bubblenavigation:bubblenavigation:1.0.7'

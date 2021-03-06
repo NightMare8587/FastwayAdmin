@@ -10,6 +10,7 @@ import android.widget.EditText;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.c.progress_dialog.BlackProgressDialog;
 import com.example.fastwayadmin.HomeScreen;
 import com.example.fastwayadmin.R;
 import com.google.firebase.auth.FirebaseAuth;
@@ -22,11 +23,14 @@ import com.hbb20.CountryCodePicker;
 
 import java.util.Objects;
 
+import dmax.dialog.SpotsDialog;
+
 public class Info extends AppCompatActivity {
 
     EditText nameOfRestaurant,AddressOfRestaurant,nearbyPlace,pinCode,contactNumber;
     Button proceed;
     ViewGroup group;
+
     protected boolean isProgressShowing = false;
     CountryCodePicker codePicker;
     FirebaseAuth infoAuth;
@@ -111,5 +115,6 @@ public class Info extends AppCompatActivity {
         codePicker = findViewById(R.id.codePicker);
         contactNumber = findViewById(R.id.contactNumber);
 //        progressBar = findViewById(R.id.progressBar);
+
     }
 }

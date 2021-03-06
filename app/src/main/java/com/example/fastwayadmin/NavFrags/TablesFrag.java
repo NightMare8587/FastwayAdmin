@@ -1,5 +1,6 @@
 package com.example.fastwayadmin.NavFrags;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -33,9 +34,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import dmax.dialog.SpotsDialog;
+
 public class TablesFrag extends Fragment {
     Toolbar tableBar;
     FloatingActionButton addTable;
+
     FirebaseAuth tableAuth;
     SwipeRefreshLayout layout;
     DatabaseReference tableRef;
