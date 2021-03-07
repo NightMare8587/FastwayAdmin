@@ -208,9 +208,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                mMap.clear();
                latitude = mLastLocation.getLatitude();
                longitude = mLastLocation.getLongitude();
-               RestLocation restLocation = new RestLocation(String.valueOf(latitude),String.valueOf(longitude));
-               ref = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants");
-               ref.child("Locations").child(auth.getUid()).setValue(restLocation);
+//               RestLocation restLocation = new RestLocation(String.valueOf(latitude),String.valueOf(longitude));
+//               ref = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants");
+//               ref.child("Locations").child(auth.getUid()).setValue(restLocation);
                LatLng current = new LatLng(mLastLocation.getLatitude(),mLastLocation.getLongitude());
                mMap.addMarker(new MarkerOptions().title("Current position").position(current));
                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(current,15));
