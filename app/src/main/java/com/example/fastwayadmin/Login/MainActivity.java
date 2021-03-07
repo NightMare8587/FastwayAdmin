@@ -56,6 +56,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
+import cc.cloudist.acplibrary.ACProgressConstant;
+import cc.cloudist.acplibrary.ACProgressFlower;
 import dmax.dialog.SpotsDialog;
 
 //import com.google.android.gms.location.LocationRequest;
@@ -68,13 +70,12 @@ public class MainActivity extends AppCompatActivity {
 
     FirebaseAuth loginAuth;
     LocationRequest locationRequest;
-    SpotsDialog.Builder alert;
     protected boolean isProgressShowing = false;
     String verId;
     FirebaseFirestore db =  FirebaseFirestore.getInstance();
     ViewGroup group;
 //    ProgressBar wait;
-    SpinKitView spinKitView;
+ACProgressFlower flower;
     PhoneAuthProvider.ForceResendingToken myToken;
     EditText fullName,emailAddress,phoneNumber,codeSent;
     CountryCodePicker ccp;
@@ -128,18 +129,18 @@ public class MainActivity extends AppCompatActivity {
                                     name = fullName.getText().toString();
                                     email = emailAddress.getText().toString();
                                     number = ccp.getSelectedCountryCodeWithPlus() + phoneNumber.getText().toString() + "";
-                                    spinKitView.setVisibility(View.VISIBLE);
+
                                     codeSent.setEnabled(true);
                                     startVerification.setVisibility(View.INVISIBLE);
                                     verifyCode.setVisibility(View.VISIBLE);
                                     startPhoneNumberVerification(number);
-                                     alert = new SpotsDialog.Builder()
-                                             .setContext(MainActivity.this)
-                                             .setMessage("Verifying Number")
-                                             .setCancelable(false);
+                                    flower = new ACProgressFlower.Builder(MainActivity.this)
+                                            .direction(ACProgressConstant.DIRECT_CLOCKWISE)
+                                            .themeColor(Color.WHITE)
+                                            .text("Verifying Number")
+                                            .build();
 
-                                     alert.build().show();
-
+                                    flower.show();
                                     dialogInterface.dismiss();
                                 }))
                         .addButton("No",Color.BLACK,Color.YELLOW, CFAlertDialog.CFAlertActionStyle.POSITIVE, CFAlertDialog.CFAlertActionAlignment.JUSTIFIED
@@ -268,7 +269,6 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onVerificationCompleted(@NonNull PhoneAuthCredential phoneAuthCredential) {
                         Toast.makeText(MainActivity.this, "Code sent", Toast.LENGTH_SHORT).show();
-                        spinKitView.setVisibility(View.INVISIBLE);
                         credential = phoneAuthCredential;
                         signInWithPhoneAuthCredentials(phoneAuthCredential);
                     }
@@ -276,7 +276,6 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onVerificationFailed(@NonNull FirebaseException e) {
                         Toast.makeText(MainActivity.this, e.getLocalizedMessage()+"", Toast.LENGTH_SHORT).show();
-                        spinKitView.setVisibility(View.INVISIBLE);
                         verifyCode.setVisibility(View.INVISIBLE);
                         startVerification.setVisibility(View.VISIBLE);
                     }
@@ -285,6 +284,7 @@ public class MainActivity extends AppCompatActivity {
                     public void onCodeSent(@NonNull String s, @NonNull PhoneAuthProvider.ForceResendingToken forceResendingToken) {
                         verId = s;
                         myToken = forceResendingToken;
+                        flower.dismiss();
                     }
                 }).build();
 
@@ -329,7 +329,6 @@ public class MainActivity extends AppCompatActivity {
 //        wait = findViewById(R.id.waitItsLoading);
         fullName = findViewById(R.id.nameLogin);
         emailAddress = findViewById(R.id.emailLogin);
-        spinKitView = findViewById(R.id.spinKit);
         phoneNumber = findViewById(R.id.phoneNumber);
         ccp = findViewById(R.id.ccp);
 //        spinKitView = findViewById(R.id.spinKit);
@@ -337,8 +336,6 @@ public class MainActivity extends AppCompatActivity {
         startVerification = findViewById(R.id.startVerification);
         verifyCode = findViewById(R.id.verifyVerification);
         reference = FirebaseDatabase.getInstance().getReference().getRoot();
-        spinKitView.setVisibility(View.INVISIBLE);
-
     }
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {

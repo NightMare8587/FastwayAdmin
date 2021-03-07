@@ -111,19 +111,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/startVerification" />
 
-    <com.github.ybq.android.spinkit.SpinKitView
-        android:id="@+id/spinKit"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        app:SpinKit_Color="@color/teal_200"
-        app:SpinKit_Style="FadingCircle"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.421" />
-
     <!--    <ProgressBar-->
     <!--        android:id="@+id/waitItsLoading"-->
     <!--        style="?android:attr/progressBarStyle"-->

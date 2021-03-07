@@ -77,6 +77,8 @@ dependencies {
     implementation 'com.crowdfire.cfalertdialog:cfalertdialog:1.1.0'
     implementation 'com.github.d-max:spots-dialog:1.1@aar'
 
+    implementation 'com.andrognito.flashbar:flashbar:1.0.2'
+    implementation 'cc.cloudist.acplibrary:library:1.2.1'
 
     // bottom nav
     implementation 'com.gauravk.bubblenavigation:bubblenavigation:1.0.7'
