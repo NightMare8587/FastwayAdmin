@@ -77,6 +77,7 @@ public class TablesFrag extends Fragment {
                     }
 
                     table.setAdapter(new TableView(tableNumber,status));
+
                 }else{
                     Toast.makeText(view.getContext(), "Add Some Tables!!!", Toast.LENGTH_SHORT).show();
                 }
@@ -103,6 +104,7 @@ public class TablesFrag extends Fragment {
                             status.add(dataSnapshot.child("status").getValue().toString());
                         }
                         table.setAdapter(new TableView(tableNumber,status));
+
                     }else{
                         Toast.makeText(view.getContext(), "Add Some Tables!!!", Toast.LENGTH_SHORT).show();
                     }
