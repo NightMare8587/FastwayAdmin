@@ -25,7 +25,6 @@ import androidx.core.content.ContextCompat;
 import com.crowdfire.cfalertdialog.CFAlertDialog;
 import com.example.fastwayadmin.Info.Info;
 import com.example.fastwayadmin.R;
-import com.github.ybq.android.spinkit.SpinKitView;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.LocationRequest;
@@ -58,7 +57,6 @@ import java.util.concurrent.TimeUnit;
 
 import cc.cloudist.acplibrary.ACProgressConstant;
 import cc.cloudist.acplibrary.ACProgressFlower;
-import dmax.dialog.SpotsDialog;
 
 //import com.google.android.gms.location.LocationRequest;
 //import com.google.android.gms.location.LocationServices;
