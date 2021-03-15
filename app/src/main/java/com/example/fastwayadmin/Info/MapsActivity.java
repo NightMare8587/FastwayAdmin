@@ -112,6 +112,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         proceed.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                ref = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(auth.getUid());
+                RestLocation restLocation = new RestLocation(String.valueOf(latitude),String.valueOf(longitude));
+                ref.child("location").setValue(restLocation);
                 startActivity(new Intent(getApplicationContext(), HomeScreen.class));
                 finish();
             }
@@ -138,6 +141,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 Address address = addressList.get(0);
                 LatLng current = new LatLng(address.getLatitude(),address.getLongitude());
                 mMap.clear();
+                latitude = address.getLatitude();
+                longitude = address.getLongitude();
                 mMap.addMarker(new MarkerOptions().position(current).title("Current Location"));
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(current,15));
             }
