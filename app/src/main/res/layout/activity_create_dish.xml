@@ -89,11 +89,11 @@
         android:id="@+id/chooseImageForFood"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="10dp"
         android:text="Choose Image"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/sellOnMRPprice" />
+        app:layout_constraintTop_toBottomOf="@+id/textView6" />
 
     <CheckBox
         android:id="@+id/sellOnMRPprice"
@@ -110,7 +110,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
-        android:text="Discount will not be applied on MRP products"
+        android:text="Discount will not be applied on MRP products \n  MRP products includes water"
+        android:textAlignment="center"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
