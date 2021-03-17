@@ -38,7 +38,7 @@ import java.util.Objects;
 public class AccountFrag extends Fragment {
     ListView listView;
     String[] names = {"My Account","My Orders","Logout"};
-    Toolbar toolbar;
+
     FirebaseAuth auth;
     @Nullable
     @Override
@@ -49,7 +49,6 @@ public class AccountFrag extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        ((AppCompatActivity) Objects.requireNonNull(getActivity())).getSupportActionBar().hide();
         listView = view.findViewById(R.id.listView);
         auth = FirebaseAuth.getInstance();
         ArrayAdapter arrayAdapter = new ArrayAdapter<String>(view.getContext(),R.layout.list,names);

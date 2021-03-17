@@ -6,11 +6,13 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -22,6 +24,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.fastwayadmin.NotificationActivity;
 import com.example.fastwayadmin.R;
+import com.example.flatdialoglibrary.dialog.FlatDialog;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.LocationRequest;
@@ -39,10 +42,10 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import java.util.Objects;
 
 public class HomeFrag extends Fragment {
-    Toolbar homeBar;
+
     FirebaseAuth auth;
     LocationRequest locationRequest;
-    ImageButton notificationButton;
+    ImageView comboImage;
 
     @Nullable
     @Override
@@ -53,20 +56,53 @@ public class HomeFrag extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        homeBar = view.findViewById(R.id.homeFragBar);
+        comboImage = view.findViewById(R.id.comboDiscountImageView);
         auth = FirebaseAuth.getInstance();
-        FirebaseMessaging.getInstance().subscribeToTopic(auth.getUid());
-        notificationButton = view.findViewById(R.id.notificationButton);
-        notificationButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(getActivity(), NotificationActivity.class));
-            }
-        });
+        FirebaseMessaging.getInstance().subscribeToTopic(Objects.requireNonNull(auth.getUid()));
         if(ContextCompat.checkSelfPermission(Objects.requireNonNull(getActivity()),Manifest.permission.CAMERA) + ContextCompat.checkSelfPermission(getActivity(),Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
             requestPermissions(new String[]{Manifest.permission.CAMERA,Manifest.permission.ACCESS_COARSE_LOCATION},1);
         }else
             createLocationRequest();
+
+
+        comboImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+//                startActivity(new Intent(getContext(),CreateDiscountCombo.class));
+                final FlatDialog flatDialog = new FlatDialog(getContext());
+                flatDialog.setTitle("Choose One Option")
+                        .setTitleColor(Color.BLACK)
+                        .setBackgroundColor(Color.parseColor("#f9fce1"))
+                        .setFirstButtonColor(Color.parseColor("#d3f6f3"))
+                        .setFirstButtonTextColor(Color.parseColor("#000000"))
+                        .setFirstButtonText("DISCOUNT & OFFERS")
+                        .setSecondButtonColor(Color.parseColor("#fee9b2"))
+                        .setSecondButtonTextColor(Color.parseColor("#000000"))
+                        .setSecondButtonText("COMBO/THALI")
+                        .setThirdButtonColor(Color.parseColor("#fbd1b7"))
+                        .setThirdButtonTextColor(Color.parseColor("#000000"))
+                        .setThirdButtonText("ADD CUSTOM OFFER")
+                        .withFirstButtonListner(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                flatDialog.dismiss();
+                            }
+                        })
+                        .withSecondButtonListner(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                flatDialog.dismiss();
+                            }
+                        })
+                        .withThirdButtonListner(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                flatDialog.dismiss();
+                            }
+                        }).show();
+
+            }
+        });
 
     }
 

@@ -23,7 +23,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 public class HomeScreen extends AppCompatActivity {
-    Toolbar toolbar;
+
     BubbleNavigationConstraintView bubble;
     FragmentManager manager;
     FirebaseAuth auth;
@@ -31,8 +31,6 @@ public class HomeScreen extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_screen);
-        toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
         initialise();
 
         manager.beginTransaction().replace(R.id.homescreen,new HomeFrag()).commit();

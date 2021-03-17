@@ -76,7 +76,7 @@ dependencies {
     // alert dialog
     implementation 'com.crowdfire.cfalertdialog:cfalertdialog:1.1.0'
     implementation 'com.github.d-max:spots-dialog:1.1@aar'
-
+    implementation 'com.github.mejdi14:Flat-Dialog-Android:1.0.5'
     implementation 'com.andrognito.flashbar:flashbar:1.0.2'
     implementation 'cc.cloudist.acplibrary:library:1.2.1'
 

@@ -5,28 +5,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/homeFragBar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="?attr/colorPrimary"
-        android:minHeight="?attr/actionBarSize"
-        android:theme="?attr/actionBarTheme"
+    <ImageView
+        android:id="@+id/comboDiscountImageView"
+        android:layout_width="329dp"
+        android:layout_height="98dp"
+        android:layout_marginTop="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:title="Home" >
-
-        <ImageButton
-            android:id="@+id/notificationButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="15dp"
-            android:background="@null"
-            app:srcCompat="@drawable/ic_baseline_notifications_24"
-            android:text="Notification"
-            android:layout_gravity="end"
-            />
-
-    </androidx.appcompat.widget.Toolbar>
+        app:srcCompat="@drawable/combo" />
 </androidx.constraintlayout.widget.ConstraintLayout>

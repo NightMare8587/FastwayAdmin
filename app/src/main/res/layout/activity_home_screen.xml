@@ -7,18 +7,18 @@
     android:layout_height="match_parent"
     tools:context=".HomeScreen">
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="?attr/colorPrimary"
-        android:backgroundTint="@color/teal_700"
-        android:minHeight="?attr/actionBarSize"
-        android:theme="?attr/actionBarTheme"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:title="Home" />
+<!--    <androidx.appcompat.widget.Toolbar-->
+<!--        android:id="@+id/toolbar"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:background="?attr/colorPrimary"-->
+<!--        android:backgroundTint="@color/teal_700"-->
+<!--        android:minHeight="?attr/actionBarSize"-->
+<!--        android:theme="?attr/actionBarTheme"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent"-->
+<!--        app:title="Home" />-->
 
 
     <com.gauravk.bubblenavigation.BubbleNavigationConstraintView
@@ -40,8 +40,9 @@
             android:id="@+id/homeButtonNav"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            app:bt_badgeTextColor="@color/black"
             app:bt_active="true"
-            app:bt_colorActive="@color/teal_200"
+            app:bt_colorActive="@color/black"
             app:bt_colorInactive="@color/browser_actions_bg_grey"
             app:bt_icon="@drawable/ic_baseline_home_24"
             app:bt_title="Home"
@@ -51,8 +52,9 @@
             android:id="@+id/MenuNavButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            app:bt_badgeTextColor="@color/black"
             app:bt_active="true"
-            app:bt_colorActive="@color/teal_200"
+            app:bt_colorActive="@color/black"
             app:bt_colorInactive="@color/browser_actions_bg_grey"
             app:bt_icon="@drawable/ic_baseline_fastfood_24"
             app:bt_title="Menu"
@@ -63,7 +65,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:bt_active="true"
-            app:bt_colorActive="@color/teal_200"
+            app:bt_colorActive="@color/black"
+            app:bt_badgeTextColor="@color/black"
             app:bt_colorInactive="@color/browser_actions_bg_grey"
             app:bt_icon="@drawable/ic_baseline_restaurant_menu_24"
             app:bt_title="Tables"
@@ -72,8 +75,9 @@
                     android:id="@+id/infoButtonNav"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    app:bt_badgeTextColor="@color/black"
                     app:bt_active="true"
-                    app:bt_colorActive="@color/teal_200"
+                    app:bt_colorActive="@color/black"
                     app:bt_colorInactive="@color/browser_actions_bg_grey"
                     app:bt_icon="@drawable/ic_baseline_account_circle_24"
                     app:bt_title="Info"

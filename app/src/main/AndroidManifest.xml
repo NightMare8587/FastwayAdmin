@@ -23,7 +23,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         tools:ignore="AllowBackup">
-        <activity android:name=".MenuActivities.CustomDishImageSearch"></activity>
+        <activity android:name=".NavFrags.CreateDiscountCombo"></activity>
+        <activity android:name=".MenuActivities.CustomDishImageSearch" />
         <activity android:name=".ListViewActivity.MyOrders" />
         <activity android:name=".ListViewActivity.MyAccount" />
         <activity android:name=".MenuActivities.SearchYourDish" />
