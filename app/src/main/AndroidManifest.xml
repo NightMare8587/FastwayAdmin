@@ -23,7 +23,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         tools:ignore="AllowBackup">
-        <activity android:name=".NavFrags.CreateDiscountCombo"></activity>
+        <activity android:name=".DiscountCombo.CustomOffer"></activity>
+        <activity android:name=".DiscountCombo.ComboAndOffers" />
+        <activity android:name=".DiscountCombo.DiscountActivity" />
+        <activity android:name=".NavFrags.CreateDiscountCombo" />
         <activity android:name=".MenuActivities.CustomDishImageSearch" />
         <activity android:name=".ListViewActivity.MyOrders" />
         <activity android:name=".ListViewActivity.MyAccount" />
