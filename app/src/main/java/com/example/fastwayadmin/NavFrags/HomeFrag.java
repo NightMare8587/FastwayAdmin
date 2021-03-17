@@ -11,18 +11,15 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
-import com.example.fastwayadmin.NotificationActivity;
 import com.example.fastwayadmin.R;
 import com.example.flatdialoglibrary.dialog.FlatDialog;
 import com.google.android.gms.common.api.ApiException;
@@ -63,7 +60,6 @@ public class HomeFrag extends Fragment {
             requestPermissions(new String[]{Manifest.permission.CAMERA,Manifest.permission.ACCESS_COARSE_LOCATION},1);
         }else
             createLocationRequest();
-
 
         comboImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -155,8 +151,8 @@ public class HomeFrag extends Fragment {
     }
     private void createLocationRequest() {
         locationRequest = LocationRequest.create();
-        locationRequest.setInterval(10000);
-        locationRequest.setFastestInterval(5000);
+        locationRequest.setInterval(600000);
+        locationRequest.setFastestInterval(600000);
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
