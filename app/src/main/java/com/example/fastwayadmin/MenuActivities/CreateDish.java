@@ -18,9 +18,11 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.crowdfire.cfalertdialog.CFAlertDialog;
 import com.example.fastwayadmin.Dish.DishInfo;
 import com.example.fastwayadmin.R;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -39,7 +41,9 @@ import java.util.Objects;
 public class CreateDish extends AppCompatActivity {
     EditText nameOfDish,halfPlate,fullPlate;
     FirebaseAuth dishAuth;
+    CheckBox checkBox;
     DatabaseReference dish;
+    String mrp;
     StorageReference storageReference;
     Button createDish,chooseImage;
     FloatingActionButton floatingActionButton;
@@ -89,7 +93,12 @@ public class CreateDish extends AppCompatActivity {
                 half = halfPlate.getText().toString();
                 full = fullPlate.getText().toString();
                 image = "";
-                addToDatabase(name,half,full,image);
+                if(checkBox.isChecked())
+                    mrp = "yes";
+                            else
+                                mrp = "no";
+
+                addToDatabase(name,half,full,image,mrp);
             }
         });
     }
@@ -124,8 +133,8 @@ public class CreateDish extends AppCompatActivity {
         builder.show();
     }
 
-    private void addToDatabase(String name, String half, String full,String image) {
-        DishInfo info = new DishInfo(name,half,full,image);
+    private void addToDatabase(String name, String half, String full,String image,String mrp) {
+        DishInfo info = new DishInfo(name,half,full,image,mrp);
         try {
             dish.child("Restaurants").child(Objects.requireNonNull(dishAuth.getUid())).child("List of Dish").child(menuType).child(name).setValue(info);
             Toast.makeText(this, "Dish Added Successfully", Toast.LENGTH_SHORT).show();
@@ -158,6 +167,7 @@ public class CreateDish extends AppCompatActivity {
         createDish = findViewById(R.id.saveDishInfo);
         dishAuth = FirebaseAuth.getInstance();
         dish = FirebaseDatabase.getInstance().getReference().getRoot();
+        checkBox = findViewById(R.id.sellOnMRPprice);
         menuType = getIntent().getStringExtra("Dish");
         chooseImage = findViewById(R.id.chooseImageForFood);
         storageReference = FirebaseStorage.getInstance().getReference();

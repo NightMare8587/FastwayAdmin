@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -63,6 +64,7 @@ public class DisplayDish extends RecyclerView.Adapter<DisplayDish.Adapter> {
                 builder.setTitle("Add Dish");
                 Context context = view.getContext();
                 LinearLayout linearLayout = new LinearLayout(context);
+                linearLayout.setPadding(8,8,8,8);
                 linearLayout.setOrientation(LinearLayout.VERTICAL);
 
                 final EditText halfPlate = new EditText(context);
@@ -77,6 +79,10 @@ public class DisplayDish extends RecyclerView.Adapter<DisplayDish.Adapter> {
                 fullPlate.setHint("Enter full Plate price");
                 linearLayout.addView(fullPlate);
 
+                final CheckBox checkBox = new CheckBox(context);
+                checkBox.setText("Sell On MRP (Discount will not be applied on MRP products)");
+                linearLayout.addView(checkBox);
+
                 final Button button = new Button(context);
                 button.setText("Add Dish");
                 linearLayout.addView(button);
@@ -86,7 +92,12 @@ public class DisplayDish extends RecyclerView.Adapter<DisplayDish.Adapter> {
                     public void onClick(View view) {
                         SharedPreferences preferences = view.getContext().getSharedPreferences("DishType",Context.MODE_PRIVATE);
                         String type = preferences.getString("Type","");
-                        CreateDishClass createDishClass = new CreateDishClass(holder.name.getText().toString(),image.get(position),halfPlate.getText().toString(),fullPlate.getText().toString());
+                        String mrp;
+                        if(checkBox.isChecked())
+                            mrp = "yes";
+                        else
+                            mrp = "false";
+                        CreateDishClass createDishClass = new CreateDishClass(holder.name.getText().toString(),image.get(position),halfPlate.getText().toString(),fullPlate.getText().toString(),mrp);
                         reference.child("List of Dish").child(type).child(holder.name.getText().toString()).setValue(createDishClass);
                         Toast.makeText(context, "Dish added Successfully", Toast.LENGTH_SHORT).show();
                         dialog.dismiss();
