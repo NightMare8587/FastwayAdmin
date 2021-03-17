@@ -20,6 +20,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import com.example.fastwayadmin.DiscountCombo.DiscountActivity;
 import com.example.fastwayadmin.R;
 import com.example.flatdialoglibrary.dialog.FlatDialog;
 import com.google.android.gms.common.api.ApiException;
@@ -81,6 +82,7 @@ public class HomeFrag extends Fragment {
                         .withFirstButtonListner(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
+                                startActivity(new Intent(getContext(), DiscountActivity.class));
                                 flatDialog.dismiss();
                             }
                         })
