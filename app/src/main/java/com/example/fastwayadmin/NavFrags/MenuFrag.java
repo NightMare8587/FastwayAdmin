@@ -20,7 +20,7 @@ import com.example.fastwayadmin.R;
 import mehdi.sakout.fancybuttons.FancyButton;
 
 public class MenuFrag extends Fragment {
-    FancyButton mainCourse,breads,snacks,deserts,sweets,drinks;
+    FancyButton mainCourse,breads,snacks,deserts,combo,drinks;
     Toolbar menuBar;
     @Nullable
     @Override
@@ -36,7 +36,7 @@ public class MenuFrag extends Fragment {
         breads = view.findViewById(R.id.Breads);
         snacks = view.findViewById(R.id.Snacks);
         deserts = view.findViewById(R.id.Deserts);
-        sweets = view.findViewById(R.id.Sweets);
+        combo = view.findViewById(R.id.Combo);
         drinks = view.findViewById(R.id.Drinks);
 
         mainCourse.setOnClickListener(new View.OnClickListener() {
@@ -91,15 +91,15 @@ public class MenuFrag extends Fragment {
             }
         });
 
-        sweets.setOnClickListener(new View.OnClickListener() {
+        combo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 SharedPreferences preferences = view.getContext().getSharedPreferences("DishType", Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = preferences.edit();
-                editor.putString("Type","Sweets");
+                editor.putString("Type","Combo");
                 editor.apply();
                 Intent intent = new Intent(getActivity(),AllMenuDish.class);
-                intent.putExtra("Dish","Sweets");
+                intent.putExtra("Dish","Combo");
                 startActivity(intent);
             }
         });

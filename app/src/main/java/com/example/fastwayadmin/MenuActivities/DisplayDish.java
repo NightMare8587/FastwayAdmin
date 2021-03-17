@@ -26,6 +26,7 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class DisplayDish extends RecyclerView.Adapter<DisplayDish.Adapter> {
 
@@ -51,8 +52,9 @@ public class DisplayDish extends RecyclerView.Adapter<DisplayDish.Adapter> {
     @Override
     public void onBindViewHolder(@NonNull Adapter holder, int position) {
         auth = FirebaseAuth.getInstance();
-        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(auth.getUid());
+        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid()));
         holder.name.setText(names.get(position));
+        if(!image.get(position).equals(""))
         Picasso.get().load(image.get(position)).centerCrop().resize(100,100).into(holder.imageView);
         holder.name.setOnClickListener(new View.OnClickListener() {
             @Override

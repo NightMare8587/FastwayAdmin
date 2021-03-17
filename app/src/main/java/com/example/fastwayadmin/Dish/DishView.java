@@ -51,6 +51,7 @@ public class DishView extends RecyclerView.Adapter<DishView.DishAdapter> {
     public void onBindViewHolder(@NonNull DishAdapter holder, int position) {
         holder.name.setText(names.get(position));
         holder.price.setText(fullPrice.get(position));
+        if(!image.get(position).equals(""))
         Picasso.get().load(image.get(position)).centerCrop().resize(100,100).into(holder.imageView);
         if(!half.get(position).isEmpty()){
             holder.available.setText("Half Plate Available");

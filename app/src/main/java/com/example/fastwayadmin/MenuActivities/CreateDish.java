@@ -44,8 +44,8 @@ public class CreateDish extends AppCompatActivity {
     Button createDish,chooseImage;
     FloatingActionButton floatingActionButton;
     String menuType;
-    String name,half,full;
-    Uri imageUri = null;
+    String name,half,full,image;
+    String imageUri = "";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -88,8 +88,8 @@ public class CreateDish extends AppCompatActivity {
                 name = nameOfDish.getText().toString();
                 half = halfPlate.getText().toString();
                 full = fullPlate.getText().toString();
-
-                addToDatabase(name,half,full);
+                image = "";
+                addToDatabase(name,half,full,image);
             }
         });
     }
@@ -124,8 +124,8 @@ public class CreateDish extends AppCompatActivity {
         builder.show();
     }
 
-    private void addToDatabase(String name, String half, String full) {
-        DishInfo info = new DishInfo(name,half,full);
+    private void addToDatabase(String name, String half, String full,String image) {
+        DishInfo info = new DishInfo(name,half,full,image);
         try {
             dish.child("Restaurants").child(Objects.requireNonNull(dishAuth.getUid())).child("List of Dish").child(menuType).child(name).setValue(info);
             Toast.makeText(this, "Dish Added Successfully", Toast.LENGTH_SHORT).show();
@@ -149,28 +149,6 @@ public class CreateDish extends AppCompatActivity {
         }
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == 0 && resultCode == RESULT_OK) {
-            Toast.makeText(this, "Done", Toast.LENGTH_SHORT).show();
-            imageUri = data.getData();
-            startPostingImage(imageUri);
-        }
-    }
-
-    private void startPostingImage(Uri imageUri) {
-        storageReference.child(dishAuth.getUid());
-        storageReference.putFile(imageUri).addOnSuccessListener(this, new OnSuccessListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                Toast.makeText(CreateDish.this, "Uploaded", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-
-    }
 
     private void initialise() {
         nameOfDish = findViewById(R.id.dishName);

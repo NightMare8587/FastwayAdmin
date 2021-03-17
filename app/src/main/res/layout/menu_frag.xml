@@ -80,7 +80,7 @@
             android:id="@+id/Deserts"
             android:layout_width="0dp"
             android:layout_height="92dp"
-            fancy:fb_text="Deserts"
+            fancy:fb_text="Deserts/    Sweets"
             fancy:fb_defaultColor="#68097D"
             android:layout_margin="10dp"
             fancy:fb_textSize="20dp"
@@ -92,10 +92,10 @@
             />
 
         <mehdi.sakout.fancybuttons.FancyButton
-            android:id="@+id/Sweets"
+            android:id="@+id/Combo"
             android:layout_width="0dp"
             android:layout_height="92dp"
-            fancy:fb_text="Sweets"
+            fancy:fb_text="Special Thali/          Combo"
             fancy:fb_defaultColor="#097A7D"
             android:layout_margin="10dp"
             fancy:fb_textSize="20dp"
