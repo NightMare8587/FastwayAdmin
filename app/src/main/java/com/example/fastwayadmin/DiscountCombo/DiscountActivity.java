@@ -2,6 +2,7 @@ package com.example.fastwayadmin.DiscountCombo;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -19,6 +20,10 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.thecode.aestheticdialogs.AestheticDialog;
+import com.thecode.aestheticdialogs.DialogAnimation;
+import com.thecode.aestheticdialogs.DialogStyle;
+import com.thecode.aestheticdialogs.DialogType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -142,7 +147,7 @@ public class DiscountActivity extends AppCompatActivity {
                                 int discount = Integer.parseInt(firstTextField);
                                 int afterDis = price - (price * discount / 100);
                                 beforeDiscount(price,afterDis,discount,type,dishName);
-                                addToDiscountDatabase(discount);
+                                addToDiscountDatabase("yes");
                                 auth = FirebaseAuth.getInstance();
                                 Log.i("type",type);
                                 Log.i("name",dishName);
@@ -178,7 +183,7 @@ public class DiscountActivity extends AppCompatActivity {
                                 int discount = 40;
                                 int afterDis = price - (price * discount / 100);
                                 beforeDiscount(price,afterDis,discount,type,dishName);
-                                addToDiscountDatabase(discount);
+                                addToDiscountDatabase("yes");
                                 auth = FirebaseAuth.getInstance();
                                 Log.i("type",type);
                                 Log.i("name",dishName);
@@ -188,6 +193,23 @@ public class DiscountActivity extends AppCompatActivity {
                           }
                        }
                     }
+                AestheticDialog.Builder builder = new AestheticDialog.Builder(DiscountActivity.this, DialogStyle.FLAT, DialogType.SUCCESS);
+                builder.setTitle("Applying Discount")
+                        .setMessage("Wait while we are applying discount :)")
+                        .setCancelable(false)
+                        .setDuration(3000)
+                        .setAnimation(DialogAnimation.SHRINK)
+                        .setDarkMode(true);
+
+                builder.show();
+
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                       builder.dismiss();
+                        finish();
+                    }
+                },3000);
                 }
 
             @Override
@@ -197,10 +219,10 @@ public class DiscountActivity extends AppCompatActivity {
         });
     }
 
-    private void addToDiscountDatabase(int discount) {
+    private void addToDiscountDatabase(String discount) {
         auth = FirebaseAuth.getInstance();
-        addToDB = FirebaseDatabase.getInstance().getReference().getRoot();
-        addToDB.child("Discounts").child(Objects.requireNonNull(auth.getUid())).child("discount").setValue(discount);
+        addToDB = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid()));
+        addToDB.child("Discount").child("available").setValue("yes");
     }
 
     private void beforeDiscount(int price,int after, int discount,String type,String name) {
@@ -226,7 +248,7 @@ public class DiscountActivity extends AppCompatActivity {
                                 int discount = 50;
                                 int afterDis = price - (price * discount / 100);
                                 beforeDiscount(price,afterDis,discount,type,dishName);
-                                addToDiscountDatabase(discount);
+                                addToDiscountDatabase("yes");
                                 auth = FirebaseAuth.getInstance();
                                 Log.i("type",type);
                                 Log.i("name",dishName);

@@ -21,12 +21,13 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
+        tools:replace="android:icon"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         tools:ignore="AllowBackup">
         <activity android:name=".DiscountCombo.CustomOffer"></activity>
         <activity android:name=".DiscountCombo.ComboAndOffers" />
         <activity android:name=".DiscountCombo.DiscountActivity" />
-        <activity android:name=".NavFrags.CreateDiscountCombo" />
+
         <activity android:name=".MenuActivities.CustomDishImageSearch" />
         <activity android:name=".ListViewActivity.MyOrders" />
         <activity android:name=".ListViewActivity.MyAccount" />
@@ -72,9 +73,6 @@
             android:name="com.google.firebase.messaging.default_notification_color"
             android:resource="@color/defaultContentColor" />
 
-        <activity
-            android:name=".GetLocation"
-            android:label="@string/title_activity_get_location" />
         <activity android:name=".HomeScreen" />
         <activity android:name=".Info.Info" />
         <activity android:name=".SplashScreen">
