@@ -67,6 +67,7 @@ public class HomeFrag extends Fragment {
             public void onClick(View view) {
 //                startActivity(new Intent(getContext(),CreateDiscountCombo.class));
                 final FlatDialog flatDialog = new FlatDialog(getContext());
+                flatDialog.setCanceledOnTouchOutside(true);
                 flatDialog.setTitle("Choose One Option")
                         .setTitleColor(Color.BLACK)
                         .setBackgroundColor(Color.parseColor("#f9fce1"))

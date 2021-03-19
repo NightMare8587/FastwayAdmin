@@ -26,6 +26,7 @@ import java.util.Objects;
 
 public class DiscountActivity extends AppCompatActivity {
     DatabaseReference reference;
+    DatabaseReference dis;
     FirebaseAuth auth;
     List<String> name = new ArrayList<>();
     RecyclerView recyclerView;
@@ -136,20 +137,21 @@ public class DiscountActivity extends AppCompatActivity {
                             String type = String.valueOf(dataSnapshot.getKey());
                             String dishName = String.valueOf(dataSnapshot1.child("name").getValue());
                             if (Integer.parseInt(Objects.requireNonNull(String.valueOf(dataSnapshot1.child("full").getValue()))) >= 149) {
-                                int price = Integer.parseInt(Objects.requireNonNull(dataSnapshot1.child("full").getValue(String.class)));
+                                int price = Integer.parseInt(Objects.requireNonNull(String.valueOf(dataSnapshot1.child("full").getValue())));
                                 int discount = 50;
                                 int afterDis = price - (price * discount / 100);
+                                beforeDiscount(price,afterDis,discount,type,dishName);
+
                                 auth = FirebaseAuth.getInstance();
                                 Log.i("type",type);
                                 Log.i("name",dishName);
 //                                reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(auth.getUid()).child("List of Dish");
                                 reference.child("List of Dish").child(type).child(dishName).child("full").setValue(afterDis);
-                            }
-                        }
-                        }
-
+                             }
+                          }
+                       }
+                    }
                 }
-            }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
@@ -157,6 +159,13 @@ public class DiscountActivity extends AppCompatActivity {
             }
         });
     }
+
+    private void beforeDiscount(int price,int after, int discount,String type,String name) {
+        DisInfo disInfo = new DisInfo(String.valueOf(price),String.valueOf(after),String.valueOf(discount));
+        dis = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid()));
+        dis.child("List of Dish").child(type).child(name).child("Discount").child(name).setValue(disInfo);
+    }
+
 
     private void fiftyDiscount() {
         auth = FirebaseAuth.getInstance();
@@ -185,5 +194,7 @@ public class DiscountActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.discountActivityRecyclerView);
         auth = FirebaseAuth.getInstance();
         reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid()));
+        dis = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
+
     }
 }
