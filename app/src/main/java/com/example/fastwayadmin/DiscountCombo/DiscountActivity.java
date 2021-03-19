@@ -27,6 +27,7 @@ import java.util.Objects;
 public class DiscountActivity extends AppCompatActivity {
     DatabaseReference reference;
     DatabaseReference dis;
+    DatabaseReference addToDB;
     FirebaseAuth auth;
     List<String> name = new ArrayList<>();
     RecyclerView recyclerView;
@@ -106,9 +107,10 @@ public class DiscountActivity extends AppCompatActivity {
 
                                             Toast.makeText(DiscountActivity.this, "Field Can't be Empty", Toast.LENGTH_SHORT).show();
                                             return;
-                                        } else
+                                        } else {
+                                            customDiscount(flatDialog1.getFirstTextField());
                                             flatDialog1.dismiss();
-
+                                        }
                                     }
                                 }).show();
                         flatDialog.dismiss();
@@ -122,6 +124,41 @@ public class DiscountActivity extends AppCompatActivity {
                         flatDialog.dismiss();
                     }
                 }).show();
+    }
+
+    private void customDiscount(String firstTextField) {
+        auth = FirebaseAuth.getInstance();
+        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid()));
+        reference.child("List of Dish").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                    for(DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
+                        if (String.valueOf(dataSnapshot1.child("mrp").getValue()).equals("no")) {
+                            String type = String.valueOf(dataSnapshot.getKey());
+                            String dishName = String.valueOf(dataSnapshot1.child("name").getValue());
+                            if (Integer.parseInt(Objects.requireNonNull(String.valueOf(dataSnapshot1.child("full").getValue()))) >= 149) {
+                                int price = Integer.parseInt(Objects.requireNonNull(String.valueOf(dataSnapshot1.child("full").getValue())));
+                                int discount = Integer.parseInt(firstTextField);
+                                int afterDis = price - (price * discount / 100);
+                                beforeDiscount(price,afterDis,discount,type,dishName);
+                                addToDiscountDatabase(discount);
+                                auth = FirebaseAuth.getInstance();
+                                Log.i("type",type);
+                                Log.i("name",dishName);
+//                                reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(auth.getUid()).child("List of Dish");
+                                reference.child("List of Dish").child(type).child(dishName).child("full").setValue(afterDis);
+                            }
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
 
@@ -138,10 +175,10 @@ public class DiscountActivity extends AppCompatActivity {
                             String dishName = String.valueOf(dataSnapshot1.child("name").getValue());
                             if (Integer.parseInt(Objects.requireNonNull(String.valueOf(dataSnapshot1.child("full").getValue()))) >= 149) {
                                 int price = Integer.parseInt(Objects.requireNonNull(String.valueOf(dataSnapshot1.child("full").getValue())));
-                                int discount = 50;
+                                int discount = 40;
                                 int afterDis = price - (price * discount / 100);
                                 beforeDiscount(price,afterDis,discount,type,dishName);
-
+                                addToDiscountDatabase(discount);
                                 auth = FirebaseAuth.getInstance();
                                 Log.i("type",type);
                                 Log.i("name",dishName);
@@ -160,6 +197,12 @@ public class DiscountActivity extends AppCompatActivity {
         });
     }
 
+    private void addToDiscountDatabase(int discount) {
+        auth = FirebaseAuth.getInstance();
+        addToDB = FirebaseDatabase.getInstance().getReference().getRoot();
+        addToDB.child("Discounts").child(Objects.requireNonNull(auth.getUid())).child("discount").setValue(discount);
+    }
+
     private void beforeDiscount(int price,int after, int discount,String type,String name) {
         DisInfo disInfo = new DisInfo(String.valueOf(price),String.valueOf(after),String.valueOf(discount));
         dis = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid()));
@@ -174,11 +217,23 @@ public class DiscountActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for(DataSnapshot dataSnapshot : snapshot.getChildren()){
-                    for(DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()){
-                        if(String.valueOf(dataSnapshot1.child("mrp").getValue()).equals("no"))
-                            if(Integer.parseInt(Objects.requireNonNull(dataSnapshot1.child("full").getValue(String.class))) >= 149)
-                                Log.i("infoo",dataSnapshot1.child("name").getValue(String.class));
-
+                    for(DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
+                        if (String.valueOf(dataSnapshot1.child("mrp").getValue()).equals("no")) {
+                            String type = String.valueOf(dataSnapshot.getKey());
+                            String dishName = String.valueOf(dataSnapshot1.child("name").getValue());
+                            if (Integer.parseInt(Objects.requireNonNull(String.valueOf(dataSnapshot1.child("full").getValue()))) >= 149) {
+                                int price = Integer.parseInt(Objects.requireNonNull(String.valueOf(dataSnapshot1.child("full").getValue())));
+                                int discount = 50;
+                                int afterDis = price - (price * discount / 100);
+                                beforeDiscount(price,afterDis,discount,type,dishName);
+                                addToDiscountDatabase(discount);
+                                auth = FirebaseAuth.getInstance();
+                                Log.i("type",type);
+                                Log.i("name",dishName);
+//                                reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(auth.getUid()).child("List of Dish");
+                                reference.child("List of Dish").child(type).child(dishName).child("full").setValue(afterDis);
+                            }
+                        }
                     }
                 }
             }
