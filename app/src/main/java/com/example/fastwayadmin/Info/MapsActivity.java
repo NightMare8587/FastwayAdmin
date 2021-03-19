@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
@@ -53,6 +54,7 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -60,6 +62,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     FusedLocationProviderClient client;
     FloatingActionButton actionButton;
     LocationRequest locationRequest;
+    SharedPreferences currentLocation;
+    SharedPreferences.Editor editor;
     EditText editText;
     ImageButton imageButton;
     FirebaseAuth auth;
@@ -72,6 +76,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         checkRequiredPermission();
+        currentLocation = getSharedPreferences("locations current",MODE_PRIVATE);
+        editor = currentLocation.edit();
         auth = FirebaseAuth.getInstance();
         ref = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants");
         editText = findViewById(R.id.searchRestuarantinMap);
@@ -112,7 +118,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         proceed.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ref = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(auth.getUid());
+                ref = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid()));
                 RestLocation restLocation = new RestLocation(String.valueOf(latitude),String.valueOf(longitude));
                 ref.child("location").setValue(restLocation);
                 startActivity(new Intent(getApplicationContext(), HomeScreen.class));
@@ -213,6 +219,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                mMap.clear();
                latitude = mLastLocation.getLatitude();
                longitude = mLastLocation.getLongitude();
+               editor.putString("longi",String.valueOf(latitude));
+               editor.putString("lati",String.valueOf(longitude));
+               editor.apply();
 //               RestLocation restLocation = new RestLocation(String.valueOf(latitude),String.valueOf(longitude));
 //               ref = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants");
 //               ref.child("Locations").child(auth.getUid()).setValue(restLocation);
@@ -243,6 +252,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 mMap.clear();
                 latitude = latLng.latitude;
                 longitude = latLng.longitude;
+                editor.putString("longi",String.valueOf(latitude));
+                editor.putString("lati",String.valueOf(longitude));
+                editor.apply();
                 mMap.addMarker(new MarkerOptions().title("Current Position").position(latLng));
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng,15));
             }

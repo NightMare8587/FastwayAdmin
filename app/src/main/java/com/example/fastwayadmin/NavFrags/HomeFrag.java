@@ -2,12 +2,16 @@ package com.example.fastwayadmin.NavFrags;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.location.Location;
 import android.os.Bundle;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,11 +25,15 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.fastwayadmin.DiscountCombo.DiscountActivity;
+import com.example.fastwayadmin.Info.RestLocation;
 import com.example.fastwayadmin.R;
 import com.example.flatdialoglibrary.dialog.FlatDialog;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.ResolvableApiException;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResponse;
@@ -35,6 +43,8 @@ import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.Objects;
@@ -44,7 +54,9 @@ public class HomeFrag extends Fragment {
     FirebaseAuth auth;
     LocationRequest locationRequest;
     ImageView comboImage;
-
+    SharedPreferences sharedPreferences;
+    DatabaseReference reference;
+    FusedLocationProviderClient client;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -56,6 +68,8 @@ public class HomeFrag extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         comboImage = view.findViewById(R.id.comboDiscountImageView);
         auth = FirebaseAuth.getInstance();
+        sharedPreferences = getActivity().getSharedPreferences("locations current", Context.MODE_PRIVATE);
+        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid()));
         FirebaseMessaging.getInstance().subscribeToTopic(Objects.requireNonNull(auth.getUid()));
         if(ContextCompat.checkSelfPermission(Objects.requireNonNull(getActivity()),Manifest.permission.CAMERA) + ContextCompat.checkSelfPermission(getActivity(),Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
             requestPermissions(new String[]{Manifest.permission.CAMERA,Manifest.permission.ACCESS_COARSE_LOCATION},1);
@@ -152,12 +166,22 @@ public class HomeFrag extends Fragment {
                 break;
         }
     }
+    private final LocationCallback mLocationCallback = new LocationCallback() {
+
+        @Override
+        public void onLocationResult(LocationResult locationResult) {
+            Location mLastLocation = locationResult.getLastLocation();
+//            RestLocation restLocation = new RestLocation(sharedPreferences.getString("lati",""),sharedPreferences.getString("longi",""));
+//            reference.child("location").setValue(restLocation);
+        }
+    };
     private void createLocationRequest() {
         locationRequest = LocationRequest.create();
         locationRequest.setInterval(600000);
         locationRequest.setFastestInterval(600000);
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-
+        client = LocationServices.getFusedLocationProviderClient(Objects.requireNonNull(getActivity()));
+        client.requestLocationUpdates(locationRequest,mLocationCallback, Looper.myLooper());
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
                 .addLocationRequest(locationRequest);
 
@@ -200,5 +224,6 @@ public class HomeFrag extends Fragment {
                 }
             }
         });
+
     }
 }
