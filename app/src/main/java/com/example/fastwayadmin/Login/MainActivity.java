@@ -94,10 +94,10 @@ ACProgressFlower flower;
 //        spinKitView.setColor(R.color.teal_200);
 //        spinKitView.setIndeterminateDrawable(bounce);
         checkPermissions();
-        if(currentUser != null){
-            startActivity(new Intent(getApplicationContext(),Info.class));
-            finish();
-        }
+//        if(currentUser != null){
+//            startActivity(new Intent(getApplicationContext(),Info.class));
+//            finish();
+//        }
 
         startVerification.setOnClickListener(new View.OnClickListener() {
 
