@@ -17,6 +17,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -87,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
     SharedPreferences loginInfo;
     SharedPreferences.Editor editor;
     ViewGroup group;
-    SignInButton signInButton;
+     ImageView signInButton;
 //    ProgressBar wait;
 ACProgressFlower flower;
     PhoneAuthProvider.ForceResendingToken myToken;
@@ -368,7 +370,7 @@ ACProgressFlower flower;
         verifyCode = findViewById(R.id.verifyVerification);
         reference = FirebaseDatabase.getInstance().getReference().getRoot();
         signInButton = findViewById(R.id.signInButton);
-        signInButton.setSize(SignInButton.SIZE_STANDARD);
+
         gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken("765176451275-u5qelumumncbf54dh2fgs1do08luae91.apps.googleusercontent.com")
                 .requestEmail()
