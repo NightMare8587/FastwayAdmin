@@ -34,7 +34,7 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
 
     @Override
     public void onBindViewHolder(@NonNull TableAdapter holder, int position) {
-        holder.tableNum.setText(tables.get(position));
+        holder.tableNum.setText("Table Number : " + tables.get(position));
         holder.status.setText(status.get(position));
     }
 

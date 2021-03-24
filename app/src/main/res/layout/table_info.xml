@@ -2,36 +2,38 @@
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent" android:layout_height="85dp"
-    android:padding="10dp"
-    android:layout_margin="5dp">
+    android:layout_width="match_parent" android:layout_height="110dp"
+    
+    android:layout_marginLeft="25dp"
+    android:layout_marginRight="25dp"
+    android:layout_marginTop="15dp"
+    android:layout_marginBottom="5dp">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:background="@drawable/gradient1"
         android:layout_height="match_parent">
 
         <TextView
-            android:id="@+id/numberOfTable"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="30dp"
-            android:layout_marginTop="28dp"
-            android:text="Table Number"
-            android:textSize="17sp"
+            android:text="Table Number : "
+            android:layout_margin="15dp"
             android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:textSize="18sp"
+            android:id="@+id/numberOfTable"/>
 
         <TextView
-            android:id="@+id/statusOfTable"
             android:layout_width="wrap_content"
+            android:layout_margin="15dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="28dp"
-            android:layout_marginEnd="30dp"
-            android:text="TextView"
-            android:textSize="17sp"
+            android:text="Status : "
+
             android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            android:textSize="18sp"
+            android:id="@+id/statusOfTable"
+            />
+
+    </LinearLayout>
 </androidx.cardview.widget.CardView>

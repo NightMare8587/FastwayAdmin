@@ -108,15 +108,15 @@ ACProgressFlower flower;
         setContentView(R.layout.activity_main);
         initialise();
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
-        FirebaseAuth.getInstance().signOut();
+
 //        Sprite bounce = new Wave();
 //        spinKitView.setColor(R.color.teal_200);
 //        spinKitView.setIndeterminateDrawable(bounce);
         checkPermissions();
-//        if(currentUser != null){
-//            startActivity(new Intent(getApplicationContext(),Info.class));
-//            finish();
-//        }
+        if(currentUser != null){
+            startActivity(new Intent(getApplicationContext(),Info.class));
+            finish();
+        }
 
         loginInfo = getSharedPreferences("loginInfo",MODE_PRIVATE);
         editor = loginInfo.edit();
