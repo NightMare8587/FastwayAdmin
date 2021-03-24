@@ -6,10 +6,13 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -25,6 +28,11 @@ import androidx.core.content.ContextCompat;
 import com.crowdfire.cfalertdialog.CFAlertDialog;
 import com.example.fastwayadmin.Info.Info;
 import com.example.fastwayadmin.R;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.LocationRequest;
@@ -39,15 +47,18 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseException;
+import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthOptions;
 import com.google.firebase.auth.PhoneAuthProvider;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.internal.InternalTokenProvider;
 import com.hbb20.CountryCodePicker;
 
 import java.util.HashMap;
@@ -68,10 +79,15 @@ public class MainActivity extends AppCompatActivity {
 
     FirebaseAuth loginAuth;
     LocationRequest locationRequest;
+    GoogleSignInOptions gso;
+    GoogleSignInClient client;
     protected boolean isProgressShowing = false;
     String verId;
     FirebaseFirestore db =  FirebaseFirestore.getInstance();
+    SharedPreferences loginInfo;
+    SharedPreferences.Editor editor;
     ViewGroup group;
+    SignInButton signInButton;
 //    ProgressBar wait;
 ACProgressFlower flower;
     PhoneAuthProvider.ForceResendingToken myToken;
@@ -90,14 +106,25 @@ ACProgressFlower flower;
         setContentView(R.layout.activity_main);
         initialise();
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        FirebaseAuth.getInstance().signOut();
 //        Sprite bounce = new Wave();
 //        spinKitView.setColor(R.color.teal_200);
 //        spinKitView.setIndeterminateDrawable(bounce);
         checkPermissions();
-        if(currentUser != null){
-            startActivity(new Intent(getApplicationContext(),Info.class));
-            finish();
-        }
+//        if(currentUser != null){
+//            startActivity(new Intent(getApplicationContext(),Info.class));
+//            finish();
+//        }
+
+        loginInfo = getSharedPreferences("loginInfo",MODE_PRIVATE);
+        editor = loginInfo.edit();
+        signInButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent signIn = client.getSignInIntent();
+                startActivityForResult(signIn,3);
+            }
+        });
 
         startVerification.setOnClickListener(new View.OnClickListener() {
 
@@ -171,6 +198,9 @@ ACProgressFlower flower;
                             Map<String,Object> map = new HashMap<>();
                             map.put("name",name);
                             map.put("email",email);
+                            editor.putString("email",email);
+                            editor.putString("name",name);
+                            editor.apply();
                             DatabaseAdmin user = new DatabaseAdmin(name,email,number);
                             reference.child("Admin").child(loginAuth.getUid()+"").setValue(user);
                             db.collection(loginAuth.getUid()).document("info")
@@ -298,6 +328,9 @@ ACProgressFlower flower;
                     Map<String,Object> map = new HashMap<>();
                     map.put("name",name);
                     map.put("email",email);
+                    editor.putString("name",name);
+                    editor.putString("email",email);
+                    editor.apply();
 //                    wait.setVisibility(View.INVISIBLE);
                     Toast.makeText(MainActivity.this, "Login Successfully", Toast.LENGTH_SHORT).show();
                     DatabaseAdmin user = new DatabaseAdmin(name,email,number);
@@ -334,6 +367,15 @@ ACProgressFlower flower;
         startVerification = findViewById(R.id.startVerification);
         verifyCode = findViewById(R.id.verifyVerification);
         reference = FirebaseDatabase.getInstance().getReference().getRoot();
+        signInButton = findViewById(R.id.signInButton);
+        signInButton.setSize(SignInButton.SIZE_STANDARD);
+        gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(String.valueOf(R.string))
+                .requestEmail()
+                .build();
+
+        client = GoogleSignIn.getClient(MainActivity.this,gso);
+
     }
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -368,21 +410,73 @@ ACProgressFlower flower;
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         final LocationSettingsStates states = LocationSettingsStates.fromIntent(data);
-        switch (requestCode) {
-            case 101:
-                switch (resultCode) {
-                    case Activity.RESULT_OK:
-                        // All required changes were successfully made
-                        Toast.makeText(MainActivity.this, states.isLocationPresent() + "", Toast.LENGTH_SHORT).show();
-                        break;
-                    case Activity.RESULT_CANCELED:
-                        // The user was asked to change settings, but chose not to
-                        Toast.makeText(MainActivity.this, "Canceled", Toast.LENGTH_SHORT).show();
-                        break;
-                    default:
-                        break;
-                }
-                break;
+        if (requestCode == 101) {
+            switch (resultCode) {
+                case Activity.RESULT_OK:
+                    // All required changes were successfully made
+                    Toast.makeText(MainActivity.this, states.isLocationPresent() + "", Toast.LENGTH_SHORT).show();
+                    break;
+                case Activity.RESULT_CANCELED:
+                    // The user was asked to change settings, but chose not to
+                    Toast.makeText(MainActivity.this, "Canceled", Toast.LENGTH_SHORT).show();
+                    break;
+                default:
+                    break;
+            }
+        }else if(requestCode == 3){
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+            handleSignInResult(task);
+        }
+    }
+    private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
+        try {
+            GoogleSignInAccount account = completedTask.getResult(ApiException.class);
+
+            // Signed in successfully, show authenticated UI.
+            Toast.makeText(this, "Sign In", Toast.LENGTH_SHORT).show();
+            createFirebaseAuthID(account.getIdToken());
+            getSignInInformation();
+        } catch (ApiException e) {
+            // The ApiException status code indicates the detailed failure reason.
+            // Please refer to the GoogleSignInStatusCodes class reference for more information.
+            Log.w("TAG", "signInResult:failed code=" + e.getStatusCode());
+            Toast.makeText(this, e.getLocalizedMessage()+"", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void createFirebaseAuthID(String idToken) {
+        AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
+        loginAuth.signInWithCredential(credential)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            // Sign in success, update UI with the signed-in user's information
+                            Log.d("TAG", "signInWithCredential:success");
+                            FirebaseUser user = loginAuth.getCurrentUser();
+//                            updateUI(user);
+                        } else {
+                            // If sign in fails, display a message to the user.
+                            Log.w("TAG", "signInWithCredential:failure", task.getException());
+//                            updateUI(null);
+                        }
+                    }
+                });
+    }
+
+    private void getSignInInformation() {
+        GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(getApplicationContext());
+        if (acct != null) {
+            String personName = acct.getDisplayName();
+            String personGivenName = acct.getGivenName();
+            String personFamilyName = acct.getFamilyName();
+            String personEmail = acct.getEmail();
+            String personId = acct.getId();
+            Uri personPhoto = acct.getPhotoUrl();
+            editor.putString("email",personEmail);
+            editor.putString("name",personName);
+            editor.apply();
+            Log.i("info",personName+ " " + personEmail + " " + personFamilyName);
         }
     }
 }
