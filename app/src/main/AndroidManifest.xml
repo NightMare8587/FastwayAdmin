@@ -21,13 +21,13 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        tools:replace="android:icon"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar"
-        tools:ignore="AllowBackup">
-        <activity android:name=".DiscountCombo.CustomOffer"></activity>
+        tools:ignore="AllowBackup"
+        tools:replace="android:icon">
+        <activity android:name=".ListViewActivity.ChangeCredentials"></activity>
+        <activity android:name=".DiscountCombo.CustomOffer" />
         <activity android:name=".DiscountCombo.ComboAndOffers" />
         <activity android:name=".DiscountCombo.DiscountActivity" />
-
         <activity android:name=".MenuActivities.CustomDishImageSearch" />
         <activity android:name=".ListViewActivity.MyOrders" />
         <activity android:name=".ListViewActivity.MyAccount" />

@@ -5,6 +5,8 @@ import android.content.SharedPreferences;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -15,10 +17,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.fastwayadmin.R;
 
 public class MyAccount extends AppCompatActivity {
-    TextView textView;
     ListView listView;
-    LinearLayout linearLayout;
-    String[] names = {"Change Credentials","My Transactions","Change Mobile Number","Delete Account"};
+
+    String[] names = {"Change Credentials","Change Mobile Number","Delete Account"};
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,15 +29,19 @@ public class MyAccount extends AppCompatActivity {
         ArrayAdapter arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,names);
         listView.setAdapter(arrayAdapter);
         SharedPreferences sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
-        textView.setText("Hi, " + String.valueOf(sharedPreferences.getString("name","")));
-
+        
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                switch (i){
+                    case 0:
+                }
+            }
+        });
     }
-
-
-
     private void initialise() {
-        textView = findViewById(R.id.account_activity_text);
+
         listView = findViewById(R.id.accountActivityListView);
-        linearLayout = findViewById(R.id.linearLayout);
+
     }
 }
