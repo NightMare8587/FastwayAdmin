@@ -37,7 +37,7 @@ import java.util.Objects;
 
 public class AccountFrag extends Fragment {
     ListView listView;
-    String[] names = {"My Account","My Orders","Logout"};
+    String[] names = {"My Account","Logout"};
 
     FirebaseAuth auth;
     @Nullable
