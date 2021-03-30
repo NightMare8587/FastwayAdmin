@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<item android:id="@+id/changeNameBottomSheet"
+    android:title="Change Name"
+
+    android:icon="@drawable/ic_baseline_account_circle_24"
+    >
+</item>
+
+    <item android:id="@+id/changeEmailBottomSheet"
+        android:title="Change Email"
+        android:icon="@drawable/ic_baseline_email_24"/>
+</menu>

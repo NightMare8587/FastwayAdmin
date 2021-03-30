@@ -17,7 +17,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -34,7 +33,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.LocationRequest;
@@ -60,7 +58,6 @@ import com.google.firebase.auth.PhoneAuthProvider;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.internal.InternalTokenProvider;
 import com.hbb20.CountryCodePicker;
 
 import java.util.HashMap;
@@ -374,6 +371,7 @@ ACProgressFlower flower;
         gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken("765176451275-u5qelumumncbf54dh2fgs1do08luae91.apps.googleusercontent.com")
                 .requestEmail()
+                .requestProfile()
                 .build();
 
         client = GoogleSignIn.getClient(MainActivity.this,gso);
@@ -433,7 +431,6 @@ ACProgressFlower flower;
     private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
         try {
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
-
             // Signed in successfully, show authenticated UI.
             Toast.makeText(this, "Sign In", Toast.LENGTH_SHORT).show();
             createFirebaseAuthID(account.getIdToken());
@@ -448,14 +445,17 @@ ACProgressFlower flower;
 
     private void createFirebaseAuthID(String idToken) {
         AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
+        Log.i("credentials",String.valueOf(credential));
         loginAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
+
                             // Sign in success, update UI with the signed-in user's information
                             Log.d("TAG", "signInWithCredential:success");
                             FirebaseUser user = loginAuth.getCurrentUser();
+                            startActivity(new Intent(MainActivity.this,Info.class));
 //                            updateUI(user);
                         } else {
                             // If sign in fails, display a message to the user.
@@ -475,6 +475,12 @@ ACProgressFlower flower;
             String personEmail = acct.getEmail();
             String personId = acct.getId();
             Uri personPhoto = acct.getPhotoUrl();
+            GoogleSignInDB users = new GoogleSignInDB(personName,personEmail);
+            FirebaseUser user = loginAuth.getCurrentUser();
+            loginAuth = FirebaseAuth.getInstance();
+            assert user != null;
+            Log.i("auths",String.valueOf(user.getUid()));
+            reference.child("Admin").child(user.getUid()+"").setValue(users);
             editor.putString("email",personEmail);
             editor.putString("name",personName);
             editor.apply();

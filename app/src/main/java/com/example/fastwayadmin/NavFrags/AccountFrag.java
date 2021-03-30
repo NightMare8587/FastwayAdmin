@@ -63,9 +63,6 @@ public class AccountFrag extends Fragment {
                         startActivity(new Intent(getActivity(), MyAccount.class));
                         break;
                     case 1:
-                        startActivity(new Intent(getActivity(), MyOrders.class));
-                        break;
-                    case 2:
                         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                         builder.setTitle("Logout")
                                 .setMessage("Do you wanna logout?")

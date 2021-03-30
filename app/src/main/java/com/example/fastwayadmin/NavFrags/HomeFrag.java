@@ -74,7 +74,7 @@ public class HomeFrag extends Fragment {
         if(ContextCompat.checkSelfPermission(Objects.requireNonNull(getActivity()),Manifest.permission.CAMERA) + ContextCompat.checkSelfPermission(getActivity(),Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
             requestPermissions(new String[]{Manifest.permission.CAMERA,Manifest.permission.ACCESS_COARSE_LOCATION},1);
         }else
-            createLocationRequest();
+//            createLocationRequest();
 
         comboImage.setOnClickListener(new View.OnClickListener() {
             @Override
