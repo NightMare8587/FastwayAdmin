@@ -83,7 +83,6 @@ public class AccountFrag extends Fragment {
                                         googleSignInClient.signOut().addOnCompleteListener((Activity) getContext(), new OnCompleteListener<Void>() {
                                             @Override
                                             public void onComplete(@NonNull Task<Void> task) {
-
                                             }
                                         });
                                         startActivity(new Intent(getActivity(), MainActivity.class));
