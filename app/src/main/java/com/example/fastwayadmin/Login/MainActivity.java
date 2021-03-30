@@ -79,6 +79,7 @@ public class MainActivity extends AppCompatActivity {
     FirebaseAuth loginAuth;
     LocationRequest locationRequest;
     GoogleSignInOptions gso;
+    GoogleSignInAccount account;
     GoogleSignInClient client;
     protected boolean isProgressShowing = false;
     String verId;
@@ -430,7 +431,7 @@ ACProgressFlower flower;
     }
     private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
         try {
-            GoogleSignInAccount account = completedTask.getResult(ApiException.class);
+             account = completedTask.getResult(ApiException.class);
             // Signed in successfully, show authenticated UI.
             Toast.makeText(this, "Sign In", Toast.LENGTH_SHORT).show();
             createFirebaseAuthID(account.getIdToken());
@@ -451,10 +452,15 @@ ACProgressFlower flower;
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-
+                            loginAuth = FirebaseAuth.getInstance();
                             // Sign in success, update UI with the signed-in user's information
                             Log.d("TAG", "signInWithCredential:success");
                             FirebaseUser user = loginAuth.getCurrentUser();
+                            assert user != null;
+                            loginAuth.updateCurrentUser(user);
+                            GoogleSignInDB googleSignInDB = new GoogleSignInDB(account.getDisplayName(),account.getEmail());
+                            reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(user.getUid());
+                            reference.setValue(googleSignInDB);
                             startActivity(new Intent(MainActivity.this,Info.class));
 //                            updateUI(user);
                         } else {
@@ -475,12 +481,6 @@ ACProgressFlower flower;
             String personEmail = acct.getEmail();
             String personId = acct.getId();
             Uri personPhoto = acct.getPhotoUrl();
-            GoogleSignInDB users = new GoogleSignInDB(personName,personEmail);
-            FirebaseUser user = loginAuth.getCurrentUser();
-            loginAuth = FirebaseAuth.getInstance();
-            assert user != null;
-            Log.i("auths",String.valueOf(user.getUid()));
-            reference.child("Admin").child(user.getUid()+"").setValue(users);
             editor.putString("email",personEmail);
             editor.putString("name",personName);
             editor.apply();

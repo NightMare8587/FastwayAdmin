@@ -1,5 +1,6 @@
 package com.example.fastwayadmin.NavFrags;
 
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -25,6 +26,11 @@ import com.example.fastwayadmin.ListViewActivity.MyAccount;
 import com.example.fastwayadmin.ListViewActivity.MyOrders;
 import com.example.fastwayadmin.Login.MainActivity;
 import com.example.fastwayadmin.R;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -38,7 +44,7 @@ import java.util.Objects;
 public class AccountFrag extends Fragment {
     ListView listView;
     String[] names = {"My Account","Logout"};
-
+    GoogleSignInClient googleSignInClient;
     FirebaseAuth auth;
     @Nullable
     @Override
@@ -53,7 +59,11 @@ public class AccountFrag extends Fragment {
         auth = FirebaseAuth.getInstance();
         ArrayAdapter arrayAdapter = new ArrayAdapter<String>(view.getContext(),R.layout.list,names);
         listView.setAdapter(arrayAdapter);
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
 
+        googleSignInClient = GoogleSignIn.getClient(Objects.requireNonNull(getContext()),gso);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -70,6 +80,12 @@ public class AccountFrag extends Fragment {
                                     @Override
                                     public void onClick(DialogInterface dialogInterface, int i) {
                                         auth.signOut();
+                                        googleSignInClient.signOut().addOnCompleteListener((Activity) getContext(), new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+
+                                            }
+                                        });
                                         startActivity(new Intent(getActivity(), MainActivity.class));
                                         getActivity().finish();
                                     }
