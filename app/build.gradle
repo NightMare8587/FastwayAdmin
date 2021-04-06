@@ -10,7 +10,7 @@ android {
 
 
     defaultConfig {
-        applicationId "com.example.fastwayadmin"
+        applicationId "com.consumer.fastwayadmin"
         minSdkVersion 21
         targetSdkVersion 30
         versionCode 1
