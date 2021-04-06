@@ -8,15 +8,19 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:765176451275:android:be2415fa3372c695738b4e",
+        "mobilesdk_app_id": "1:765176451275:android:47f93c308f4e4ce4738b4e",
         "android_client_info": {
-          "package_name": "com.consumer.fastway"
+          "package_name": "com.consumers.fastway"
         }
       },
       "oauth_client": [
         {
-          "client_id": "765176451275-u5qelumumncbf54dh2fgs1do08luae91.apps.googleusercontent.com",
-          "client_type": 3
+          "client_id": "765176451275-1b06r3pe8pacmdl68kvh40sv314jn1gq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.consumers.fastway",
+            "certificate_hash": "5078284dc58db754eb15270db0bae67bfd1e74a4"
+          }
         }
       ],
       "api_key": [
@@ -28,7 +32,7 @@
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "765176451275-u5qelumumncbf54dh2fgs1do08luae91.apps.googleusercontent.com",
+              "client_id": "765176451275-u1ati379eiinc9b21472ml968chmlsqh.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
@@ -37,15 +41,19 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:765176451275:android:32716ce1e523032d738b4e",
+        "mobilesdk_app_id": "1:765176451275:android:25ab5c54f8b30d9a738b4e",
         "android_client_info": {
-          "package_name": "com.consumer.fastwayadmin"
+          "package_name": "com.consumers.fastwayadmin"
         }
       },
       "oauth_client": [
         {
-          "client_id": "765176451275-u5qelumumncbf54dh2fgs1do08luae91.apps.googleusercontent.com",
-          "client_type": 3
+          "client_id": "765176451275-vu40ngd47ki9r4n0p7aadvvqhn8op88a.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.consumers.fastwayadmin",
+            "certificate_hash": "5078284dc58db754eb15270db0bae67bfd1e74a4"
+          }
         }
       ],
       "api_key": [
@@ -57,7 +65,7 @@
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "765176451275-u5qelumumncbf54dh2fgs1do08luae91.apps.googleusercontent.com",
+              "client_id": "765176451275-u1ati379eiinc9b21472ml968chmlsqh.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
