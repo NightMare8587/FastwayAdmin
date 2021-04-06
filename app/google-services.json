@@ -8,20 +8,12 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:765176451275:android:f6b1b006b456d9e5738b4e",
+        "mobilesdk_app_id": "1:765176451275:android:be2415fa3372c695738b4e",
         "android_client_info": {
-          "package_name": "com.example.fastway"
+          "package_name": "com.consumer.fastway"
         }
       },
       "oauth_client": [
-        {
-          "client_id": "765176451275-3fvrmdal035u0vlfhjnlq425u90kvcal.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.example.fastway",
-            "certificate_hash": "5078284dc58db754eb15270db0bae67bfd1e74a4"
-          }
-        },
         {
           "client_id": "765176451275-u5qelumumncbf54dh2fgs1do08luae91.apps.googleusercontent.com",
           "client_type": 3
@@ -29,7 +21,7 @@
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyAb_UDqUkeuWUM3lxbr-KG5giboxzD8eSo"
+          "current_key": "AIzaSyAWW-EGcjGEjQ5PkmsndI2n1wHvx1qGwVE"
         }
       ],
       "services": {
@@ -45,20 +37,12 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:765176451275:android:04ecdb1965fd5dfc738b4e",
+        "mobilesdk_app_id": "1:765176451275:android:32716ce1e523032d738b4e",
         "android_client_info": {
-          "package_name": "com.example.fastwayadmin"
+          "package_name": "com.consumer.fastwayadmin"
         }
       },
       "oauth_client": [
-        {
-          "client_id": "765176451275-aacuhq6dmv65ltj1u8i46p2ee218u93n.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.example.fastwayadmin",
-            "certificate_hash": "5078284dc58db754eb15270db0bae67bfd1e74a4"
-          }
-        },
         {
           "client_id": "765176451275-u5qelumumncbf54dh2fgs1do08luae91.apps.googleusercontent.com",
           "client_type": 3

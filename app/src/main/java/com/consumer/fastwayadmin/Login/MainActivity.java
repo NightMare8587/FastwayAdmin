@@ -370,7 +370,7 @@ ACProgressFlower flower;
         signInButton = findViewById(R.id.signInButton);
 
         gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken("765176451275-u5qelumumncbf54dh2fgs1do08luae91.apps.googleusercontent.com")
+                .requestIdToken("765176451275-79b0cirodh8qa369aoens67j1lskbepq.apps.googleusercontent.com")
                 .requestEmail()
                 .requestProfile()
                 .build();
