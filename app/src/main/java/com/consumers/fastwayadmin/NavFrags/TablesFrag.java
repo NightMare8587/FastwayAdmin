@@ -28,6 +28,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -66,12 +67,20 @@ public class TablesFrag extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.exists()){
+                    HashMap<String,List<String>> map = new HashMap<>();
                     for(DataSnapshot dataSnapshot : snapshot.getChildren()){
                         tableNumber.add(Objects.requireNonNull(dataSnapshot.child("tableNum").getValue()).toString());
                         status.add(dataSnapshot.child("status").getValue().toString());
+                        if(dataSnapshot.hasChild("customerId")) {
+//                            map.put(String.valueOf(dataSnapshot.child("tableNum").getValue(String.class)),String.valueOf(dataSnapshot.child("customerId").getValue()));
+                            List<String> list = new ArrayList<>();
+                            list.add(String.valueOf(dataSnapshot.child("customerId").getValue()));
+                            list.add(String.valueOf(dataSnapshot.child("time").getValue()));
+                            map.put(String.valueOf(dataSnapshot.child("tableNum").getValue(String.class)), list);
+                        }
                     }
 
-                    table.setAdapter(new TableView(tableNumber,status));
+                    table.setAdapter(new TableView(tableNumber,status,map));
 
                 }else{
                     Toast.makeText(view.getContext(), "Add Some Tables!!!", Toast.LENGTH_SHORT).show();
@@ -94,11 +103,18 @@ public class TablesFrag extends Fragment {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     if(snapshot.exists()){
-                        for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                        HashMap<String,List<String>> map = new HashMap<>();
+                        for(DataSnapshot dataSnapshot : snapshot.getChildren()) {
                             tableNumber.add(Objects.requireNonNull(dataSnapshot.child("tableNum").getValue()).toString());
                             status.add(dataSnapshot.child("status").getValue().toString());
+                            if (dataSnapshot.hasChild("customerId")) {
+                                List<String> list = new ArrayList<>();
+                                list.add(String.valueOf(dataSnapshot.child("customerId").getValue()));
+                                list.add(String.valueOf(dataSnapshot.child("time").getValue()));
+                                map.put(String.valueOf(dataSnapshot.child("tableNum").getValue(String.class)), list);
+                            }
                         }
-                        table.setAdapter(new TableView(tableNumber,status));
+                        table.setAdapter(new TableView(tableNumber,status,map));
 
                     }else{
                         Toast.makeText(view.getContext(), "Add Some Tables!!!", Toast.LENGTH_SHORT).show();
