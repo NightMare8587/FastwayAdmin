@@ -1,6 +1,7 @@
 package com.consumers.fastwayadmin.Tables;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.consumers.fastwayadmin.R;
+import com.developer.kalert.KAlertDialog;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -23,11 +25,13 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
     List<String> status = new ArrayList<>();
     HashMap<String,List<String>> map = new HashMap<>();
     DatabaseReference reference;
+    Context context;
     FirebaseAuth auth;
-    public TableView(List<String> tables,List<String> status,HashMap<String,List<String>> map){
+    public TableView(List<String> tables,List<String> status,HashMap<String,List<String>> map,Context context){
         this.status = status;
         this.map = map;
         this.tables = tables;
+        this.context = context;
     }
 
     @NonNull
@@ -58,13 +62,30 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
             holder.cancel.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    new K
-                    reference.child(tables.get(position)).child("customerId").removeValue();
-                    reference.child(tables.get(position)).child("status").setValue("available");
-                    reference.child(tables.get(position)).child("time").removeValue();
-                    holder.chatWith.setVisibility(View.INVISIBLE);
-                    holder.cancel.setVisibility(View.INVISIBLE);
-                    holder.timeOfReserved.setVisibility(View.INVISIBLE);
+                    new KAlertDialog(view.getContext(),KAlertDialog.WARNING_TYPE)
+                            .setTitleText("Warning!!!")
+                            .setContentText("Do you sure wanna remove this reserved table??")
+                            .setCancelText("No")
+                            .setCancelClickListener(new KAlertDialog.KAlertClickListener() {
+                                @Override
+                                public void onClick(KAlertDialog kAlertDialog) {
+                                    kAlertDialog.dismissWithAnimation();
+                                }
+                            })
+                            .setConfirmText("Yes")
+                            .setConfirmClickListener(new KAlertDialog.KAlertClickListener() {
+                                @Override
+                                public void onClick(KAlertDialog kAlertDialog) {
+                                    reference.child(tables.get(position)).child("customerId").removeValue();
+                                    reference.child(tables.get(position)).child("status").setValue("available");
+                                    reference.child(tables.get(position)).child("time").removeValue();
+                                    holder.chatWith.setVisibility(View.INVISIBLE);
+                                    holder.cancel.setVisibility(View.INVISIBLE);
+                                    holder.timeOfReserved.setVisibility(View.INVISIBLE);
+                                    kAlertDialog.dismissWithAnimation();
+                                }
+                            }).show();
+
 
                 }
             });

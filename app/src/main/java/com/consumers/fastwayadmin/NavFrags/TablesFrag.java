@@ -27,15 +27,18 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class TablesFrag extends Fragment {
     Toolbar tableBar;
     FloatingActionButton addTable;
-
+    TableView tableView;
     FirebaseAuth tableAuth;
     SwipeRefreshLayout layout;
     DatabaseReference tableRef;
@@ -79,8 +82,9 @@ public class TablesFrag extends Fragment {
                             map.put(String.valueOf(dataSnapshot.child("tableNum").getValue(String.class)), list);
                         }
                     }
-
-                    table.setAdapter(new TableView(tableNumber,status,map));
+                    tableView = new TableView(tableNumber,status,map,getContext());
+                    table.setAdapter(tableView);
+                    tableView.notifyDataSetChanged();
 
                 }else{
                     Toast.makeText(view.getContext(), "Add Some Tables!!!", Toast.LENGTH_SHORT).show();
@@ -114,7 +118,9 @@ public class TablesFrag extends Fragment {
                                 map.put(String.valueOf(dataSnapshot.child("tableNum").getValue(String.class)), list);
                             }
                         }
-                        table.setAdapter(new TableView(tableNumber,status,map));
+                        tableView = new TableView(tableNumber,status,map,getContext());
+                        table.setAdapter(tableView);
+                        tableView.notifyDataSetChanged();
 
                     }else{
                         Toast.makeText(view.getContext(), "Add Some Tables!!!", Toast.LENGTH_SHORT).show();
