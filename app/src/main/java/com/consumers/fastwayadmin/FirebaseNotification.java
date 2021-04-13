@@ -10,6 +10,7 @@ import android.os.Build;
 import android.widget.RemoteViews;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 
 import com.consumers.fastwayadmin.Login.MainActivity;
@@ -31,6 +32,7 @@ public class FirebaseNotification extends FirebaseMessagingService {
         super.onNewToken(s);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
@@ -56,6 +58,7 @@ public class FirebaseNotification extends FirebaseMessagingService {
         return remoteViews;
     }
     // Method to display the notifications
+    @RequiresApi(api = Build.VERSION_CODES.N)
     public void showNotification(String title,
                                  String message) {
         auth = FirebaseAuth.getInstance();
@@ -90,6 +93,7 @@ public class FirebaseNotification extends FirebaseMessagingService {
                 = new NotificationCompat
                 .Builder(getApplicationContext(),
                 channel_id)
+                .setPriority(NotificationManager.IMPORTANCE_HIGH)
                 .setSmallIcon(R.drawable.ic_baseline_home_24)
                 .setAutoCancel(true)
                 .setVibrate(new long[]{1000, 1000, 1000,
