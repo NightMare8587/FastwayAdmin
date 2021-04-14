@@ -12,6 +12,7 @@ import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Looper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,8 +24,11 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.consumers.fastwayadmin.DiscountCombo.DiscountActivity;
+import com.consumers.fastwayadmin.NavFrags.homeFrag.homeFragClass;
 import com.consumers.fastwayadmin.R;
 import com.example.flatdialoglibrary.dialog.FlatDialog;
 import com.google.android.gms.common.api.ApiException;
@@ -42,20 +46,29 @@ import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class HomeFrag extends Fragment {
 
     FirebaseAuth auth;
+    RecyclerView recyclerView;
     LocationRequest locationRequest;
+    LinearLayoutManager horizonatl;
     ImageView comboImage;
     SharedPreferences sharedPreferences;
     DatabaseReference reference;
     FusedLocationProviderClient client;
+    List<String> tableNum = new ArrayList<>();
+    List<String> seats = new ArrayList<>();
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -65,8 +78,11 @@ public class HomeFrag extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        recyclerView = view.findViewById(R.id.homeFragRecyclerView);
+//        recyclerView.setLayoutManager(new LinearLayoutManager(view.getContext(),LinearLayoutManager.HORIZONTAL),true);
         comboImage = view.findViewById(R.id.comboDiscountImageView);
         auth = FirebaseAuth.getInstance();
+        horizonatl = new LinearLayoutManager(view.getContext(),LinearLayoutManager.HORIZONTAL,false);
         sharedPreferences = getActivity().getSharedPreferences("locations current", Context.MODE_PRIVATE);
         reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid()));
         FirebaseMessaging.getInstance().subscribeToTopic(Objects.requireNonNull(auth.getUid()));
@@ -112,6 +128,31 @@ public class HomeFrag extends Fragment {
                                 flatDialog.dismiss();
                             }
                         }).show();
+
+            }
+        });
+
+        reference.child("Tables").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists()){
+//                    Toast.makeText(view.getContext(), ""+snapshot.getChildrenCount(), Toast.LENGTH_SHORT).show();
+                    for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                        if(dataSnapshot.child("status").getValue(String.class).equals("unavailable")){
+                            tableNum.add(dataSnapshot.child("tableNum").getValue(String.class));
+                            seats.add(dataSnapshot.child("numSeats").getValue(String.class));
+                        }
+                    }
+                    recyclerView.setLayoutManager(horizonatl);
+//                    Toast.makeText(view.getContext(), ""+seats.toString(), Toast.LENGTH_SHORT).show();
+                    recyclerView.setAdapter(new homeFragClass(tableNum,seats));
+                }else{
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
 
             }
         });
