@@ -180,6 +180,8 @@ public class HomeFrag extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.exists()){
+                    tableNum.clear();
+                    seats.clear();
 //                    Toast.makeText(view.getContext(), "I am invoked", Toast.LENGTH_SHORT).show();
 //                    Toast.makeText(view.getContext(), ""+snapshot.getChildrenCount(), Toast.LENGTH_SHORT).show();
                     for(DataSnapshot dataSnapshot : snapshot.getChildren()){
@@ -202,32 +204,33 @@ public class HomeFrag extends Fragment {
             }
         });
 
-//        reference.child("Tables").addChildEventListener(new ChildEventListener() {
-//            @Override
-//            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-//
-//            }
-//
-//            @Override
-//            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+        reference.child("Tables").addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
 //                Toast.makeText(view.getContext(), ""+snapshot.child("status").getValue(), Toast.LENGTH_SHORT).show();
-//            }
-//
-//            @Override
-//            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
-//
-//            }
-//
-//            @Override
-//            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-//
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//
-//            }
-//        });
+                updateDatabase();
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
 
 
 
@@ -265,6 +268,36 @@ public class HomeFrag extends Fragment {
             }
         });
 
+    }
+
+    private void updateDatabase() {
+        reference.child("Tables").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists()){
+                    tableNum.clear();
+                    seats.clear();
+//                    Toast.makeText(view.getContext(), "I am invoked", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(view.getContext(), ""+snapshot.getChildrenCount(), Toast.LENGTH_SHORT).show();
+                    for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                        if(dataSnapshot.child("status").getValue(String.class).equals("unavailable")){
+                            tableNum.add(dataSnapshot.child("tableNum").getValue(String.class));
+                            seats.add(dataSnapshot.child("numSeats").getValue(String.class));
+                        }
+                    }
+                    recyclerView.setLayoutManager(horizonatl);
+//                    Toast.makeText(view.getContext(), ""+seats.toString(), Toast.LENGTH_SHORT).show();
+                    recyclerView.setAdapter(new homeFragClass(tableNum,seats));
+                }else{
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
     @Override
