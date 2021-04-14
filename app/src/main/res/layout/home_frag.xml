@@ -24,22 +24,47 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/comboDiscountImageView">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:textStyle="bold"
-            android:textSize="18sp"
-            android:layout_margin="8dp"
-            android:text="Current Tables"/>
-
-        <androidx.recyclerview.widget.RecyclerView
+        <LinearLayout
             android:layout_width="match_parent"
-            app:reverseLayout="true"
-            android:layout_height="match_parent"
-            android:id="@+id/homeFragRecyclerView"
-            />
+            android:orientation="horizontal"
+            android:layout_gravity="center"
+            android:layout_weight="0.2"
+            android:layout_height="0dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAlignment="center"
+                android:layout_weight="0.8"
+                android:layout_gravity="center"
+                android:textStyle="bold"
+                android:textSize="18sp"
+                android:text="Current Tables"/>
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:layout_gravity="center"
+                android:textColor="@color/quantum_cyan"
+                android:text="Refersh"
+                android:drawableStart="@drawable/ic_baseline_refresh_24"
+                android:id="@+id/refreshCurrentTables"
+                android:background="@null"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.8">
+            <androidx.recyclerview.widget.RecyclerView
+                android:layout_width="match_parent"
+                app:reverseLayout="true"
+                android:layout_height="match_parent"
+                android:id="@+id/homeFragRecyclerView"
+                />
+        </LinearLayout>
+
+
+
 
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

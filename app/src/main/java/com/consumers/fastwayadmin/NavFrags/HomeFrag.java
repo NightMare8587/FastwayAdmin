@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -30,6 +31,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.consumers.fastwayadmin.DiscountCombo.DiscountActivity;
 import com.consumers.fastwayadmin.NavFrags.homeFrag.homeFragClass;
 import com.consumers.fastwayadmin.R;
+import com.developer.kalert.KAlertDialog;
 import com.example.flatdialoglibrary.dialog.FlatDialog;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.ResolvableApiException;
@@ -64,6 +66,7 @@ public class HomeFrag extends Fragment {
     LocationRequest locationRequest;
     LinearLayoutManager horizonatl;
     ImageView comboImage;
+    Button refershRecyclerView;
     SharedPreferences sharedPreferences;
     DatabaseReference reference;
     FusedLocationProviderClient client;
@@ -79,6 +82,7 @@ public class HomeFrag extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         recyclerView = view.findViewById(R.id.homeFragRecyclerView);
+        refershRecyclerView = view.findViewById(R.id.refreshCurrentTables);
 //        recyclerView.setLayoutManager(new LinearLayoutManager(view.getContext(),LinearLayoutManager.HORIZONTAL),true);
         comboImage = view.findViewById(R.id.comboDiscountImageView);
         auth = FirebaseAuth.getInstance();
@@ -154,6 +158,39 @@ public class HomeFrag extends Fragment {
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
 
+            }
+        });
+
+        refershRecyclerView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                tableNum.clear();
+                seats.clear();
+                
+                reference.child("Tables").addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if(snapshot.exists()){
+//                    Toast.makeText(view.getContext(), ""+snapshot.getChildrenCount(), Toast.LENGTH_SHORT).show();
+                            for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                                if(dataSnapshot.child("status").getValue(String.class).equals("unavailable")){
+                                    tableNum.add(dataSnapshot.child("tableNum").getValue(String.class));
+                                    seats.add(dataSnapshot.child("numSeats").getValue(String.class));
+                                }
+                            }
+                            recyclerView.setLayoutManager(horizonatl);
+//                    Toast.makeText(view.getContext(), ""+seats.toString(), Toast.LENGTH_SHORT).show();
+                            recyclerView.setAdapter(new homeFragClass(tableNum,seats));
+                        }else{
+
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
             }
         });
 
