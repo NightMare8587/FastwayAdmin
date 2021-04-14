@@ -29,10 +29,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.consumers.fastwayadmin.DiscountCombo.DiscountActivity;
+//import com.consumers.fastwayadmin.NavFrags.homeFrag.homeAdapter;
 import com.consumers.fastwayadmin.NavFrags.homeFrag.homeFragClass;
+//import com.consumers.fastwayadmin.NavFrags.homeFrag.homeModel;
 import com.consumers.fastwayadmin.R;
 import com.developer.kalert.KAlertDialog;
 import com.example.flatdialoglibrary.dialog.FlatDialog;
+import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -48,6 +51,7 @@ import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -58,6 +62,8 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class HomeFrag extends Fragment {
 
@@ -67,6 +73,8 @@ public class HomeFrag extends Fragment {
     LinearLayoutManager horizonatl;
     ImageView comboImage;
     Button refershRecyclerView;
+//    homeAdapter homeAdapter;
+
     SharedPreferences sharedPreferences;
     DatabaseReference reference;
     FusedLocationProviderClient client;
@@ -135,11 +143,44 @@ public class HomeFrag extends Fragment {
 
             }
         });
+//        new Timer().scheduleAtFixedRate(new TimerTask() {
+//            @Override
+//            public void run() {
+//                reference.child("Tables").addListenerForSingleValueEvent(new ValueEventListener() {
+//                    @Override
+//                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                        if(snapshot.exists()){
+//                            tableNum.clear();
+//                            seats.clear();
+////                            Toast.makeText(view.getContext(), "I am invoked", Toast.LENGTH_SHORT).show();
+////                    Toast.makeText(view.getContext(), ""+snapshot.getChildrenCount(), Toast.LENGTH_SHORT).show();
+//                            for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+//                                if(dataSnapshot.child("status").getValue(String.class).equals("unavailable")){
+//                                    tableNum.add(dataSnapshot.child("tableNum").getValue(String.class));
+//                                    seats.add(dataSnapshot.child("numSeats").getValue(String.class));
+//                                }
+//                            }
+//                            recyclerView.setLayoutManager(horizonatl);
+////                    Toast.makeText(view.getContext(), ""+seats.toString(), Toast.LENGTH_SHORT).show();
+//                            recyclerView.setAdapter(new homeFragClass(tableNum,seats));
+//                        }else{
+//
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void onCancelled(@NonNull DatabaseError error) {
+//
+//                    }
+//                });
+//            }
+//        },0,2500);
 
         reference.child("Tables").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.exists()){
+//                    Toast.makeText(view.getContext(), "I am invoked", Toast.LENGTH_SHORT).show();
 //                    Toast.makeText(view.getContext(), ""+snapshot.getChildrenCount(), Toast.LENGTH_SHORT).show();
                     for(DataSnapshot dataSnapshot : snapshot.getChildren()){
                         if(dataSnapshot.child("status").getValue(String.class).equals("unavailable")){
@@ -161,12 +202,42 @@ public class HomeFrag extends Fragment {
             }
         });
 
+//        reference.child("Tables").addChildEventListener(new ChildEventListener() {
+//            @Override
+//            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+//
+//            }
+//
+//            @Override
+//            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+//                Toast.makeText(view.getContext(), ""+snapshot.child("status").getValue(), Toast.LENGTH_SHORT).show();
+//            }
+//
+//            @Override
+//            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+//
+//            }
+//
+//            @Override
+//            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+//
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//
+//            }
+//        });
+
+
+
+
         refershRecyclerView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 tableNum.clear();
                 seats.clear();
-                
+
                 reference.child("Tables").addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -303,4 +374,5 @@ public class HomeFrag extends Fragment {
         });
 
     }
+
 }

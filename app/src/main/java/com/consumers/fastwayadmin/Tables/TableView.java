@@ -70,7 +70,12 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
             holder.cancel.setVisibility(View.VISIBLE);
             holder.timeOfReserved.setVisibility(View.VISIBLE);
             holder.timeOfReserved.setText(myList.get(1)+"");
+            holder.chatWith.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
 
+                }
+            });
 
             holder.cancel.setOnClickListener(new View.OnClickListener() {
                 @Override
