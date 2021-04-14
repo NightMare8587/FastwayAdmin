@@ -3,6 +3,7 @@ package com.consumers.fastwayadmin.Tables;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -73,7 +74,9 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
             holder.chatWith.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-
+                    Intent intent = new Intent(view.getContext(),ChatWithCustomer.class);
+                    intent.putExtra("id",myList.get(0));
+                    view.getContext().startActivity(intent);
                 }
             });
 

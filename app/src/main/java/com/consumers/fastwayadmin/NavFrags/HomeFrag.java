@@ -74,7 +74,6 @@ public class HomeFrag extends Fragment {
     ImageView comboImage;
     Button refershRecyclerView;
 //    homeAdapter homeAdapter;
-
     SharedPreferences sharedPreferences;
     DatabaseReference reference;
     FusedLocationProviderClient client;
