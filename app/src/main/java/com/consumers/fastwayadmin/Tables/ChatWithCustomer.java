@@ -28,6 +28,9 @@ public class ChatWithCustomer extends AppCompatActivity {
     DatabaseReference reference;
     FirebaseAuth auth;
     RecyclerView recyclerView;
+    List<String> message = new ArrayList<>();
+    List<String> time = new ArrayList<>();
+    List<String> id = new ArrayList<>();
     EditText editText;
     Button sendME;
     @Override
@@ -45,11 +48,13 @@ public class ChatWithCustomer extends AppCompatActivity {
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        reference.child("messages").addListenerForSingleValueEvent(new ValueEventListener() {
+        reference.child("messages").child(id).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                if(snapshot.exists()) {
+                    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
 
+                    }
                 }
             }
 
@@ -66,7 +71,7 @@ public class ChatWithCustomer extends AppCompatActivity {
                     Toast.makeText(ChatWithCustomer.this, "Enter Some Text", Toast.LENGTH_SHORT).show();
                     return;
                 }else{
-                    chat chat = new chat(editText.getText().toString(),auth.getUid()+"",System.currentTimeMillis()+"");
+                    chat chat = new chat(editText.getText().toString(),auth.getUid()+"",System.currentTimeMillis()+"","1");
                   reference.child("messages").child(System.currentTimeMillis()+"").setValue(chat);
                 }
             }
