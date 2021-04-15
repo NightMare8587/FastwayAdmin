@@ -24,7 +24,8 @@
         android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         tools:ignore="AllowBackup"
         tools:replace="android:icon">
-        <activity android:name=".Tables.ChatWithCustomer"></activity>
+
+        <activity android:name=".Tables.ChatWithCustomer" android:windowSoftInputMode="adjustResize" >  </activity>
         <activity android:name=".DiscountCombo.CustomOffer" />
         <activity android:name=".DiscountCombo.ComboAndOffers" />
         <activity android:name=".DiscountCombo.DiscountActivity" />

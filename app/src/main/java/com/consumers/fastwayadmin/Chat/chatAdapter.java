@@ -1,31 +1,94 @@
 package com.consumers.fastwayadmin.Chat;
 
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class chatAdapter extends RecyclerView.Adapter<chatAdapter.holder> {
+import com.consumers.fastwayadmin.R;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class chatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    List<String> message = new ArrayList<>();
+    List<String> time = new ArrayList<>();
+    List<String> leftOrRight = new ArrayList<>();
+    int send = 1;
+    int receive = 0;
+
+    public chatAdapter(List<String> message, List<String> time, List<String> leftOrRight) {
+        this.message = message;
+        this.time = time;
+        this.leftOrRight = leftOrRight;
+    }
+
     @NonNull
     @Override
-    public holder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return null;
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view;
+        LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
+        if(viewType == send){
+            view = layoutInflater.inflate(R.layout.card_message_revive,parent,false);
+            return new ReciveHolder(view);
+        }else{
+            view = layoutInflater.inflate(R.layout.card_message_send,parent,false);
+            return new SentViewHolder(view);
+        }
+//        view = layoutInflater.inflate(R.layout.card_message_send,parent,false);
+//        return new holder(view);
+    }
+
+    public class SentViewHolder extends RecyclerView.ViewHolder{
+        TextView send;
+        public SentViewHolder(@NonNull View itemView) {
+            super(itemView);
+            send = itemView.findViewById(R.id.textSend);
+        }
+    }
+
+    public class ReciveHolder extends RecyclerView.ViewHolder{
+        TextView recive;
+        public ReciveHolder(@NonNull View itemView) {
+            super(itemView);
+            recive = itemView.findViewById(R.id.textRecive);
+        }
     }
 
     @Override
-    public void onBindViewHolder(@NonNull holder holder, int position) {
+    public int getItemViewType(int position) {
+        if(Integer.parseInt(leftOrRight.get(position)) == send)
+            return 1;
+        else
+            return 0;
+//        return super.getItemViewType(position);
+    }
 
+    @Override
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+//        holder.send.setText(message.get(position));
+        if(holder.getClass() == SentViewHolder.class){
+            SentViewHolder viewHolder = (SentViewHolder) holder;
+            ((SentViewHolder) holder).send.setText(message.get(position));
+        }else{
+            ReciveHolder reciveHolder = (ReciveHolder) holder;
+            ((ReciveHolder) holder).recive.setText(message.get(position));
+        }
     }
 
     @Override
     public int getItemCount() {
-        return 0;
+        return message.size();
     }
-    public static class holder extends RecyclerView.ViewHolder{
-
-        public holder(@NonNull View itemView) {
-            super(itemView);
-        }
-    }
+//    public static class holder extends RecyclerView.ViewHolder{
+//        TextView send,receive;
+//        public holder(@NonNull View itemView) {
+//            super(itemView);
+//            send = itemView.findViewById(R.id.textSend);
+////            receive = itemView.findViewById(R.id.textRecive);
+//        }
+//    }
 }
