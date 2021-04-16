@@ -16,9 +16,10 @@
         app:layout_constraintStart_toStartOf="parent">
 
         <EditText
-
+            android:background="@null"
             android:id="@+id/sendMessageEditText"
             android:layout_width="0dp"
+            android:inputType="textMultiLine"
             android:layout_height="match_parent"
             android:layout_margin="5dp"
             android:layout_weight="0.7" />
