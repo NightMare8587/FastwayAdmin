@@ -1,6 +1,7 @@
 package com.consumers.fastwayadmin.ListViewActivity;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -15,10 +16,15 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.consumers.fastwayadmin.Login.MainActivity;
 import com.consumers.fastwayadmin.R;
 import com.developer.kalert.KAlertDialog;
 import com.example.flatdialoglibrary.dialog.FlatDialog;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseException;
 import com.google.firebase.auth.AuthResult;
@@ -50,6 +56,8 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
     ListView listView;
     DatabaseReference reference;
     FirebaseAuth auth;
+    GoogleSignInClient client;
+    GoogleSignInOptions gso;
     String verId;
     PhoneAuthCredential credential;
     ModalBottomSheetDialog modalBottomSheetDialog;
@@ -223,6 +231,70 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
 
                             }
                         });
+                        break;
+
+                    case 3:
+                        new KAlertDialog(MyAccount.this,KAlertDialog.WARNING_TYPE)
+                                .setTitleText("Delete Account")
+                                .setContentText("Do you sure wanna delete your account!!!\n"+"This action can't be revert")
+                                .setConfirmText("Yes, Delete")
+                                .setConfirmClickListener(new KAlertDialog.KAlertClickListener() {
+                                    @Override
+                                    public void onClick(KAlertDialog kAlertDialog) {
+
+                                        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin");
+                                        reference.child(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser().getUid())).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+
+                                            }
+                                        });
+                                        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants");
+                                        reference.child(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser().getUid())).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+
+                                            }
+                                        });
+                                        auth = FirebaseAuth.getInstance();
+                                        FirebaseUser firebaseUser = auth.getCurrentUser();
+                                        auth.signOut();
+                                       firebaseUser.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                           @Override
+                                           public void onSuccess(Void aVoid) {
+
+                                           }
+                                       });
+                                        gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                                                .requestIdToken("765176451275-u5qelumumncbf54dh2fgs1do08luae91.apps.googleusercontent.com")
+                                                .requestEmail()
+                                                .build();
+
+                                        client = GoogleSignIn.getClient(MyAccount.this,gso);
+                                        try{
+
+                                            client.revokeAccess().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<Void> task) {
+
+                                                }
+                                            });
+                                            client.signOut();
+                                        }
+                                        catch (Exception e){
+                                            Log.i("exception",e.getLocalizedMessage());
+                                        }
+                                        kAlertDialog.dismissWithAnimation();
+                                        startActivity(new Intent(MyAccount.this, MainActivity.class));
+                                        finish();
+                                    }
+                                }).setCancelText("No, Wait")
+                                .setCancelClickListener(new KAlertDialog.KAlertClickListener() {
+                                    @Override
+                                    public void onClick(KAlertDialog kAlertDialog) {
+                                        kAlertDialog.dismissWithAnimation();
+                                    }
+                                }).show();
                         break;
                 }
             }
