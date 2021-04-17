@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="150dp"
+    android:layout_width="200dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_margin="10dp"
-    android:layout_height="120dp">
+    android:layout_height="160dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -26,6 +26,23 @@
             android:id="@+id/homeFragRecyclerViewSeats"
             android:text="Seats: "
             android:layout_height="wrap_content"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="34dp"
+            android:id="@+id/chat"
+            android:layout_gravity="center"
+            android:background="@drawable/chat_with_customer_button"
+            android:padding="8dp"
+            android:text="Chat With Customer" />
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_marginTop="5dp"
+            android:layout_height="34dp"
+            android:layout_gravity="center"
+            android:background="@drawable/chat_with_customer_button"
+            android:padding="8dp"
+            android:text="Chat With Customer" />
     </LinearLayout>
 
 </androidx.cardview.widget.CardView>

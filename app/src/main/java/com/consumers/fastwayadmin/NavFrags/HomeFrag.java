@@ -77,6 +77,7 @@ public class HomeFrag extends Fragment {
     SharedPreferences sharedPreferences;
     DatabaseReference reference;
     FusedLocationProviderClient client;
+    List<String> resId = new ArrayList<>();
     List<String> tableNum = new ArrayList<>();
     List<String> seats = new ArrayList<>();
     @Nullable
@@ -142,38 +143,6 @@ public class HomeFrag extends Fragment {
 
             }
         });
-//        new Timer().scheduleAtFixedRate(new TimerTask() {
-//            @Override
-//            public void run() {
-//                reference.child("Tables").addListenerForSingleValueEvent(new ValueEventListener() {
-//                    @Override
-//                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                        if(snapshot.exists()){
-//                            tableNum.clear();
-//                            seats.clear();
-////                            Toast.makeText(view.getContext(), "I am invoked", Toast.LENGTH_SHORT).show();
-////                    Toast.makeText(view.getContext(), ""+snapshot.getChildrenCount(), Toast.LENGTH_SHORT).show();
-//                            for(DataSnapshot dataSnapshot : snapshot.getChildren()){
-//                                if(dataSnapshot.child("status").getValue(String.class).equals("unavailable")){
-//                                    tableNum.add(dataSnapshot.child("tableNum").getValue(String.class));
-//                                    seats.add(dataSnapshot.child("numSeats").getValue(String.class));
-//                                }
-//                            }
-//                            recyclerView.setLayoutManager(horizonatl);
-////                    Toast.makeText(view.getContext(), ""+seats.toString(), Toast.LENGTH_SHORT).show();
-//                            recyclerView.setAdapter(new homeFragClass(tableNum,seats));
-//                        }else{
-//
-//                        }
-//                    }
-//
-//                    @Override
-//                    public void onCancelled(@NonNull DatabaseError error) {
-//
-//                    }
-//                });
-//            }
-//        },0,2500);
 
         reference.child("Tables").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -181,17 +150,19 @@ public class HomeFrag extends Fragment {
                 if(snapshot.exists()){
                     tableNum.clear();
                     seats.clear();
+                    resId.clear();
 //                    Toast.makeText(view.getContext(), "I am invoked", Toast.LENGTH_SHORT).show();
 //                    Toast.makeText(view.getContext(), ""+snapshot.getChildrenCount(), Toast.LENGTH_SHORT).show();
                     for(DataSnapshot dataSnapshot : snapshot.getChildren()){
                         if(dataSnapshot.child("status").getValue(String.class).equals("unavailable")){
+                            resId.add(dataSnapshot.child("customerId").getValue(String.class));
                             tableNum.add(dataSnapshot.child("tableNum").getValue(String.class));
                             seats.add(dataSnapshot.child("numSeats").getValue(String.class));
                         }
                     }
                     recyclerView.setLayoutManager(horizonatl);
 //                    Toast.makeText(view.getContext(), ""+seats.toString(), Toast.LENGTH_SHORT).show();
-                    recyclerView.setAdapter(new homeFragClass(tableNum,seats));
+                    recyclerView.setAdapter(new homeFragClass(tableNum,seats,resId));
                 }else{
 
                 }
@@ -244,16 +215,20 @@ public class HomeFrag extends Fragment {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         if(snapshot.exists()){
+                            resId.clear();
+                            seats.clear();
+                            tableNum.clear();
 //                    Toast.makeText(view.getContext(), ""+snapshot.getChildrenCount(), Toast.LENGTH_SHORT).show();
                             for(DataSnapshot dataSnapshot : snapshot.getChildren()){
                                 if(dataSnapshot.child("status").getValue(String.class).equals("unavailable")){
+                                    resId.add(dataSnapshot.child("customerId").getValue(String.class));
                                     tableNum.add(dataSnapshot.child("tableNum").getValue(String.class));
                                     seats.add(dataSnapshot.child("numSeats").getValue(String.class));
                                 }
                             }
                             recyclerView.setLayoutManager(horizonatl);
 //                    Toast.makeText(view.getContext(), ""+seats.toString(), Toast.LENGTH_SHORT).show();
-                            recyclerView.setAdapter(new homeFragClass(tableNum,seats));
+                            recyclerView.setAdapter(new homeFragClass(tableNum,seats,resId));
                         }else{
 
                         }
@@ -276,17 +251,19 @@ public class HomeFrag extends Fragment {
                 if(snapshot.exists()){
                     tableNum.clear();
                     seats.clear();
+                    resId.clear();
 //                    Toast.makeText(view.getContext(), "I am invoked", Toast.LENGTH_SHORT).show();
 //                    Toast.makeText(view.getContext(), ""+snapshot.getChildrenCount(), Toast.LENGTH_SHORT).show();
                     for(DataSnapshot dataSnapshot : snapshot.getChildren()){
                         if(dataSnapshot.child("status").getValue(String.class).equals("unavailable")){
+                            resId.add(dataSnapshot.child("customerId").getValue(String.class));
                             tableNum.add(dataSnapshot.child("tableNum").getValue(String.class));
                             seats.add(dataSnapshot.child("numSeats").getValue(String.class));
                         }
                     }
                     recyclerView.setLayoutManager(horizonatl);
 //                    Toast.makeText(view.getContext(), ""+seats.toString(), Toast.LENGTH_SHORT).show();
-                    recyclerView.setAdapter(new homeFragClass(tableNum,seats));
+                    recyclerView.setAdapter(new homeFragClass(tableNum,seats,resId));
                 }else{
 
                 }
