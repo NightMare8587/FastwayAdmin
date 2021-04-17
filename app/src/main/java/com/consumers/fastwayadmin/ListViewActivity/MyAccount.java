@@ -199,7 +199,6 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
                                                                                     }
                                                                                 });
                                                                             }
-
                                                                         }
                                                                     });
                                                                 }
