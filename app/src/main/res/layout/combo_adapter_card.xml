@@ -1,5 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent">
+    android:layout_width="170dp"
+    android:layout_margin="15dp"
+    android:layout_height="100dp">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:id="@+id/comboAdapterTextView"
+            android:text="Dish Name"
+            android:layout_gravity="center"
+            android:layout_marginTop="12dp"
+            android:layout_height="wrap_content"/>
+
+        <Button
+            android:id="@+id/comboAdapterButton"
+            android:layout_width="wrap_content"
+            android:layout_height="34dp"
+            android:layout_marginTop="15dp"
+            android:padding="5dp"
+            android:layout_gravity="center"
+            android:background="@null"
+            android:text="Remove Item"
+            android:textColor="@color/red_btn_bg_pressed_color" />
+
+    </LinearLayout>
 </androidx.cardview.widget.CardView>

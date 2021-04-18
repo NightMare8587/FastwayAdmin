@@ -177,7 +177,7 @@ public class HomeFrag extends Fragment {
         reference.child("Tables").addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
+                updateDatabase();
             }
 
             @Override
@@ -188,17 +188,17 @@ public class HomeFrag extends Fragment {
 
             @Override
             public void onChildRemoved(@NonNull DataSnapshot snapshot) {
-
+                updateDatabase();
             }
 
             @Override
             public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
+                updateDatabase();
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
+                updateDatabase();
             }
         });
 
