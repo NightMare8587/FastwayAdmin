@@ -4,13 +4,13 @@
     package="com.consumers.fastwayadmin">
 
     <uses-sdk tools:overrideLibrary="com.google.zxing.client.android" />
+
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-
     <uses-permission
         android:name="android.permission.READ_SMS"
         tools:node="remove" />
@@ -26,8 +26,10 @@
         android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         tools:ignore="AllowBackup"
         tools:replace="android:icon">
-
-        <activity android:name=".Tables.ChatWithCustomer" android:windowSoftInputMode="adjustResize" >  </activity>
+        <activity android:name=".DiscountCombo.SelectDishForCombo"></activity>
+        <activity
+            android:name=".Tables.ChatWithCustomer"
+            android:windowSoftInputMode="adjustResize"></activity>
         <activity android:name=".DiscountCombo.CustomOffer" />
         <activity android:name=".DiscountCombo.ComboAndOffers" />
         <activity android:name=".DiscountCombo.DiscountActivity" />

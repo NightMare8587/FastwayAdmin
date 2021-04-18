@@ -131,6 +131,7 @@ public class HomeFrag extends Fragment {
                         .withSecondButtonListner(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
+
                                 flatDialog.dismiss();
                             }
                         })
@@ -163,8 +164,6 @@ public class HomeFrag extends Fragment {
                     recyclerView.setLayoutManager(horizonatl);
 //                    Toast.makeText(view.getContext(), ""+seats.toString(), Toast.LENGTH_SHORT).show();
                     recyclerView.setAdapter(new homeFragClass(tableNum,seats,resId));
-                }else{
-
                 }
             }
 

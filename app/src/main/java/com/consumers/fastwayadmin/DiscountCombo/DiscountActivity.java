@@ -1,5 +1,6 @@
 package com.consumers.fastwayadmin.DiscountCombo;
 
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
@@ -74,6 +75,15 @@ public class DiscountActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View view) {
                         FlatDialog flatDialog1 = new FlatDialog(DiscountActivity.this);
+                        flatDialog1.setCanceledOnTouchOutside(true);
+                        flatDialog1.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                            @Override
+                            public void onCancel(DialogInterface dialogInterface) {
+                                finish();
+                                Toast.makeText(DiscountActivity.this, "Cancelled", Toast.LENGTH_SHORT).show();
+                                dialogInterface.dismiss();
+                            }
+                        });
                         flatDialog1.setTitle("Choose One Option")
                                 .setSubtitle("Only Applicable for items above 149")
                                 .setSubtitleColor(Color.BLACK)
