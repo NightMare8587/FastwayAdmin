@@ -96,7 +96,50 @@ public class ComboAndOffers extends AppCompatActivity {
                                 dialog.positiveClickListener(new PositiveClick() {
                                     @Override
                                     public void onClick(View view) {
-                                        dialog.dismiss();
+                                        if(dialog.getInputText().length() == 0){
+                                            Toast.makeText(ComboAndOffers.this, "Enter some name", Toast.LENGTH_SHORT).show();
+                                            return;
+                                        }else {
+                                            String comboName = dialog.getInputText();
+                                            dialog.dismiss();
+                                            auth = FirebaseAuth.getInstance();
+                                            reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid())).child("Current combo");
+                                            reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                @Override
+                                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                                    if(snapshot.exists()) {
+                                                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                                                            name.add(dataSnapshot.child("name").getValue(String.class));
+                                                        }
+                                                        reference =  FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid()));
+                                                        reference.child("Current combo").removeValue();
+                                                        reference =  FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid())).child("List of Dish");
+                                                        for(int i=0;i<name.size();i++) {
+                                                            combo combo = new combo(name.get(i));
+                                                            reference.child("Combo").child(comboName).child(name.get(i)).child("name").setValue(combo);
+                                                        }
+                                                        name.clear();
+                                                        recyclerView.setAdapter(new comboAdapter(name));
+                                                        new KAlertDialog(ComboAndOffers.this,KAlertDialog.SUCCESS_TYPE)
+                                                                .setTitleText("Success")
+                                                                .setContentText("combo created successfully")
+                                                                .setConfirmText("Ok, Great")
+                                                                .setConfirmClickListener(new KAlertDialog.KAlertClickListener() {
+                                                                    @Override
+                                                                    public void onClick(KAlertDialog kAlertDialog) {
+                                                                        kAlertDialog.dismissWithAnimation();
+                                                                    }
+                                                                }).show();
+                                                    }
+                                                }
+
+                                                @Override
+                                                public void onCancelled(@NonNull DatabaseError error) {
+
+                                                }
+                                            });
+
+                                        }
                                     }
                                 });
 
@@ -158,7 +201,7 @@ public class ComboAndOffers extends AppCompatActivity {
                     recyclerView.setLayoutManager(horizonatl);
                    recyclerView.setAdapter(new comboAdapter(name));
                 }else {
-                    Toast.makeText(ComboAndOffers.this, "Something Went Wrong", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(ComboAndOffers.this, "Something Went Wrong", Toast.LENGTH_SHORT).show();
                     createCombo.setVisibility(View.INVISIBLE);
                 }
             }
