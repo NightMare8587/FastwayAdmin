@@ -14,8 +14,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.consumers.fastwayadmin.Info.MapsActivity;
+import com.consumers.fastwayadmin.Info.MapsActivity2;
 import com.consumers.fastwayadmin.Login.MainActivity;
 import com.consumers.fastwayadmin.R;
 import com.developer.kalert.KAlertDialog;
@@ -451,7 +454,7 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
                             .setFirstTextFieldBorderColor(Color.BLACK)
                             .setFirstTextFieldHintColor(Color.BLACK)
                             .setFirstTextFieldTextColor(Color.BLACK)
-                            .setFirstTextFieldHint("Enter New Name")
+                            .setFirstTextFieldHint("Enter New Email")
                             .setFirstButtonText("Make Changes")
                             .setFirstButtonColor(Color.LTGRAY)
                             .setFirstButtonTextColor(Color.BLACK)
@@ -482,7 +485,108 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
                     flatDialog1.show();
                     modalBottomSheetDialog.dismiss();
                     break;
+                case R.id.changePhoneNumberBottomSheetRestaurant:
+                    FlatDialog flatDialog2 = new FlatDialog(MyAccount.this);
+                    flatDialog2.setTitle("Enter New Number")
+                            .setBackgroundColor(Color.WHITE)
+                            .setTitleColor(Color.BLACK)
+                            .setFirstTextFieldBorderColor(Color.BLACK)
+                            .setFirstTextFieldHintColor(Color.BLACK)
+                            .setFirstTextFieldTextColor(Color.BLACK)
+                            .setFirstTextFieldHint("Enter New Number")
+                            .setFirstButtonText("Make Changes")
+                            .setFirstButtonColor(Color.LTGRAY)
+                            .setFirstButtonTextColor(Color.BLACK)
+                            .setSecondButtonText("Cancel")
+                            .setSecondButtonColor(Color.CYAN)
+                            .setSecondButtonTextColor(Color.BLACK)
+                            .withFirstButtonListner(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    if(flatDialog2.getFirstTextField().length() == 0){
+                                        Toast.makeText(MyAccount.this, "Field can't be empty", Toast.LENGTH_SHORT).show();
+                                        return;
+                                    }else {
+                                        reference.child("number").setValue(flatDialog2.getFirstTextField().toString());
+                                        Toast.makeText(MyAccount.this, "Number Changed Successfully", Toast.LENGTH_SHORT).show();
+                                        flatDialog2.dismiss();
+                                    }
+                                }
+                            })
+                            .withSecondButtonListner(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    flatDialog2.dismiss();
+                                }
+                            });
+
+                    flatDialog2.create();
+                    flatDialog2.show();
+                    modalBottomSheetDialog.dismiss();
+                    break;
+                case R.id.changeAddressBottomSheetRestaurant:
+                    FlatDialog flatDialog4 = new FlatDialog(MyAccount.this);
+                    flatDialog4.setTitle("Enter New Address")
+                            .setBackgroundColor(Color.WHITE)
+                            .setTitleColor(Color.BLACK)
+                            .setFirstTextFieldBorderColor(Color.BLACK)
+                            .setFirstTextFieldHintColor(Color.BLACK)
+                            .setFirstTextFieldTextColor(Color.BLACK)
+                            .setFirstTextFieldHint("Enter New Address")
+                            .setSecondTextFieldHint("Enter New Nearby place")
+                            .setSecondTextFieldBorderColor(Color.BLACK)
+                            .setSecondTextFieldHintColor(Color.BLACK)
+                            .setSecondTextFieldTextColor(Color.BLACK)
+                            .setFirstButtonText("Make Changes")
+                            .setFirstButtonColor(Color.LTGRAY)
+                            .setFirstButtonTextColor(Color.BLACK)
+                            .setSecondButtonText("Cancel")
+                            .setSecondButtonColor(Color.CYAN)
+                            .setSecondButtonTextColor(Color.BLACK)
+                            .withFirstButtonListner(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    if(flatDialog4.getFirstTextField().length() == 0 && flatDialog4.getSecondTextField().length() == 0){
+                                        Toast.makeText(MyAccount.this, "Field can't be empty", Toast.LENGTH_SHORT).show();
+                                        return;
+                                    }else {
+                                        reference.child("address").setValue(flatDialog4.getFirstTextField().toString());
+                                        reference.child("nearby").setValue(flatDialog4.getSecondTextField().toString());
+                                        Toast.makeText(MyAccount.this, "Address And Nearby Changed Successfully", Toast.LENGTH_SHORT).show();
+                                        startActivityForResult(new Intent(MyAccount.this, MapsActivity2.class),69);
+                                        flatDialog4.dismiss();
+                                    }
+                                }
+                            })
+                            .withSecondButtonListner(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    flatDialog4.dismiss();
+                                }
+                            });
+
+                    flatDialog4.create();
+                    flatDialog4.show();
+                    modalBottomSheetDialog.dismiss();
+                    break;
             }
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == 69){
+           new KAlertDialog(MyAccount.this,KAlertDialog.SUCCESS_TYPE)
+                   .setTitleText("Success")
+                   .setContentText("Location Changes Successfully")
+                   .setConfirmText("Great")
+                   .setConfirmClickListener(new KAlertDialog.KAlertClickListener() {
+                       @Override
+                       public void onClick(KAlertDialog kAlertDialog) {
+                           kAlertDialog.dismissWithAnimation();
+                       }
+                   }).show();
         }
     }
 }
