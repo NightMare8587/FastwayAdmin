@@ -3,6 +3,7 @@ package com.consumers.fastwayadmin.NavFrags;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,7 +31,7 @@ import java.util.Objects;
 
 public class AccountFrag extends Fragment {
     ListView listView;
-    String[] names = {"My Account","Logout"};
+    String[] names = {"My Account","Logout","Terms And Conditions","Privacy policy"};
     GoogleSignInClient googleSignInClient;
     FirebaseAuth auth;
     @Nullable
@@ -84,6 +85,15 @@ public class AccountFrag extends Fragment {
                                 }).create();
 
                         builder.show();
+                        break;
+
+                    case 2:
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.websitepolicies.com/policies/view/CpwDZziF"));
+                        startActivity(browserIntent);
+                        break;
+                    case 3:
+                        Intent privacyIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://fastway.flycricket.io/privacy.html"));
+                        startActivity(privacyIntent);
                         break;
                 }
             }
