@@ -4,10 +4,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
@@ -16,15 +19,44 @@ import androidx.fragment.app.Fragment;
 import com.consumers.fastwayadmin.MenuActivities.AllMenuDish;
 import com.consumers.fastwayadmin.R;
 
+import java.util.Objects;
+
 import mehdi.sakout.fancybuttons.FancyButton;
 
 public class MenuFrag extends Fragment {
     FancyButton mainCourse,breads,snacks,deserts,combo,drinks;
     Toolbar menuBar;
+    int count = 0;
+    boolean pressed = false;
+    int total = 0;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.menu_frag,container,false);
+    }
+
+
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                count++;
+                pressed = true;
+                Toast.makeText(getContext(), "Press again to exit", Toast.LENGTH_SHORT).show();
+
+                if(count == 2 && pressed)
+                    Objects.requireNonNull(getActivity()).finish();
+
+                new Handler().postDelayed(() -> {
+                    pressed = false;
+                    count = 0;
+                },2000);
+            }
+        };
+        requireActivity().getOnBackPressedDispatcher().addCallback(this,callback);
     }
 
     @Override

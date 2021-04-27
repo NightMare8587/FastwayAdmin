@@ -5,13 +5,16 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -34,10 +37,36 @@ public class AccountFrag extends Fragment {
     String[] names = {"My Account","Logout","Terms And Conditions","Privacy policy"};
     GoogleSignInClient googleSignInClient;
     FirebaseAuth auth;
+    int count = 0;
+    boolean pressed = false;
+    int total = 0;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.account_frag,container,false);
+
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                count++;
+                pressed = true;
+                Toast.makeText(getContext(), "Press again to exit", Toast.LENGTH_SHORT).show();
+
+                if(count == 2 && pressed)
+                    Objects.requireNonNull(getActivity()).finish();
+
+                new Handler().postDelayed(() -> {
+                    pressed = false;
+                    count = 0;
+                },2000);
+            }
+        };
+        requireActivity().getOnBackPressedDispatcher().addCallback(this,callback);
     }
 
     @Override

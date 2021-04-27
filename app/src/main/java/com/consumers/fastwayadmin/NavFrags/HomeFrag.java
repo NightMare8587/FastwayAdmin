@@ -11,6 +11,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,6 +21,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -81,10 +83,36 @@ public class HomeFrag extends Fragment {
     List<String> resId = new ArrayList<>();
     List<String> tableNum = new ArrayList<>();
     List<String> seats = new ArrayList<>();
+    int count = 0;
+    boolean pressed = false;
+    int total = 0;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.home_frag,container,false);
+    }
+
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                count++;
+                pressed = true;
+                Toast.makeText(getContext(), "Press again to exit", Toast.LENGTH_SHORT).show();
+
+                if(count == 2 && pressed)
+                    Objects.requireNonNull(getActivity()).finish();
+
+                new Handler().postDelayed(() -> {
+                    pressed = false;
+                    count = 0;
+                },2000);
+            }
+        };
+        requireActivity().getOnBackPressedDispatcher().addCallback(this,callback);
     }
 
     @Override
