@@ -1,17 +1,22 @@
 package com.consumers.fastwayadmin.MenuActivities;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.view.View;
 import android.widget.Button;
@@ -21,13 +26,22 @@ import android.widget.Toast;
 
 import com.consumers.fastwayadmin.Dish.DishInfo;
 import com.consumers.fastwayadmin.R;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Objects;
 
 public class CreateDish extends AppCompatActivity {
@@ -35,7 +49,9 @@ public class CreateDish extends AppCompatActivity {
     FirebaseAuth dishAuth;
     CheckBox checkBox;
     DatabaseReference dish;
+    OutputStream outputStream;
     String mrp;
+    FirebaseStorage storage;
     StorageReference storageReference;
     Button createDish,chooseImage;
     FloatingActionButton floatingActionButton;
@@ -150,6 +166,45 @@ public class CreateDish extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == 0 && resultCode == RESULT_OK && data != null){
+            Bitmap bitmap = (Bitmap) data.getExtras().get("data");
+            File filepath = Environment.getExternalStorageDirectory();
+            File dir = new File(filepath.getAbsolutePath());
+            dir.mkdir();
+            File file = new File(dir, System.currentTimeMillis() + ".jpg");
+            try {
+                outputStream = new FileOutputStream(file);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+            try {
+                outputStream.flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                StorageReference reference = storageReference.child(dishAuth.getUid() + "/" + "image" + "/"  + System.currentTimeMillis());
+                reference.putFile(Uri.fromFile(file)).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                        Toast.makeText(CreateDish.this, "Upload Complete", Toast.LENGTH_SHORT).show();
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+
+                    }
+                });
+            }catch (Exception e){
+                Toast.makeText(this, ""+e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
 
     private void initialise() {
         nameOfDish = findViewById(R.id.dishName);
@@ -162,6 +217,7 @@ public class CreateDish extends AppCompatActivity {
         checkBox = findViewById(R.id.sellOnMRPprice);
         menuType = getIntent().getStringExtra("Dish");
         chooseImage = findViewById(R.id.chooseImageForFood);
-        storageReference = FirebaseStorage.getInstance().getReference();
+        storage = FirebaseStorage.getInstance();
+        storageReference = storage.getReference();
     }
 }
