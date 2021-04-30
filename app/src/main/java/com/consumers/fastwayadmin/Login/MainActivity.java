@@ -29,6 +29,7 @@ import androidx.core.content.ContextCompat;
 import com.crowdfire.cfalertdialog.CFAlertDialog;
 import com.consumers.fastwayadmin.Info.Info;
 import com.consumers.fastwayadmin.R;
+import com.developer.kalert.KAlertDialog;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -67,6 +68,12 @@ import java.util.concurrent.TimeUnit;
 
 import cc.cloudist.acplibrary.ACProgressConstant;
 import cc.cloudist.acplibrary.ACProgressFlower;
+import karpuzoglu.enes.com.fastdialog.Animations;
+import karpuzoglu.enes.com.fastdialog.FastDialog;
+import karpuzoglu.enes.com.fastdialog.FastDialogBuilder;
+import karpuzoglu.enes.com.fastdialog.NegativeClick;
+import karpuzoglu.enes.com.fastdialog.PositiveClick;
+import karpuzoglu.enes.com.fastdialog.Type;
 
 //import com.google.android.gms.location.LocationRequest;
 //import com.google.android.gms.location.LocationServices;
@@ -79,6 +86,7 @@ public class MainActivity extends AppCompatActivity {
     FirebaseAuth loginAuth;
     LocationRequest locationRequest;
     GoogleSignInOptions gso;
+    FastDialog verifyCodeDialog,fastDialog;
     GoogleSignInAccount account;
     GoogleSignInClient client;
     protected boolean isProgressShowing = false;
@@ -89,11 +97,10 @@ public class MainActivity extends AppCompatActivity {
     ViewGroup group;
      ImageView signInButton;
 //    ProgressBar wait;
-ACProgressFlower flower;
     PhoneAuthProvider.ForceResendingToken myToken;
-    EditText fullName,emailAddress,phoneNumber,codeSent;
+    EditText fullName,emailAddress,phoneNumber;
     CountryCodePicker ccp;
-    Button startVerification,verifyCode;
+    Button startVerification;
     DatabaseReference reference;
     String name,email,number;
     PhoneAuthCredential credential;
@@ -111,13 +118,17 @@ ACProgressFlower flower;
 //        spinKitView.setColor(R.color.teal_200);
 //        spinKitView.setIndeterminateDrawable(bounce);
         checkPermissions();
+        // checking is user is currently logged in
         if(currentUser != null){
             startActivity(new Intent(getApplicationContext(),Info.class));
             finish();
         }
 
+        //saving user login info
         loginInfo = getSharedPreferences("loginInfo",MODE_PRIVATE);
         editor = loginInfo.edit();
+
+        //google sign in button
         signInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -126,6 +137,7 @@ ACProgressFlower flower;
             }
         });
 
+        // start phone auth verification
         startVerification.setOnClickListener(new View.OnClickListener() {
 
             @SuppressLint("SetTextI18n")
@@ -145,85 +157,105 @@ ACProgressFlower flower;
                     return;
                 }
 
-                CFAlertDialog.Builder builder = new CFAlertDialog.Builder(MainActivity.this)
-                        .setDialogStyle(CFAlertDialog.CFAlertStyle.ALERT)
-                        .setTitle("Confirmation")
-                        .setMessage("Do you wanna continue with this number " + phoneNumber.getText().toString())
-                        .addButton("Yes", Color.BLACK,Color.LTGRAY, CFAlertDialog.CFAlertActionStyle.POSITIVE, CFAlertDialog.CFAlertActionAlignment.JUSTIFIED,
-                                ((dialogInterface, i) -> {
-                                    name = fullName.getText().toString();
-                                    email = emailAddress.getText().toString();
-                                    number = ccp.getSelectedCountryCodeWithPlus() + phoneNumber.getText().toString() + "";
+                new KAlertDialog(MainActivity.this,KAlertDialog.WARNING_TYPE)
+                        .setContentText("Do you sure wanna continue with this number")
+                        .setTitleText("Confirmation")
+                        .setConfirmText("Yes, Send OTP")
+                        .setCancelText("No, Wait")
+                        .setConfirmClickListener(new KAlertDialog.KAlertClickListener() {
+                            @Override
+                            public void onClick(KAlertDialog kAlertDialog) {
+                                name = fullName.getText().toString();
+                                email = emailAddress.getText().toString();
+                                number = ccp.getSelectedCountryCodeWithPlus() + phoneNumber.getText().toString() + "";
+                                fastDialog = new FastDialogBuilder(MainActivity.this, Type.PROGRESS)
+                                        .progressText("Sending OTP Please wait")
+                                        .setAnimation(Animations.FADE_IN)
+                                        .create();
+                                fastDialog.show();
+                                startVerification.setVisibility(View.INVISIBLE);
+                                startPhoneNumberVerification(number);
 
-                                    codeSent.setEnabled(true);
-                                    startVerification.setVisibility(View.INVISIBLE);
-                                    verifyCode.setVisibility(View.VISIBLE);
-                                    startPhoneNumberVerification(number);
-                                    flower = new ACProgressFlower.Builder(MainActivity.this)
-                                            .direction(ACProgressConstant.DIRECT_CLOCKWISE)
-                                            .themeColor(Color.WHITE)
-                                            .text("Verifying Number")
-                                            .build();
-
-                                    flower.show();
-                                    dialogInterface.dismiss();
-                                }))
-                        .addButton("No",Color.BLACK,Color.YELLOW, CFAlertDialog.CFAlertActionStyle.POSITIVE, CFAlertDialog.CFAlertActionAlignment.JUSTIFIED
-                        ,((dialogInterface, i) -> {
-                                    phoneNumber.requestFocus();
-                                    dialogInterface.dismiss();
-                                }));
-
-                builder.show();
-
-            }
-        });
-
-
-        verifyCode.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(codeSent.length() <= 5){
-                    codeSent.requestFocus();
-                    codeSent.setError("invalid code");
-//                    wait.setVisibility(View.INVISIBLE);
-                    return;
-                }
-              credential = PhoneAuthProvider.getCredential(verId,codeSent.getText().toString());
-                loginAuth.signInWithCredential(credential).addOnCompleteListener(MainActivity.this, new OnCompleteListener<AuthResult>() {
+                                kAlertDialog.dismissWithAnimation();
+                            }
+                        }).setCancelClickListener(new KAlertDialog.KAlertClickListener() {
                     @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if(task.isSuccessful()){
-                            Toast.makeText(MainActivity.this, "Login Successfully", Toast.LENGTH_SHORT).show();
-                            Map<String,Object> map = new HashMap<>();
-                            map.put("name",name);
-                            map.put("email",email);
-                            editor.putString("email",email);
-                            editor.putString("name",name);
-                            editor.apply();
-                            DatabaseAdmin user = new DatabaseAdmin(name,email,number);
-                            reference.child("Admin").child(loginAuth.getUid()+"").setValue(user);
-                            db.collection(loginAuth.getUid()).document("info")
-                                    .set(map).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    Toast.makeText(MainActivity.this, "Data Uploaded Successfully", Toast.LENGTH_SHORT).show();
-                                }
-                            }).addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    Toast.makeText(MainActivity.this, "Something went wrong", Toast.LENGTH_SHORT).show();
-                                }
-                            });
-
-//                            wait.setVisibility(View.INVISIBLE);
-                            startActivity(new Intent(MainActivity.this,Info.class));
-                            finish();
-                        }
+                    public void onClick(KAlertDialog kAlertDialog) {
+                        kAlertDialog.dismissWithAnimation();
                     }
-                });
+                }).show();
+
+//                CFAlertDialog.Builder builder = new CFAlertDialog.Builder(MainActivity.this)
+//                        .setDialogStyle(CFAlertDialog.CFAlertStyle.ALERT)
+//                        .setTitle("Confirmation")
+//                        .setMessage("Do you wanna continue with this number " + phoneNumber.getText().toString())
+//                        .addButton("Yes", Color.BLACK,Color.LTGRAY, CFAlertDialog.CFAlertActionStyle.POSITIVE, CFAlertDialog.CFAlertActionAlignment.JUSTIFIED,
+//                                ((dialogInterface, i) -> {
+//                                    name = fullName.getText().toString();
+//                                    email = emailAddress.getText().toString();
+//                                    number = ccp.getSelectedCountryCodeWithPlus() + phoneNumber.getText().toString() + "";
+//
+//                                    startVerification.setVisibility(View.INVISIBLE);
+//                                    startPhoneNumberVerification(number);
+//
+//                                    dialogInterface.dismiss();
+//                                }))
+//                        .addButton("No",Color.BLACK,Color.YELLOW, CFAlertDialog.CFAlertActionStyle.POSITIVE, CFAlertDialog.CFAlertActionAlignment.JUSTIFIED
+//                        ,((dialogInterface, i) -> {
+//                                    phoneNumber.requestFocus();
+//                                    dialogInterface.dismiss();
+//                                }));
+//
+//                builder.show();
+
             }
         });
+
+
+//        verifyCode.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                if(codeSent.length() <= 5){
+//                    codeSent.requestFocus();
+//                    codeSent.setError("invalid code");
+////                    wait.setVisibility(View.INVISIBLE);
+//                    return;
+//                }
+//              credential = PhoneAuthProvider.getCredential(verId,codeSent.getText().toString());
+//                loginAuth.signInWithCredential(credential).addOnCompleteListener(MainActivity.this, new OnCompleteListener<AuthResult>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<AuthResult> task) {
+//                        if(task.isSuccessful()){
+//                            Toast.makeText(MainActivity.this, "Login Successfully", Toast.LENGTH_SHORT).show();
+//                            Map<String,Object> map = new HashMap<>();
+//                            map.put("name",name);
+//                            map.put("email",email);
+//                            editor.putString("email",email);
+//                            editor.putString("name",name);
+//                            editor.apply();
+//                            DatabaseAdmin user = new DatabaseAdmin(name,email,number);
+//                            reference.child("Admin").child(loginAuth.getUid()+"").setValue(user);
+//                            db.collection(loginAuth.getUid()).document("info")
+//                                    .set(map).addOnSuccessListener(new OnSuccessListener<Void>() {
+//                                @Override
+//                                public void onSuccess(Void aVoid) {
+//                                    Toast.makeText(MainActivity.this, "Data Uploaded Successfully", Toast.LENGTH_SHORT).show();
+//                                }
+//                            }).addOnFailureListener(new OnFailureListener() {
+//                                @Override
+//                                public void onFailure(@NonNull Exception e) {
+//                                    Toast.makeText(MainActivity.this, "Something went wrong", Toast.LENGTH_SHORT).show();
+//                                }
+//                            });
+//
+////                            wait.setVisibility(View.INVISIBLE);
+//                            startActivity(new Intent(MainActivity.this,Info.class));
+//                            finish();
+//                        }
+//                    }
+//                });
+//            }
+//        });
     }
 
 
@@ -304,7 +336,6 @@ ACProgressFlower flower;
                     @Override
                     public void onVerificationFailed(@NonNull FirebaseException e) {
                         Toast.makeText(MainActivity.this, e.getLocalizedMessage()+"", Toast.LENGTH_SHORT).show();
-                        verifyCode.setVisibility(View.INVISIBLE);
                         startVerification.setVisibility(View.VISIBLE);
                     }
 
@@ -312,7 +343,8 @@ ACProgressFlower flower;
                     public void onCodeSent(@NonNull String s, @NonNull PhoneAuthProvider.ForceResendingToken forceResendingToken) {
                         verId = s;
                         myToken = forceResendingToken;
-                        flower.dismiss();
+                        fastDialog.dismiss();
+                        verifyCodeDialog.show();
                     }
                 }).build();
 
@@ -357,15 +389,11 @@ ACProgressFlower flower;
 
     private void initialise() {
         loginAuth = FirebaseAuth.getInstance();
-//        wait = findViewById(R.id.waitItsLoading);
         fullName = findViewById(R.id.nameLogin);
         emailAddress = findViewById(R.id.emailLogin);
         phoneNumber = findViewById(R.id.phoneNumber);
         ccp = findViewById(R.id.ccp);
-//        spinKitView = findViewById(R.id.spinKit);
-        codeSent = findViewById(R.id.codeSent);
         startVerification = findViewById(R.id.startVerification);
-        verifyCode = findViewById(R.id.verifyVerification);
         reference = FirebaseDatabase.getInstance().getReference().getRoot();
         signInButton = findViewById(R.id.signInButton);
 
@@ -376,6 +404,52 @@ ACProgressFlower flower;
                 .build();
 
         client = GoogleSignIn.getClient(MainActivity.this,gso);
+
+        verifyCodeDialog = new FastDialogBuilder(MainActivity.this,Type.DIALOG)
+                .setTitleText("Verify")
+                .setHint("Enter 6 digit Code")
+                .positiveText("Verify")
+                .negativeText("Cancel")
+                .create();
+
+        verifyCodeDialog.positiveClickListener(new PositiveClick() {
+            @Override
+            public void onClick(View view) {
+                if(verifyCodeDialog.getInputText().length() <= 5){
+                    Toast.makeText(MainActivity.this, "Enter Valid Code", Toast.LENGTH_SHORT).show();
+                    return;
+                }else{
+                    credential = PhoneAuthProvider.getCredential(verId,verifyCodeDialog.getInputText());
+
+                    loginAuth.signInWithCredential(credential).addOnCompleteListener(MainActivity.this, new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            if(task.isSuccessful()){
+                                Toast.makeText(MainActivity.this, "Login Successfully", Toast.LENGTH_SHORT).show();
+                                DatabaseAdmin user = new DatabaseAdmin(number,name,email);
+                                editor.putString("name",name);
+                                editor.putString("email",email);
+                                editor.apply();
+                                verifyCodeDialog.dismiss();
+                                reference.child("Users").child(Objects.requireNonNull(loginAuth.getUid())).setValue(user);
+                                startActivity(new Intent(getApplicationContext(),Info.class));
+                                finish();
+                            }else{
+                                Toast.makeText(MainActivity.this, "Something went wrong", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+                }
+            }
+        });
+
+        verifyCodeDialog.negativeClickListener(new NegativeClick() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(MainActivity.this, "Cancelled", Toast.LENGTH_SHORT).show();
+                verifyCodeDialog.dismiss();
+            }
+        });
 
     }
     @Override
