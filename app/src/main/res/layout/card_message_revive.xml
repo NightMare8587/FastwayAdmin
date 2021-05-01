@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_gravity="end"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
+    android:layout_width="wrap_content"
     app:cardElevation="0dp"
     app:cardBackgroundColor="@android:color/transparent"
     android:background="@null"
@@ -23,6 +23,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="end"
         android:layout_margin="15dp"
+
         android:layout_marginTop="0dp"
         android:layout_marginEnd="14dp"
         android:layout_marginRight="14dp"

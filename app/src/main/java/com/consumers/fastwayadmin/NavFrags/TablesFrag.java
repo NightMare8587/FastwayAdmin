@@ -20,22 +20,19 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.consumers.fastwayadmin.R;
 import com.consumers.fastwayadmin.Tables.AddTables;
 import com.consumers.fastwayadmin.Tables.TableView;
-import com.github.ybq.android.spinkit.SpinKitView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.sql.Time;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class TablesFrag extends Fragment {
     Toolbar tableBar;
@@ -44,13 +41,11 @@ public class TablesFrag extends Fragment {
     FirebaseAuth tableAuth;
     SwipeRefreshLayout layout;
     DatabaseReference tableRef;
-    SpinKitView spinKitView;
     List<String> tableNumber = new ArrayList<>();
     List<String> status  = new ArrayList<>();
     RecyclerView table;
     int count = 0;
     boolean pressed = false;
-    int total = 0;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -124,6 +119,34 @@ public class TablesFrag extends Fragment {
 
             }
         });
+
+        tableRef.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                updateChild();
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                updateChild();
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+                updateChild();
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                updateChild();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
         addTable.setOnClickListener(view1 -> startActivity(new Intent(getActivity(), AddTables.class)));
 
         layout.setOnRefreshListener(() -> {
@@ -134,6 +157,8 @@ public class TablesFrag extends Fragment {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     if(snapshot.exists()){
+                        tableNumber.clear();
+                        status.clear();
                         HashMap<String,List<String>> map = new HashMap<>();
                         for(DataSnapshot dataSnapshot : snapshot.getChildren()) {
                             tableNumber.add(Objects.requireNonNull(dataSnapshot.child("tableNum").getValue()).toString());
@@ -166,5 +191,38 @@ public class TablesFrag extends Fragment {
         });
     }
 
+    private void updateChild() {
+        tableRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists()){
+                    tableNumber.clear();
+                    status.clear();
+                    HashMap<String,List<String>> map = new HashMap<>();
+                    for(DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                        tableNumber.add(Objects.requireNonNull(dataSnapshot.child("tableNum").getValue()).toString());
+                        status.add(dataSnapshot.child("status").getValue().toString());
+                        if (dataSnapshot.hasChild("customerId")) {
+                            List<String> list = new ArrayList<>();
+                            list.add(String.valueOf(dataSnapshot.child("customerId").getValue()));
+                            list.add(String.valueOf(dataSnapshot.child("time").getValue()));
+                            map.put(String.valueOf(dataSnapshot.child("tableNum").getValue(String.class)), list);
+                        }
+                    }
+                    tableView = new TableView(tableNumber,status,map,getContext());
+                    table.setAdapter(tableView);
+                    tableView.notifyDataSetChanged();
 
+                }else{
+                    Toast.makeText(getContext(), "Add Some Tables!!!", Toast.LENGTH_SHORT).show();
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
 }
