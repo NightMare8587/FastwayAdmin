@@ -15,6 +15,8 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -25,6 +27,8 @@ import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -75,6 +79,7 @@ public class HomeFrag extends Fragment {
     LocationRequest locationRequest;
     LinearLayoutManager horizonatl;
     ImageView comboImage;
+    Toolbar toolbar;
     Button refershRecyclerView;
 //    homeAdapter homeAdapter;
     SharedPreferences sharedPreferences;
@@ -118,6 +123,8 @@ public class HomeFrag extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        toolbar = view.findViewById(R.id.homeFragToolBar);
+        ((AppCompatActivity) Objects.requireNonNull(getActivity())).setSupportActionBar(toolbar);
         recyclerView = view.findViewById(R.id.homeFragRecyclerView);
         refershRecyclerView = view.findViewById(R.id.refreshCurrentTables);
 //        recyclerView.setLayoutManager(new LinearLayoutManager(view.getContext(),LinearLayoutManager.HORIZONTAL),true);

@@ -20,6 +20,8 @@
             android:id="@+id/sendMessageEditText"
             android:layout_width="0dp"
             android:inputType="textMultiLine"
+            android:hint="Enter Text Here"
+            android:paddingStart="5dp"
             android:layout_height="match_parent"
             android:layout_margin="5dp"
             android:layout_weight="0.7" />

@@ -64,7 +64,7 @@ public class HomeScreen extends AppCompatActivity {
         int id = item.getItemId();
 
         if(id == R.id.notification)
-            Toast.makeText(this, "Button Clicked", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Haha Clicked", Toast.LENGTH_SHORT).show();
 
         return super.onOptionsItemSelected(item);
     }
