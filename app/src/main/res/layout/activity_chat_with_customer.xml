@@ -9,19 +9,19 @@
     <LinearLayout
         android:id="@+id/linearLayout2"
         android:layout_width="0dp"
-        android:layout_height="70dp"
+        android:layout_height="50dp"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
         <EditText
-            android:background="@null"
+            android:background="@drawable/edittext_back"
             android:id="@+id/sendMessageEditText"
             android:layout_width="0dp"
             android:inputType="textMultiLine"
             android:hint="Enter Text Here"
-            android:paddingStart="5dp"
+            android:paddingStart="15dp"
             android:layout_height="match_parent"
             android:layout_margin="5dp"
             android:layout_weight="0.7" />
@@ -32,9 +32,9 @@
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
             android:layout_weight="0.3"
-            android:background="@color/quantum_cyan"
+            android:background="@drawable/button_back"
             android:drawableStart="@drawable/ic_baseline_send_24"
-            android:padding="20dp"
+            android:padding="10dp"
 
             android:text="send" />
 
