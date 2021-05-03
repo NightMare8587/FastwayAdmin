@@ -132,6 +132,7 @@ public class ChatWithCustomer extends AppCompatActivity {
                         JSONObject notification = new JSONObject();
                         notification.put("title","Restaurant Owner");
                         notification.put("body",""+editText.getText().toString().trim());
+                        notification.put("click_action","Chat");
                         main.put("notification",notification);
 
                         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, main, new Response.Listener<JSONObject>() {
