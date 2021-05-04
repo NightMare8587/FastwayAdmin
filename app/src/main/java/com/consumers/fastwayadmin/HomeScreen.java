@@ -4,12 +4,14 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.consumers.fastwayadmin.Chat.DisplayAllAvaialbleChats;
 import com.consumers.fastwayadmin.NavFrags.AccountFrag;
 import com.consumers.fastwayadmin.NavFrags.HomeFrag;
 import com.consumers.fastwayadmin.NavFrags.MenuFrag;
@@ -64,7 +66,7 @@ public class HomeScreen extends AppCompatActivity {
         int id = item.getItemId();
 
         if(id == R.id.notification)
-            Toast.makeText(this, "Haha Clicked", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(HomeScreen.this, DisplayAllAvaialbleChats.class));
 
         return super.onOptionsItemSelected(item);
     }
