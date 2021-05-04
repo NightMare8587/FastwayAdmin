@@ -2,6 +2,7 @@ package com.consumers.fastwayadmin.Chat;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
@@ -48,7 +49,8 @@ public class DisplayAllAvaialbleChats extends AppCompatActivity {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot snapshot) {
                                 if(snapshot.exists()){
-                                    Log.i("usename",String.valueOf(snapshot.child("name").getValue()));
+                                    Log.i("namesAll",String.valueOf(snapshot.child("name").getValue()));
+                                    name.add(String.valueOf(snapshot.child("name").getValue()));
                                 }
                             }
 
@@ -64,6 +66,9 @@ public class DisplayAllAvaialbleChats extends AppCompatActivity {
                         recentMessage.clear();
                     }
                     Log.i("mess",allMesages.toString());
+                    Log.i("all",name.toString());
+                    recyclerView.setLayoutManager(new LinearLayoutManager(DisplayAllAvaialbleChats.this));
+                    recyclerView.setAdapter(new DisplayAdapter(name,allMesages,DisplayAllAvaialbleChats.this));
                 }
 
             }

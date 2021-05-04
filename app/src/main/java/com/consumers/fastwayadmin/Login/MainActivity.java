@@ -56,8 +56,11 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthOptions;
 import com.google.firebase.auth.PhoneAuthProvider;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.hbb20.CountryCodePicker;
 
@@ -426,12 +429,26 @@ public class MainActivity extends AppCompatActivity {
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if(task.isSuccessful()){
                                 Toast.makeText(MainActivity.this, "Login Successfully", Toast.LENGTH_SHORT).show();
-                                DatabaseAdmin user = new DatabaseAdmin(number,name,email);
+                                DatabaseAdmin user = new DatabaseAdmin(name,email,number);
                                 editor.putString("name",name);
                                 editor.putString("email",email);
                                 editor.apply();
                                 verifyCodeDialog.dismiss();
-                                reference.child("Users").child(Objects.requireNonNull(loginAuth.getUid())).setValue(user);
+                                loginAuth = FirebaseAuth.getInstance();
+//                                reference.child("Admin").child(Objects.requireNonNull(loginAuth.getUid())).setValue(user);
+                                reference.child("Admin").addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                        if(!snapshot.hasChild(Objects.requireNonNull(loginAuth.getUid()))){
+                                            reference.child("Admin").child(Objects.requireNonNull(loginAuth.getUid())).setValue(user);
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError error) {
+
+                                    }
+                                });
                                 startActivity(new Intent(getApplicationContext(),Info.class));
                                 finish();
                             }else{
