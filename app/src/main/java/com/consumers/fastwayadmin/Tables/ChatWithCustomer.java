@@ -1,6 +1,7 @@
 package com.consumers.fastwayadmin.Tables;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -160,7 +161,8 @@ public class ChatWithCustomer extends AppCompatActivity {
                     catch (Exception e){
                         Toast.makeText(getApplicationContext(), e.getLocalizedMessage()+"null", Toast.LENGTH_SHORT).show();
                     }
-                    chat chat = new chat(editText.getText().toString(),auth.getUid()+"",System.currentTimeMillis()+"","1");
+                    SharedPreferences sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
+                    chat chat = new chat(editText.getText().toString(),auth.getUid()+"",System.currentTimeMillis()+"","1",sharedPreferences.getString("name",""));
                   reference.child("messages").child(id).child(System.currentTimeMillis()+"").setValue(chat);
                   editText.setText("");
                   updateChat();

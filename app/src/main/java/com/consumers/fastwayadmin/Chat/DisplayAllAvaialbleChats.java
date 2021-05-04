@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.consumers.fastwayadmin.R;
 import com.google.firebase.auth.FirebaseAuth;
@@ -23,8 +24,10 @@ public class DisplayAllAvaialbleChats extends AppCompatActivity {
     FirebaseAuth auth;
     List<String> id = new ArrayList<>();
     DatabaseReference getUserName;
+    String currentName = "";
     List<String> name = new ArrayList<>();
     List<List<String>> allMesages = new ArrayList<>();
+    List<List<String>> allusers = new ArrayList<>();
 
     List<String> recentMessage = new ArrayList<>();
     DatabaseReference reference;
@@ -44,33 +47,45 @@ public class DisplayAllAvaialbleChats extends AppCompatActivity {
 
                     for(DataSnapshot dataSnapshot : snapshot.getChildren()){
                         id.add(String.valueOf(dataSnapshot.getKey()));
-                        getUserName = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(String.valueOf(dataSnapshot.getKey()));
-                        getUserName.addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                if(snapshot.exists()){
-                                    Log.i("namesAll",String.valueOf(snapshot.child("name").getValue()));
-                                    name.add(String.valueOf(snapshot.child("name").getValue()));
-                                }
-                            }
+//                        update(String.valueOf(dataSnapshot.getKey()));
 
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError error) {
-
-                            }
-                        });
                         for(DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()){
                             recentMessage.add(String.valueOf(dataSnapshot1.child("message").getValue()));
+                            currentName = String.valueOf(dataSnapshot.child("name").getValue());
                         }
+                        name.add(currentName);
+                        Log.i("all",name.toString());
                         allMesages.add(new ArrayList<>(recentMessage));
+                        allusers.add(new ArrayList<>(name));
                         recentMessage.clear();
                     }
                     Log.i("mess",allMesages.toString());
-                    Log.i("all",name.toString());
+                    Log.i("all",allusers.toString());
                     recyclerView.setLayoutManager(new LinearLayoutManager(DisplayAllAvaialbleChats.this));
-                    recyclerView.setAdapter(new DisplayAdapter(name,allMesages,DisplayAllAvaialbleChats.this));
+                    recyclerView.setAdapter(new DisplayAdapter(name,allMesages,DisplayAllAvaialbleChats.this,id));
                 }
 
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void update(String id) {
+        getUserName = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(id);
+        getUserName.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists()){
+                    Log.i("namesAll",String.valueOf(snapshot.child("name").getValue()));
+                    String names = snapshot.child("name").getValue(String.class);
+                    Toast.makeText(DisplayAllAvaialbleChats.this, ""+names, Toast.LENGTH_SHORT).show();
+                    name.add(names);
+                    Log.i("current",name.toString());
+                }
             }
 
             @Override
