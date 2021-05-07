@@ -10,6 +10,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -181,33 +182,35 @@ public class HomeFrag extends Fragment {
             }
         });
 
-        reference.child("Tables").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(snapshot.exists()){
-                    tableNum.clear();
-                    seats.clear();
-                    resId.clear();
-//                    Toast.makeText(view.getContext(), "I am invoked", Toast.LENGTH_SHORT).show();
-//                    Toast.makeText(view.getContext(), ""+snapshot.getChildrenCount(), Toast.LENGTH_SHORT).show();
-                    for(DataSnapshot dataSnapshot : snapshot.getChildren()){
-                        if(dataSnapshot.child("status").getValue(String.class).equals("unavailable")){
-                            resId.add(dataSnapshot.child("customerId").getValue(String.class));
-                            tableNum.add(dataSnapshot.child("tableNum").getValue(String.class));
-                            seats.add(dataSnapshot.child("numSeats").getValue(String.class));
-                        }
-                    }
-                    recyclerView.setLayoutManager(horizonatl);
-//                    Toast.makeText(view.getContext(), ""+seats.toString(), Toast.LENGTH_SHORT).show();
-                    recyclerView.setAdapter(new homeFragClass(tableNum,seats,resId));
-                }
-            }
+        new MyTask().execute();
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
+//        reference.child("Tables").addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                if(snapshot.exists()){
+//                    tableNum.clear();
+//                    seats.clear();
+//                    resId.clear();
+////                    Toast.makeText(view.getContext(), "I am invoked", Toast.LENGTH_SHORT).show();
+////                    Toast.makeText(view.getContext(), ""+snapshot.getChildrenCount(), Toast.LENGTH_SHORT).show();
+//                    for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+//                        if(dataSnapshot.child("status").getValue(String.class).equals("unavailable")){
+//                            resId.add(dataSnapshot.child("customerId").getValue(String.class));
+//                            tableNum.add(dataSnapshot.child("tableNum").getValue(String.class));
+//                            seats.add(dataSnapshot.child("numSeats").getValue(String.class));
+//                        }
+//                    }
+//                    recyclerView.setLayoutManager(horizonatl);
+////                    Toast.makeText(view.getContext(), ""+seats.toString(), Toast.LENGTH_SHORT).show();
+//                    recyclerView.setAdapter(new homeFragClass(tableNum,seats,resId));
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//
+//            }
+//        });
 
         reference.child("Tables").addChildEventListener(new ChildEventListener() {
             @Override
@@ -367,6 +370,57 @@ public class HomeFrag extends Fragment {
 //            reference.child("location").setValue(restLocation);
         }
     };
+    
+    private class MyTask extends AsyncTask<Void,Void,Void>{
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected void onPostExecute(Void unused) {
+            super.onPostExecute(unused);
+            reference.child("Tables").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if(snapshot.exists()){
+                        tableNum.clear();
+                        seats.clear();
+                        resId.clear();
+//                    Toast.makeText(view.getContext(), "I am invoked", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(view.getContext(), ""+snapshot.getChildrenCount(), Toast.LENGTH_SHORT).show();
+                        for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                            if(dataSnapshot.child("status").getValue(String.class).equals("unavailable")){
+                                resId.add(dataSnapshot.child("customerId").getValue(String.class));
+                                tableNum.add(dataSnapshot.child("tableNum").getValue(String.class));
+                                seats.add(dataSnapshot.child("numSeats").getValue(String.class));
+                            }
+                        }
+                        recyclerView.setLayoutManager(horizonatl);
+//                    Toast.makeText(view.getContext(), ""+seats.toString(), Toast.LENGTH_SHORT).show();
+                        recyclerView.setAdapter(new homeFragClass(tableNum,seats,resId));
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(Void... values) {
+            super.onProgressUpdate(values);
+        }
+    }
+    
     private void createLocationRequest() {
         locationRequest = LocationRequest.create();
         locationRequest.setInterval(600000);

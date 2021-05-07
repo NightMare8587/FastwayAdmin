@@ -1,6 +1,7 @@
 package com.consumers.fastwayadmin.NavFrags;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.LayoutInflater;
@@ -88,6 +89,7 @@ public class TablesFrag extends Fragment {
         tableRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(tableAuth.getUid())).child("Tables");
         tableNumber.clear();
         status.clear();
+//        new MyTask().execute();
         tableRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -224,5 +226,60 @@ public class TablesFrag extends Fragment {
 
             }
         });
+    }
+
+    private class MyTask extends AsyncTask<Void,Void,Void>{
+
+        @Override
+        protected void onProgressUpdate(Void... values) {
+            super.onProgressUpdate(values);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+
+        @Override
+        protected void onPostExecute(Void unused) {
+            super.onPostExecute(unused);
+            tableRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if(snapshot.exists()){
+                        HashMap<String,List<String>> map = new HashMap<>();
+                        for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                            tableNumber.add(Objects.requireNonNull(dataSnapshot.child("tableNum").getValue()).toString());
+                            status.add(dataSnapshot.child("status").getValue().toString());
+                            if(dataSnapshot.hasChild("customerId")) {
+//                            map.put(String.valueOf(dataSnapshot.child("tableNum").getValue(String.class)),String.valueOf(dataSnapshot.child("customerId").getValue()));
+                                List<String> list = new ArrayList<>();
+                                list.add(String.valueOf(dataSnapshot.child("customerId").getValue()));
+                                list.add(String.valueOf(dataSnapshot.child("time").getValue()));
+                                map.put(String.valueOf(dataSnapshot.child("tableNum").getValue(String.class)), list);
+                            }
+                        }
+                        tableView = new TableView(tableNumber,status,map,getContext());
+                        table.setAdapter(tableView);
+                        tableView.notifyDataSetChanged();
+
+                    }else{
+                        Toast.makeText(getContext(), "Add Some Tables!!!", Toast.LENGTH_SHORT).show();
+                    }
+
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            return null;
+        }
     }
 }
