@@ -4,7 +4,7 @@
 
     <item android:id="@+id/notification"
         app:showAsAction="always"
-        android:icon="@drawable/ic_baseline_message_24"
-        android:title="Notification"/>
+        android:icon="@drawable/ic_baseline_support_agent_24"
+        android:title="Support"/>
 
 </menu>
