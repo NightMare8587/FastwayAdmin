@@ -7,8 +7,9 @@
 
     <ImageView
         android:id="@+id/comboDiscountImageView"
-        android:layout_width="329dp"
-        android:layout_height="98dp"
+        android:layout_width="330dp"
+        android:layout_height="120dp"
+        android:scaleType="fitXY"
         android:layout_marginTop="14dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -74,9 +75,10 @@
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/homeFragToolBar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/toolbar_style"
-        android:minHeight="?attr/actionBarSize"
+        android:layout_height="58dp"
+        android:background="@drawable/toolbar"
+        android:minHeight="55dp"
+        android:maxHeight="60dp"
         android:theme="?attr/actionBarTheme"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
