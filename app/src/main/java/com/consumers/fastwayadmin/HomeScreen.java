@@ -2,6 +2,7 @@ package com.consumers.fastwayadmin;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import android.content.Intent;
@@ -26,29 +27,43 @@ public class HomeScreen extends AppCompatActivity {
     BubbleNavigationConstraintView bubble;
     FragmentManager manager;
     FirebaseAuth auth;
+    Fragment active;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_screen);
         initialise();
+        Fragment first = new HomeFrag();
+        Fragment second = new MenuFrag();
+        Fragment third = new TablesFrag();
+        Fragment four = new AccountFrag();
 
-        manager.beginTransaction().replace(R.id.homescreen,new HomeFrag()).commit();
+         active = first;
 
+//        manager.beginTransaction().replace(R.id.homescreen,new HomeFrag()).commit();
+        manager.beginTransaction().add(R.id.homescreen, four, "4").hide(four).commit();
+        manager.beginTransaction().add(R.id.homescreen, third, "3").hide(third).commit();
+        manager.beginTransaction().add(R.id.homescreen, second, "2").hide(second).commit();
+        manager.beginTransaction().add(R.id.homescreen, first, "1").commit();
         bubble.setNavigationChangeListener(new BubbleNavigationChangeListener() {
             @Override
             public void onNavigationChanged(View view, int position) {
                 switch (position){
                     case 0:
-                        manager.beginTransaction().replace(R.id.homescreen,new HomeFrag()).commit();
+                        manager.beginTransaction().hide(active).show(first).commit();
+                        active = first;
                         break;
                     case 1:
-                        manager.beginTransaction().replace(R.id.homescreen,new MenuFrag()).commit();
+                        manager.beginTransaction().hide(active).show(second).commit();
+                        active = second;
                         break;
                     case 2:
-                        manager.beginTransaction().replace(R.id.homescreen,new TablesFrag()).commit();
+                        manager.beginTransaction().hide(active).show(third).commit();
+                        active = third;
                         break;
                     case 3:
-                        manager.beginTransaction().replace(R.id.homescreen,new AccountFrag()).commit();
+                        manager.beginTransaction().hide(active).show(four).commit();
+                        active = four;
                         break;
                 }
             }
