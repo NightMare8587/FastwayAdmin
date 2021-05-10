@@ -86,7 +86,7 @@
             android:name="com.google.firebase.messaging.default_notification_color"
             android:resource="@color/defaultContentColor" />
 
-        <activity android:name=".HomeScreen" />
+        <activity android:name=".HomeScreen.HomeScreen" />
         <activity android:name=".Info.Info" />
         <activity android:name=".SplashScreen">
             <intent-filter>

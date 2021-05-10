@@ -20,16 +20,18 @@
             android:layout_height="0dp"
             android:orientation="vertical"
             android:layout_weight="0.2">
+
             <TextView
+                android:id="@+id/numberOfTable"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Table Number : "
                 android:layout_marginStart="15dp"
                 android:layout_marginTop="8dp"
                 android:layout_weight="0.7"
-                android:textStyle="bold"
+                android:text="Table Number : "
+                android:textColor="#000000"
                 android:textSize="18sp"
-                android:id="@+id/numberOfTable"/>
+                android:textStyle="bold" />
 
         </LinearLayout>
 
@@ -38,17 +40,18 @@
             android:layout_height="0dp"
             android:orientation="horizontal"
             android:layout_weight="0.3">
+
             <TextView
+                android:id="@+id/statusOfTable"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Status : "
                 android:layout_marginStart="15dp"
-                android:layout_weight="0.2"
                 android:layout_marginTop="10dp"
-                android:textStyle="bold"
+                android:layout_weight="0.2"
+                android:text="Status : "
+                android:textColor="#000000"
                 android:textSize="18sp"
-                android:id="@+id/statusOfTable"
-                />
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/timeOfReservedTable"
