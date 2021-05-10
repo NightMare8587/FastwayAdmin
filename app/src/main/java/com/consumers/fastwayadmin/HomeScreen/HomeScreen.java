@@ -22,6 +22,8 @@ import com.gauravk.bubblenavigation.listener.BubbleNavigationChangeListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.messaging.FirebaseMessaging;
 
+import java.util.Objects;
+
 public class HomeScreen extends AppCompatActivity {
 
     BubbleNavigationConstraintView bubble;
@@ -81,7 +83,7 @@ public class HomeScreen extends AppCompatActivity {
         int id = item.getItemId();
 
         if(id == R.id.notification)
-            startActivity(new Intent(HomeScreen.this, DisplayAllAvaialbleChats.class));
+            startActivity(new Intent(HomeScreen.this, SupportActivity.class));
 
         return super.onOptionsItemSelected(item);
     }
@@ -90,6 +92,6 @@ public class HomeScreen extends AppCompatActivity {
         auth = FirebaseAuth.getInstance();
         bubble = findViewById(R.id.top_navigation_constraint);
         manager = getSupportFragmentManager();
-        FirebaseMessaging.getInstance().subscribeToTopic(auth.getUid());
+        FirebaseMessaging.getInstance().subscribeToTopic(Objects.requireNonNull(auth.getUid()));
     }
 }
