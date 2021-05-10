@@ -30,7 +30,8 @@
         android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         tools:ignore="AllowBackup"
         tools:replace="android:icon">
-        <activity android:name=".Chat.DisplayAllAvaialbleChats"></activity>
+        <activity android:name=".HomeScreen.SupportActivity"></activity>
+        <activity android:name=".Chat.DisplayAllAvaialbleChats" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
