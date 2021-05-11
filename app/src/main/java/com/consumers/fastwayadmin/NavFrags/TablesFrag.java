@@ -84,7 +84,7 @@ public class TablesFrag extends Fragment {
         layout = view.findViewById(R.id.tableRefreshLayout);
         table = view.findViewById(R.id.tableRecyclerView);
         table.setLayoutManager(new LinearLayoutManager(view.getContext()));
-        Toast.makeText(getActivity(), "Swipe down to refresh", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(getActivity(), "Swipe down to refresh", Toast.LENGTH_SHORT).show();
         tableAuth = FirebaseAuth.getInstance();
         tableRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(tableAuth.getUid())).child("Tables");
         tableNumber.clear();

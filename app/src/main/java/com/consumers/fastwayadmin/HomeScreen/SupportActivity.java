@@ -21,7 +21,7 @@ public class SupportActivity extends AppCompatActivity {
         setContentView(R.layout.activity_support);
         view = findViewById(R.id.webView);
         WebSettings settings = view.getSettings();
-        view.getSettings().getJavaScriptEnabled();
+        view.getSettings().setJavaScriptEnabled(true);
         view.setInitialScale(1);
         view.getSettings().setUserAgentString("Android");
         settings.setUseWideViewPort(true);
@@ -33,7 +33,7 @@ public class SupportActivity extends AppCompatActivity {
         settings.setAllowUniversalAccessFromFileURLs(true);
         view.requestFocus();
         settings.setDomStorageEnabled(true);
-        view.loadUrl("https://maheshwariloya.wixsite.com/my-site-2");
+        view.loadUrl("https://maheshwariloya.wixsite.com/my-site");
         view.setWebViewClient(new WebViewClient());
     }
 }
