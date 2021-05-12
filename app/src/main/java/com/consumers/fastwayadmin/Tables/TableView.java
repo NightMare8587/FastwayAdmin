@@ -103,6 +103,7 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
                                         main.put("to","/topics/"+myList.get(0)+"");
                                         JSONObject notification = new JSONObject();
                                         notification.put("title","Cancelled" );
+                                        notification.put("click_action","Table Frag");
                                         notification.put("body","Your Reserved Tables is cancelled by the owner");
                                         main.put("notification",notification);
 

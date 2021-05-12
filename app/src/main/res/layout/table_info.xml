@@ -2,8 +2,8 @@
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent" android:layout_height="165dp"
-
+    android:layout_width="match_parent" android:layout_height="145dp"
+    app:cardCornerRadius="25dp"
     android:layout_marginLeft="15dp"
     android:layout_marginRight="15dp"
     android:layout_marginTop="12dp"
@@ -24,10 +24,11 @@
             <TextView
                 android:id="@+id/numberOfTable"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="0dp"
                 android:layout_marginStart="15dp"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="9dp"
                 android:layout_weight="0.7"
+                android:fontFamily="@font/merriweather_sans_bold"
                 android:text="Table Number : "
                 android:textColor="#000000"
                 android:textSize="18sp"
@@ -39,7 +40,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:orientation="horizontal"
-            android:layout_weight="0.3">
+            android:layout_weight="0.2">
 
             <TextView
                 android:id="@+id/statusOfTable"
@@ -48,6 +49,7 @@
                 android:layout_marginStart="15dp"
                 android:layout_marginTop="10dp"
                 android:layout_weight="0.2"
+                android:fontFamily="@font/merriweather_sans_bold"
                 android:text="Status : "
                 android:textColor="#000000"
                 android:textSize="18sp"
@@ -80,9 +82,10 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="18dp"
                 android:layout_weight="0.6"
+                android:fontFamily="@font/merriweather_sans_bold"
                 android:text="Chat With Customer"
                 android:textColor="@color/purple_700"
-                android:textSize="15sp"
+                android:textSize="17sp"
                 android:textStyle="bold"
                 android:visibility="invisible"
                 tools:ignore="HardcodedText" />
@@ -93,9 +96,10 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="18dp"
                 android:layout_weight="0.4"
+                android:fontFamily="@font/merriweather_sans_bold"
                 android:text="Cancel"
                 android:textColor="@color/default_badge_background_color"
-                android:textSize="15sp"
+                android:textSize="17sp"
                 android:textStyle="bold"
                 android:visibility="invisible" />
 
