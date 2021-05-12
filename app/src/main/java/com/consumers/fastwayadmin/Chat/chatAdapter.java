@@ -1,9 +1,12 @@
 package com.consumers.fastwayadmin.Chat;
 
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -73,9 +76,27 @@ public class chatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         if(holder.getClass() == SentViewHolder.class){
             SentViewHolder viewHolder = (SentViewHolder) holder;
             ((SentViewHolder) holder).send.setText(message.get(position));
+            ((SentViewHolder) holder).send.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    ClipboardManager cm = (ClipboardManager)v.getContext().getSystemService(Context.CLIPBOARD_SERVICE);
+                    cm.setText(((SentViewHolder) holder).send.getText().toString());
+                    Toast.makeText(v.getContext(), "Copied to clipboard", Toast.LENGTH_SHORT).show();
+                    return true;
+                }
+            });
         }else{
             ReciveHolder reciveHolder = (ReciveHolder) holder;
             ((ReciveHolder) holder).recive.setText(message.get(position));
+            ((ReciveHolder) holder).recive.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    ClipboardManager cm = (ClipboardManager)v.getContext().getSystemService(Context.CLIPBOARD_SERVICE);
+                    cm.setText(((ReciveHolder) holder).recive.getText().toString());
+                    Toast.makeText(v.getContext(), "Copied to clipboard", Toast.LENGTH_SHORT).show();
+                    return true;
+                }
+            });
         }
     }
 
