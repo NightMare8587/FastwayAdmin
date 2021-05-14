@@ -1,4 +1,4 @@
-package com.consumers.fastwayadmin;
+package com.consumers.fastwayadmin.SplashAndIntro;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.Handler;
 
 import com.consumers.fastwayadmin.Login.MainActivity;
+import com.consumers.fastwayadmin.R;
 
 public class SplashScreen extends AppCompatActivity {
 
@@ -18,7 +19,7 @@ public class SplashScreen extends AppCompatActivity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                startActivity(new Intent(SplashScreen.this, MainActivity.class));
+                startActivity(new Intent(SplashScreen.this, IntroActivity.class));
                 finish();
             }
         },2000);

@@ -30,7 +30,8 @@
         android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         tools:ignore="AllowBackup"
         tools:replace="android:icon">
-        <activity android:name=".HomeScreen.SupportActivity"></activity>
+        <activity android:name=".SplashAndIntro.IntroActivity"></activity>
+        <activity android:name=".HomeScreen.SupportActivity" />
         <activity android:name=".Chat.DisplayAllAvaialbleChats" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
@@ -92,7 +93,7 @@
 
         <activity android:name=".HomeScreen.HomeScreen" />
         <activity android:name=".Info.Info" />
-        <activity android:name=".SplashScreen">
+        <activity android:name=".SplashAndIntro.SplashScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

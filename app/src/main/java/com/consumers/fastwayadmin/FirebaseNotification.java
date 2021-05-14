@@ -13,8 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 
-import com.consumers.fastwayadmin.Login.MainActivity;
-import com.consumers.fastwayadmin.Tables.ChatWithCustomer;
+import com.consumers.fastwayadmin.SplashAndIntro.SplashScreen;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;

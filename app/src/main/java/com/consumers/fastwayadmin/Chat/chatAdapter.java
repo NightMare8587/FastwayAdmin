@@ -21,7 +21,6 @@ public class chatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     List<String> time = new ArrayList<>();
     List<String> leftOrRight = new ArrayList<>();
     int send = 1;
-    int receive = 0;
 
     public chatAdapter(List<String> message, List<String> time, List<String> leftOrRight) {
         this.message = message;
