@@ -5,12 +5,14 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
 import com.consumers.fastwayadmin.Login.MainActivity;
 import com.consumers.fastwayadmin.R;
+import com.consumers.fastwayadmin.SplashAndIntro.IntroFrags.FragFour;
 import com.consumers.fastwayadmin.SplashAndIntro.IntroFrags.FragOne;
 import com.consumers.fastwayadmin.SplashAndIntro.IntroFrags.FragThree;
 import com.consumers.fastwayadmin.SplashAndIntro.IntroFrags.FragTwo;
@@ -19,6 +21,7 @@ public class IntroActivity extends AppCompatActivity {
     FragmentManager manager;
     Fragment active;
     Button next,back;
+    SharedPreferences sharedPreferences;
     int count = 1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,11 +29,15 @@ public class IntroActivity extends AppCompatActivity {
         setContentView(R.layout.activity_intro);
         manager = getSupportFragmentManager();
         FragOne fragOne = new FragOne();
+        sharedPreferences = getSharedPreferences("IntroAct",MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
         FragThree fragThree = new FragThree();
+        FragFour fragFour = new FragFour();
         FragTwo fragTwo = new FragTwo();
         next = findViewById(R.id.showNextIntro);
         back = findViewById(R.id.showPreviousIntro);
         active = fragOne;
+        manager.beginTransaction().add(R.id.myIntroAct, fragFour, "4").hide(fragFour).commit();
         manager.beginTransaction().add(R.id.myIntroAct, fragThree, "3").hide(fragThree).commit();
         manager.beginTransaction().add(R.id.myIntroAct, fragTwo, "2").hide(fragTwo).commit();
         manager.beginTransaction().add(R.id.myIntroAct, fragOne, "1").commit();
@@ -44,28 +51,46 @@ public class IntroActivity extends AppCompatActivity {
                 else
                     back.setVisibility(View.INVISIBLE);
 
-                if(count == 3){
+                if(count == 4){
                     next.setText("DONE");
                 }else
                     next.setText("NEXT");
 
-                if(count > 3){
+                if(count > 4){
                     startActivity(new Intent(IntroActivity.this, MainActivity.class));
+                    editor.putString("done","yes");
+                    editor.apply();
                     finish();
                 }
 
                switch (count){
                    case 1:
-                       manager.beginTransaction().setCustomAnimations(R.anim.slide_in).hide(active).show(fragOne).commit();
+                       manager.beginTransaction().setCustomAnimations(
+                               R.anim.slide_in,  // enter
+                               R.anim.fade_out
+                       ).hide(active).show(fragOne).commit();
                        active = fragOne;
                        break;
                    case 2:
-                       manager.beginTransaction().hide(active).show(fragTwo).commit();
+                       manager.beginTransaction().hide(active).setCustomAnimations(
+                               R.anim.slide_in,  // enter
+                               R.anim.fade_out
+                       ).show(fragTwo).commit();
                        active = fragTwo;
                        break;
                    case 3:
-                       manager.beginTransaction().hide(active).show(fragThree).commit();
+                       manager.beginTransaction().hide(active).setCustomAnimations(
+                               R.anim.slide_in,  // enter
+                               R.anim.fade_out
+                       ).show(fragThree).commit();
                        active = fragThree;
+                       break;
+                   case 4:
+                       manager.beginTransaction().hide(active).setCustomAnimations(
+                               R.anim.slide_in,  // enter
+                               R.anim.fade_out
+                       ).show(fragFour).commit();
+                       active = fragFour;
                        break;
                }
             }
@@ -80,24 +105,41 @@ public class IntroActivity extends AppCompatActivity {
                 else
                     back.setVisibility(View.INVISIBLE);
 
-                if(count == 3){
+                if(count == 4){
                     next.setText("DONE");
                 }else
                     next.setText("NEXT");
 
                 switch (count){
                     case 1:
-                        manager.beginTransaction().hide(active).show(fragOne).commit();
+                        manager.beginTransaction().hide(active).setCustomAnimations(
+                                R.anim.slide_in_left,  // enter
+                                R.anim.slide_in
+                        ).show(fragOne).commit();
                         active = fragOne;
                         break;
                     case 2:
-                        manager.beginTransaction().hide(active).show(fragTwo).commit();
+                        manager.beginTransaction().hide(active).setCustomAnimations(
+                                R.anim.slide_in_left,  // enter
+                                R.anim.slide_in
+                        ).show(fragTwo).commit();
                         active = fragTwo;
                         break;
                     case 3:
-                        manager.beginTransaction().hide(active).show(fragThree).commit();
+                        manager.beginTransaction().hide(active).setCustomAnimations(
+                                R.anim.slide_in_left,  // enter
+                                R.anim.slide_in
+                        ).show(fragThree).commit();
                         active = fragThree;
                         break;
+                    case 4:
+                        manager.beginTransaction().hide(active).setCustomAnimations(
+                                R.anim.slide_in_left,  // enter
+                                R.anim.slide_in
+                        ).show(fragFour).commit();
+                        active = fragFour;
+                        break;
+
                 }
             }
         });
