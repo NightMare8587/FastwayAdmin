@@ -56,7 +56,7 @@ public class IntroActivity extends AppCompatActivity {
 
                switch (count){
                    case 1:
-                       manager.beginTransaction().hide(active).show(fragOne).commit();
+                       manager.beginTransaction().setCustomAnimations(R.anim.slide_in).hide(active).show(fragOne).commit();
                        active = fragOne;
                        break;
                    case 2:
