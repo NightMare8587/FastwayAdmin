@@ -67,28 +67,28 @@ public class IntroActivity extends AppCompatActivity {
                    case 1:
                        manager.beginTransaction().setCustomAnimations(
                                R.anim.slide_in,  // enter
-                               R.anim.fade_out
+                               R.anim.fade_in
                        ).hide(active).show(fragOne).commit();
                        active = fragOne;
                        break;
                    case 2:
                        manager.beginTransaction().hide(active).setCustomAnimations(
                                R.anim.slide_in,  // enter
-                               R.anim.fade_out
+                               R.anim.fade_in
                        ).show(fragTwo).commit();
                        active = fragTwo;
                        break;
                    case 3:
                        manager.beginTransaction().hide(active).setCustomAnimations(
                                R.anim.slide_in,  // enter
-                               R.anim.fade_out
+                               R.anim.fade_in
                        ).show(fragThree).commit();
                        active = fragThree;
                        break;
                    case 4:
                        manager.beginTransaction().hide(active).setCustomAnimations(
                                R.anim.slide_in,  // enter
-                               R.anim.fade_out
+                               R.anim.fade_in
                        ).show(fragFour).commit();
                        active = fragFour;
                        break;
@@ -113,29 +113,29 @@ public class IntroActivity extends AppCompatActivity {
                 switch (count){
                     case 1:
                         manager.beginTransaction().hide(active).setCustomAnimations(
-                                R.anim.slide_in_left,  // enter
-                                R.anim.slide_in
+                                R.anim.slide_out,  // enter
+                                R.anim.fade_in
                         ).show(fragOne).commit();
                         active = fragOne;
                         break;
                     case 2:
                         manager.beginTransaction().hide(active).setCustomAnimations(
-                                R.anim.slide_in_left,  // enter
-                                R.anim.slide_in
+                                R.anim.slide_out,  // enter
+                                R.anim.fade_in
                         ).show(fragTwo).commit();
                         active = fragTwo;
                         break;
                     case 3:
                         manager.beginTransaction().hide(active).setCustomAnimations(
-                                R.anim.slide_in_left,  // enter
-                                R.anim.slide_in
+                                R.anim.slide_out,  // enter
+                                R.anim.fade_in
                         ).show(fragThree).commit();
                         active = fragThree;
                         break;
                     case 4:
                         manager.beginTransaction().hide(active).setCustomAnimations(
-                                R.anim.slide_in_left,  // enter
-                                R.anim.slide_in
+                                R.anim.slide_out,  // enter
+                                R.anim.fade_in
                         ).show(fragFour).commit();
                         active = fragFour;
                         break;
