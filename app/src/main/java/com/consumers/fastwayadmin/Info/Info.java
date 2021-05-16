@@ -94,7 +94,7 @@ public class Info extends AppCompatActivity {
 
 
     private void createChildForRestaurant() {
-        InfoRestaurant infoRestaurant = new InfoRestaurant(name,address,pin,number,nearby);
+        InfoRestaurant infoRestaurant = new InfoRestaurant(name,address,pin,number,nearby,"0","0","0");
         infoRef.child("Restaurants").child(Objects.requireNonNull(infoAuth.getUid())).setValue(infoRestaurant);
         startActivity(new Intent(Info.this, MapsActivity.class));
         finish();

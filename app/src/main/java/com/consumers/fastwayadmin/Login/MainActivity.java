@@ -214,51 +214,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
-//        verifyCode.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                if(codeSent.length() <= 5){
-//                    codeSent.requestFocus();
-//                    codeSent.setError("invalid code");
-////                    wait.setVisibility(View.INVISIBLE);
-//                    return;
-//                }
-//              credential = PhoneAuthProvider.getCredential(verId,codeSent.getText().toString());
-//                loginAuth.signInWithCredential(credential).addOnCompleteListener(MainActivity.this, new OnCompleteListener<AuthResult>() {
-//                    @Override
-//                    public void onComplete(@NonNull Task<AuthResult> task) {
-//                        if(task.isSuccessful()){
-//                            Toast.makeText(MainActivity.this, "Login Successfully", Toast.LENGTH_SHORT).show();
-//                            Map<String,Object> map = new HashMap<>();
-//                            map.put("name",name);
-//                            map.put("email",email);
-//                            editor.putString("email",email);
-//                            editor.putString("name",name);
-//                            editor.apply();
-//                            DatabaseAdmin user = new DatabaseAdmin(name,email,number);
-//                            reference.child("Admin").child(loginAuth.getUid()+"").setValue(user);
-//                            db.collection(loginAuth.getUid()).document("info")
-//                                    .set(map).addOnSuccessListener(new OnSuccessListener<Void>() {
-//                                @Override
-//                                public void onSuccess(Void aVoid) {
-//                                    Toast.makeText(MainActivity.this, "Data Uploaded Successfully", Toast.LENGTH_SHORT).show();
-//                                }
-//                            }).addOnFailureListener(new OnFailureListener() {
-//                                @Override
-//                                public void onFailure(@NonNull Exception e) {
-//                                    Toast.makeText(MainActivity.this, "Something went wrong", Toast.LENGTH_SHORT).show();
-//                                }
-//                            });
-//
-////                            wait.setVisibility(View.INVISIBLE);
-//                            startActivity(new Intent(MainActivity.this,Info.class));
-//                            finish();
-//                        }
-//                    }
-//                });
-//            }
-//        });
     }
 
 
