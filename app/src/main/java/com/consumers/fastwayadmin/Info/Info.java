@@ -22,6 +22,11 @@ import com.hbb20.CountryCodePicker;
 
 import java.util.Objects;
 
+import karpuzoglu.enes.com.fastdialog.Animations;
+import karpuzoglu.enes.com.fastdialog.FastDialog;
+import karpuzoglu.enes.com.fastdialog.FastDialogBuilder;
+import karpuzoglu.enes.com.fastdialog.Type;
+
 public class Info extends AppCompatActivity {
 
     EditText nameOfRestaurant,AddressOfRestaurant,nearbyPlace,pinCode,contactNumber;
@@ -32,6 +37,7 @@ public class Info extends AppCompatActivity {
     CountryCodePicker codePicker;
     FirebaseAuth infoAuth;
     DatabaseReference infoRef;
+    FastDialog fastDialog;
     String name,address,nearby,pin,number;
 //    ProgressBar progressBar;
     @Override
@@ -39,15 +45,21 @@ public class Info extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_info);
         initialise();
-
+        fastDialog = new FastDialogBuilder(Info.this, Type.PROGRESS)
+                .progressText("Checking Database...")
+                .setAnimation(Animations.SLIDE_TOP)
+                .create();
+        fastDialog.show();
         infoRef.child("Restaurants").addListenerForSingleValueEvent(new ValueEventListener() {
            @Override
            public void onDataChange(@NonNull DataSnapshot snapshot) {
                if(snapshot.child(Objects.requireNonNull(infoAuth.getUid())).exists()){
 //                   progressBar.setVisibility(View.INVISIBLE);
                    startActivity(new Intent(Info.this, HomeScreen.class));
+                   fastDialog.dismiss();
                    finish();
-               }
+               }else
+                   fastDialog.dismiss();
 
 //               progressBar.setVisibility(View.INVISIBLE);
            }

@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/myIntroAct"
     android:layout_width="match_parent"
+    android:background="@drawable/frag_one_back"
     android:layout_height="match_parent"
     tools:context=".SplashAndIntro.IntroActivity">
 
@@ -13,7 +14,10 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="40dp"
+        android:background="@drawable/inreo_button_back"
         android:text="next"
+        android:textSize="16sp"
+        android:textStyle="bold|italic"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
@@ -23,7 +27,10 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginBottom="40dp"
+        android:background="@drawable/inreo_button_next"
         android:text="back"
+        android:textSize="16sp"
+        android:textStyle="bold|italic"
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

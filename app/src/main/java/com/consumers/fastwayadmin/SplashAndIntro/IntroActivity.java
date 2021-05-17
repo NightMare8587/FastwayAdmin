@@ -51,7 +51,7 @@ public class IntroActivity extends AppCompatActivity {
                 else
                     back.setVisibility(View.INVISIBLE);
 
-                if(count == 4){
+                if(count > 3){
                     next.setText("DONE");
                 }else
                     next.setText("NEXT");
@@ -105,7 +105,7 @@ public class IntroActivity extends AppCompatActivity {
                 else
                     back.setVisibility(View.INVISIBLE);
 
-                if(count == 4){
+                if(count > 3){
                     next.setText("DONE");
                 }else
                     next.setText("NEXT");
