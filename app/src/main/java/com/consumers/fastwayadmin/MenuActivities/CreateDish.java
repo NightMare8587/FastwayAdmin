@@ -142,7 +142,7 @@ public class CreateDish extends AppCompatActivity {
     }
 
     private void addToDatabase(String name, String half, String full,String image,String mrp) {
-        DishInfo info = new DishInfo(name,half,full,image,mrp);
+        DishInfo info = new DishInfo(name,half,full,image,mrp,"0","0","0");
         try {
             dish.child("Restaurants").child(Objects.requireNonNull(dishAuth.getUid())).child("List of Dish").child(menuType).child(name).setValue(info);
             Toast.makeText(this, "Dish Added Successfully", Toast.LENGTH_SHORT).show();
