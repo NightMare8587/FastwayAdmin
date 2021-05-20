@@ -26,6 +26,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import com.consumers.fastwayadmin.GMailSender;
 import com.crowdfire.cfalertdialog.CFAlertDialog;
 import com.consumers.fastwayadmin.Info.Info;
 import com.consumers.fastwayadmin.R;
@@ -77,7 +78,7 @@ import karpuzoglu.enes.com.fastdialog.FastDialogBuilder;
 import karpuzoglu.enes.com.fastdialog.NegativeClick;
 import karpuzoglu.enes.com.fastdialog.PositiveClick;
 import karpuzoglu.enes.com.fastdialog.Type;
-
+import android.os.AsyncTask;
 //import com.google.android.gms.location.LocationRequest;
 //import com.google.android.gms.location.LocationServices;
 //import com.google.android.gms.location.LocationSettingsRequest;
@@ -85,8 +86,10 @@ import karpuzoglu.enes.com.fastdialog.Type;
 //import com.google.android.gms.location.SettingsClient;
 
 public class MainActivity extends AppCompatActivity {
-
+    String subject = "Welcome to Fastway";
+    String body = "Haha you nigga";
     FirebaseAuth loginAuth;
+    String reciverMailID;
     LocationRequest locationRequest;
     GoogleSignInOptions gso;
     FastDialog verifyCodeDialog,fastDialog;
@@ -108,6 +111,10 @@ public class MainActivity extends AppCompatActivity {
     String name,email,number;
     PhoneAuthCredential credential;
     FirebaseUser currentUser;
+
+    GMailSender sender;
+    String emailOfSender = "maheshwariloya@gmail.com";
+    String passOfSender = "loyapulkit8587";
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -318,6 +325,7 @@ public class MainActivity extends AppCompatActivity {
                     Map<String,Object> map = new HashMap<>();
                     map.put("name",name);
                     map.put("email",email);
+                    reciverMailID = email;
                     editor.putString("name",name);
                     editor.putString("email",email);
                     editor.apply();
@@ -395,6 +403,8 @@ public class MainActivity extends AppCompatActivity {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                                         if(!snapshot.hasChild(Objects.requireNonNull(loginAuth.getUid()))){
+                                            sender = new GMailSender(emailOfSender,passOfSender);
+                                            new MyAsyncClass().execute();
                                             reference.child("Admin").child(Objects.requireNonNull(loginAuth.getUid())).setValue(user);
                                         }
                                     }
@@ -481,7 +491,9 @@ public class MainActivity extends AppCompatActivity {
             // Signed in successfully, show authenticated UI.
             Toast.makeText(this, "Sign In", Toast.LENGTH_SHORT).show();
             createFirebaseAuthID(account.getIdToken());
+            sender = new GMailSender(emailOfSender,passOfSender);
             getSignInInformation();
+            new MyAsyncClass().execute();
         } catch (ApiException e) {
             // The ApiException status code indicates the detailed failure reason.
             // Please refer to the GoogleSignInStatusCodes class reference for more information.
@@ -525,12 +537,46 @@ public class MainActivity extends AppCompatActivity {
             String personGivenName = acct.getGivenName();
             String personFamilyName = acct.getFamilyName();
             String personEmail = acct.getEmail();
+            reciverMailID = personEmail;
             String personId = acct.getId();
             Uri personPhoto = acct.getPhotoUrl();
             editor.putString("email",personEmail);
             editor.putString("name",personName);
             editor.apply();
             Log.i("info",personName+ " " + personEmail + " " + personFamilyName);
+        }
+    }
+    class MyAsyncClass extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected void onPreExecute() {
+
+            super.onPreExecute();
+
+        }
+
+        @Override
+
+        protected Void doInBackground(Void... mApi) {
+            try {
+
+                // Add subject, Body, your mail Id, and receiver mail Id.
+                sender.sendMail(subject, body, emailOfSender, reciverMailID);
+                Log.d("send", "done");
+            }
+            catch (Exception ex) {
+                Log.d("exceptionsending", ex.toString());
+            }
+            return null;
+        }
+
+        @Override
+
+        protected void onPostExecute(Void result) {
+
+            super.onPostExecute(result);
+            Toast.makeText(MainActivity.this, "mail send", Toast.LENGTH_SHORT).show();
+
         }
     }
 }

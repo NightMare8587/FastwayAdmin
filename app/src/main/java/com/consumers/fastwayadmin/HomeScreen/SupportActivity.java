@@ -13,27 +13,12 @@ import com.consumers.fastwayadmin.R;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SupportActivity extends AppCompatActivity {
-   WebView view;
+public class SupportActivity extends AppCompatActivity{
+   
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_support);
-        view = findViewById(R.id.webView);
-        WebSettings settings = view.getSettings();
-        view.getSettings().setJavaScriptEnabled(true);
-        view.setInitialScale(1);
-        view.getSettings().setUserAgentString("Android");
-        settings.setUseWideViewPort(true);
-        settings.setLoadWithOverviewMode(true);
-        settings.setUseWideViewPort(true);
-        settings.setAllowFileAccess(true);
-        settings.setAllowContentAccess(true);
-        settings.setAllowFileAccessFromFileURLs(true);
-        settings.setAllowUniversalAccessFromFileURLs(true);
-        view.requestFocus();
-        settings.setDomStorageEnabled(true);
-        view.loadUrl("https://maheshwariloya.wixsite.com/my-site");
-        view.setWebViewClient(new WebViewClient());
+
     }
 }
