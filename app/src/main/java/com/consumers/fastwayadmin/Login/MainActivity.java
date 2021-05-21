@@ -113,8 +113,8 @@ public class MainActivity extends AppCompatActivity {
     FirebaseUser currentUser;
 
     GMailSender sender;
-    String emailOfSender = "maheshwariloya@gmail.com";
-    String passOfSender = "loyapulkit8587";
+    String emailOfSender = "fastway8587@gmail.com";
+    String passOfSender = "@Ploya8587";
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -516,9 +516,24 @@ public class MainActivity extends AppCompatActivity {
                             FirebaseUser user = loginAuth.getCurrentUser();
                             assert user != null;
                             loginAuth.updateCurrentUser(user);
-                            GoogleSignInDB googleSignInDB = new GoogleSignInDB(account.getDisplayName(),account.getEmail());
-                            reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(user.getUid());
-                            reference.setValue(googleSignInDB);
+                            reference.child("Admin").addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                    if(!snapshot.hasChild(Objects.requireNonNull(loginAuth.getUid()))){
+                                        sender = new GMailSender(emailOfSender,passOfSender);
+                                        new MyAsyncClass().execute();
+                                        GoogleSignInDB googleSignInDB = new GoogleSignInDB(account.getDisplayName(),account.getEmail());
+                                        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(user.getUid());
+                                        reference.setValue(googleSignInDB);
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError error) {
+
+                                }
+                            });
+
                             startActivity(new Intent(MainActivity.this,Info.class));
 //                            updateUI(user);
                         } else {
