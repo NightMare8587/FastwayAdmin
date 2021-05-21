@@ -113,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
     FirebaseUser currentUser;
 
     GMailSender sender;
-    String emailOfSender = "fastway8587@gmail.com";
+    String emailOfSender = "fastway85187@gmail.com";
     String passOfSender = "@Ploya8587";
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -493,7 +493,7 @@ public class MainActivity extends AppCompatActivity {
             createFirebaseAuthID(account.getIdToken());
             sender = new GMailSender(emailOfSender,passOfSender);
             getSignInInformation();
-            new MyAsyncClass().execute();
+
         } catch (ApiException e) {
             // The ApiException status code indicates the detailed failure reason.
             // Please refer to the GoogleSignInStatusCodes class reference for more information.
