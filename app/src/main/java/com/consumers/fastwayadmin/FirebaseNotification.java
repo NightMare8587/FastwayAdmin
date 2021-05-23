@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 
+import com.consumers.fastwayadmin.Login.MainActivity;
 import com.consumers.fastwayadmin.SplashAndIntro.SplashScreen;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
@@ -43,8 +44,7 @@ public class FirebaseNotification extends FirebaseMessagingService {
             // directly as below.
             showNotification(
                     remoteMessage.getNotification().getTitle(),
-                    remoteMessage.getNotification().getBody(),
-                    remoteMessage.getNotification().getClickAction());
+                    remoteMessage.getNotification().getBody());
         }
     }
     private RemoteViews getCustomDesign(String title,
@@ -61,17 +61,14 @@ public class FirebaseNotification extends FirebaseMessagingService {
     // Method to display the notifications
     @RequiresApi(api = Build.VERSION_CODES.N)
     public void showNotification(String title,
-                                 String message,String action) {
+                                 String message) {
         auth = FirebaseAuth.getInstance();
         notificationClass notificationClass = new notificationClass(title,message, ServerValue.TIMESTAMP);
         ref = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
         ref.child("Notification").child(title).setValue(notificationClass);
         // Pass the intent to switch to the MainActivity
-        Intent intent = null;
-
-
-            intent = new Intent(this, SplashScreen.class);
-
+        Intent intent
+                = new Intent(this, MainActivity.class);
         // Assign channel ID
         String channel_id = "notification_channel";
         // Here FLAG_ACTIVITY_CLEAR_TOP flag is set to clear

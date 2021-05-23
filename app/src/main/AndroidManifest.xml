@@ -106,6 +106,12 @@
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.DEFAULT" />
+
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="MAINACTIVITY"> </action>
+                <category android:name="android.intent.category.DEFAULT"> </category>
             </intent-filter>
         </activity>
     </application>
