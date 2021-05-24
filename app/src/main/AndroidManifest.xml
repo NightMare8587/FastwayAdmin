@@ -10,7 +10,7 @@
          location permissions for the "MyLocation" functionality.
     -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.CAMERA" />
@@ -31,7 +31,7 @@
         android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         tools:ignore="AllowBackup"
         tools:replace="android:icon">
-        <activity android:name=".SplashAndIntro.IntroActivity"></activity>
+        <activity android:name=".SplashAndIntro.IntroActivity" />
         <activity android:name=".HomeScreen.SupportActivity" />
         <activity android:name=".Chat.DisplayAllAvaialbleChats" />
         <!--
@@ -106,12 +106,11 @@
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.DEFAULT" />
-
             </intent-filter>
-
             <intent-filter>
-                <action android:name="MAINACTIVITY"> </action>
-                <category android:name="android.intent.category.DEFAULT"> </category>
+                <action android:name="MAINACTIVITY" />
+
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
     </application>
