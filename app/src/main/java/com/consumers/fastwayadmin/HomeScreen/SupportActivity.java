@@ -21,7 +21,7 @@ import java.util.List;
 public class SupportActivity extends AppCompatActivity{
     ListView listView;
     ListView faqList;
-    FragmentManager fragmentManager;
+
     List<String> genarlQuery = new ArrayList<String>();
     List<String> faQQuery = new ArrayList<String>();
     @Override
@@ -30,7 +30,6 @@ public class SupportActivity extends AppCompatActivity{
         setContentView(R.layout.activity_support);
         genarlQuery.add("Live Chat With Us");
         genarlQuery.add("Email Us");
-        fragmentManager = getSupportFragmentManager();
         initialise();
         listView = findViewById(R.id.genralQueryListView);
         faqList = findViewById(R.id.faqListView);
