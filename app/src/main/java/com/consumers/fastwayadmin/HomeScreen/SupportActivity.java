@@ -11,8 +11,9 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.consumers.fastwayadmin.HomeScreen.Activities.CashbacksAndOffers;
+import com.consumers.fastwayadmin.HomeScreen.Activities.PaymentsAndRefunds;
 import com.consumers.fastwayadmin.R;
-import com.consumers.fastwayadmin.demoFrag;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +34,6 @@ public class SupportActivity extends AppCompatActivity{
         initialise();
         listView = findViewById(R.id.genralQueryListView);
         faqList = findViewById(R.id.faqListView);
-        demoFrag demoFrag = new demoFrag();
         ArrayAdapter<String> faqAdapter = new ArrayAdapter<String>(this,R.layout.list,faQQuery);
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, R.layout.list,genarlQuery);
         faqList.setAdapter(faqAdapter);
@@ -45,12 +45,10 @@ public class SupportActivity extends AppCompatActivity{
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 switch (position){
                     case 0:
-                        getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_in_top,R.anim.fade_in).replace(R.id.supportactivity, demoFrag).commit();
-//                        startActivity(new Intent(SupportActivity.this, PaymentAndRefunds.class));
-//                        overridePendingTransition(R.anim.slide_in_top,R.anim.slide_out_bottom);
+                        startActivity(new Intent(SupportActivity.this, PaymentsAndRefunds.class));
                         break;
                     case 1:
-
+                        startActivity(new Intent(SupportActivity.this, CashbacksAndOffers.class));
                         break;
                 }
             }
