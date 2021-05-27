@@ -6,18 +6,24 @@ import android.graphics.Paint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.consumers.fastwayadmin.MenuActivities.EditMenu;
 import com.consumers.fastwayadmin.R;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -57,6 +63,12 @@ public class DishView extends RecyclerView.Adapter<DishView.DishAdapter> {
     @Override
     public void onBindViewHolder(@NonNull DishAdapter holder, int position) {
         holder.name.setText(names.get(position));
+        holder.cardView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
         holder.price.setText(fullPrice.get(position));
         if(!before.get(position).equals("")){
             holder.price.setText("\u20B9" + before.get(position));
@@ -84,6 +96,21 @@ public class DishView extends RecyclerView.Adapter<DishView.DishAdapter> {
 //
 //        Log.i("info",uri.toString());
 //
+
+        holder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                FirebaseAuth auth = FirebaseAuth.getInstance();
+                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("Restaurants").child(Objects.requireNonNull(auth.getUid())).child("List of Dish").child(type);
+                if(isChecked){
+                    databaseReference.child(names.get(position)).child("enable").setValue("yes");
+                    holder.checkBox.setText("Enabled");
+                }else{
+                    databaseReference.child(names.get(position)).child("enable").setValue("no");
+                    holder.checkBox.setText("Disabled");
+                }
+            }
+        });
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -134,14 +161,17 @@ public class DishView extends RecyclerView.Adapter<DishView.DishAdapter> {
     public static class DishAdapter extends RecyclerView.ViewHolder {
         TextView name,price,available,discountPrice;
         ImageView imageView;
-
+        CardView cardView;
+        CheckBox checkBox;
         public DishAdapter(@NonNull View itemView) {
             super(itemView);
             imageView = itemView.findViewById(R.id.displayDishImage);
             name = itemView.findViewById(R.id.DishName);
             price = itemView.findViewById(R.id.pricePfDish);
+            cardView = itemView.findViewById(R.id.myCard);
             available = itemView.findViewById(R.id.availableOr);
             discountPrice = itemView.findViewById(R.id.discountedPrice);
+            checkBox = itemView.findViewById(R.id.enableDisableCheckBox);
         }
     }
 }

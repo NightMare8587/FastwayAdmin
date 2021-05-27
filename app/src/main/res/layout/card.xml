@@ -31,14 +31,14 @@
             android:id="@+id/pricePfDish"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="25dp"
+            android:layout_marginEnd="24dp"
             android:text="000"
             android:textSize="16sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.406" />
+            app:layout_constraintVertical_bias="0.367" />
 
         <TextView
             android:id="@+id/availableOr"
@@ -56,7 +56,7 @@
             android:id="@+id/displayDishImage"
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:layout_marginStart="4dp"
+            android:layout_marginStart="15dp"
             android:layout_marginTop="16dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -66,12 +66,23 @@
             android:id="@+id/discountedPrice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
             android:layout_marginEnd="25dp"
-            android:layout_marginBottom="45dp"
             android:text="000"
             android:textSize="16sp"
             android:textStyle="bold"
             android:visibility="invisible"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/pricePfDish" />
+
+        <CheckBox
+            android:id="@+id/enableDisableCheckBox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="15dp"
+            android:layout_marginBottom="2dp"
+            android:checked="true"
+            android:text="Enabled"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
