@@ -2,6 +2,7 @@ package com.consumers.fastwayadmin.Dish;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Paint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,14 +29,20 @@ public class DishView extends RecyclerView.Adapter<DishView.DishAdapter> {
     List<String> fullPrice = new ArrayList<String>();
     List<String> half = new ArrayList<String>();
     List<String> image = new ArrayList<>();
+    List<String> before = new ArrayList<>();
+    List<String> after = new ArrayList<>();
+    List<String> discount = new ArrayList<>();
     FirebaseAuth auth;
     DatabaseReference ref;
     String main = "https://pixabay.com/api/?";
     String type;
-    public DishView(List<String> names,List<String> full,List<String> half,String type,List<String> image){
+    public DishView(List<String> names,List<String> full,List<String> half,String type,List<String> image,List<String> before,List<String> after,List<String> discount){
         this.fullPrice = full;
         this.half = half;
         this.names = names;
+        this.before = before;
+        this.after = after;
+        this.discount = discount;
         this.type = type;
         this.image = image;
     }
@@ -51,6 +58,15 @@ public class DishView extends RecyclerView.Adapter<DishView.DishAdapter> {
     public void onBindViewHolder(@NonNull DishAdapter holder, int position) {
         holder.name.setText(names.get(position));
         holder.price.setText(fullPrice.get(position));
+        if(!before.get(position).equals("")){
+            holder.price.setText("\u20B9" + before.get(position));
+            holder.price.setPaintFlags(holder.price.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+            holder.discountPrice.setText("\u20B9" + after.get(position));
+            holder.discountPrice.setVisibility(View.VISIBLE);
+        }else{
+            holder.price.setText("\u20B9" + fullPrice.get(position));
+            holder.discountPrice.setVisibility(View.INVISIBLE);
+        }
         if(!image.get(position).equals(""))
         Picasso.get().load(image.get(position)).centerCrop().resize(100,100).into(holder.imageView);
         if(!half.get(position).isEmpty()){
@@ -116,7 +132,7 @@ public class DishView extends RecyclerView.Adapter<DishView.DishAdapter> {
     }
 
     public static class DishAdapter extends RecyclerView.ViewHolder {
-        TextView name,price,available;
+        TextView name,price,available,discountPrice;
         ImageView imageView;
 
         public DishAdapter(@NonNull View itemView) {
@@ -125,6 +141,7 @@ public class DishView extends RecyclerView.Adapter<DishView.DishAdapter> {
             name = itemView.findViewById(R.id.DishName);
             price = itemView.findViewById(R.id.pricePfDish);
             available = itemView.findViewById(R.id.availableOr);
+            discountPrice = itemView.findViewById(R.id.discountedPrice);
         }
     }
 }

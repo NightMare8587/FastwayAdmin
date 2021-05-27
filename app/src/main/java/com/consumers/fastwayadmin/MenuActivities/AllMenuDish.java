@@ -8,6 +8,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -36,6 +37,9 @@ public class AllMenuDish extends AppCompatActivity {
     String dish;
     ProgressBar loading;
     List<String> names = new ArrayList<String>();
+    List<String> before = new ArrayList<>();
+    List<String> after = new ArrayList<>();
+    List<String> discount = new ArrayList<>();
     List<String> image = new ArrayList<>();
     List<String> fullPrice = new ArrayList<String>();
     List<String> halfPrice = new ArrayList<String>();
@@ -47,6 +51,9 @@ public class AllMenuDish extends AppCompatActivity {
         names.clear();
         halfPrice.clear();
         image.clear();
+        before.clear();
+        after.clear();
+        discount.clear();
         fullPrice.clear();
         menuRef.child(Objects.requireNonNull(menuAuth.getUid())).child("List of Dish").child(dish).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -56,6 +63,17 @@ public class AllMenuDish extends AppCompatActivity {
                     loading.setVisibility(View.INVISIBLE);
                 }else{
                     for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                        if(dataSnapshot.child("Discount").child(dataSnapshot.child("name").getValue().toString()).child("dis").exists()){
+                            Log.d("hola","yes");
+                            before.add(String.valueOf(dataSnapshot.child("Discount").child(Objects.requireNonNull(dataSnapshot.child("name").getValue(String.class))).child("before").getValue(String.class)));
+                            after.add(String.valueOf(dataSnapshot.child("Discount").child(Objects.requireNonNull(dataSnapshot.child("name").getValue(String.class))).child("after").getValue(String.class)));
+                            discount.add(String.valueOf(dataSnapshot.child("Discount").child(Objects.requireNonNull(dataSnapshot.child("name").getValue(String.class))).child("dis").getValue(String.class)));
+                        }else {
+                            Log.d("hola", "no");
+                            before.add("");
+                            after.add("");
+                            discount.add("");
+                        }
                         names.add(dataSnapshot.child("name").getValue().toString());
                         halfPrice.add(dataSnapshot.child("half").getValue().toString());
                         fullPrice.add(dataSnapshot.child("full").getValue().toString());
@@ -63,7 +81,7 @@ public class AllMenuDish extends AppCompatActivity {
                     }
                 }
                 loading.setVisibility(View.INVISIBLE);
-                recyclerView.setAdapter(new DishView(names,fullPrice,halfPrice,dish,image));
+                recyclerView.setAdapter(new DishView(names,fullPrice,halfPrice,dish,image,before,after,discount));
             }
 
             @Override
@@ -88,6 +106,9 @@ public class AllMenuDish extends AppCompatActivity {
             public void onRefresh() {
                 names.clear();
                 halfPrice.clear();
+                before.clear();
+                after.clear();
+                discount.clear();
                 fullPrice.clear();
                 image.clear();
                 menuRef.child(menuAuth.getUid()).child("List of Dish").child(dish).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -98,6 +119,17 @@ public class AllMenuDish extends AppCompatActivity {
                             loading.setVisibility(View.INVISIBLE);
                         }else{
                             for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                                if(dataSnapshot.child("Discount").child(dataSnapshot.child("name").getValue().toString()).child("dis").exists()){
+                                    Log.d("hola","yes");
+                                    before.add(String.valueOf(dataSnapshot.child("Discount").child(Objects.requireNonNull(dataSnapshot.child("name").getValue(String.class))).child("before").getValue(String.class)));
+                                    after.add(String.valueOf(dataSnapshot.child("Discount").child(Objects.requireNonNull(dataSnapshot.child("name").getValue(String.class))).child("after").getValue(String.class)));
+                                    discount.add(String.valueOf(dataSnapshot.child("Discount").child(Objects.requireNonNull(dataSnapshot.child("name").getValue(String.class))).child("dis").getValue(String.class)));
+                                }else {
+                                    Log.d("hola", "no");
+                                    before.add("");
+                                    after.add("");
+                                    discount.add("");
+                                }
                                 names.add(dataSnapshot.child("name").getValue().toString());
                                 halfPrice.add(dataSnapshot.child("half").getValue().toString());
                                 fullPrice.add(dataSnapshot.child("full").getValue().toString());
@@ -106,7 +138,7 @@ public class AllMenuDish extends AppCompatActivity {
                         }
                         loading.setVisibility(View.INVISIBLE);
                         swipeRefreshLayout.setRefreshing(false);
-                        recyclerView.setAdapter(new DishView(names,fullPrice,halfPrice,dish,image));
+                        recyclerView.setAdapter(new DishView(names,fullPrice,halfPrice,dish,image,before,after,discount));
                     }
 
                     @Override
