@@ -18,6 +18,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class SelectDishForCombo extends AppCompatActivity {
     RecyclerView recyclerView;
@@ -36,7 +37,7 @@ public class SelectDishForCombo extends AppCompatActivity {
         recyclerView = findViewById(R.id.selectDishComboRecyclerView);
         auth = FirebaseAuth.getInstance();
         type = getIntent().getStringExtra("dishType");
-        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(auth.getUid()).child("List of Dish");
+        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid())).child("List of Dish");
         reference.child(type).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {

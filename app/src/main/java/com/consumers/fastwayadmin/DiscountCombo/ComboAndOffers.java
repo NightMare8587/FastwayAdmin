@@ -103,41 +103,67 @@ public class ComboAndOffers extends AppCompatActivity {
                                             String comboName = dialog.getInputText();
                                             dialog.dismiss();
                                             auth = FirebaseAuth.getInstance();
-                                            reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid())).child("Current combo");
-                                            reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                                            FastDialog priceDialog = new FastDialogBuilder(ComboAndOffers.this, Type.DIALOG)
+                                                    .setTitleText("Price Of Combo")
+                                                    .setText("Enter Price Of Combo below")
+                                                    .setHint("Enter Price Of Combo")
+                                                    .positiveText("Confirm")
+                                                    .setAnimation(Animations.GROW_IN)
+                                                    .cancelable(false)
+                                                    .negativeText("Cancel").create();
+
+                                            priceDialog.show();
+
+                                            priceDialog.positiveClickListener(new PositiveClick() {
                                                 @Override
-                                                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                                    if(snapshot.exists()) {
-                                                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                                                            name.add(dataSnapshot.child("name").getValue(String.class));
-                                                        }
-                                                        reference =  FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid()));
-                                                        reference.child("Current combo").removeValue();
-                                                        reference =  FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid())).child("List of Dish");
-                                                        for(int i=0;i<name.size();i++) {
-                                                            combo combo = new combo(name.get(i));
-                                                            reference.child("Combo").child(comboName).child(name.get(i)).child("name").setValue(combo);
-                                                        }
-                                                        name.clear();
-                                                        recyclerView.setAdapter(new comboAdapter(name));
-                                                        new KAlertDialog(ComboAndOffers.this,KAlertDialog.SUCCESS_TYPE)
-                                                                .setTitleText("Success")
-                                                                .setContentText("combo created successfully")
-                                                                .setConfirmText("Ok, Great")
-                                                                .setConfirmClickListener(new KAlertDialog.KAlertClickListener() {
-                                                                    @Override
-                                                                    public void onClick(KAlertDialog kAlertDialog) {
-                                                                        kAlertDialog.dismissWithAnimation();
+                                                public void onClick(View view) {
+                                                    if(!(priceDialog.getInputText().length() == 0)) {
+
+                                                        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid())).child("Current combo");
+                                                        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                            @Override
+                                                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                                                if (snapshot.exists()) {
+                                                                    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                                                                        name.add(dataSnapshot.child("name").getValue(String.class));
                                                                     }
-                                                                }).show();
+                                                                    reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid()));
+                                                                    reference.child("Current combo").removeValue();
+                                                                    reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid())).child("List of Dish");
+                                                                    for (int i = 0; i < name.size(); i++) {
+                                                                        combo combo = new combo(name.get(i));
+                                                                        reference.child("Combo").child(comboName).child(name.get(i)).child("name").setValue(combo);
+                                                                    }
+                                                                    reference.child("Combo").child(comboName).child("price").setValue(priceDialog.getInputText());
+                                                                    reference.child("Combo").child(comboName).child("count").setValue("0");
+                                                                    reference.child("Combo").child(comboName).child("rating").setValue("0");
+                                                                    reference.child("Combo").child(comboName).child("totalRate").setValue("0");
+
+                                                                    name.clear();
+                                                                    recyclerView.setAdapter(new comboAdapter(name));
+                                                                    new KAlertDialog(ComboAndOffers.this, KAlertDialog.SUCCESS_TYPE)
+                                                                            .setTitleText("Success")
+                                                                            .setContentText("combo created successfully")
+                                                                            .setConfirmText("Ok, Great")
+                                                                            .setConfirmClickListener(new KAlertDialog.KAlertClickListener() {
+                                                                                @Override
+                                                                                public void onClick(KAlertDialog kAlertDialog) {
+                                                                                    kAlertDialog.dismissWithAnimation();
+                                                                                    priceDialog.dismiss();
+                                                                                }
+                                                                            }).show();
+                                                                }
+                                                            }
+
+                                                            @Override
+                                                            public void onCancelled(@NonNull DatabaseError error) {
+
+                                                            }
+                                                        });
                                                     }
                                                 }
-
-                                                @Override
-                                                public void onCancelled(@NonNull DatabaseError error) {
-
-                                                }
                                             });
+
 
                                         }
                                     }
