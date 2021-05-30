@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.consumers.fastwayadmin.MenuActivities.EditMenu;
 import com.consumers.fastwayadmin.R;
+import com.developer.kalert.KAlertDialog;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -115,10 +116,49 @@ public class DishView extends RecyclerView.Adapter<DishView.DishAdapter> {
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(view.getContext(), EditMenu.class);
-                intent.putExtra("type",type);
-                intent.putExtra("dish",names.get(position));
-                view.getContext().startActivity(intent);
+//                Intent intent = new Intent(view.getContext(), EditMenu.class);
+//                intent.putExtra("type",type);
+//                intent.putExtra("dish",names.get(position));
+//                view.getContext().startActivity(intent);
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
+                builder.setTitle("Important");
+                builder.setMessage("Choose one option");
+                builder.setPositiveButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                builder.setNegativeButton("Change Price", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        new KAlertDialog(view.getContext(),KAlertDialog.ERROR_TYPE)
+                                .setTitleText("Important")
+                                .setContentText("Changing price/Name will remove all offers applied on dish")
+                                .setConfirmText("Ok")
+                                .setCancelText("Cancel")
+                                .setConfirmClickListener(new KAlertDialog.KAlertClickListener() {
+                                    @Override
+                                    public void onClick(KAlertDialog kAlertDialog) {
+                                            Intent intent = new Intent(view.getContext(), EditMenu.class);
+                                            intent.putExtra("type",type);
+                                            intent.putExtra("dish",names.get(position));
+                                            view.getContext().startActivity(intent);
+                                            kAlertDialog.dismissWithAnimation();
+                                    }
+                                })
+                                .setCancelClickListener(new KAlertDialog.KAlertClickListener() {
+                                    @Override
+                                    public void onClick(KAlertDialog kAlertDialog) {
+                                        kAlertDialog.dismissWithAnimation();
+                                    }
+                                }).show();
+                    }
+                });
+
+                builder.create().show();
+
             }
         });
 

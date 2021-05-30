@@ -1,5 +1,6 @@
 package com.consumers.fastwayadmin.MenuActivities;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
@@ -9,11 +10,15 @@ import android.widget.EditText;
 
 import com.consumers.fastwayadmin.R;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class EditMenu extends AppCompatActivity {
 
@@ -22,6 +27,7 @@ public class EditMenu extends AppCompatActivity {
     FirebaseAuth editAuth;
     DatabaseReference editRef;
     String type;
+    String change;
     String dish;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,19 +39,29 @@ public class EditMenu extends AppCompatActivity {
             final Map<String,Object> update = new HashMap<String,Object>();
             @Override
             public void onClick(View view) {
-                if(name.length() != 0){
-                    update.put("name",name.getText().toString());
-                }
 
                 if(fullPlate.length() != 0){
-                  update.put("full",fullPlate.getText().toString());
+                 editRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                     @Override
+                     public void onDataChange(@NonNull  DataSnapshot snapshot) {
+                         if(snapshot.child("Discount").child(dish).child("dis").exists()){
+                             editRef.child("Discount").removeValue();
+                         }
+                         editRef.child("full").setValue(fullPlate.getText().toString());
+                     }
+
+                     @Override
+                     public void onCancelled(@NonNull  DatabaseError error) {
+
+                     }
+                 });
                 }
 
                 if(halfPlate.length() != 0){
-                   update.put("half",halfPlate.getText().toString());
+                    editRef.child("half").setValue(fullPlate.getText().toString());
                 }
 
-                editRef.updateChildren(update);
+                finish();
             }
         });
 
@@ -59,7 +75,14 @@ public class EditMenu extends AppCompatActivity {
         editAuth = FirebaseAuth.getInstance();
         type = getIntent().getStringExtra("type");
         dish = getIntent().getStringExtra("dish");
-        editRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(editAuth.getUid()).child("List of Dish")
+//        change = getIntent().getStringExtra("change");
+//        if(change.equals("price")){
+//            fullPlate.setVisibility(View.VISIBLE);
+//            halfPlate.setVisibility(View.VISIBLE);
+//        }else{
+//            name.setVisibility(View.VISIBLE);
+//        }
+        editRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(editAuth.getUid())).child("List of Dish")
                                 .child(type).child(dish);
     }
 }
