@@ -45,11 +45,13 @@ public class ChatWithCustomer extends AppCompatActivity {
     DatabaseReference reference;
     FirebaseAuth auth;
     String id;
+    String restaurantName;
     String URL = "https://fcm.googleapis.com/fcm/send";
     RecyclerView recyclerView;
     List<String> message = new ArrayList<>();
     List<String> time = new ArrayList<>();
     LinearLayoutManager linearLayoutManager;
+    DatabaseReference resName;
     List<String> leftOrRight = new ArrayList<>();
     EditText editText;
     Button sendME;
@@ -65,6 +67,19 @@ public class ChatWithCustomer extends AppCompatActivity {
         recyclerView = findViewById(R.id.messageRecyclerView);
          id = getIntent().getStringExtra("id");
 
+        resName = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(auth.getUid());
+        resName.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull  DataSnapshot snapshot) {
+                if(snapshot.exists())
+                    restaurantName = String.valueOf(snapshot.child("name").getValue());
+            }
+
+            @Override
+            public void onCancelled(@NonNull  DatabaseError error) {
+
+            }
+        });
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         reference.child("messages").child(id).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -131,7 +146,7 @@ public class ChatWithCustomer extends AppCompatActivity {
                     try{
                         main.put("to","/topics/"+id+"");
                         JSONObject notification = new JSONObject();
-                        notification.put("title","Restaurant Owner");
+                        notification.put("title","Restaurant Owner" + "(" + restaurantName + ")");
                         notification.put("body",""+editText.getText().toString().trim());
                         main.put("notification",notification);
 
