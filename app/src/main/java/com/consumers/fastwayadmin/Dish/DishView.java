@@ -64,6 +64,7 @@ public class DishView extends RecyclerView.Adapter<DishView.DishAdapter> {
     @Override
     public void onBindViewHolder(@NonNull DishAdapter holder, int position) {
         holder.name.setText(names.get(position));
+//        notifyDataSetChanged();
         holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -214,4 +215,6 @@ public class DishView extends RecyclerView.Adapter<DishView.DishAdapter> {
             checkBox = itemView.findViewById(R.id.enableDisableCheckBox);
         }
     }
+
+
 }

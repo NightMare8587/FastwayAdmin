@@ -1,12 +1,14 @@
 package com.consumers.fastwayadmin.MenuActivities;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -17,6 +19,7 @@ import com.consumers.fastwayadmin.Dish.DishView;
 import com.consumers.fastwayadmin.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -48,13 +51,7 @@ public class AllMenuDish extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_all_menu_dish);
         initialise();
-        names.clear();
-        halfPrice.clear();
-        image.clear();
-        before.clear();
-        after.clear();
-        discount.clear();
-        fullPrice.clear();
+
         menuRef.child(Objects.requireNonNull(menuAuth.getUid())).child("List of Dish").child(dish).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -62,6 +59,13 @@ public class AllMenuDish extends AppCompatActivity {
                     Toast.makeText(AllMenuDish.this, "Empty!! Add Some Dish", Toast.LENGTH_SHORT).show();
                     loading.setVisibility(View.INVISIBLE);
                 }else{
+                    names.clear();
+                    halfPrice.clear();
+                    image.clear();
+                    before.clear();
+                    after.clear();
+                    discount.clear();
+                    fullPrice.clear();
                     for(DataSnapshot dataSnapshot : snapshot.getChildren()){
                         if(dataSnapshot.child("Discount").child(dataSnapshot.child("name").getValue().toString()).child("dis").exists()){
                             Log.d("hola","yes");
@@ -80,8 +84,11 @@ public class AllMenuDish extends AppCompatActivity {
                         image.add(dataSnapshot.child("image").getValue().toString());
                     }
                 }
+                DishView dishView = new DishView(names,fullPrice,halfPrice,dish,image,before,after,discount);
                 loading.setVisibility(View.INVISIBLE);
-                recyclerView.setAdapter(new DishView(names,fullPrice,halfPrice,dish,image,before,after,discount));
+                recyclerView.setAdapter(dishView);
+                dishView.notifyDataSetChanged();
+
             }
 
             @Override
@@ -89,7 +96,33 @@ public class AllMenuDish extends AppCompatActivity {
 
             }
         });
-
+//        DatabaseReference childref = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(menuAuth.getUid()).child("List of Dish");
+//        menuRef.addChildEventListener(new ChildEventListener() {
+//            @Override
+//            public void onChildAdded(@NonNull  DataSnapshot snapshot, @Nullable  String previousChildName) {
+//                updateChild();
+//            }
+//
+//            @Override
+//            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+//                updateChild();
+//            }
+//
+//            @Override
+//            public void onChildRemoved(@NonNull  DataSnapshot snapshot) {
+//
+//            }
+//
+//            @Override
+//            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable  String previousChildName) {
+//
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//
+//            }
+//        });
         search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -104,13 +137,7 @@ public class AllMenuDish extends AppCompatActivity {
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                names.clear();
-                halfPrice.clear();
-                before.clear();
-                after.clear();
-                discount.clear();
-                fullPrice.clear();
-                image.clear();
+
                 menuRef.child(menuAuth.getUid()).child("List of Dish").child(dish).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -118,6 +145,13 @@ public class AllMenuDish extends AppCompatActivity {
                             Toast.makeText(AllMenuDish.this, "Empty!! Add Some Dish", Toast.LENGTH_SHORT).show();
                             loading.setVisibility(View.INVISIBLE);
                         }else{
+                            names.clear();
+                            halfPrice.clear();
+                            before.clear();
+                            after.clear();
+                            discount.clear();
+                            fullPrice.clear();
+                            image.clear();
                             for(DataSnapshot dataSnapshot : snapshot.getChildren()){
                                 if(dataSnapshot.child("Discount").child(dataSnapshot.child("name").getValue().toString()).child("dis").exists()){
                                     Log.d("hola","yes");
@@ -163,4 +197,50 @@ public class AllMenuDish extends AppCompatActivity {
         dish = getIntent().getStringExtra("Dish");
         swipeRefreshLayout = findViewById(R.id.swipe);
     }
+
+    private void updateChild(){
+
+        menuRef.child(Objects.requireNonNull(menuAuth.getUid())).child("List of Dish").child(dish).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(!snapshot.exists()){
+                    Toast.makeText(AllMenuDish.this, "Empty!! Add Some Dish", Toast.LENGTH_SHORT).show();
+                    loading.setVisibility(View.INVISIBLE);
+                }else{
+                    names.clear();
+                    halfPrice.clear();
+                    image.clear();
+                    before.clear();
+                    after.clear();
+                    discount.clear();
+                    fullPrice.clear();
+                    for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                        if(dataSnapshot.child("Discount").child(dataSnapshot.child("name").getValue().toString()).child("dis").exists()){
+                            Log.d("hola","yes");
+                            before.add(String.valueOf(dataSnapshot.child("Discount").child(Objects.requireNonNull(dataSnapshot.child("name").getValue(String.class))).child("before").getValue(String.class)));
+                            after.add(String.valueOf(dataSnapshot.child("Discount").child(Objects.requireNonNull(dataSnapshot.child("name").getValue(String.class))).child("after").getValue(String.class)));
+                            discount.add(String.valueOf(dataSnapshot.child("Discount").child(Objects.requireNonNull(dataSnapshot.child("name").getValue(String.class))).child("dis").getValue(String.class)));
+                        }else {
+                            Log.d("hola", "no");
+                            before.add("");
+                            after.add("");
+                            discount.add("");
+                        }
+                        names.add(dataSnapshot.child("name").getValue().toString());
+                        halfPrice.add(dataSnapshot.child("half").getValue().toString());
+                        fullPrice.add(dataSnapshot.child("full").getValue().toString());
+                        image.add(dataSnapshot.child("image").getValue().toString());
+                    }
+                }
+                loading.setVisibility(View.INVISIBLE);
+                recyclerView.setAdapter(new DishView(names,fullPrice,halfPrice,dish,image,before,after,discount));
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
 }
