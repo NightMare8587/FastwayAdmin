@@ -5,6 +5,7 @@
     android:layout_width="match_parent" android:layout_height="145dp"
     app:cardCornerRadius="25dp"
     android:layout_marginLeft="15dp"
+    android:id="@+id/adminTableCardView"
     android:layout_marginRight="15dp"
     android:layout_marginTop="12dp"
     android:layout_marginBottom="5dp">

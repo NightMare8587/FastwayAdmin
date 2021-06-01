@@ -2,8 +2,14 @@ package com.consumers.fastwayadmin.Tables;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
+import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.volley.AuthFailureError;
@@ -22,13 +29,22 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.consumers.fastwayadmin.R;
 import com.developer.kalert.KAlertDialog;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -144,9 +160,88 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
                                 }
                             }).show();
 
+
+
                 }
             });
         }
+        holder.cardView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+                FirebaseStorage storage;
+                StorageReference storageReference;
+                storage = FirebaseStorage.getInstance();
+                storageReference = storage.getReference();
+                StorageReference imageRef = storageReference.child(firebaseAuth.getUid() + "/" + tables.get(position));
+//                StorageReference imageRef = storageReference.child(firebaseAuth.getUid() + "/" + )
+                AlertDialog.Builder alertDialog = new AlertDialog.Builder(v.getContext());
+                alertDialog.setTitle("Important");
+                alertDialog.setMessage("Choose one option");
+                alertDialog.setCancelable(true);
+                alertDialog.setPositiveButton("Get QR Code", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        imageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                            @Override
+                            public void onSuccess(Uri uri) {
+                                Picasso.get()
+                                        .load("" + uri)
+                                        .into(new Target() {
+                                                  @Override
+                                                  public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                                                      try {
+                                                          String root = Environment.getExternalStorageDirectory().toString();
+                                                          File myDir = new File(root);
+
+                                                          if (!myDir.exists()) {
+                                                              myDir.mkdirs();
+                                                          }
+
+                                                          String name = new Date().toString() + ".jpg";
+                                                          myDir = new File(myDir, name);
+                                                          FileOutputStream out = new FileOutputStream(myDir);
+                                                          bitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);
+
+                                                          out.flush();
+                                                          out.close();
+                                                      } catch(Exception e){
+                                                          // some action
+                                                      }
+                                                  }
+
+                                                  @Override
+                                                  public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+
+                                                  }
+
+                                                  @Override
+                                                  public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+                                                  }
+                                              }
+                                        );
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Toast.makeText(context, "Failed :) " + e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        });
+
+                    }
+                });
+                alertDialog.setNegativeButton("Delete Table", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+                alertDialog.create().show();
+            }
+        });
     }
 
     @Override
@@ -156,11 +251,13 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
 
     public static class TableAdapter extends RecyclerView.ViewHolder{
         TextView tableNum,status,chatWith,cancel,timeOfReserved;
+        CardView cardView;
         public TableAdapter(@NonNull View itemView) {
             super(itemView);
             tableNum = itemView.findViewById(R.id.numberOfTable);
             status = itemView.findViewById(R.id.statusOfTable);
             chatWith = itemView.findViewById(R.id.chatWithCustomer);
+            cardView = itemView.findViewById(R.id.adminTableCardView);
             cancel = itemView.findViewById(R.id.cancelSeat);
             timeOfReserved = itemView.findViewById(R.id.timeOfReservedTable);
         }
