@@ -31,7 +31,8 @@
         android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         tools:ignore="AllowBackup"
         tools:replace="android:icon">
-        <activity android:name=".HomeScreen.RefundQueries.RefundCancellationQuery"></activity>
+        <activity android:name=".MenuActivities.Combo.ComboMenuDish"></activity>
+        <activity android:name=".HomeScreen.RefundQueries.RefundCancellationQuery" />
         <activity android:name=".HomeScreen.PaymentQueries.PaymentFeeQuery" />
         <activity android:name=".HomeScreen.PaymentQueries.PaymentOptionQuery" />
         <activity android:name=".HomeScreen.Activities.CashbacksAndOffers" />

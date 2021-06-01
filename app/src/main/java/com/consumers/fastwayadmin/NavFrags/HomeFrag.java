@@ -110,7 +110,7 @@ public class HomeFrag extends Fragment {
                 Toast.makeText(getContext(), "Press again to exit", Toast.LENGTH_SHORT).show();
 
                 if(count == 2 && pressed)
-                    Objects.requireNonNull(getActivity()).finish();
+                    requireActivity().finish();
 
                 new Handler().postDelayed(() -> {
                     pressed = false;
@@ -125,17 +125,17 @@ public class HomeFrag extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         toolbar = view.findViewById(R.id.homeFragToolBar);
-        ((AppCompatActivity) Objects.requireNonNull(getActivity())).setSupportActionBar(toolbar);
+        ((AppCompatActivity) requireActivity()).setSupportActionBar(toolbar);
         recyclerView = view.findViewById(R.id.homeFragRecyclerView);
         refershRecyclerView = view.findViewById(R.id.refreshCurrentTables);
 //        recyclerView.setLayoutManager(new LinearLayoutManager(view.getContext(),LinearLayoutManager.HORIZONTAL),true);
         comboImage = view.findViewById(R.id.comboDiscountImageView);
         auth = FirebaseAuth.getInstance();
         horizonatl = new LinearLayoutManager(view.getContext(),LinearLayoutManager.HORIZONTAL,false);
-        sharedPreferences = getActivity().getSharedPreferences("locations current", Context.MODE_PRIVATE);
+        sharedPreferences = requireActivity().getSharedPreferences("locations current", Context.MODE_PRIVATE);
         reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid()));
         FirebaseMessaging.getInstance().subscribeToTopic(Objects.requireNonNull(auth.getUid()));
-        if(ContextCompat.checkSelfPermission(Objects.requireNonNull(getActivity()),Manifest.permission.CAMERA) + ContextCompat.checkSelfPermission(getActivity(),Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+        if(ContextCompat.checkSelfPermission(requireActivity(),Manifest.permission.CAMERA) + ContextCompat.checkSelfPermission(getActivity(),Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
             requestPermissions(new String[]{Manifest.permission.CAMERA,Manifest.permission.ACCESS_COARSE_LOCATION},1);
         }else
 //            createLocationRequest();

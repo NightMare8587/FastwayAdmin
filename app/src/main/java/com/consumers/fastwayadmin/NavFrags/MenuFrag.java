@@ -17,6 +17,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
 import com.consumers.fastwayadmin.MenuActivities.AllMenuDish;
+import com.consumers.fastwayadmin.MenuActivities.Combo.ComboMenuDish;
 import com.consumers.fastwayadmin.R;
 
 import java.util.Objects;
@@ -128,7 +129,7 @@ public class MenuFrag extends Fragment {
                 SharedPreferences.Editor editor = preferences.edit();
                 editor.putString("Type","Combo");
                 editor.apply();
-                Intent intent = new Intent(getActivity(),AllMenuDish.class);
+                Intent intent = new Intent(getActivity(), ComboMenuDish.class);
                 intent.putExtra("Dish","Combo");
                 startActivity(intent);
             }

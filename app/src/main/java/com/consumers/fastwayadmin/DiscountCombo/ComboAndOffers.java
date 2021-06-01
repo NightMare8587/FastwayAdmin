@@ -136,6 +136,7 @@ public class ComboAndOffers extends AppCompatActivity {
                                                                     }
                                                                     reference.child("Combo").child(comboName).child("price").setValue(priceDialog.getInputText());
                                                                     reference.child("Combo").child(comboName).child("count").setValue("0");
+                                                                    reference.child("Combo").child(comboName).child("enable").setValue("yes");
                                                                     reference.child("Combo").child(comboName).child("rating").setValue("0");
                                                                     reference.child("Combo").child(comboName).child("totalRate").setValue("0");
 
@@ -150,6 +151,7 @@ public class ComboAndOffers extends AppCompatActivity {
                                                                                 public void onClick(KAlertDialog kAlertDialog) {
                                                                                     kAlertDialog.dismissWithAnimation();
                                                                                     priceDialog.dismiss();
+                                                                                    finish();
                                                                                 }
                                                                             }).show();
                                                                 }
