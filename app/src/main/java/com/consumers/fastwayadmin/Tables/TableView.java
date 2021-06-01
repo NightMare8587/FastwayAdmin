@@ -199,7 +199,7 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
                                                               myDir.mkdirs();
                                                           }
 
-                                                          String name = new Date().toString() + ".jpg";
+                                                          String name = "Table " + tables.get(position) +  ".jpg";
                                                           myDir = new File(myDir, name);
                                                           FileOutputStream out = new FileOutputStream(myDir);
                                                           bitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);
