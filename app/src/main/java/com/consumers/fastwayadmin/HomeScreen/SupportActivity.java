@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import com.consumers.fastwayadmin.HomeScreen.Activities.CashbacksAndOffers;
 import com.consumers.fastwayadmin.HomeScreen.Activities.PaymentsAndRefunds;
+import com.consumers.fastwayadmin.HomeScreen.LiveChat.LiveChatActivity;
 import com.consumers.fastwayadmin.R;
 
 import java.util.ArrayList;
@@ -57,7 +58,8 @@ public class SupportActivity extends AppCompatActivity{
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 switch (position){
                     case 0:
-                        Toast.makeText(SupportActivity.this, "Work in Progress :)", Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(SupportActivity.this, "Work in Progress :)", Toast.LENGTH_SHORT).show();
+                        startActivity(new Intent(SupportActivity.this, LiveChatActivity.class));
                         break;
                     case 1:
                         Intent emailIntent = new Intent(Intent.ACTION_SEND);

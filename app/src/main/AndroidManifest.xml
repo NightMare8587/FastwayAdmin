@@ -37,6 +37,7 @@
         <activity android:name=".HomeScreen.PaymentQueries.PaymentOptionQuery" />
         <activity android:name=".HomeScreen.Activities.CashbacksAndOffers" />
         <activity android:name=".HomeScreen.Activities.PaymentsAndRefunds" />
+        <activity android:name=".HomeScreen.LiveChat.LiveChatActivity"/>
         <activity android:name=".SplashAndIntro.IntroActivity" />
         <activity android:name=".HomeScreen.SupportActivity" />
         <activity android:name=".Chat.DisplayAllAvaialbleChats" />
