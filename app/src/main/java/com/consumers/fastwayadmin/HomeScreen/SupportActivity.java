@@ -1,18 +1,14 @@
 package com.consumers.fastwayadmin.HomeScreen;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentManager;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 
-import com.consumers.fastwayadmin.HomeScreen.Activities.CashbacksAndOffers;
-import com.consumers.fastwayadmin.HomeScreen.Activities.PaymentsAndRefunds;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.consumers.fastwayadmin.HomeScreen.LiveChat.LiveChatActivity;
 import com.consumers.fastwayadmin.R;
 
@@ -45,10 +41,7 @@ public class SupportActivity extends AppCompatActivity{
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 switch (position){
                     case 0:
-                        startActivity(new Intent(SupportActivity.this, PaymentsAndRefunds.class));
-                        break;
-                    case 1:
-                        startActivity(new Intent(SupportActivity.this, CashbacksAndOffers.class));
+                        startActivity(new Intent(SupportActivity.this, FaqActivity.class));
                         break;
                 }
             }
@@ -73,7 +66,6 @@ public class SupportActivity extends AppCompatActivity{
     }
 
     private void initialise() {
-        faQQuery.add("Payments And Refunds");
-        faQQuery.add("Cashbacks And Offers");
+        faQQuery.add("FAQ Queries");
     }
 }
