@@ -2,6 +2,7 @@ package com.consumers.fastwayadmin.HomeScreen.LiveChat;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -13,7 +14,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Request;
 import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 import com.consumers.fastwayadmin.R;
@@ -28,12 +35,14 @@ import com.google.firebase.database.annotations.NotNull;
 
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 public class LiveChatActivity extends AppCompatActivity {
     RequestQueue requestQueue;
-    String URL = "https://fcm.googleapis.com/fcm/send";
+    String URL = "https://intercellular-stabi.000webhostapp.com/fastwayadminbot.php";
     RecyclerView recyclerView;
     List<String> message = new ArrayList<>();
     FirebaseAuth auth;
@@ -53,6 +62,7 @@ public class LiveChatActivity extends AppCompatActivity {
         linearLayoutManager = new LinearLayoutManager(getApplicationContext());
         linearLayoutManager.setStackFromEnd(true);
         reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
+        botReply();
         reference.child("Live Chat").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -92,6 +102,41 @@ public class LiveChatActivity extends AppCompatActivity {
                     liveChatClass liveChatClass = new liveChatClass(messa,time,"0");
                     reference.child("Live Chat").child(System.currentTimeMillis() + "").setValue(liveChatClass);
                     editText.setText("");
+
+                    StringRequest jsonObjectRequest = new StringRequest(Request.Method.POST, URL, new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            try{
+//                                Toast.makeText(LiveChatActivity.this, ""+response.toString(), Toast.LENGTH_SHORT).show();
+
+                                liveChatClass liveChatClass = new liveChatClass(response.toString() + "","" + System.currentTimeMillis(),"1");
+
+                                reference.child("Live Chat").child(System.currentTimeMillis() + "").setValue(liveChatClass);
+                                if(response.equals("Wrong Input"))
+                                    botReply();
+                            }catch (Exception e){
+                                Toast.makeText(LiveChatActivity.this, "" + e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            Toast.makeText(LiveChatActivity.this, "" + error.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    }){
+                        @Nullable
+                        @Override
+                        protected Map<String, String> getParams() throws AuthFailureError {
+                            Map<String,String> params = new HashMap<>();
+                            params.put("response",messa);
+                            return params;
+                        }
+                    };
+                    jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(
+                            5000,
+                            DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                            DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+                    requestQueue.add(jsonObjectRequest);
                 }
             }
         });
@@ -123,6 +168,20 @@ public class LiveChatActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    private void botReply() {
+
+        liveChatClass liveChatClass = new liveChatClass("Hi I am Fastway Bot",System.currentTimeMillis() + "","1");
+        reference.child("Live Chat").child(System.currentTimeMillis() + "").setValue(liveChatClass);
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                liveChatClass liveChatClass = new liveChatClass("Choose One Option\n1.Refund Status\n2.Other Options\n\n Enter number as input",System.currentTimeMillis() + "","1");
+                reference.child("Live Chat").child(System.currentTimeMillis() + "").setValue(liveChatClass);
+            }
+        },500);
     }
 
     private void updateChild() {
