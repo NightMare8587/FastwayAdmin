@@ -96,33 +96,33 @@ public class AllMenuDish extends AppCompatActivity {
 
             }
         });
-//        DatabaseReference childref = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(menuAuth.getUid()).child("List of Dish");
-//        menuRef.addChildEventListener(new ChildEventListener() {
-//            @Override
-//            public void onChildAdded(@NonNull  DataSnapshot snapshot, @Nullable  String previousChildName) {
-//                updateChild();
-//            }
-//
-//            @Override
-//            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-//                updateChild();
-//            }
-//
-//            @Override
-//            public void onChildRemoved(@NonNull  DataSnapshot snapshot) {
-//
-//            }
-//
-//            @Override
-//            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable  String previousChildName) {
-//
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//
-//            }
-//        });
+        DatabaseReference childref = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(menuAuth.getUid()).child("List of Dish");
+        menuRef.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull  DataSnapshot snapshot, @Nullable  String previousChildName) {
+                updateChild();
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                updateChild();
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull  DataSnapshot snapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable  String previousChildName) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
         search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
