@@ -3,9 +3,11 @@ package com.consumers.fastwayadmin.Dish;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Paint;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
@@ -71,18 +73,45 @@ public class DishView extends RecyclerView.Adapter<DishView.DishAdapter> {
 
             }
         });
+
+        holder.removeOffers.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FirebaseAuth auth = FirebaseAuth.getInstance();
+                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid())).child("List of Dish").child(type).child(names.get(position));
+                databaseReference.child("Discount").addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            String before = String.valueOf(snapshot.child(names.get(position)).child("before").getValue());
+                            Log.d("before",before);
+                            databaseReference.child("Discount").removeValue();
+                            databaseReference.child("full").setValue(before);
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+            }
+        });
         holder.price.setText(fullPrice.get(position));
         if(!before.get(position).equals("")){
             holder.price.setText("\u20B9" + before.get(position));
             holder.price.setPaintFlags(holder.price.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
             holder.discountPrice.setText("\u20B9" + after.get(position));
             holder.discountPrice.setVisibility(View.VISIBLE);
+            holder.removeOffers.setVisibility(View.VISIBLE);
         }else{
             holder.price.setText("\u20B9" + fullPrice.get(position));
             holder.discountPrice.setVisibility(View.INVISIBLE);
+            holder.removeOffers.setVisibility(View.INVISIBLE);
         }
         if(!image.get(position).equals(""))
         Picasso.get().load(image.get(position)).centerCrop().resize(100,100).into(holder.imageView);
+        else
+            Picasso.get().load("https://image.shutterstock.com/image-vector/no-image-vector-isolated-on-600w-1481369594.jpg").centerCrop().resize(100, 100).into(holder.imageView);
+
         if(!half.get(position).isEmpty()){
             holder.available.setText("Half Plate Available");
         }else{
@@ -203,6 +232,7 @@ public class DishView extends RecyclerView.Adapter<DishView.DishAdapter> {
         TextView name,price,available,discountPrice;
         ImageView imageView;
         CardView cardView;
+        Button removeOffers;
         CheckBox checkBox;
         public DishAdapter(@NonNull View itemView) {
             super(itemView);
@@ -213,6 +243,7 @@ public class DishView extends RecyclerView.Adapter<DishView.DishAdapter> {
             available = itemView.findViewById(R.id.availableOr);
             discountPrice = itemView.findViewById(R.id.discountedPrice);
             checkBox = itemView.findViewById(R.id.enableDisableCheckBox);
+            removeOffers = itemView.findViewById(R.id.removeOffersButtomDish);
         }
     }
 
