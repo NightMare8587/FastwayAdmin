@@ -58,6 +58,10 @@ import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.play.core.appupdate.AppUpdateInfo;
+import com.google.android.play.core.appupdate.AppUpdateManager;
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory;
+import com.google.android.play.core.install.model.UpdateAvailability;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -73,10 +77,13 @@ import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import static com.google.android.play.core.install.model.AppUpdateType.IMMEDIATE;
+
 public class HomeFrag extends Fragment {
 
     FirebaseAuth auth;
     RecyclerView recyclerView;
+    private int UPDATE_REQUEST_CODE = 69;
     LocationRequest locationRequest;
     LinearLayoutManager horizonatl;
     ImageView comboImage;
@@ -126,6 +133,7 @@ public class HomeFrag extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         toolbar = view.findViewById(R.id.homeFragToolBar);
         ((AppCompatActivity) requireActivity()).setSupportActionBar(toolbar);
+        inAppUpdateInfo();
         recyclerView = view.findViewById(R.id.homeFragRecyclerView);
         refershRecyclerView = view.findViewById(R.id.refreshCurrentTables);
 //        recyclerView.setLayoutManager(new LinearLayoutManager(view.getContext(),LinearLayoutManager.HORIZONTAL),true);
@@ -282,6 +290,29 @@ public class HomeFrag extends Fragment {
 
     }
 
+    private void inAppUpdateInfo() {
+        AppUpdateManager appUpdateManager = AppUpdateManagerFactory.create(getContext());
+
+// Returns an intent object that you use to check for an update.
+        com.google.android.play.core.tasks.Task<AppUpdateInfo> appUpdateInfoTask = appUpdateManager.getAppUpdateInfo();
+
+// Checks that the platform will allow the specified type of update.
+        appUpdateInfoTask.addOnSuccessListener(appUpdateInfo -> {
+            if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
+                    // This example applies an immediate update. To apply a flexible update
+                    // instead, pass in AppUpdateType.FLEXIBLE
+                    && appUpdateInfo.isUpdateTypeAllowed(IMMEDIATE)) {
+                // Request the update.
+
+                try {
+                    appUpdateManager.startUpdateFlowForResult(appUpdateInfo, IMMEDIATE, (Activity) getContext(),UPDATE_REQUEST_CODE);
+                } catch (IntentSender.SendIntentException e) {
+                    Toast.makeText(getContext(), "" + e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
     private void updateDatabase() {
         reference.child("Tables").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -320,13 +351,13 @@ public class HomeFrag extends Fragment {
             if(grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED){
                 Toast.makeText(getActivity(), "Permission Granted", Toast.LENGTH_SHORT).show();
             }else if(grantResults[0] == PackageManager.PERMISSION_DENIED && grantResults[1] == PackageManager.PERMISSION_DENIED){
-                AlertDialog.Builder builder = new AlertDialog.Builder(Objects.requireNonNull(getActivity()));
+                AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
                 builder.setCancelable(false);
                 builder.setTitle("Important").setMessage("Camera is required for proper functioning of app. Wanna provide permission??")
                         .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                if(ContextCompat.checkSelfPermission(Objects.requireNonNull(getActivity()),Manifest.permission.CAMERA) + ContextCompat.checkSelfPermission(getActivity(),Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+                                if(ContextCompat.checkSelfPermission(requireActivity(),Manifest.permission.CAMERA) + ContextCompat.checkSelfPermission(getActivity(),Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
                                     requestPermissions(new String[]{Manifest.permission.CAMERA,Manifest.permission.ACCESS_COARSE_LOCATION},1);
                                 }
                             }
@@ -426,13 +457,13 @@ public class HomeFrag extends Fragment {
         locationRequest.setInterval(600000);
         locationRequest.setFastestInterval(600000);
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        client = LocationServices.getFusedLocationProviderClient(Objects.requireNonNull(getActivity()));
+        client = LocationServices.getFusedLocationProviderClient(requireActivity());
         client.requestLocationUpdates(locationRequest,mLocationCallback, Looper.myLooper());
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
                 .addLocationRequest(locationRequest);
 
 
-        SettingsClient client = LocationServices.getSettingsClient(Objects.requireNonNull(getActivity()));
+        SettingsClient client = LocationServices.getSettingsClient(requireActivity());
         Task<LocationSettingsResponse> task = client.checkLocationSettings(builder.build());
 
         task.addOnCompleteListener(new OnCompleteListener<LocationSettingsResponse>() {
@@ -473,4 +504,27 @@ public class HomeFrag extends Fragment {
 
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        AppUpdateManager appUpdateManager = AppUpdateManagerFactory.create(getContext());
+
+// Returns an intent object that you use to check for an update.
+        com.google.android.play.core.tasks.Task<AppUpdateInfo> appUpdateInfoTask = appUpdateManager.getAppUpdateInfo();
+        appUpdateManager.getAppUpdateInfo().addOnSuccessListener(appUpdateInfo -> {
+            if (appUpdateInfo.updateAvailability()
+                    == UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS) {
+                // If an in-app update is already running, resume the update.
+                try {
+                    appUpdateManager.startUpdateFlowForResult(
+                            appUpdateInfo,
+                            IMMEDIATE,
+                            (Activity) getContext(),
+                            UPDATE_REQUEST_CODE);
+                } catch (IntentSender.SendIntentException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
 }
