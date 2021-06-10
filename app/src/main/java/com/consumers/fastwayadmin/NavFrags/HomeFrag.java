@@ -83,7 +83,7 @@ public class HomeFrag extends Fragment {
 
     FirebaseAuth auth;
     RecyclerView recyclerView;
-    private int UPDATE_REQUEST_CODE = 69;
+    private final int UPDATE_REQUEST_CODE = 69;
     LocationRequest locationRequest;
     LinearLayoutManager horizonatl;
     ImageView comboImage;

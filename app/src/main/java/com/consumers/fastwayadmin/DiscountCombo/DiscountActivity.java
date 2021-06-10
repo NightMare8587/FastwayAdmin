@@ -135,7 +135,7 @@ public class DiscountActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View view) {
                         recyclerView.setLayoutManager(new LinearLayoutManager(DiscountActivity.this));
-                        recyclerView.setAdapter(new DiscountRecycler(name));
+                        recyclerView.setAdapter(new DiscountRecycler(name,DiscountActivity.this));
                         flatDialog.dismiss();
                     }
                 }).show();
