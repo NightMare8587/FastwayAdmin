@@ -83,6 +83,7 @@ public class HomeFrag extends Fragment {
 
     FirebaseAuth auth;
     RecyclerView recyclerView;
+    List<String> currentOrderName = new ArrayList<>();
     private final int UPDATE_REQUEST_CODE = 69;
     LocationRequest locationRequest;
     LinearLayoutManager horizonatl;
@@ -147,7 +148,7 @@ public class HomeFrag extends Fragment {
             requestPermissions(new String[]{Manifest.permission.CAMERA,Manifest.permission.ACCESS_COARSE_LOCATION},1);
         }else
 //            createLocationRequest();
-
+        new retriveTable().execute();
         comboImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -503,6 +504,39 @@ public class HomeFrag extends Fragment {
         });
 
     }
+
+    private class retriveTable extends AsyncTask<Void,Void,Void>{
+
+        @Override
+        protected void onPostExecute(Void unused) {
+            super.onPostExecute(unused);
+            FirebaseAuth auth = FirebaseAuth.getInstance();
+            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(auth.getUid()).child("Tables");
+            databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                        if(dataSnapshot.hasChild("Current Order")){
+                            Log.d("current order","yes");
+                        }
+                        else
+                            Log.d("current order","no");
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            return null;
+        }
+    }
+
 
     @Override
     public void onResume() {
