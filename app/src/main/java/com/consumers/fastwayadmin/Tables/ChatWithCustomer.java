@@ -66,7 +66,6 @@ public class ChatWithCustomer extends AppCompatActivity {
         reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
         recyclerView = findViewById(R.id.messageRecyclerView);
          id = getIntent().getStringExtra("id");
-
         resName = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(auth.getUid());
         resName.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override

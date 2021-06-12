@@ -21,10 +21,12 @@ public class homeFragClass extends RecyclerView.Adapter<homeFragClass.ViewHolder
     List<String> tableNum = new ArrayList<>();
     List<String> seats = new ArrayList<>();
     List<String> resId = new ArrayList<>();
-    public homeFragClass(List<String> tableNum,List<String> seats,List<String> resId){
+    List<String> isCurrentOrder = new ArrayList<>();
+    public homeFragClass(List<String> tableNum,List<String> seats,List<String> resId,List<String> isCurrentOrder){
         this.seats = seats;
         this.resId = resId;
         this.tableNum = tableNum;
+        this.isCurrentOrder = isCurrentOrder;
     }
     @NonNull
     @Override
@@ -47,6 +49,21 @@ public class homeFragClass extends RecyclerView.Adapter<homeFragClass.ViewHolder
                 view.getContext().startActivity(intent);
             }
         });
+
+        holder.isCurrentOrderMade.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(v.getContext(),ApproveCurrentOrder.class);
+                intent.putExtra("table",tableNum.get(position));
+                v.getContext().startActivity(intent);
+            }
+        });
+
+        if(isCurrentOrder.get(position).equals("1"))
+            holder.isCurrentOrderMade.setVisibility(View.VISIBLE);
+        else
+            holder.isCurrentOrderMade.setVisibility(View.INVISIBLE);
+
     }
 
     @Override
@@ -56,12 +73,13 @@ public class homeFragClass extends RecyclerView.Adapter<homeFragClass.ViewHolder
 
     public static class ViewHolder extends RecyclerView.ViewHolder{
         TextView tables,seats;
-        Button chat;
+        Button chat,isCurrentOrderMade;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             tables = itemView.findViewById(R.id.homeFragRecyclerViewTables);
             seats = itemView.findViewById(R.id.homeFragRecyclerViewSeats);
             chat = itemView.findViewById(R.id.chat);
+            isCurrentOrderMade = itemView.findViewById(R.id.isCurrentOrderMade);
         }
     }
 }

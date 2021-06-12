@@ -32,21 +32,25 @@
             android:layout_height="wrap_content"/>
 
         <Button
-            android:layout_width="wrap_content"
-            android:layout_height="34dp"
             android:id="@+id/chat"
-            android:layout_gravity="center"
-            android:background="@drawable/chat_with_customer_button"
-            android:padding="8dp"
-            android:text="Chat With Customer" />
-        <Button
             android:layout_width="wrap_content"
-            android:layout_marginTop="5dp"
             android:layout_height="34dp"
             android:layout_gravity="center"
             android:background="@drawable/chat_with_customer_button"
             android:padding="8dp"
-            android:text="Chat With Customer" />
+            android:text="Chat With Customer"
+            android:textColor="#000000" />
+
+        <Button
+            android:id="@+id/isCurrentOrderMade"
+            android:layout_width="wrap_content"
+            android:layout_height="34dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="5dp"
+            android:background="@drawable/chat_with_customer_button"
+            android:padding="8dp"
+            android:text="Current Order"
+            android:textColor="#000000" />
     </LinearLayout>
 
 </androidx.cardview.widget.CardView>

@@ -88,8 +88,10 @@ public class HomeFrag extends Fragment {
     LocationRequest locationRequest;
     LinearLayoutManager horizonatl;
     ImageView comboImage;
+    List<List<String>> currentOrdersIfAvailable = new ArrayList<>();
     Toolbar toolbar;
     Button refershRecyclerView;
+    List<String> isCurrentOrder = new ArrayList<>();
 //    homeAdapter homeAdapter;
     SharedPreferences sharedPreferences;
     DatabaseReference reference;
@@ -264,18 +266,25 @@ public class HomeFrag extends Fragment {
                         if(snapshot.exists()){
                             resId.clear();
                             seats.clear();
+                            currentOrdersIfAvailable.clear();
+                            isCurrentOrder.clear();
                             tableNum.clear();
 //                    Toast.makeText(view.getContext(), ""+snapshot.getChildrenCount(), Toast.LENGTH_SHORT).show();
                             for(DataSnapshot dataSnapshot : snapshot.getChildren()){
                                 if(dataSnapshot.child("status").getValue(String.class).equals("unavailable")){
+
                                     resId.add(dataSnapshot.child("customerId").getValue(String.class));
                                     tableNum.add(dataSnapshot.child("tableNum").getValue(String.class));
                                     seats.add(dataSnapshot.child("numSeats").getValue(String.class));
+                                    if(dataSnapshot.hasChild("Current Order")){
+                                        isCurrentOrder.add("1");
+                                    }else
+                                        isCurrentOrder.add("0");
                                 }
                             }
                             recyclerView.setLayoutManager(horizonatl);
 //                    Toast.makeText(view.getContext(), ""+seats.toString(), Toast.LENGTH_SHORT).show();
-                            recyclerView.setAdapter(new homeFragClass(tableNum,seats,resId));
+                            recyclerView.setAdapter(new homeFragClass(tableNum,seats,resId,isCurrentOrder));
                         }else{
 
                         }
@@ -321,19 +330,26 @@ public class HomeFrag extends Fragment {
                 if(snapshot.exists()){
                     tableNum.clear();
                     seats.clear();
+                    isCurrentOrder.clear();
                     resId.clear();
 //                    Toast.makeText(view.getContext(), "I am invoked", Toast.LENGTH_SHORT).show();
 //                    Toast.makeText(view.getContext(), ""+snapshot.getChildrenCount(), Toast.LENGTH_SHORT).show();
                     for(DataSnapshot dataSnapshot : snapshot.getChildren()){
                         if(dataSnapshot.child("status").getValue(String.class).equals("unavailable")){
+
                             resId.add(dataSnapshot.child("customerId").getValue(String.class));
                             tableNum.add(dataSnapshot.child("tableNum").getValue(String.class));
                             seats.add(dataSnapshot.child("numSeats").getValue(String.class));
+
+                            if(dataSnapshot.hasChild("Current Order")){
+                                isCurrentOrder.add("1");
+                            }else
+                                isCurrentOrder.add("0");
                         }
                     }
                     recyclerView.setLayoutManager(horizonatl);
 //                    Toast.makeText(view.getContext(), ""+seats.toString(), Toast.LENGTH_SHORT).show();
-                    recyclerView.setAdapter(new homeFragClass(tableNum,seats,resId));
+                    recyclerView.setAdapter(new homeFragClass(tableNum,seats,resId,isCurrentOrder));
                 }else{
 
                 }
@@ -420,6 +436,7 @@ public class HomeFrag extends Fragment {
                         tableNum.clear();
                         seats.clear();
                         resId.clear();
+                        isCurrentOrder.clear();
 //                    Toast.makeText(view.getContext(), "I am invoked", Toast.LENGTH_SHORT).show();
 //                    Toast.makeText(view.getContext(), ""+snapshot.getChildrenCount(), Toast.LENGTH_SHORT).show();
                         for(DataSnapshot dataSnapshot : snapshot.getChildren()){
@@ -427,11 +444,16 @@ public class HomeFrag extends Fragment {
                                 resId.add(dataSnapshot.child("customerId").getValue(String.class));
                                 tableNum.add(dataSnapshot.child("tableNum").getValue(String.class));
                                 seats.add(dataSnapshot.child("numSeats").getValue(String.class));
+
+                                if(dataSnapshot.hasChild("Current Order")){
+                                    isCurrentOrder.add("1");
+                                }else
+                                    isCurrentOrder.add("0");
                             }
                         }
                         recyclerView.setLayoutManager(horizonatl);
 //                    Toast.makeText(view.getContext(), ""+seats.toString(), Toast.LENGTH_SHORT).show();
-                        recyclerView.setAdapter(new homeFragClass(tableNum,seats,resId));
+                        recyclerView.setAdapter(new homeFragClass(tableNum,seats,resId,isCurrentOrder));
                     }
                 }
 
