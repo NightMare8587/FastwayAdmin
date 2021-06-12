@@ -1,6 +1,9 @@
 package com.consumers.fastwayadmin.MenuActivities.Combo;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +14,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.consumers.fastwayadmin.R;
@@ -54,6 +58,28 @@ public class ComboRecyclerView extends RecyclerView.Adapter<ComboRecyclerView.Ho
         param.height = 150*current.size();
         holder.listView.setLayoutParams(param);
         holder.listView.requestLayout();
+        holder.cardView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder alert = new AlertDialog.Builder(v.getContext());
+                alert.setTitle("Choose one option");
+                alert.setPositiveButton("Add/Remove Items", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent intent = new Intent(v.getContext(),AddRemoveItemCombo.class);
+                        intent.putExtra("name",comboName.get(position));
+                        intent.putStringArrayListExtra("dishName", (ArrayList<String>) dishName.get(position));
+                        v.getContext().startActivity(intent);
+                        dialog.dismiss();
+                    }
+                }).setNegativeButton("Change Price", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                }).create().show();
+            }
+        });
         holder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -79,12 +105,14 @@ public class ComboRecyclerView extends RecyclerView.Adapter<ComboRecyclerView.Ho
         TextView comboName,price;
         ListView listView;
         CheckBox checkBox;
+        CardView cardView;
         public Holder(@NonNull View itemView) {
             super(itemView);
             comboName = itemView.findViewById(R.id.comboMenuDishName);
             price = itemView.findViewById(R.id.comboMenuPriceView);
             listView = itemView.findViewById(R.id.comboDishListViewMenu);
             checkBox = itemView.findViewById(R.id.checkBox);
+            cardView = itemView.findViewById(R.id.comboAdCard);
         }
     }
 }

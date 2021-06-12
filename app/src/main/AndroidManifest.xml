@@ -33,7 +33,10 @@
         android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         tools:ignore="AllowBackup"
         tools:replace="android:icon">
-        <activity android:name=".NavFrags.homeFrag.ApproveCurrentOrder"></activity>
+        <activity android:name=".MenuActivities.Combo.SelectDishForCurrentCombo"></activity>
+        <activity android:name=".MenuActivities.Combo.AddDishToCurrentCombo" />
+        <activity android:name=".MenuActivities.Combo.AddRemoveItemCombo" />
+        <activity android:name=".NavFrags.homeFrag.ApproveCurrentOrder" />
 
         <service
             android:name=".MyService"
