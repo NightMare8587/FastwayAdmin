@@ -55,6 +55,7 @@ public class homeFragClass extends RecyclerView.Adapter<homeFragClass.ViewHolder
             public void onClick(View v) {
                 Intent intent = new Intent(v.getContext(),ApproveCurrentOrder.class);
                 intent.putExtra("table",tableNum.get(position));
+                intent.putExtra("id",resId.get(position));
                 v.getContext().startActivity(intent);
             }
         });
