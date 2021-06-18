@@ -62,6 +62,15 @@ public class DiscountActivity extends AppCompatActivity {
         });
 
         FlatDialog flatDialog = new FlatDialog(DiscountActivity.this);
+        flatDialog.setCanceledOnTouchOutside(true);
+        flatDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                dialog.dismiss();
+                Toast.makeText(DiscountActivity.this, "Cancelled", Toast.LENGTH_SHORT).show();
+                finish();
+            }
+        });
         flatDialog.setTitle("Choose One Option")
                 .setTitleColor(Color.BLACK)
                 .setBackgroundColor(Color.parseColor("#f9fce1"))
@@ -167,6 +176,23 @@ public class DiscountActivity extends AppCompatActivity {
                         }
                     }
                 }
+                AestheticDialog.Builder builder = new AestheticDialog.Builder(DiscountActivity.this, DialogStyle.FLAT, DialogType.SUCCESS);
+                builder.setTitle("Applying Discount")
+                        .setMessage("Wait while we are applying discount :)")
+                        .setCancelable(false)
+                        .setDuration(3000)
+                        .setAnimation(DialogAnimation.SHRINK)
+                        .setDarkMode(true);
+
+                builder.show();
+
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        builder.dismiss();
+                        finish();
+                    }
+                },3000);
             }
 
             @Override
@@ -268,6 +294,23 @@ public class DiscountActivity extends AppCompatActivity {
                         }
                     }
                 }
+                AestheticDialog.Builder builder = new AestheticDialog.Builder(DiscountActivity.this, DialogStyle.FLAT, DialogType.SUCCESS);
+                builder.setTitle("Applying Discount")
+                        .setMessage("Wait while we are applying discount :)")
+                        .setCancelable(false)
+                        .setDuration(3000)
+                        .setAnimation(DialogAnimation.SHRINK)
+                        .setDarkMode(true);
+
+                builder.show();
+
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        builder.dismiss();
+                        finish();
+                    }
+                },3000);
             }
 
             @Override
