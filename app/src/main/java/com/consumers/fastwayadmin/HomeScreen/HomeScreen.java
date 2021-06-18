@@ -14,6 +14,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.consumers.fastwayadmin.Chat.DisplayAllAvaialbleChats;
 import com.consumers.fastwayadmin.MyService;
 import com.consumers.fastwayadmin.NavFrags.AccountFrag;
@@ -32,6 +39,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
 
+import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -39,6 +50,7 @@ import java.util.TimerTask;
 public class HomeScreen extends AppCompatActivity {
 
     BubbleNavigationConstraintView bubble;
+    String URL = "https://fcm.googleapis.com/fcm/send";
     FragmentManager manager;
     FirebaseAuth auth;
     Fragment active;
@@ -94,6 +106,7 @@ public class HomeScreen extends AppCompatActivity {
                             for(DataSnapshot dataSnapshot : snapshot.getChildren()){
                                 String tableNum = dataSnapshot.child("tableNum").getValue(String.class);
                                 String time = String.valueOf(dataSnapshot.child("timeInMillis").getValue());
+                               final String id = String.valueOf(dataSnapshot.child("customerId").getValue());
                                 int result = time.compareTo(String.valueOf(System.currentTimeMillis()));
                                 if(result < 0){
                                     assert tableNum != null;
@@ -101,6 +114,41 @@ public class HomeScreen extends AppCompatActivity {
                                     databaseReference.child(tableNum).child("time").removeValue();
                                     databaseReference.child(tableNum).child("timeInMillis").removeValue();
                                     databaseReference.child(tableNum).child("status").setValue("available");
+                                    RequestQueue requestQueue = Volley.newRequestQueue(HomeScreen.this);
+                                    JSONObject main = new JSONObject();
+                                    try{
+                                        main.put("to","/topics/"+id+"");
+                                        JSONObject notification = new JSONObject();
+                                        notification.put("title","Cancelled" );
+                                        notification.put("click_action","Table Frag");
+                                        notification.put("body","Your Reserved Tables is cancelled because you didn't make it on time");
+                                        main.put("notification",notification);
+
+                                        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, main, new Response.Listener<JSONObject>() {
+                                            @Override
+                                            public void onResponse(JSONObject response) {
+
+                                            }
+                                        }, new Response.ErrorListener() {
+                                            @Override
+                                            public void onErrorResponse(VolleyError error) {
+//                                               Toast.makeText(, error.getLocalizedMessage()+"null", Toast.LENGTH_SHORT).show();
+                                            }
+                                        }){
+                                            @Override
+                                            public Map<String, String> getHeaders() throws AuthFailureError {
+                                                Map<String,String> header = new HashMap<>();
+                                                header.put("content-type","application/json");
+                                                header.put("authorization","key=AAAAsigSEMs:APA91bEUF9ZFwIu84Jctci56DQd0TQOepztGOIKIBhoqf7N3ueQrkClw0xBTlWZEWyvwprXZmZgW2MNywF1pNBFpq1jFBr0CmlrJ0wygbZIBOnoZ0jP1zZC6nPxqF2MAP6iF3wuBHD2R");
+                                                return header;
+                                            }
+                                        };
+
+                                        requestQueue.add(jsonObjectRequest);
+                                    }
+                                    catch (Exception e){
+                                       Toast.makeText(HomeScreen.this, e.getLocalizedMessage()+"null", Toast.LENGTH_SHORT).show();
+                                    }
                                 }
                             }
                         }

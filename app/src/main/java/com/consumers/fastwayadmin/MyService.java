@@ -11,11 +11,19 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.consumers.fastwayadmin.HomeScreen.HomeScreen;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -24,7 +32,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.json.JSONObject;
+
 import java.sql.Time;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -32,6 +44,8 @@ import java.util.TimerTask;
 public class MyService extends Service {
     private static final int NOTIF_ID = 1;
     private static final String NOTIF_CHANNEL_ID = "Channel_Id";
+    Context context = this;
+    String URL = "https://fcm.googleapis.com/fcm/send";
     public MyService() {
     }
 
@@ -55,6 +69,7 @@ public class MyService extends Service {
                            for(DataSnapshot dataSnapshot : snapshot.getChildren()){
                                String tableNum = dataSnapshot.child("tableNum").getValue(String.class);
                                String time = String.valueOf(dataSnapshot.child("timeInMillis").getValue());
+                               String id = String.valueOf(dataSnapshot.child("customerId").getValue());
                                int result = time.compareTo(String.valueOf(System.currentTimeMillis()));
                                if(result < 0){
                                    assert tableNum != null;
@@ -62,6 +77,41 @@ public class MyService extends Service {
                                    databaseReference.child(tableNum).child("time").removeValue();
                                    databaseReference.child(tableNum).child("timeInMillis").removeValue();
                                    databaseReference.child(tableNum).child("status").setValue("available");
+                                   RequestQueue requestQueue = Volley.newRequestQueue(context);
+                                   JSONObject main = new JSONObject();
+                                   try{
+                                       main.put("to","/topics/"+id+"");
+                                       JSONObject notification = new JSONObject();
+                                       notification.put("title","Cancelled" );
+                                       notification.put("click_action","Table Frag");
+                                       notification.put("body","Your Reserved Tables is cancelled because you didn't make it on time");
+                                       main.put("notification",notification);
+
+                                       JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, main, new Response.Listener<JSONObject>() {
+                                           @Override
+                                           public void onResponse(JSONObject response) {
+
+                                           }
+                                       }, new Response.ErrorListener() {
+                                           @Override
+                                           public void onErrorResponse(VolleyError error) {
+//                                               Toast.makeText(, error.getLocalizedMessage()+"null", Toast.LENGTH_SHORT).show();
+                                           }
+                                       }){
+                                           @Override
+                                           public Map<String, String> getHeaders() throws AuthFailureError {
+                                               Map<String,String> header = new HashMap<>();
+                                               header.put("content-type","application/json");
+                                               header.put("authorization","key=AAAAsigSEMs:APA91bEUF9ZFwIu84Jctci56DQd0TQOepztGOIKIBhoqf7N3ueQrkClw0xBTlWZEWyvwprXZmZgW2MNywF1pNBFpq1jFBr0CmlrJ0wygbZIBOnoZ0jP1zZC6nPxqF2MAP6iF3wuBHD2R");
+                                               return header;
+                                           }
+                                       };
+
+                                       requestQueue.add(jsonObjectRequest);
+                                   }
+                                   catch (Exception e){
+//                                       Toast.makeText(view.getContext(), e.getLocalizedMessage()+"null", Toast.LENGTH_SHORT).show();
+                                   }
                                }
                            }
                        }
