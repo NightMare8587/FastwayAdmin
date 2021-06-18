@@ -64,7 +64,7 @@ public class TablesFrag extends Fragment {
                 Toast.makeText(getContext(), "Press again to exit", Toast.LENGTH_SHORT).show();
 
                 if(count == 2 && pressed)
-                    Objects.requireNonNull(getActivity()).finish();
+                    requireActivity().finish();
 
                 new Handler().postDelayed(() -> {
                     pressed = false;
