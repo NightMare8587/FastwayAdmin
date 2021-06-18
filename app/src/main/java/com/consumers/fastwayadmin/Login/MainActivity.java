@@ -128,6 +128,10 @@ public class MainActivity extends AppCompatActivity {
 //        spinKitView.setColor(R.color.teal_200);
 //        spinKitView.setIndeterminateDrawable(bounce);
         checkPermissions();
+        SharedPreferences sharedPreferences1 = getSharedPreferences("After Logout",MODE_PRIVATE);
+        SharedPreferences.Editor editor1 = sharedPreferences1.edit();
+        editor1.putString("logout","no");
+        editor1.apply();
         // checking is user is currently logged in
         if(currentUser != null){
             startActivity(new Intent(getApplicationContext(),Info.class));

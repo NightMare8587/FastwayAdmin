@@ -24,14 +24,12 @@ public class SplashScreen extends AppCompatActivity {
             public void run() {
                 if(sharedPreferences.contains("done")){
                     startActivity(new Intent(SplashScreen.this, MainActivity.class));
-                    finish();
-                    overridePendingTransition(R.anim.slide_in, R.anim.fade_out);
                 }else {
                     startActivity(new Intent(SplashScreen.this, IntroActivity.class));
-                    finish();
-                    overridePendingTransition(R.anim.slide_in, R.anim.fade_out);
                 }
+                finish();
+                overridePendingTransition(R.anim.slide_in, R.anim.fade_out);
             }
-        },2000);
+        },1650);
     }
 }
