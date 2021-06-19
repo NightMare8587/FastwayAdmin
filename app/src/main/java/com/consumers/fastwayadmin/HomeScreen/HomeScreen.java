@@ -54,11 +54,13 @@ public class HomeScreen extends AppCompatActivity {
     FragmentManager manager;
     FirebaseAuth auth;
     Fragment active;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_screen);
         initialise();
+
         Fragment first = new HomeFrag();
         Fragment second = new MenuFrag();
         Fragment third = new TablesFrag();
@@ -180,8 +182,12 @@ public class HomeScreen extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         SharedPreferences sharedPreferences = getSharedPreferences("After Logout",MODE_PRIVATE);
-        if(!sharedPreferences.getString("logout","").equals("yes"))
-        startService(new Intent(this,MyService.class));
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        if(sharedPreferences.contains("logout")){
+            editor.remove("logout");
+            editor.apply();
+        }else
+            startService(new Intent(this,MyService.class));
     }
 
     @Override
