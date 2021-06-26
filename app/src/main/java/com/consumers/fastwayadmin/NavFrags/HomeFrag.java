@@ -36,6 +36,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.consumers.fastwayadmin.DiscountCombo.ComboAndOffers;
+import com.consumers.fastwayadmin.DiscountCombo.CustomOffer;
 import com.consumers.fastwayadmin.DiscountCombo.DiscountActivity;
 //import com.consumers.fastwayadmin.NavFrags.homeFrag.homeAdapter;
 import com.consumers.fastwayadmin.NavFrags.homeFrag.homeFragClass;
@@ -187,6 +188,7 @@ public class HomeFrag extends Fragment {
                             @Override
                             public void onClick(View view) {
                                 flatDialog.dismiss();
+                                startActivity(new Intent(getContext(), CustomOffer.class));
                             }
                         }).show();
 
