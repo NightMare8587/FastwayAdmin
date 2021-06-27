@@ -83,7 +83,7 @@
                     app:bt_title="Info"
                     app:bt_titlePadding="@dimen/title_padding" />
 
-         
+
 
     </com.gauravk.bubblenavigation.BubbleNavigationConstraintView>
 </androidx.constraintlayout.widget.ConstraintLayout>
