@@ -1,6 +1,7 @@
 package com.consumers.fastwayadmin.NavFrags;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -16,12 +17,13 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
@@ -38,13 +40,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.consumers.fastwayadmin.DiscountCombo.ComboAndOffers;
 import com.consumers.fastwayadmin.DiscountCombo.CustomOffer;
 import com.consumers.fastwayadmin.DiscountCombo.DiscountActivity;
-//import com.consumers.fastwayadmin.NavFrags.homeFrag.homeAdapter;
 import com.consumers.fastwayadmin.NavFrags.homeFrag.homeFragClass;
-//import com.consumers.fastwayadmin.NavFrags.homeFrag.homeModel;
 import com.consumers.fastwayadmin.R;
-import com.developer.kalert.KAlertDialog;
 import com.example.flatdialoglibrary.dialog.FlatDialog;
-import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -75,26 +73,32 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import static com.google.android.play.core.install.model.AppUpdateType.IMMEDIATE;
+
+//import com.consumers.fastwayadmin.NavFrags.homeFrag.homeAdapter;
+//import com.consumers.fastwayadmin.NavFrags.homeFrag.homeModel;
 
 public class HomeFrag extends Fragment {
 
     FirebaseAuth auth;
     RecyclerView recyclerView;
+    LinearLayout linearLayout;
+    DatabaseReference onlineOrOfflineRestaurant;
+    SharedPreferences restaurantStatus;
     List<String> currentOrderName = new ArrayList<>();
     private final int UPDATE_REQUEST_CODE = 69;
     LocationRequest locationRequest;
     LinearLayoutManager horizonatl;
     ImageView comboImage;
+    SharedPreferences.Editor statusEditor;
     List<List<String>> currentOrdersIfAvailable = new ArrayList<>();
     Toolbar toolbar;
     Button refershRecyclerView;
     List<String> isCurrentOrder = new ArrayList<>();
 //    homeAdapter homeAdapter;
     SharedPreferences sharedPreferences;
+    Switch onlineOrOffline;
     DatabaseReference reference;
     FusedLocationProviderClient client;
     List<String> resId = new ArrayList<>();
@@ -132,21 +136,40 @@ public class HomeFrag extends Fragment {
         requireActivity().getOnBackPressedDispatcher().addCallback(this,callback);
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         toolbar = view.findViewById(R.id.homeFragToolBar);
         ((AppCompatActivity) requireActivity()).setSupportActionBar(toolbar);
         inAppUpdateInfo();
+        restaurantStatus = view.getContext().getSharedPreferences("RestaurantStatus",Context.MODE_PRIVATE);
+        statusEditor = restaurantStatus.edit();
+        onlineOrOffline = view.findViewById(R.id.restaurantOnOff);
+        linearLayout = view.findViewById(R.id.mainFragLinearLayout);
         recyclerView = view.findViewById(R.id.homeFragRecyclerView);
         refershRecyclerView = view.findViewById(R.id.refreshCurrentTables);
 //        recyclerView.setLayoutManager(new LinearLayoutManager(view.getContext(),LinearLayoutManager.HORIZONTAL),true);
         comboImage = view.findViewById(R.id.comboDiscountImageView);
         auth = FirebaseAuth.getInstance();
+        onlineOrOfflineRestaurant = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid()));
         horizonatl = new LinearLayoutManager(view.getContext(),LinearLayoutManager.HORIZONTAL,false);
         sharedPreferences = requireActivity().getSharedPreferences("locations current", Context.MODE_PRIVATE);
         reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid()));
         FirebaseMessaging.getInstance().subscribeToTopic(Objects.requireNonNull(auth.getUid()));
+        if(restaurantStatus.contains("status")){
+            if(restaurantStatus.getString("status","").equals("offline")){
+                comboImage.setVisibility(View.INVISIBLE);
+                linearLayout.setVisibility(View.INVISIBLE);
+                onlineOrOffline.setChecked(false);
+                onlineOrOffline.setText("offline");
+            }else{
+                comboImage.setVisibility(View.VISIBLE);
+                linearLayout.setVisibility(View.VISIBLE);
+                onlineOrOffline.setChecked(true);
+                onlineOrOffline.setText("online");
+            }
+        }
         if(ContextCompat.checkSelfPermission(requireActivity(),Manifest.permission.CAMERA) + ContextCompat.checkSelfPermission(getActivity(),Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
             requestPermissions(new String[]{Manifest.permission.CAMERA,Manifest.permission.ACCESS_COARSE_LOCATION},1);
         }else
@@ -224,6 +247,30 @@ public class HomeFrag extends Fragment {
 //
 //            }
 //        });
+
+
+        onlineOrOffline.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
+                    statusEditor.putString("status","online");
+                    onlineOrOffline.setText("online");
+                    statusEditor.apply();
+                    comboImage.setVisibility(View.VISIBLE);
+                    linearLayout.setVisibility(View.VISIBLE);
+                    onlineOrOfflineRestaurant.child("status").setValue("online");
+                }else{
+                    statusEditor.putString("status","offline");
+                    onlineOrOffline.setText("offline");
+                    statusEditor.apply();
+                    comboImage.setVisibility(View.INVISIBLE);
+                    linearLayout.setVisibility(View.INVISIBLE);
+                    onlineOrOfflineRestaurant.child("status").setValue("offline");
+                }
+
+            }
+        });
+
 
         reference.child("Tables").addChildEventListener(new ChildEventListener() {
             @Override

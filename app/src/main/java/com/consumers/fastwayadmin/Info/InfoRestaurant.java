@@ -1,9 +1,9 @@
 package com.consumers.fastwayadmin.Info;
 
 public class InfoRestaurant {
-    public String name,address,pin,number,nearby,rating,totalRate,count;
+    public String name,address,pin,number,nearby,rating,totalRate,count,status;
 
-    public InfoRestaurant(String name,String address,String pin,String number,String nearby,String rating,String totalRate,String count){
+    public InfoRestaurant(String name,String address,String pin,String number,String nearby,String rating,String totalRate,String count,String status){
         this.address = address;
         this.name = name;
         this.nearby = nearby;
@@ -12,5 +12,6 @@ public class InfoRestaurant {
         this.totalRate = totalRate;
         this.count = count;
         this.rating = rating;
+        this.status = status;
     }
 }

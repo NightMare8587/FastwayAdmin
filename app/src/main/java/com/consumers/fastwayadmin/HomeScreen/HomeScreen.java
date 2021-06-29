@@ -173,33 +173,33 @@ public class HomeScreen extends AppCompatActivity {
         return true;
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Log.i("called","after logout");
-        stopService(new Intent(this,MyService.class));
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        SharedPreferences sharedPreferences = getSharedPreferences("After Logout",MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        if(sharedPreferences.contains("logout")){
-            editor.remove("logout");
-            editor.apply();
-        }else
-            startService(new Intent(this,MyService.class));
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-//        ServiceInitiatorClass serviceInitiatorClass = new ServiceInitiatorClass();
-//        Toast.makeText(serviceInitiatorClass, "Hi", Toast.LENGTH_SHORT).show();
-        Log.i("hello","I called");
-        stopService(new Intent(this,MyService.class));
-    }
+//    @Override
+//    protected void onResume() {
+//        super.onResume();
+//        Log.i("called","after logout");
+//        stopService(new Intent(this,MyService.class));
+//    }
+//
+//    @Override
+//    protected void onStop() {
+//        super.onStop();
+//        SharedPreferences sharedPreferences = getSharedPreferences("After Logout",MODE_PRIVATE);
+//        SharedPreferences.Editor editor = sharedPreferences.edit();
+//        if(sharedPreferences.contains("logout")){
+//            editor.remove("logout");
+//            editor.apply();
+//        }else
+//            startService(new Intent(this,MyService.class));
+//    }
+//
+//    @Override
+//    protected void onPause() {
+//        super.onPause();
+////        ServiceInitiatorClass serviceInitiatorClass = new ServiceInitiatorClass();
+////        Toast.makeText(serviceInitiatorClass, "Hi", Toast.LENGTH_SHORT).show();
+//        Log.i("hello","I called");
+//        stopService(new Intent(this,MyService.class));
+//    }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
