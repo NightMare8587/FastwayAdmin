@@ -248,7 +248,6 @@ public class HomeFrag extends Fragment {
 //            }
 //        });
 
-
         onlineOrOffline.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
