@@ -86,7 +86,6 @@ public class HomeFrag extends Fragment {
     LinearLayout linearLayout;
     DatabaseReference onlineOrOfflineRestaurant;
     SharedPreferences restaurantStatus;
-    List<String> currentOrderName = new ArrayList<>();
     private final int UPDATE_REQUEST_CODE = 69;
     LocationRequest locationRequest;
     LinearLayoutManager horizonatl;
@@ -106,7 +105,7 @@ public class HomeFrag extends Fragment {
     List<String> seats = new ArrayList<>();
     int count = 0;
     boolean pressed = false;
-    int total = 0;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -170,52 +169,40 @@ public class HomeFrag extends Fragment {
                 onlineOrOffline.setText("online");
             }
         }
-        if(ContextCompat.checkSelfPermission(requireActivity(),Manifest.permission.CAMERA) + ContextCompat.checkSelfPermission(getActivity(),Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+        if(ContextCompat.checkSelfPermission(requireActivity(),Manifest.permission.CAMERA) + ContextCompat.checkSelfPermission(requireActivity(),Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
             requestPermissions(new String[]{Manifest.permission.CAMERA,Manifest.permission.ACCESS_COARSE_LOCATION},1);
         }else
 //            createLocationRequest();
         new retriveTable().execute();
-        comboImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        comboImage.setOnClickListener(view1 -> {
 //                startActivity(new Intent(getContext(),CreateDiscountCombo.class));
-                final FlatDialog flatDialog = new FlatDialog(getContext());
-                flatDialog.setCanceledOnTouchOutside(true);
-                flatDialog.setTitle("Choose One Option")
-                        .setTitleColor(Color.BLACK)
-                        .setBackgroundColor(Color.parseColor("#f9fce1"))
-                        .setFirstButtonColor(Color.parseColor("#d3f6f3"))
-                        .setFirstButtonTextColor(Color.parseColor("#000000"))
-                        .setFirstButtonText("DISCOUNT & OFFERS")
-                        .setSecondButtonColor(Color.parseColor("#fee9b2"))
-                        .setSecondButtonTextColor(Color.parseColor("#000000"))
-                        .setSecondButtonText("COMBO/THALI")
-                        .setThirdButtonColor(Color.parseColor("#fbd1b7"))
-                        .setThirdButtonTextColor(Color.parseColor("#000000"))
-                        .setThirdButtonText("ADD CUSTOM OFFER")
-                        .withFirstButtonListner(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                startActivity(new Intent(getContext(), DiscountActivity.class));
-                                flatDialog.dismiss();
-                            }
-                        })
-                        .withSecondButtonListner(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                startActivity(new Intent(getContext(), ComboAndOffers.class));
-                                flatDialog.dismiss();
-                            }
-                        })
-                        .withThirdButtonListner(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                flatDialog.dismiss();
-                                startActivity(new Intent(getContext(), CustomOffer.class));
-                            }
-                        }).show();
+            final FlatDialog flatDialog = new FlatDialog(getContext());
+            flatDialog.setCanceledOnTouchOutside(true);
+            flatDialog.setTitle("Choose One Option")
+                    .setTitleColor(Color.BLACK)
+                    .setBackgroundColor(Color.parseColor("#f9fce1"))
+                    .setFirstButtonColor(Color.parseColor("#d3f6f3"))
+                    .setFirstButtonTextColor(Color.parseColor("#000000"))
+                    .setFirstButtonText("DISCOUNT & OFFERS")
+                    .setSecondButtonColor(Color.parseColor("#fee9b2"))
+                    .setSecondButtonTextColor(Color.parseColor("#000000"))
+                    .setSecondButtonText("COMBO/THALI")
+                    .setThirdButtonColor(Color.parseColor("#fbd1b7"))
+                    .setThirdButtonTextColor(Color.parseColor("#000000"))
+                    .setThirdButtonText("ADD CUSTOM OFFER")
+                    .withFirstButtonListner(view11 -> {
+                        startActivity(new Intent(getContext(), DiscountActivity.class));
+                        flatDialog.dismiss();
+                    })
+                    .withSecondButtonListner(view112 -> {
+                        startActivity(new Intent(getContext(), ComboAndOffers.class));
+                        flatDialog.dismiss();
+                    })
+                    .withThirdButtonListner(view113 -> {
+                        flatDialog.dismiss();
+                        startActivity(new Intent(getContext(), CustomOffer.class));
+                    }).show();
 
-            }
         });
 
         new MyTask().execute();
@@ -248,26 +235,23 @@ public class HomeFrag extends Fragment {
 //            }
 //        });
 
-        onlineOrOffline.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(isChecked){
-                    statusEditor.putString("status","online");
-                    onlineOrOffline.setText("online");
-                    statusEditor.apply();
-                    comboImage.setVisibility(View.VISIBLE);
-                    linearLayout.setVisibility(View.VISIBLE);
-                    onlineOrOfflineRestaurant.child("status").setValue("online");
-                }else{
-                    statusEditor.putString("status","offline");
-                    onlineOrOffline.setText("offline");
-                    statusEditor.apply();
-                    comboImage.setVisibility(View.INVISIBLE);
-                    linearLayout.setVisibility(View.INVISIBLE);
-                    onlineOrOfflineRestaurant.child("status").setValue("offline");
-                }
-
+        onlineOrOffline.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if(isChecked){
+                statusEditor.putString("status","online");
+                onlineOrOffline.setText("online");
+                statusEditor.apply();
+                comboImage.setVisibility(View.VISIBLE);
+                linearLayout.setVisibility(View.VISIBLE);
+                onlineOrOfflineRestaurant.child("status").setValue("online");
+            }else{
+                statusEditor.putString("status","offline");
+                onlineOrOffline.setText("offline");
+                statusEditor.apply();
+                comboImage.setVisibility(View.INVISIBLE);
+                linearLayout.setVisibility(View.INVISIBLE);
+                onlineOrOfflineRestaurant.child("status").setValue("offline");
             }
+
         });
 
 
@@ -302,54 +286,49 @@ public class HomeFrag extends Fragment {
 
 
 
-        refershRecyclerView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                tableNum.clear();
-                seats.clear();
+        refershRecyclerView.setOnClickListener(view12 -> {
+            tableNum.clear();
+            seats.clear();
 
-                reference.child("Tables").addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if(snapshot.exists()){
-                            resId.clear();
-                            seats.clear();
-                            currentOrdersIfAvailable.clear();
-                            isCurrentOrder.clear();
-                            tableNum.clear();
+            reference.child("Tables").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if(snapshot.exists()){
+                        resId.clear();
+                        seats.clear();
+                        currentOrdersIfAvailable.clear();
+                        isCurrentOrder.clear();
+                        tableNum.clear();
 //                    Toast.makeText(view.getContext(), ""+snapshot.getChildrenCount(), Toast.LENGTH_SHORT).show();
-                            for(DataSnapshot dataSnapshot : snapshot.getChildren()){
-                                if(dataSnapshot.child("status").getValue(String.class).equals("unavailable")){
+                        for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                            if(Objects.equals(dataSnapshot.child("status").getValue(String.class), "unavailable")){
 
-                                    resId.add(dataSnapshot.child("customerId").getValue(String.class));
-                                    tableNum.add(dataSnapshot.child("tableNum").getValue(String.class));
-                                    seats.add(dataSnapshot.child("numSeats").getValue(String.class));
-                                    if(dataSnapshot.hasChild("Current Order")){
-                                        isCurrentOrder.add("1");
-                                    }else
-                                        isCurrentOrder.add("0");
-                                }
+                                resId.add(dataSnapshot.child("customerId").getValue(String.class));
+                                tableNum.add(dataSnapshot.child("tableNum").getValue(String.class));
+                                seats.add(dataSnapshot.child("numSeats").getValue(String.class));
+                                if(dataSnapshot.hasChild("Current Order")){
+                                    isCurrentOrder.add("1");
+                                }else
+                                    isCurrentOrder.add("0");
                             }
-                            recyclerView.setLayoutManager(horizonatl);
-//                    Toast.makeText(view.getContext(), ""+seats.toString(), Toast.LENGTH_SHORT).show();
-                            recyclerView.setAdapter(new homeFragClass(tableNum,seats,resId,isCurrentOrder));
-                        }else{
-
                         }
+                        recyclerView.setLayoutManager(horizonatl);
+//                    Toast.makeText(view.getContext(), ""+seats.toString(), Toast.LENGTH_SHORT).show();
+                        recyclerView.setAdapter(new homeFragClass(tableNum,seats,resId,isCurrentOrder));
                     }
+                }
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
 
-                    }
-                });
-            }
+                }
+            });
         });
 
     }
 
     private void inAppUpdateInfo() {
-        AppUpdateManager appUpdateManager = AppUpdateManagerFactory.create(getContext());
+        AppUpdateManager appUpdateManager = AppUpdateManagerFactory.create(requireContext());
 
 // Returns an intent object that you use to check for an update.
         com.google.android.play.core.tasks.Task<AppUpdateInfo> appUpdateInfoTask = appUpdateManager.getAppUpdateInfo();
@@ -383,7 +362,7 @@ public class HomeFrag extends Fragment {
 //                    Toast.makeText(view.getContext(), "I am invoked", Toast.LENGTH_SHORT).show();
 //                    Toast.makeText(view.getContext(), ""+snapshot.getChildrenCount(), Toast.LENGTH_SHORT).show();
                     for(DataSnapshot dataSnapshot : snapshot.getChildren()){
-                        if(dataSnapshot.child("status").getValue(String.class).equals("unavailable")){
+                        if(Objects.equals(dataSnapshot.child("status").getValue(String.class), "unavailable")){
 
                             resId.add(dataSnapshot.child("customerId").getValue(String.class));
                             tableNum.add(dataSnapshot.child("tableNum").getValue(String.class));
@@ -422,7 +401,7 @@ public class HomeFrag extends Fragment {
                         .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                if(ContextCompat.checkSelfPermission(requireActivity(),Manifest.permission.CAMERA) + ContextCompat.checkSelfPermission(getActivity(),Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+                                if(ContextCompat.checkSelfPermission(requireActivity(),Manifest.permission.CAMERA) + ContextCompat.checkSelfPermission(requireActivity(),Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
                                     requestPermissions(new String[]{Manifest.permission.CAMERA,Manifest.permission.ACCESS_COARSE_LOCATION},1);
                                 }
                             }
@@ -440,21 +419,19 @@ public class HomeFrag extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         final LocationSettingsStates states = LocationSettingsStates.fromIntent(data);
-        switch (requestCode) {
-            case 101:
-                switch (resultCode) {
-                    case Activity.RESULT_OK:
-                        // All required changes were successfully made
-                        Toast.makeText(getActivity(), states.isLocationPresent() + "", Toast.LENGTH_SHORT).show();
-                        break;
-                    case Activity.RESULT_CANCELED:
-                        // The user was asked to change settings, but chose not to
-                        Toast.makeText(getActivity(), "Canceled", Toast.LENGTH_SHORT).show();
-                        break;
-                    default:
-                        break;
-                }
-                break;
+        if (requestCode == 101) {
+            switch (resultCode) {
+                case Activity.RESULT_OK:
+                    // All required changes were successfully made
+                    Toast.makeText(getActivity(), states.isLocationPresent() + "", Toast.LENGTH_SHORT).show();
+                    break;
+                case Activity.RESULT_CANCELED:
+                    // The user was asked to change settings, but chose not to
+                    Toast.makeText(getActivity(), "Canceled", Toast.LENGTH_SHORT).show();
+                    break;
+                default:
+                    break;
+            }
         }
     }
     private final LocationCallback mLocationCallback = new LocationCallback() {
@@ -537,38 +514,35 @@ public class HomeFrag extends Fragment {
         SettingsClient client = LocationServices.getSettingsClient(requireActivity());
         Task<LocationSettingsResponse> task = client.checkLocationSettings(builder.build());
 
-        task.addOnCompleteListener(new OnCompleteListener<LocationSettingsResponse>() {
-            @Override
-            public void onComplete(Task<LocationSettingsResponse> task) {
-                try {
-                    LocationSettingsResponse response = task.getResult(ApiException.class);
-                    // All location settings are satisfied. The client can initialize location
-                    // requests here.
+        task.addOnCompleteListener(task1 -> {
+            try {
+                LocationSettingsResponse response = task1.getResult(ApiException.class);
+                // All location settings are satisfied. The client can initialize location
+                // requests here.
 
-                } catch (ApiException exception) {
-                    switch (exception.getStatusCode()) {
-                        case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
-                            // Location settings are not satisfied. But could be fixed by showing the
-                            // user a dialog.
-                            try {
-                                // Cast to a resolvable exception.
-                                ResolvableApiException resolvable = (ResolvableApiException) exception;
-                                // Show the dialog by calling startResolutionForResult(),
-                                // and check the result in onActivityResult().
-                                resolvable.startResolutionForResult(
-                                        getActivity(),
-                                        101);
-                            } catch (IntentSender.SendIntentException e) {
-                                // Ignore the error.
-                            } catch (ClassCastException e) {
-                                // Ignore, should be an impossible error.
-                            }
-                            break;
-                        case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
-                            // Location settings are not satisfied. However, we have no way to fix the
-                            // settings so we won't show the dialog.
-                            break;
-                    }
+            } catch (ApiException exception) {
+                switch (exception.getStatusCode()) {
+                    case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+                        // Location settings are not satisfied. But could be fixed by showing the
+                        // user a dialog.
+                        try {
+                            // Cast to a resolvable exception.
+                            ResolvableApiException resolvable = (ResolvableApiException) exception;
+                            // Show the dialog by calling startResolutionForResult(),
+                            // and check the result in onActivityResult().
+                            resolvable.startResolutionForResult(
+                                    getActivity(),
+                                    101);
+                        } catch (IntentSender.SendIntentException e) {
+                            // Ignore the error.
+                        } catch (ClassCastException e) {
+                            // Ignore, should be an impossible error.
+                        }
+                        break;
+                    case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
+                        // Location settings are not satisfied. However, we have no way to fix the
+                        // settings so we won't show the dialog.
+                        break;
                 }
             }
         });
