@@ -1,5 +1,6 @@
 package com.consumers.fastwayadmin.SplashAndIntro;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -57,10 +58,22 @@ public class IntroActivity extends AppCompatActivity {
                     next.setText("NEXT");
 
                 if(count > 4){
-                    startActivity(new Intent(IntroActivity.this, MainActivity.class));
-                    editor.putString("done","yes");
-                    editor.apply();
-                    finish();
+                    AlertDialog.Builder alertDialog = new AlertDialog.Builder(IntroActivity.this);
+                    View myView = getLayoutInflater().inflate(R.layout.terms_condition_layout,null);
+                    alertDialog.setCancelable(false);
+                    Button accept = (Button) myView.findViewById(R.id.acceptTermsAndC);
+
+                    accept.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            startActivity(new Intent(IntroActivity.this, MainActivity.class));
+                            editor.putString("done","yes");
+                            editor.apply();
+                            finish();
+                        }
+                    });
+                    alertDialog.setView(myView);
+                    alertDialog.create().show();
                 }
 
                switch (count){
