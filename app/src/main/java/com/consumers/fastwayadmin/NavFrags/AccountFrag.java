@@ -39,7 +39,7 @@ public class AccountFrag extends Fragment {
     ListView listView;
     String[] names = {"My Account","Logout","Terms And Conditions","Privacy policy"};
     GoogleSignInClient googleSignInClient;
-    SharedPreferences sharedPreferences;
+
     FirebaseAuth auth;
     int count = 0;
     boolean pressed = false;
@@ -78,8 +78,7 @@ public class AccountFrag extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         listView = view.findViewById(R.id.listView);
         auth = FirebaseAuth.getInstance();
-        sharedPreferences = requireActivity().getSharedPreferences("After Logout",Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
+
         ArrayAdapter arrayAdapter = new ArrayAdapter<String>(view.getContext(),R.layout.list,names);
         listView.setAdapter(arrayAdapter);
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -103,7 +102,9 @@ public class AccountFrag extends Fragment {
                                     @Override
                                     public void onClick(DialogInterface dialogInterface, int i) {
                                         requireContext().stopService(new Intent(requireContext(), MyService.class));
-                                        editor.putString("logout","yes");
+                                        SharedPreferences stopServices = requireActivity().getSharedPreferences("Stop Services",Context.MODE_PRIVATE);
+                                        SharedPreferences.Editor editor = stopServices.edit();
+                                        editor.putString("online","false");
                                         editor.apply();
                                         auth.signOut();
                                         googleSignInClient.signOut().addOnCompleteListener((Activity) getContext(), new OnCompleteListener<Void>() {

@@ -142,6 +142,8 @@ public class HomeFrag extends Fragment {
         toolbar = view.findViewById(R.id.homeFragToolBar);
         ((AppCompatActivity) requireActivity()).setSupportActionBar(toolbar);
         inAppUpdateInfo();
+        SharedPreferences stopServices = requireActivity().getSharedPreferences("Stop Services",Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = stopServices.edit();
         restaurantStatus = view.getContext().getSharedPreferences("RestaurantStatus",Context.MODE_PRIVATE);
         statusEditor = restaurantStatus.edit();
         onlineOrOffline = view.findViewById(R.id.restaurantOnOff);
@@ -243,6 +245,8 @@ public class HomeFrag extends Fragment {
                 comboImage.setVisibility(View.VISIBLE);
                 linearLayout.setVisibility(View.VISIBLE);
                 onlineOrOfflineRestaurant.child("status").setValue("online");
+                editor.putString("online","true");
+                editor.apply();
             }else{
                 statusEditor.putString("status","offline");
                 onlineOrOffline.setText("offline");
@@ -250,6 +254,8 @@ public class HomeFrag extends Fragment {
                 comboImage.setVisibility(View.INVISIBLE);
                 linearLayout.setVisibility(View.INVISIBLE);
                 onlineOrOfflineRestaurant.child("status").setValue("offline");
+                editor.putString("online","false");
+                editor.apply();
             }
 
         });

@@ -3,6 +3,7 @@ package com.consumers.fastwayadmin.Login;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -128,6 +129,10 @@ public class MainActivity extends AppCompatActivity {
 //        spinKitView.setColor(R.color.teal_200);
 //        spinKitView.setIndeterminateDrawable(bounce);
         checkPermissions();
+        SharedPreferences stopServices = getSharedPreferences("Stop Services", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor5 = stopServices.edit();
+        editor5.putString("online","true");
+        editor5.apply();
         SharedPreferences sharedPreferences1 = getSharedPreferences("After Logout",MODE_PRIVATE);
         SharedPreferences.Editor editor1 = sharedPreferences1.edit();
         editor1.putString("logout","no");
