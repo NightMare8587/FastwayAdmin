@@ -19,6 +19,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="7dp"
             android:padding="5dp"
+            android:maxWidth="250dp"
             android:text="First Message"
             android:textColor="@color/white"
             android:textSize="18sp"
