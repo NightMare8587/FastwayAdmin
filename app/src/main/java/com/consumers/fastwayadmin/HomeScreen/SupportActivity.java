@@ -10,6 +10,7 @@ import android.widget.ListView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.consumers.fastwayadmin.HomeScreen.LiveChat.LiveChatActivity;
+import com.consumers.fastwayadmin.HomeScreen.ReportSupport.ReportCustomer;
 import com.consumers.fastwayadmin.R;
 
 import java.util.ArrayList;
@@ -43,6 +44,9 @@ public class SupportActivity extends AppCompatActivity{
                     case 0:
                         startActivity(new Intent(SupportActivity.this, FaqActivity.class));
                         break;
+                    case 1:
+                        startActivity(new Intent(SupportActivity.this, ReportCustomer.class));
+                        break;
                 }
             }
         });
@@ -67,5 +71,6 @@ public class SupportActivity extends AppCompatActivity{
 
     private void initialise() {
         faQQuery.add("FAQ Queries");
+        faQQuery.add("Report a customer/Add to block list");
     }
 }
