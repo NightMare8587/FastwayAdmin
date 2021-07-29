@@ -9,8 +9,8 @@ import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -28,7 +28,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import com.consumers.fastwayadmin.GMailSender;
-import com.crowdfire.cfalertdialog.CFAlertDialog;
 import com.consumers.fastwayadmin.Info.Info;
 import com.consumers.fastwayadmin.R;
 import com.developer.kalert.KAlertDialog;
@@ -71,20 +70,13 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-import cc.cloudist.acplibrary.ACProgressConstant;
-import cc.cloudist.acplibrary.ACProgressFlower;
 import karpuzoglu.enes.com.fastdialog.Animations;
 import karpuzoglu.enes.com.fastdialog.FastDialog;
 import karpuzoglu.enes.com.fastdialog.FastDialogBuilder;
 import karpuzoglu.enes.com.fastdialog.NegativeClick;
 import karpuzoglu.enes.com.fastdialog.PositiveClick;
 import karpuzoglu.enes.com.fastdialog.Type;
-import android.os.AsyncTask;
-//import com.google.android.gms.location.LocationRequest;
-//import com.google.android.gms.location.LocationServices;
-//import com.google.android.gms.location.LocationSettingsRequest;
-//import com.google.android.gms.location.LocationSettingsResponse;
-//import com.google.android.gms.location.SettingsClient;
+
 
 public class MainActivity extends AppCompatActivity {
     String subject = "Welcome to Fastway";
