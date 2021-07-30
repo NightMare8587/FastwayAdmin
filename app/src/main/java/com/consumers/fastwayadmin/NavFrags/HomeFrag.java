@@ -1,5 +1,7 @@
 package com.consumers.fastwayadmin.NavFrags;
 
+import static com.google.android.play.core.install.model.AppUpdateType.IMMEDIATE;
+
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -20,7 +22,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Switch;
@@ -38,7 +39,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.consumers.fastwayadmin.DiscountCombo.ComboAndOffers;
-import com.consumers.fastwayadmin.DiscountCombo.CustomOffer;
 import com.consumers.fastwayadmin.DiscountCombo.DiscountActivity;
 import com.consumers.fastwayadmin.NavFrags.homeFrag.homeFragClass;
 import com.consumers.fastwayadmin.R;
@@ -55,7 +55,6 @@ import com.google.android.gms.location.LocationSettingsResponse;
 import com.google.android.gms.location.LocationSettingsStates;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.location.SettingsClient;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.play.core.appupdate.AppUpdateInfo;
 import com.google.android.play.core.appupdate.AppUpdateManager;
@@ -73,8 +72,6 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
-import static com.google.android.play.core.install.model.AppUpdateType.IMMEDIATE;
 
 //import com.consumers.fastwayadmin.NavFrags.homeFrag.homeAdapter;
 //import com.consumers.fastwayadmin.NavFrags.homeFrag.homeModel;
