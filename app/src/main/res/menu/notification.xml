@@ -3,10 +3,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
 
+    <item android:id="@+id/randomChatMessages"
+        app:showAsAction="always"
+        android:title="Messages"
+        android:icon="@drawable/ic_baseline_message_24"/>
 
     <item android:id="@+id/notification"
         app:showAsAction="always"
         android:icon="@drawable/ic_customer_support"
         android:title="Support"/>
+
+
 
 </menu>

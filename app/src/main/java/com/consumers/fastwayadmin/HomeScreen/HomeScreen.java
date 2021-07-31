@@ -208,7 +208,8 @@ public class HomeScreen extends AppCompatActivity {
 
         if(id == R.id.notification)
             startActivity(new Intent(HomeScreen.this, SupportActivity.class));
-
+        else
+          startActivity(new Intent(HomeScreen.this,RandomChatNow.class));
         return super.onOptionsItemSelected(item);
     }
 
