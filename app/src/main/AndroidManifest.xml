@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.consumers.fastwayadmin" >
+    package="com.consumers.fastwayadmin">
 
     <uses-sdk tools:overrideLibrary="com.google.zxing.client.android" />
 
@@ -28,7 +28,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         tools:ignore="AllowBackup"
-        tools:replace="android:icon" >
+        tools:replace="android:icon">
+        <activity
+            android:name=".RandomChatNoww"
+            android:exported="true" />
         <activity
             android:name=".HomeScreen.RandomChatNow"
             android:exported="true" />
@@ -90,7 +93,7 @@
 
         <service
             android:name=".FirebaseNotification"
-            android:exported="false" >
+            android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
@@ -112,14 +115,14 @@
 
         <activity android:name=".HomeScreen.HomeScreen" />
         <activity android:name=".Info.Info" />
-        <activity android:name=".SplashAndIntro.SplashScreen" >
+        <activity android:name=".SplashAndIntro.SplashScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Login.MainActivity" >
+        <activity android:name=".Login.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
