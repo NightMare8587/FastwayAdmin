@@ -2,6 +2,7 @@ package com.consumers.fastwayadmin.HomeScreen.ReportSupport;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -96,6 +97,11 @@ public class MyOrderView extends RecyclerView.Adapter<MyOrderView.holder>  {
        holder.priceList.setLayoutParams(param);
        holder.priceList.requestLayout();
 
+       holder.rate.setOnClickListener(v -> {
+           Intent intent = new Intent(context,ReportOptionsActivity.class);
+           intent.putExtra("ID",resId.get(position));
+           context.startActivity(intent);
+       });
 
    }
 
