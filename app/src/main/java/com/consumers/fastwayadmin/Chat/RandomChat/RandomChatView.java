@@ -64,6 +64,7 @@ public class RandomChatView extends RecyclerView.Adapter<RandomChatView.Recycler
                    intent.putStringArrayListExtra("message", (ArrayList<String>) messages);
                     intent.putStringArrayListExtra("time", (ArrayList<String>) timing);
                     intent.putStringArrayListExtra("id", (ArrayList<String>) leftRight);
+                    intent.putExtra("userId",id.get(position));
                     v.getContext().startActivity(intent);
                 }
 
