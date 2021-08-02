@@ -30,6 +30,9 @@
         tools:ignore="AllowBackup"
         tools:replace="android:icon">
         <activity
+            android:name=".Chat.RandomChat.TempActivity"
+            android:exported="true" />
+        <activity
             android:name=".HomeScreen.ReportSupport.ReportOptionsActivity"
             android:exported="true" />
         <activity
