@@ -2,14 +2,6 @@ package com.consumers.fastwayadmin.HomeScreen.ReportSupport;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Typeface;
-import android.graphics.pdf.PdfDocument;
-import android.os.AsyncTask;
-import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,7 +10,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
@@ -31,9 +22,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -48,7 +36,7 @@ public class MyOrderView extends RecyclerView.Adapter<MyOrderView.holder>  {
    List<List<String>> finalType;
    List<String> resId;
    Context context;
-   List<String> type = new ArrayList<>();
+   List<String> type;
    public MyOrderView(List<List<String>> finalType, Context context, List<String> resId,
                       List<String> type, List<String> timeOfOrder, List<String> foodOrderTime,
                       List<List<String>> finalList, List<List<String>> finalListPrice) {
@@ -93,10 +81,6 @@ public class MyOrderView extends RecyclerView.Adapter<MyOrderView.holder>  {
        Calendar calendar = Calendar.getInstance();
        calendar.setTimeInMillis(milis);
        holder.time.setText("" + dateFormat.format(calendar.getTime()));
-//       if(!dishImage.get(position).isEmpty()) {
-//           Picasso.get().load(dishImage.get(position)).resize(100, 100).into(holder.imageView);
-//           Log.i("empty","not");
-//       }
        List<String> priceList = new ArrayList<>(finalListPrice.get(position));
        ArrayAdapter<String> priceAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1,priceList);
        List<String> myList = new ArrayList<>(finalList.get(position));
