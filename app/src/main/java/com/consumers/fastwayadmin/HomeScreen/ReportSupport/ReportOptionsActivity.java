@@ -80,7 +80,7 @@ public class ReportOptionsActivity extends AppCompatActivity {
                                         issueDetail = editText.getText().toString();
                                         break;
                                 }
-                                addToBlockList.child(Objects.requireNonNull(auth.getUid())).child("id").setValue(auth.getUid());
+                                addToBlockList.child(id + "").child("authId").setValue(id + "");
                                 OtherReportClass otherReportClass = new OtherReportClass(issueName,issueDetail,userName,userEmail);
                                 reportRef.child(Objects.requireNonNull(auth.getUid())).setValue(otherReportClass);
                                 generateNotification();
