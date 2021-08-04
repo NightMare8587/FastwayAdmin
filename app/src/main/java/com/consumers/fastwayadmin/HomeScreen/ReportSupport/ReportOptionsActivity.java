@@ -9,6 +9,7 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioGroup;
@@ -28,7 +29,7 @@ import java.util.Objects;
 public class ReportOptionsActivity extends AppCompatActivity {
     FirebaseAuth auth;
     RadioGroup radioGroup;
-    String id;
+    String userID;
     String channel_id = "notification_channel";
     EditText editText;
     String issueName,issueDetail,userName,userEmail;
@@ -42,7 +43,7 @@ public class ReportOptionsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_report_options);
         initialise();
         editText = findViewById(R.id.specifyinDetailEditText);
-        getUserDetails = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(id);
+        getUserDetails = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(userID);
         getUserDetails.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -80,7 +81,7 @@ public class ReportOptionsActivity extends AppCompatActivity {
                                         issueDetail = editText.getText().toString();
                                         break;
                                 }
-                                addToBlockList.child(id + "").child("authId").setValue(id + "");
+                                addToBlockList.child("authId").setValue(userID);
                                 OtherReportClass otherReportClass = new OtherReportClass(issueName,issueDetail,userName,userEmail);
                                 reportRef.child(Objects.requireNonNull(auth.getUid())).setValue(otherReportClass);
                                 generateNotification();
@@ -154,8 +155,9 @@ public class ReportOptionsActivity extends AppCompatActivity {
         auth = FirebaseAuth.getInstance();
         radioGroup = findViewById(R.id.radioGroupOthers);
         submitReport = findViewById(R.id.SubmitOthersReport);
-        id = getIntent().getStringExtra("ID");
-        addToBlockList = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid())).child("Blocked List");
+        userID = getIntent().getStringExtra("ID");
+        Log.i("id",userID);
+        addToBlockList = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid())).child("Blocked List").child(userID);
         reportRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Admin");
     }
 }
