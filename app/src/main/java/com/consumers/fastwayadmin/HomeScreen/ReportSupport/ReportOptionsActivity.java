@@ -82,7 +82,7 @@ public class ReportOptionsActivity extends AppCompatActivity {
                                         break;
                                 }
                                 addToBlockList.child("authId").setValue(userID);
-                                OtherReportClass otherReportClass = new OtherReportClass(issueName,issueDetail,userName,userEmail);
+                                OtherReportClass otherReportClass = new OtherReportClass(issueName,issueDetail,userName,userEmail,userID);
                                 reportRef.child(Objects.requireNonNull(auth.getUid())).setValue(otherReportClass);
                                 generateNotification();
                                 kAlertDialog.dismissWithAnimation();
@@ -103,7 +103,7 @@ public class ReportOptionsActivity extends AppCompatActivity {
                                         issueDetail = editText.getText().toString();
                                         break;
                                 }
-                                OtherReportClass otherReportClass = new OtherReportClass(issueName,issueDetail,userName,userEmail);
+                                OtherReportClass otherReportClass = new OtherReportClass(issueName,issueDetail,userName,userEmail,userID);
                                 reportRef.child(Objects.requireNonNull(auth.getUid())).setValue(otherReportClass);
                                 generateNotification();
                                 Toast.makeText(ReportOptionsActivity.this, "Report Submitted Successfully", Toast.LENGTH_SHORT).show();
