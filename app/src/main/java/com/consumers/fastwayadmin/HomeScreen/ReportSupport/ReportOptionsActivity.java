@@ -7,6 +7,7 @@ import androidx.core.app.NotificationCompat;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -81,8 +82,9 @@ public class ReportOptionsActivity extends AppCompatActivity {
                                         issueDetail = editText.getText().toString();
                                         break;
                                 }
+                                SharedPreferences sharedPreferences = getSharedPreferences("RestaurantInfo",MODE_PRIVATE);
                                 addToBlockList.child("authId").setValue(userID);
-                                OtherReportClass otherReportClass = new OtherReportClass(issueName,issueDetail,userName,userEmail,userID);
+                                OtherReportClass otherReportClass = new OtherReportClass(issueName,issueDetail,userName,userEmail,userID,sharedPreferences.getString("hotelName",""));
                                 reportRef.child(Objects.requireNonNull(auth.getUid())).setValue(otherReportClass);
                                 generateNotification();
                                 kAlertDialog.dismissWithAnimation();
@@ -103,7 +105,8 @@ public class ReportOptionsActivity extends AppCompatActivity {
                                         issueDetail = editText.getText().toString();
                                         break;
                                 }
-                                OtherReportClass otherReportClass = new OtherReportClass(issueName,issueDetail,userName,userEmail,userID);
+                                SharedPreferences sharedPreferences = getSharedPreferences("RestaurantInfo",MODE_PRIVATE);
+                                OtherReportClass otherReportClass = new OtherReportClass(issueName,issueDetail,userName,userEmail,userID,sharedPreferences.getString("hotelName",""));
                                 reportRef.child(Objects.requireNonNull(auth.getUid())).setValue(otherReportClass);
                                 generateNotification();
                                 Toast.makeText(ReportOptionsActivity.this, "Report Submitted Successfully", Toast.LENGTH_SHORT).show();

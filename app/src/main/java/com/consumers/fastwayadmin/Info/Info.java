@@ -1,6 +1,7 @@
 package com.consumers.fastwayadmin.Info;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,6 +38,7 @@ public class Info extends AppCompatActivity {
     CountryCodePicker codePicker;
     FirebaseAuth infoAuth;
     DatabaseReference infoRef;
+    DatabaseReference checkRef;
     FastDialog fastDialog;
     String name,address,nearby,pin,number;
 //    ProgressBar progressBar;
@@ -50,7 +52,8 @@ public class Info extends AppCompatActivity {
                 .setAnimation(Animations.SLIDE_TOP)
                 .create();
         fastDialog.show();
-        infoRef.child("Restaurants").addListenerForSingleValueEvent(new ValueEventListener() {
+        checkRef = FirebaseDatabase.getInstance().getReference().getRoot();
+        checkRef.child("Restaurants").addListenerForSingleValueEvent(new ValueEventListener() {
            @Override
            public void onDataChange(@NonNull DataSnapshot snapshot) {
                if(snapshot.child(Objects.requireNonNull(infoAuth.getUid())).exists()){
@@ -106,15 +109,30 @@ public class Info extends AppCompatActivity {
 
 
     private void createChildForRestaurant() {
-        InfoRestaurant infoRestaurant = new InfoRestaurant(name,address,pin,number,nearby,"0","0","0","online");
-        infoRef.child("Restaurants").child(Objects.requireNonNull(infoAuth.getUid())).setValue(infoRestaurant);
+        SharedPreferences sharedPreferences = getSharedPreferences("RestaurantInfo",MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("hotelName",name);
+        editor.putString("hotelAddress",address);
+        editor.putString("hotelNumber",number);
+        editor.apply();
+//        InfoRestaurant infoRestaurant = new InfoRestaurant(name,address,pin,number,nearby,"0","0","0","online");
+//        infoRef.child("Restaurants").child(Objects.requireNonNull(infoAuth.getUid())).setValue(infoRestaurant);
+        infoRef.child("name").setValue(name);
+        infoRef.child("address").setValue(address);
+        infoRef.child("number").setValue(number);
+        infoRef.child("nearby").setValue(nearby);
+        infoRef.child("pin").setValue(pin);
+        infoRef.child("rating").setValue("0");
+        infoRef.child("totalRate").setValue("0");
+        infoRef.child("count").setValue("0");
+        infoRef.child("status").setValue("online");
         startActivity(new Intent(Info.this, MapsActivity.class));
         finish();
     }
 
     private void initialise() {
         infoAuth = FirebaseAuth.getInstance();
-        infoRef = FirebaseDatabase.getInstance().getReference().getRoot();
+        infoRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(infoAuth.getUid()));
         nameOfRestaurant = findViewById(R.id.nameOfRestaurant);
         AddressOfRestaurant = findViewById(R.id.AddressOfRestaurant);
         nearbyPlace = findViewById(R.id.nearbyPlace);
