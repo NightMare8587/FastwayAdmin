@@ -1,21 +1,26 @@
 package com.consumers.fastwayadmin.ListViewActivity;
 
 import android.annotation.SuppressLint;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.consumers.fastwayadmin.Info.MapsActivity;
@@ -528,48 +533,89 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
                     modalBottomSheetDialog.dismiss();
                     break;
                 case R.id.changeAddressBottomSheetRestaurant:
-                    FlatDialog flatDialog4 = new FlatDialog(MyAccount.this);
-                    flatDialog4.setTitle("Enter New Address")
-                            .setBackgroundColor(Color.WHITE)
-                            .setTitleColor(Color.BLACK)
-                            .setFirstTextFieldBorderColor(Color.BLACK)
-                            .setFirstTextFieldHintColor(Color.BLACK)
-                            .setFirstTextFieldTextColor(Color.BLACK)
-                            .setFirstTextFieldHint("Enter New Address")
-                            .setSecondTextFieldHint("Enter New Nearby place")
-                            .setSecondTextFieldBorderColor(Color.BLACK)
-                            .setSecondTextFieldHintColor(Color.BLACK)
-                            .setSecondTextFieldTextColor(Color.BLACK)
-                            .setFirstButtonText("Make Changes")
-                            .setFirstButtonColor(Color.LTGRAY)
-                            .setFirstButtonTextColor(Color.BLACK)
-                            .setSecondButtonText("Cancel")
-                            .setSecondButtonColor(Color.CYAN)
-                            .setSecondButtonTextColor(Color.BLACK)
-                            .withFirstButtonListner(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
-                                    if(flatDialog4.getFirstTextField().length() == 0 && flatDialog4.getSecondTextField().length() == 0){
-                                        Toast.makeText(MyAccount.this, "Field can't be empty", Toast.LENGTH_SHORT).show();
-                                        return;
-                                    }else {
-                                        reference.child("address").setValue(flatDialog4.getFirstTextField().toString());
-                                        reference.child("nearby").setValue(flatDialog4.getSecondTextField().toString());
-                                        Toast.makeText(MyAccount.this, "Address And Nearby Changed Successfully", Toast.LENGTH_SHORT).show();
+//                    FlatDialog flatDialog4 = new FlatDialog(MyAccount.this);
+//                    flatDialog4.setTitle("Enter New Address")
+//                            .setBackgroundColor(Color.WHITE)
+//                            .setTitleColor(Color.BLACK)
+//                            .setFirstTextFieldBorderColor(Color.BLACK)
+//                            .setFirstTextFieldHintColor(Color.BLACK)
+//                            .setFirstTextFieldTextColor(Color.BLACK)
+//                            .setFirstTextFieldHint("Enter New Address")
+//                            .setSecondTextFieldHint("Enter New Nearby place")
+//                            .setSecondTextFieldBorderColor(Color.BLACK)
+//                            .setSecondTextFieldHintColor(Color.BLACK)
+//                            .setSecondTextFieldTextColor(Color.BLACK)
+//                            .setFirstButtonText("Make Changes")
+//                            .setFirstButtonColor(Color.LTGRAY)
+//                            .setFirstButtonTextColor(Color.BLACK)
+//                            .setSecondButtonText("Cancel")
+//                            .setSecondButtonColor(Color.CYAN)
+//                            .setSecondButtonTextColor(Color.BLACK)
+//                            .withFirstButtonListner(new View.OnClickListener() {
+//                                @Override
+//                                public void onClick(View view) {
+//                                    if(flatDialog4.getFirstTextField().length() == 0 && flatDialog4.getSecondTextField().length() == 0){
+//                                        Toast.makeText(MyAccount.this, "Field can't be empty", Toast.LENGTH_SHORT).show();
+//                                        return;
+//                                    }else {
+//                                        reference.child("address").setValue(flatDialog4.getFirstTextField().toString());
+//                                        reference.child("nearby").setValue(flatDialog4.getSecondTextField().toString());
+////                                        reference.child("pin").setValue(flatDialog4.getLargeTextField().toString());
+//                                        Toast.makeText(MyAccount.this, "Address And Nearby Changed Successfully", Toast.LENGTH_SHORT).show();
+//                                        startActivityForResult(new Intent(MyAccount.this, MapsActivity2.class),69);
+//                                        flatDialog4.dismiss();
+//                                    }
+//                                }
+//                            })
+//                            .withSecondButtonListner(new View.OnClickListener() {
+//                                @Override
+//                                public void onClick(View view) {
+//                                    flatDialog4.dismiss();
+//                                }
+//                            });
+//
+//                    flatDialog4.create();
+//                    flatDialog4.show();
+                    AlertDialog.Builder alert = new AlertDialog.Builder(MyAccount.this);
+                    alert.setTitle("Change Info");
+                    LinearLayout layout = new LinearLayout(MyAccount.this);
+                    layout.setOrientation(LinearLayout.VERTICAL);
+                    EditText resAddress = new EditText(MyAccount.this);
+                    EditText resNearby = new EditText(MyAccount.this);
+                    EditText resPIN = new EditText(MyAccount.this);
+//                    resAddress.setBackground(null);
+//                    resNearby.setBackground(null);
+//                    resPIN.setBackground(null);
+                    resPIN.setInputType(InputType.TYPE_CLASS_NUMBER);
+                    resAddress.setHint("Enter new address");
+                    resNearby.setHint("Enter new nearby");
+                    resPIN.setHint("Enter new pin");
+                    layout.addView(resAddress);
+                    layout.addView(resNearby);
+                    layout.addView(resPIN);
+                    alert.setPositiveButton("Make Changes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            if(!resPIN.getText().toString().equals("") && !resAddress.getText().toString().equals("") && !resNearby.getText().toString().equals("")) {
+                                reference.child("address").setValue(resAddress.getText().toString());
+                                reference.child("nearby").setValue(resNearby.getText().toString());
+                                reference.child("pin").setValue(resPIN.getText().toString());
+                                dialogInterface.dismiss();
+                                Toast.makeText(MyAccount.this, "Address And Nearby Changed Successfully", Toast.LENGTH_SHORT).show();
                                         startActivityForResult(new Intent(MyAccount.this, MapsActivity2.class),69);
-                                        flatDialog4.dismiss();
-                                    }
-                                }
-                            })
-                            .withSecondButtonListner(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
-                                    flatDialog4.dismiss();
-                                }
-                            });
 
-                    flatDialog4.create();
-                    flatDialog4.show();
+                            }else
+                                Toast.makeText(MyAccount.this, "Field can't be empty", Toast.LENGTH_SHORT).show();
+
+                        }
+                    }).setNegativeButton("No, Wait", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.dismiss();
+                        }
+                    });
+                    alert.setView(layout);
+                    alert.create().show();
                     modalBottomSheetDialog.dismiss();
                     break;
             }
