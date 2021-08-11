@@ -72,7 +72,10 @@ public class ReportOptionsActivity extends AppCompatActivity {
                                     .setTitleText("Error")
                                     .setContentText("there is an ongoing report from this account")
                                     .setConfirmText("Exit")
-                                    .setConfirmClickListener(KAlertDialog::dismissWithAnimation);
+                                    .setConfirmClickListener(k -> {
+                                        k.dismissWithAnimation();
+                                        finish();
+                                    });
                             kAlertDialog.create();
                             kAlertDialog.show();
                         }else{
