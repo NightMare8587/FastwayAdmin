@@ -14,6 +14,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -28,6 +29,7 @@ import com.consumers.fastwayadmin.Dish.DishInfo;
 import com.consumers.fastwayadmin.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
@@ -50,6 +52,7 @@ public class CreateDish extends AppCompatActivity {
     CheckBox checkBox;
     DatabaseReference dish;
     OutputStream outputStream;
+    String nameOfDishes;
     String mrp;
     FirebaseStorage storage;
     StorageReference storageReference;
@@ -79,6 +82,9 @@ public class CreateDish extends AppCompatActivity {
             @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
             public void onClick(View view) {
+                if(nameOfDish.getText().toString().equals(""))
+                    Toast.makeText(CreateDish.this, "Please enter name of dish", Toast.LENGTH_SHORT).show();
+                else
                 CheckPermission();
 //               showDialogBox();
             }
@@ -135,7 +141,7 @@ public class CreateDish extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE); //IMAGE CAPTURE CODE
-                startActivityForResult(intent, 0);
+                startActivityForResult(intent, 20);
             }
         }).create();
         builder.show();
@@ -145,6 +151,7 @@ public class CreateDish extends AppCompatActivity {
         DishInfo info = new DishInfo(name,half,full,image,mrp,"0","0","0","yes");
         try {
             dish.child("Restaurants").child(Objects.requireNonNull(dishAuth.getUid())).child("List of Dish").child(menuType).child(name).setValue(info);
+            new Upload().execute();
             Toast.makeText(this, "Dish Added Successfully", Toast.LENGTH_SHORT).show();
         }catch (Exception e){
             Toast.makeText(this, "Something went Wrong!!!!!", Toast.LENGTH_SHORT).show();
@@ -169,12 +176,12 @@ public class CreateDish extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == 0 && resultCode == RESULT_OK && data != null){
+        if(requestCode == 20 && resultCode == RESULT_OK && data != null){
             Bitmap bitmap = (Bitmap) data.getExtras().get("data");
             File filepath = Environment.getExternalStorageDirectory();
             File dir = new File(filepath.getAbsolutePath());
             dir.mkdir();
-            File file = new File(dir, System.currentTimeMillis() + ".jpg");
+            File file = new File(dir, nameOfDish.getText().toString() + ".jpg");
             try {
                 outputStream = new FileOutputStream(file);
             } catch (FileNotFoundException e) {
@@ -188,11 +195,12 @@ public class CreateDish extends AppCompatActivity {
                 e.printStackTrace();
             }
             try {
-                StorageReference reference = storageReference.child(dishAuth.getUid() + "/" + "image" + "/"  + System.currentTimeMillis());
+                StorageReference reference = storageReference.child(dishAuth.getUid() + "/" + "image" + "/"  + nameOfDish.getText().toString());
                 reference.putFile(Uri.fromFile(file)).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-                        Toast.makeText(CreateDish.this, "Upload Complete", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(CreateDish.this, "Upload Complete and image saved in phone successfully", Toast.LENGTH_SHORT).show();
+
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
@@ -220,4 +228,24 @@ public class CreateDish extends AppCompatActivity {
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
     }
+
+    public class Upload extends AsyncTask<Void,Void,Void>{
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+//            FirebaseStorage firebaseStorage = FirebaseStorage.getInstance();
+//            FirebaseAuth auth = FirebaseAuth.getInstance();
+//            StorageReference storageReference = firebaseStorage.getReference();
+//            StorageReference reference = storageReference.child(auth.getUid() + "/" + "image" + "/"  + name);
+            StorageReference reference = storageReference.child(dishAuth.getUid() + "/" + "image" + "/"  + nameOfDish.getText().toString());
+            reference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                @Override
+                public void onSuccess(@NonNull Uri uri) {
+                    dish.child("Restaurants").child(Objects.requireNonNull(dishAuth.getUid())).child("List of Dish").child(menuType).child(name).child("image").setValue(uri + "");
+                }
+            });
+            return null;
+        }
+    }
+
 }

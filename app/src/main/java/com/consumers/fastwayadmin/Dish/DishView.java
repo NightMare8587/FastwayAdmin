@@ -1,5 +1,6 @@
 package com.consumers.fastwayadmin.Dish;
 
+import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Paint;
@@ -64,7 +65,7 @@ public class DishView extends RecyclerView.Adapter<DishView.DishAdapter> {
     }
 
     @Override
-    public void onBindViewHolder(@NonNull DishAdapter holder, int position) {
+    public void onBindViewHolder(@NonNull DishAdapter holder, @SuppressLint("RecyclerView") int position) {
         holder.name.setText(names.get(position));
 //        notifyDataSetChanged();
         holder.cardView.setOnClickListener(new View.OnClickListener() {
