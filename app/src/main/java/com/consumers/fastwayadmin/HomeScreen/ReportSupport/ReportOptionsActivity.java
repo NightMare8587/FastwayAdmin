@@ -62,61 +62,83 @@ public class ReportOptionsActivity extends AppCompatActivity {
         submitReport.setOnClickListener(v -> {
             if(editText.getText().toString().equals("")){
                 Toast.makeText(ReportOptionsActivity.this, "Field can't be empty :)", Toast.LENGTH_SHORT).show();
-            }else {
-                KAlertDialog kAlertDialog = new KAlertDialog(ReportOptionsActivity.this,KAlertDialog.WARNING_TYPE)
-                        .setTitleText("Warning")
-                        .setContentText("Reporting a customer will permanently ban them from this restaurant")
-                        .setConfirmText("Report")
-                        .setCancelText("Don't ban just report")
-                        .setConfirmClickListener(new KAlertDialog.KAlertClickListener() {
-                            @Override
-                            public void onClick(KAlertDialog kAlertDialog) {
-                                int id = radioGroup.getCheckedRadioButtonId();
-                                switch (id) {
-                                    case R.id.customerBehaviourRadioButton:
-                                        issueName = "Customer Behaviour";
-                                        issueDetail = editText.getText().toString();
-                                        break;
-                                    case R.id.otherProblemRadioButton:
-                                        issueName = "Others";
-                                        issueDetail = editText.getText().toString();
-                                        break;
-                                }
-                                SharedPreferences sharedPreferences = getSharedPreferences("RestaurantInfo",MODE_PRIVATE);
-                                addToBlockList.child("authId").setValue(userID);
-                                OtherReportClass otherReportClass = new OtherReportClass(issueName,issueDetail,userName,userEmail,userID,sharedPreferences.getString("hotelName",""));
-                                reportRef.child(Objects.requireNonNull(auth.getUid())).setValue(otherReportClass);
-                                generateNotification();
-                                kAlertDialog.dismissWithAnimation();
+            }
+            else{
+                reportRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if(snapshot.hasChild(Objects.requireNonNull(auth.getUid()))){
+                            KAlertDialog kAlertDialog = new KAlertDialog(ReportOptionsActivity.this,KAlertDialog.ERROR_TYPE)
+                                    .setTitleText("Error")
+                                    .setContentText("there is an ongoing report from this account")
+                                    .setConfirmText("Exit")
+                                    .setConfirmClickListener(KAlertDialog::dismissWithAnimation);
+                            kAlertDialog.create();
+                            kAlertDialog.show();
+                        }else{
+                            KAlertDialog kAlertDialog = new KAlertDialog(ReportOptionsActivity.this,KAlertDialog.WARNING_TYPE)
+                                    .setTitleText("Warning")
+                                    .setContentText("Reporting a customer will permanently ban them from this restaurant")
+                                    .setConfirmText("Report")
+                                    .setCancelText("Don't ban just report")
+                                    .setConfirmClickListener(new KAlertDialog.KAlertClickListener() {
+                                        @Override
+                                        public void onClick(KAlertDialog kAlertDialog) {
+                                            int id = radioGroup.getCheckedRadioButtonId();
+                                            switch (id) {
+                                                case R.id.customerBehaviourRadioButton:
+                                                    issueName = "Customer Behaviour";
+                                                    issueDetail = editText.getText().toString();
+                                                    break;
+                                                case R.id.otherProblemRadioButton:
+                                                    issueName = "Others";
+                                                    issueDetail = editText.getText().toString();
+                                                    break;
+                                            }
+                                            SharedPreferences sharedPreferences = getSharedPreferences("RestaurantInfo",MODE_PRIVATE);
+                                            addToBlockList.child("authId").setValue(userID);
+                                            OtherReportClass otherReportClass = new OtherReportClass(issueName,issueDetail,userName,userEmail,userID,sharedPreferences.getString("hotelName",""));
+                                            reportRef.child(Objects.requireNonNull(auth.getUid())).setValue(otherReportClass);
+                                            generateNotification();
+                                            kAlertDialog.dismissWithAnimation();
 
-                                finish();
-                            }
-                        }).setCancelClickListener(new KAlertDialog.KAlertClickListener() {
-                            @Override
-                            public void onClick(KAlertDialog kAlertDialog) {
-                                int id = radioGroup.getCheckedRadioButtonId();
-                                switch (id) {
-                                    case R.id.customerBehaviourRadioButton:
-                                        issueName = "Customer Behaviour";
-                                        issueDetail = editText.getText().toString();
-                                        break;
-                                    case R.id.otherProblemRadioButton:
-                                        issueName = "Others";
-                                        issueDetail = editText.getText().toString();
-                                        break;
-                                }
-                                SharedPreferences sharedPreferences = getSharedPreferences("RestaurantInfo",MODE_PRIVATE);
-                                OtherReportClass otherReportClass = new OtherReportClass(issueName,issueDetail,userName,userEmail,userID,sharedPreferences.getString("hotelName",""));
-                                reportRef.child(Objects.requireNonNull(auth.getUid())).setValue(otherReportClass);
-                                generateNotification();
-                                Toast.makeText(ReportOptionsActivity.this, "Report Submitted Successfully", Toast.LENGTH_SHORT).show();
-                                kAlertDialog.dismissWithAnimation();
-                                finish();
-                            }
-                        });
-                kAlertDialog.setCanceledOnTouchOutside(false);
-                kAlertDialog.create();
-                kAlertDialog.show();
+                                            finish();
+                                        }
+                                    }).setCancelClickListener(new KAlertDialog.KAlertClickListener() {
+                                        @Override
+                                        public void onClick(KAlertDialog kAlertDialog) {
+                                            int id = radioGroup.getCheckedRadioButtonId();
+                                            switch (id) {
+                                                case R.id.customerBehaviourRadioButton:
+                                                    issueName = "Customer Behaviour";
+                                                    issueDetail = editText.getText().toString();
+                                                    break;
+                                                case R.id.otherProblemRadioButton:
+                                                    issueName = "Others";
+                                                    issueDetail = editText.getText().toString();
+                                                    break;
+                                            }
+                                            SharedPreferences sharedPreferences = getSharedPreferences("RestaurantInfo",MODE_PRIVATE);
+                                            OtherReportClass otherReportClass = new OtherReportClass(issueName,issueDetail,userName,userEmail,userID,sharedPreferences.getString("hotelName",""));
+                                            reportRef.child(Objects.requireNonNull(auth.getUid())).setValue(otherReportClass);
+                                            generateNotification();
+                                            Toast.makeText(ReportOptionsActivity.this, "Report Submitted Successfully", Toast.LENGTH_SHORT).show();
+                                            kAlertDialog.dismissWithAnimation();
+                                            finish();
+                                        }
+                                    });
+                            kAlertDialog.setCanceledOnTouchOutside(false);
+                            kAlertDialog.create();
+                            kAlertDialog.show();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+
 
             }
         });

@@ -1,5 +1,6 @@
 package com.consumers.fastwayadmin.MenuActivities;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.view.LayoutInflater;
@@ -50,7 +51,7 @@ public class DisplayDish extends RecyclerView.Adapter<DisplayDish.Adapter> {
     }
 
     @Override
-    public void onBindViewHolder(@NonNull Adapter holder, int position) {
+    public void onBindViewHolder(@NonNull Adapter holder, @SuppressLint("RecyclerView") int position) {
         auth = FirebaseAuth.getInstance();
         reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid()));
         holder.name.setText(names.get(position));
