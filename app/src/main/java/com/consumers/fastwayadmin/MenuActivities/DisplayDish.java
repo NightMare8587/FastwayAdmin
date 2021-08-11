@@ -96,7 +96,7 @@ public class DisplayDish extends RecyclerView.Adapter<DisplayDish.Adapter> {
                             mrp = "yes";
                         else
                             mrp = "false";
-                        CreateDishClass createDishClass = new CreateDishClass(holder.name.getText().toString(),image.get(position),halfPlate.getText().toString(),fullPlate.getText().toString(),mrp);
+                        CreateDishClass createDishClass = new CreateDishClass(holder.name.getText().toString(),image.get(position),halfPlate.getText().toString(),fullPlate.getText().toString(),mrp,"0","0","0","yes");
                         reference.child("List of Dish").child(type).child(holder.name.getText().toString()).setValue(createDishClass);
                         Toast.makeText(context, "Dish added Successfully", Toast.LENGTH_SHORT).show();
                         dialog.dismiss();
