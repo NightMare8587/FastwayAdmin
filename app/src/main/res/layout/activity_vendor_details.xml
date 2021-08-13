@@ -36,48 +36,68 @@
 
     <EditText
         android:id="@+id/numberVendorEditText"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="35dp"
         android:layout_marginTop="16dp"
+        android:layout_marginEnd="35dp"
         android:ems="10"
         android:hint="Enter Phone"
         android:inputType="number"
-        app:layout_constraintEnd_toStartOf="@+id/startPhoneAuthVendorEdittext"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/emailVendorEditText" />
+
+    <EditText
+        android:id="@+id/AccountnumberVendorEditText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="35dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="35dp"
+        android:ems="10"
+        android:hint="Enter Account Number"
+        android:inputType="number"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/numberVendorEditText" />
+
+    <EditText
+        android:id="@+id/AccountHolderNameEditText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="35dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="35dp"
+        android:ems="10"
+        android:hint="Enter Account Holder Name"
+        android:inputType="number"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/AccountnumberVendorEditText" />
+
+    <EditText
+        android:id="@+id/AccountIFSCcodeVendor"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="35dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="35dp"
+        android:ems="10"
+        android:hint="Enter IFSC code"
+        android:inputType="number"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/AccountHolderNameEditText" />
 
     <Button
-        android:id="@+id/startPhoneAuthVendorEdittext"
+        android:id="@+id/proceedVendorDetails"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Verify"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/numberVendorEditText"
-        app:layout_constraintTop_toBottomOf="@+id/emailVendorEditText" />
-
-    <com.google.android.material.tabs.TabLayout
-        android:id="@+id/vendorTabLayout"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="1dp"
-        android:layout_marginTop="27dp"
-        android:layout_marginEnd="1dp"
+        android:layout_marginTop="35dp"
+        android:text="proceed"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/startPhoneAuthVendorEdittext">
-    </com.google.android.material.tabs.TabLayout>
+        app:layout_constraintTop_toBottomOf="@+id/AccountIFSCcodeVendor" />
 
-    <androidx.viewpager.widget.ViewPager
-        android:id="@+id/vendorViewPager"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginStart="1dp"
-        android:layout_marginTop="3dp"
-        android:layout_marginEnd="1dp"
-        android:layout_marginBottom="1dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/vendorTabLayout" />
 </androidx.constraintlayout.widget.ConstraintLayout>

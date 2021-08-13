@@ -1,18 +1,14 @@
 package com.consumers.fastwayadmin.HomeScreen;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -21,17 +17,13 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
-import com.consumers.fastwayadmin.Chat.DisplayAllAvaialbleChats;
-import com.consumers.fastwayadmin.MyService;
 import com.consumers.fastwayadmin.NavFrags.AccountFrag;
 import com.consumers.fastwayadmin.NavFrags.HomeFrag;
 import com.consumers.fastwayadmin.NavFrags.MenuFrag;
 import com.consumers.fastwayadmin.NavFrags.TablesFrag;
 import com.consumers.fastwayadmin.R;
 import com.consumers.fastwayadmin.RandomChatNoww;
-import com.consumers.fastwayadmin.ServiceInitiatorClass;
 import com.gauravk.bubblenavigation.BubbleNavigationConstraintView;
-import com.gauravk.bubblenavigation.listener.BubbleNavigationChangeListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -42,7 +34,6 @@ import com.google.firebase.messaging.FirebaseMessaging;
 
 import org.json.JSONObject;
 
-import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -55,7 +46,6 @@ public class HomeScreen extends AppCompatActivity {
     String URL = "https://fcm.googleapis.com/fcm/send";
     FragmentManager manager;
     FirebaseAuth auth;
-    Fragment active;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,39 +53,24 @@ public class HomeScreen extends AppCompatActivity {
         setContentView(R.layout.activity_home_screen);
         initialise();
 
-        Fragment first = new HomeFrag();
-        Fragment second = new MenuFrag();
-        Fragment third = new TablesFrag();
-        Fragment four = new AccountFrag();
-//        ServiceInitiatorClass serviceInitiatorClass = new ServiceInitiatorClass();
-         active = first;
+        manager.beginTransaction().replace(R.id.homescreen,new HomeFrag()).commit();
+        bubble.setNavigationChangeListener((view, position) -> {
+            switch (position){
+                case 0:
+                    manager.beginTransaction().replace(R.id.homescreen,new HomeFrag()).commit();
+                    break;
+                case 1:
+                    manager.beginTransaction().replace(R.id.homescreen,new MenuFrag()).commit();
 
-//        manager.beginTransaction().replace(R.id.homescreen,new HomeFrag()).commit();
-        manager.beginTransaction().add(R.id.homescreen, four, "4").hide(four).commit();
-        manager.beginTransaction().add(R.id.homescreen, third, "3").hide(third).commit();
-        manager.beginTransaction().add(R.id.homescreen, second, "2").hide(second).commit();
-        manager.beginTransaction().add(R.id.homescreen, first, "1").commit();
-        bubble.setNavigationChangeListener(new BubbleNavigationChangeListener() {
-            @Override
-            public void onNavigationChanged(View view, int position) {
-                switch (position){
-                    case 0:
-                        manager.beginTransaction().hide(active).show(first).commit();
-                        active = first;
-                        break;
-                    case 1:
-                        manager.beginTransaction().hide(active).show(second).commit();
-                        active = second;
-                        break;
-                    case 2:
-                        manager.beginTransaction().hide(active).show(third).commit();
-                        active = third;
-                        break;
-                    case 3:
-                        manager.beginTransaction().hide(active).show(four).commit();
-                        active = four;
-                        break;
-                }
+                    break;
+                case 2:
+                    manager.beginTransaction().replace(R.id.homescreen,new TablesFrag()).commit();
+
+                    break;
+                case 3:
+                    manager.beginTransaction().replace(R.id.homescreen,new AccountFrag()).commit();
+
+                    break;
             }
         });
         FirebaseAuth auth = FirebaseAuth.getInstance();

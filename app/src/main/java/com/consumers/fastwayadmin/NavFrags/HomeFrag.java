@@ -155,15 +155,12 @@ public class HomeFrag extends Fragment {
             AlertDialog.Builder alertDialog = new AlertDialog.Builder(view.getContext());
             alertDialog.setTitle("Important");
             alertDialog.setMessage("You need to add bank details to accept payments");
-            alertDialog.setPositiveButton("Add", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    accountInfo = view.getContext().getSharedPreferences("AccountInfo",Context.MODE_PRIVATE);
-                    Intent intent = new Intent(view.getContext(),VendorDetailsActivity.class);
-                    intent.putExtra("name",accountInfo.getString("name",""));
-                    intent.putExtra("email",accountInfo.getString("email",""));
-                    startActivityForResult(intent,100);
-                }
+            alertDialog.setPositiveButton("Add", (dialogInterface, i) -> {
+                accountInfo = view.getContext().getSharedPreferences("AccountInfo",Context.MODE_PRIVATE);
+                Intent intent = new Intent(view.getContext(),VendorDetailsActivity.class);
+                intent.putExtra("name",accountInfo.getString("name",""));
+                intent.putExtra("email",accountInfo.getString("email",""));
+                startActivity(intent);
             }).create();
 
             alertDialog.show();
