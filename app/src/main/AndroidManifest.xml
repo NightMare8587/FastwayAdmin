@@ -30,6 +30,9 @@
         tools:ignore="AllowBackup"
         tools:replace="android:icon">
         <activity
+            android:name=".NavFrags.VendorDetailsActivity"
+            android:exported="true" />
+        <activity
             android:name=".Chat.RandomChat.TempActivity"
             android:exported="true" />
         <activity

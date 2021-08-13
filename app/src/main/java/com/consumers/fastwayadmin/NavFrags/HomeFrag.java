@@ -82,8 +82,11 @@ public class HomeFrag extends Fragment {
     RecyclerView recyclerView;
     LinearLayout linearLayout;
     DatabaseReference onlineOrOfflineRestaurant;
+    SharedPreferences accountInfo;
     SharedPreferences restaurantStatus;
     private final int UPDATE_REQUEST_CODE = 69;
+    SharedPreferences vendorIdCreated;
+    SharedPreferences.Editor vendorIdEditor;
     LocationRequest locationRequest;
     LinearLayoutManager horizonatl;
     ImageView comboImage;
@@ -145,6 +148,27 @@ public class HomeFrag extends Fragment {
         statusEditor = restaurantStatus.edit();
         onlineOrOffline = view.findViewById(R.id.restaurantOnOff);
         linearLayout = view.findViewById(R.id.mainFragLinearLayout);
+        vendorIdCreated = view.getContext().getSharedPreferences("VendorID",Context.MODE_PRIVATE);
+        vendorIdEditor = vendorIdCreated.edit();
+
+        if(!vendorIdCreated.contains("vendorDetails")){
+            AlertDialog.Builder alertDialog = new AlertDialog.Builder(view.getContext());
+            alertDialog.setTitle("Important");
+            alertDialog.setMessage("You need to add bank details to accept payments");
+            alertDialog.setPositiveButton("Add", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    accountInfo = view.getContext().getSharedPreferences("AccountInfo",Context.MODE_PRIVATE);
+                    Intent intent = new Intent(view.getContext(),VendorDetailsActivity.class);
+                    intent.putExtra("name",accountInfo.getString("name",""));
+                    intent.putExtra("email",accountInfo.getString("email",""));
+                    startActivityForResult(intent,100);
+                }
+            }).create();
+
+            alertDialog.show();
+        }
+
         recyclerView = view.findViewById(R.id.homeFragRecyclerView);
         refershRecyclerView = view.findViewById(R.id.refreshCurrentTables);
 //        recyclerView.setLayoutManager(new LinearLayoutManager(view.getContext(),LinearLayoutManager.HORIZONTAL),true);
