@@ -11,6 +11,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.consumers.fastwayadmin.Login.MainActivity;
 import com.consumers.fastwayadmin.R;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -23,6 +28,9 @@ import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthOptions;
 import com.google.firebase.auth.PhoneAuthProvider;
 
+import org.json.JSONObject;
+
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import karpuzoglu.enes.com.fastdialog.Animations;
@@ -35,6 +43,7 @@ import karpuzoglu.enes.com.fastdialog.Type;
 public class VendorDetailsActivity extends AppCompatActivity {
     String name,email,phone,acNumber,acName,acIFSC;
     FirebaseAuth mAuth;
+    String authURL = "https://payout-api.cashfree.com/payout/v1/authorize";
     Button proceed;
     EditText nameEdit,emailEdit,phoneEdit,accountNumber,accountName,IFSCcode;
     @Override
@@ -76,8 +85,30 @@ public class VendorDetailsActivity extends AppCompatActivity {
                 acName = accountName.getText().toString();
                 acNumber = accountNumber.getText().toString();
                 acIFSC = IFSCcode.getText().toString();
+
+
+                verifyAuthURL();
             }
         });
+    }
+
+    private void verifyAuthURL() {
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, authURL, null, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        }){
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                return super.getHeaders();
+            }
+        };
     }
 
 
