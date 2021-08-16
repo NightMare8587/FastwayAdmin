@@ -6,7 +6,9 @@ import androidx.viewpager.widget.ViewPager;
 import androidx.viewpager2.widget.ViewPager2;
 
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -14,9 +16,12 @@ import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
+import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.consumers.fastwayadmin.Login.MainActivity;
 import com.consumers.fastwayadmin.R;
 import com.developer.kalert.KAlertDialog;
@@ -34,6 +39,7 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import org.json.JSONObject;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -47,7 +53,9 @@ import karpuzoglu.enes.com.fastdialog.Type;
 
 public class VendorDetailsActivity extends AppCompatActivity {
     String name,email,phone,acNumber,acName,acIFSC;
+    String url = "https://intercellular-stabi.000webhostapp.com/addBankDetails.php";
     FirebaseAuth mAuth;
+    String mauthId;
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
     String authURL = "https://payout-api.cashfree.com/payout/v1/authorize";
@@ -59,6 +67,7 @@ public class VendorDetailsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_vendor_details);
         initialise();
         mAuth = FirebaseAuth.getInstance();
+        mauthId = String.valueOf(mAuth.getUid());
         sharedPreferences = getSharedPreferences("VendorID",MODE_PRIVATE);
         editor = sharedPreferences.edit();
         proceed.setOnClickListener(v -> {
@@ -104,7 +113,38 @@ public class VendorDetailsActivity extends AppCompatActivity {
                         .setConfirmClickListener(new KAlertDialog.KAlertClickListener() {
                             @Override
                             public void onClick(KAlertDialog kAlertDialog) {
-                                VendorBankClass vendorBankClass = new VendorBankClass(name,email,acNumber,acName,acIFSC,phone);
+                                RequestQueue requestQueue = Volley.newRequestQueue(VendorDetailsActivity.this);
+                                StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+                                    @Override
+                                    public void onResponse(String response) {
+                                        if(response != null){
+                                            Log.i("response",response);
+                                            finish();
+                                        }
+                                    }
+                                }, new Response.ErrorListener() {
+                                    @Override
+                                    public void onErrorResponse(VolleyError error) {
+                                        Log.i("error",error.getLocalizedMessage() + " ");
+                                    }
+                                }){
+                                    @NonNull
+                                    @Override
+                                    public Map<String, String> getParams() throws AuthFailureError {
+                                        Map<String,String> params = new HashMap<>();
+                                        params.put("name",name + "");
+                                        params.put("email",email + "");
+                                        params.put("phone",phone);
+                                        params.put("AccountNumber",acNumber);
+                                        params.put("AccountName",acName);
+                                        params.put("ifscCode",acIFSC);
+                                        params.put("vendorID",mauthId);
+                                        Log.i("details",name +  " " + mauthId + " ");
+                                        return params;
+                                    }
+                                };
+                                requestQueue.add(stringRequest);
+                                VendorBankClass vendorBankClass = new VendorBankClass(name,email,acNumber,acName,acIFSC,phone,mauthId);
                                 editor.putString("vendorDetails","yes");
                                 editor.putString("accountNumber",acNumber);
                                 editor.putString("accountName",acName);
@@ -112,8 +152,6 @@ public class VendorDetailsActivity extends AppCompatActivity {
                                 editor.apply();
                                 reference.child("Bank Details").setValue(vendorBankClass);
                                 kAlertDialog.dismissWithAnimation();
-                                Toast.makeText(VendorDetailsActivity.this, "Credentials saved successfully", Toast.LENGTH_SHORT).show();
-                                finish();
                             }
                         }).setCancelClickListener(new KAlertDialog.KAlertClickListener() {
                             @Override
@@ -164,4 +202,5 @@ public class VendorDetailsActivity extends AppCompatActivity {
         emailEdit.setText(email);
 
     }
+
 }
