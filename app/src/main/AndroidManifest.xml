@@ -27,7 +27,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar"
-        tools:ignore="AllowBackup"
         tools:replace="android:icon">
         <activity
             android:name=".NavFrags.VendorDetailsActivity"

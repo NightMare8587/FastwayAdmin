@@ -81,6 +81,7 @@ public class HomeFrag extends Fragment {
     FirebaseAuth auth;
     RecyclerView recyclerView;
     LinearLayout linearLayout;
+    DatabaseReference checkForBank;
     DatabaseReference onlineOrOfflineRestaurant;
     SharedPreferences accountInfo;
     SharedPreferences restaurantStatus;
@@ -150,21 +151,7 @@ public class HomeFrag extends Fragment {
         linearLayout = view.findViewById(R.id.mainFragLinearLayout);
         vendorIdCreated = view.getContext().getSharedPreferences("VendorID",Context.MODE_PRIVATE);
         vendorIdEditor = vendorIdCreated.edit();
-
-        if(!vendorIdCreated.contains("vendorDetails")){
-            AlertDialog.Builder alertDialog = new AlertDialog.Builder(view.getContext());
-            alertDialog.setTitle("Important");
-            alertDialog.setMessage("You need to add bank details to accept payments");
-            alertDialog.setPositiveButton("Add", (dialogInterface, i) -> {
-                accountInfo = view.getContext().getSharedPreferences("AccountInfo",Context.MODE_PRIVATE);
-                Intent intent = new Intent(view.getContext(),VendorDetailsActivity.class);
-                intent.putExtra("name",accountInfo.getString("name",""));
-                intent.putExtra("email",accountInfo.getString("email",""));
-                startActivity(intent);
-            }).create();
-
-            alertDialog.show();
-        }
+        new checkBank().execute();
 
         recyclerView = view.findViewById(R.id.homeFragRecyclerView);
         refershRecyclerView = view.findViewById(R.id.refreshCurrentTables);
@@ -629,5 +616,40 @@ public class HomeFrag extends Fragment {
                 }
             }
         });
+    }
+
+    public class checkBank extends AsyncTask<Void,Void,Void>{
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            FirebaseAuth auth = FirebaseAuth.getInstance();
+            checkForBank = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
+            checkForBank.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if(!snapshot.hasChild("Bank Details")){
+                        AlertDialog.Builder alertDialog = new AlertDialog.Builder(requireContext());
+                        alertDialog.setTitle("Important");
+                        alertDialog.setMessage("You need to add bank details to accept payments");
+                        alertDialog.setPositiveButton("Add", (dialogInterface, i) -> {
+                            accountInfo = requireContext().getSharedPreferences("AccountInfo",Context.MODE_PRIVATE);
+                            Intent intent = new Intent(requireContext(),VendorDetailsActivity.class);
+                            intent.putExtra("name",accountInfo.getString("name",""));
+                            intent.putExtra("email",accountInfo.getString("email",""));
+                            startActivity(intent);
+                        }).create();
+
+                        alertDialog.show();
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+
+            return null;
+        }
     }
 }

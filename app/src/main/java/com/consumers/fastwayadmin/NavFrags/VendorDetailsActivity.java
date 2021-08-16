@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.ViewPager;
 import androidx.viewpager2.widget.ViewPager2;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -18,6 +19,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.consumers.fastwayadmin.Login.MainActivity;
 import com.consumers.fastwayadmin.R;
+import com.developer.kalert.KAlertDialog;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.tabs.TabLayout;
@@ -27,10 +29,13 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthOptions;
 import com.google.firebase.auth.PhoneAuthProvider;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import org.json.JSONObject;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import karpuzoglu.enes.com.fastdialog.Animations;
@@ -43,6 +48,8 @@ import karpuzoglu.enes.com.fastdialog.Type;
 public class VendorDetailsActivity extends AppCompatActivity {
     String name,email,phone,acNumber,acName,acIFSC;
     FirebaseAuth mAuth;
+    SharedPreferences sharedPreferences;
+    SharedPreferences.Editor editor;
     String authURL = "https://payout-api.cashfree.com/payout/v1/authorize";
     Button proceed;
     EditText nameEdit,emailEdit,phoneEdit,accountNumber,accountName,IFSCcode;
@@ -52,7 +59,8 @@ public class VendorDetailsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_vendor_details);
         initialise();
         mAuth = FirebaseAuth.getInstance();
-
+        sharedPreferences = getSharedPreferences("VendorID",MODE_PRIVATE);
+        editor = sharedPreferences.edit();
         proceed.setOnClickListener(v -> {
             if(nameEdit.getText().toString().equals("")){
                 nameEdit.setError("Field can't be empty");
@@ -85,9 +93,39 @@ public class VendorDetailsActivity extends AppCompatActivity {
                 acName = accountName.getText().toString();
                 acNumber = accountNumber.getText().toString();
                 acIFSC = IFSCcode.getText().toString();
+                FirebaseAuth auth = FirebaseAuth.getInstance();
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
 
+                KAlertDialog kAlertDialog = new KAlertDialog(VendorDetailsActivity.this,KAlertDialog.WARNING_TYPE)
+                        .setTitleText("Warning")
+                        .setContentText("Do you sure wanna continue with above credentials?")
+                        .setConfirmText("Yes")
+                        .setCancelText("No, Wait")
+                        .setConfirmClickListener(new KAlertDialog.KAlertClickListener() {
+                            @Override
+                            public void onClick(KAlertDialog kAlertDialog) {
+                                VendorBankClass vendorBankClass = new VendorBankClass(name,email,acNumber,acName,acIFSC,phone);
+                                editor.putString("vendorDetails","yes");
+                                editor.putString("accountNumber",acNumber);
+                                editor.putString("accountName",acName);
+                                editor.putString("ifscCode",acIFSC);
+                                editor.apply();
+                                reference.child("Bank Details").setValue(vendorBankClass);
+                                kAlertDialog.dismissWithAnimation();
+                                Toast.makeText(VendorDetailsActivity.this, "Credentials saved successfully", Toast.LENGTH_SHORT).show();
+                                finish();
+                            }
+                        }).setCancelClickListener(new KAlertDialog.KAlertClickListener() {
+                            @Override
+                            public void onClick(KAlertDialog kAlertDialog) {
+                                kAlertDialog.dismissWithAnimation();
+                            }
+                        });
 
-                verifyAuthURL();
+                kAlertDialog.setCanceledOnTouchOutside(true);
+                kAlertDialog.create();
+                kAlertDialog.show();
+//                verifyAuthURL();
             }
         });
     }
