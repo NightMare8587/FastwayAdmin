@@ -39,6 +39,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.consumers.fastwayadmin.DiscountCombo.ComboAndOffers;
+import com.consumers.fastwayadmin.DiscountCombo.CustomOffer;
 import com.consumers.fastwayadmin.DiscountCombo.DiscountActivity;
 import com.consumers.fastwayadmin.NavFrags.homeFrag.homeFragClass;
 import com.consumers.fastwayadmin.R;
@@ -194,9 +195,9 @@ public class HomeFrag extends Fragment {
                     .setSecondButtonColor(Color.parseColor("#fee9b2"))
                     .setSecondButtonTextColor(Color.parseColor("#000000"))
                     .setSecondButtonText("COMBO/THALI")
-//                    .setThirdButtonColor(Color.parseColor("#fbd1b7"))
-//                    .setThirdButtonTextColor(Color.parseColor("#000000"))
-//                    .setThirdButtonText("ADD CUSTOM OFFER")
+                    .setThirdButtonColor(Color.parseColor("#fbd1b7"))
+                    .setThirdButtonTextColor(Color.parseColor("#000000"))
+                    .setThirdButtonText("ADD CUSTOM OFFER")
                     .withFirstButtonListner(view11 -> {
                         startActivity(new Intent(getContext(), DiscountActivity.class));
                         flatDialog.dismiss();
@@ -205,10 +206,10 @@ public class HomeFrag extends Fragment {
                         startActivity(new Intent(getContext(), ComboAndOffers.class));
                         flatDialog.dismiss();
                     })
-//                    .withThirdButtonListner(view113 -> {
-//                        flatDialog.dismiss();
-//                        startActivity(new Intent(getContext(), CustomOffer.class));
-//                    })
+                    .withThirdButtonListner(view113 -> {
+                        flatDialog.dismiss();
+                        startActivity(new Intent(getContext(), CustomOffer.class));
+                    })
                     .show();
 
         });

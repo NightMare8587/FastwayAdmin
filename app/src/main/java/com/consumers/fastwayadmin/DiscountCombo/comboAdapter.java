@@ -1,5 +1,6 @@
 package com.consumers.fastwayadmin.DiscountCombo;
 
+import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,7 +34,7 @@ public class comboAdapter extends RecyclerView.Adapter<comboAdapter.Holder> {
     }
 
     @Override
-    public void onBindViewHolder(@NonNull Holder holder, int position) {
+    public void onBindViewHolder(@NonNull Holder holder, @SuppressLint("RecyclerView") int position) {
         holder.name.setText(name.get(position));
         holder.comboButton.setOnClickListener(new View.OnClickListener() {
             @Override

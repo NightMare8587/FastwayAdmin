@@ -1,5 +1,6 @@
 package com.consumers.fastwayadmin.DiscountCombo;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,6 +10,7 @@ import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -24,6 +26,13 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
+import karpuzoglu.enes.com.fastdialog.Animations;
+import karpuzoglu.enes.com.fastdialog.FastDialog;
+import karpuzoglu.enes.com.fastdialog.FastDialogBuilder;
+import karpuzoglu.enes.com.fastdialog.NegativeClick;
+import karpuzoglu.enes.com.fastdialog.PositiveClick;
+import karpuzoglu.enes.com.fastdialog.Type;
 
 public class SelectDishAdapter extends RecyclerView.Adapter<SelectDishAdapter.holder> {
     List<String> name = new ArrayList<>();
@@ -45,7 +54,7 @@ public class SelectDishAdapter extends RecyclerView.Adapter<SelectDishAdapter.ho
     }
 
     @Override
-    public void onBindViewHolder(@NonNull holder holder, int position) {
+    public void onBindViewHolder(@NonNull holder holder, @SuppressLint("RecyclerView") int position) {
         FirebaseAuth auth = FirebaseAuth.getInstance();
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid()));
         holder.nameOfDish.setText(name.get(position));
@@ -55,22 +64,54 @@ public class SelectDishAdapter extends RecyclerView.Adapter<SelectDishAdapter.ho
         holder.nameOfDish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                new KAlertDialog(context,KAlertDialog.WARNING_TYPE)
-                        .setTitleText("Add To Combo")
-                        .setContentText("You sure wanna add this to combo")
-                        .setConfirmText("Yes, Add it")
-                        .setConfirmClickListener(new KAlertDialog.KAlertClickListener() {
-                            @Override
-                            public void onClick(KAlertDialog kAlertDialog) {
-                                reference.child("Current combo").child(name.get(position)).child("name").setValue(name.get(position));
-                                kAlertDialog.dismissWithAnimation();
-                            }
-                        }).setCancelText("No, Wait").setCancelClickListener(new KAlertDialog.KAlertClickListener() {
+                FastDialog fastDialog = new FastDialogBuilder(view.getContext(), Type.DIALOG)
+                        .setTitleText("Enter Quantity")
+                        .setText("Enter quantity of dish")
+                        .setHint("Enter here")
+                        .positiveText("Proceed")
+                        .negativeText("Cancel")
+                        .setAnimation(Animations.SLIDE_TOP)
+                        .create();
+
+                fastDialog.show();
+
+                fastDialog.positiveClickListener(new PositiveClick() {
                     @Override
-                    public void onClick(KAlertDialog kAlertDialog) {
-                        kAlertDialog.dismissWithAnimation();
+                    public void onClick(View view) {
+                        if(fastDialog.getInputText().equals("")){
+                            Toast.makeText(view.getContext(), "Field can't be empty", Toast.LENGTH_SHORT).show();
+                        }else{
+                            fastDialog.dismiss();
+                            String inputText = fastDialog.getInputText();
+                            new KAlertDialog(context,KAlertDialog.WARNING_TYPE)
+                                    .setTitleText("Add To Combo")
+                                    .setContentText("You sure wanna add this to combo")
+                                    .setConfirmText("Yes, Add it")
+                                    .setConfirmClickListener(new KAlertDialog.KAlertClickListener() {
+                                        @Override
+                                        public void onClick(KAlertDialog kAlertDialog) {
+                                            reference.child("Current combo").child(name.get(position)).child("name").setValue(name.get(position));
+                                            reference.child("Current combo").child(name.get(position)).child("quantity").setValue(inputText);
+                                            kAlertDialog.dismissWithAnimation();
+                                        }
+                                    }).setCancelText("No, Wait").setCancelClickListener(new KAlertDialog.KAlertClickListener() {
+                                @Override
+                                public void onClick(KAlertDialog kAlertDialog) {
+                                    kAlertDialog.dismissWithAnimation();
+                                }
+                            }).show();
+
+                        }
                     }
-                }).show();
+                });
+
+                fastDialog.negativeClickListener(new NegativeClick() {
+                    @Override
+                    public void onClick(View view) {
+                        fastDialog.dismiss();
+                    }
+                });
+
             }
         });
     }

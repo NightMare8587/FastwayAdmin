@@ -40,6 +40,7 @@ import mehdi.sakout.fancybuttons.FancyButton;
 public class ComboAndOffers extends AppCompatActivity {
     FancyButton mainCourse,breads,snacks,deserts,drinks;
     RecyclerView recyclerView;
+    List<String> dishQuantity = new ArrayList<>();
     DatabaseReference reference;
     Button createCombo;
     List<String> name = new ArrayList<>();
@@ -126,12 +127,13 @@ public class ComboAndOffers extends AppCompatActivity {
                                                                 if (snapshot.exists()) {
                                                                     for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                                                                         name.add(dataSnapshot.child("name").getValue(String.class));
+                                                                        dishQuantity.add(dataSnapshot.child("quantity").getValue(String.class));
                                                                     }
                                                                     reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid()));
                                                                     reference.child("Current combo").removeValue();
                                                                     reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid())).child("List of Dish");
                                                                     for (int i = 0; i < name.size(); i++) {
-                                                                        combo combo = new combo(name.get(i));
+                                                                        combo combo = new combo(name.get(i),dishQuantity.get(i));
                                                                         reference.child("Combo").child(comboName).child(name.get(i)).child("name").setValue(combo);
                                                                     }
                                                                     reference.child("Combo").child(comboName).child("price").setValue(priceDialog.getInputText());
@@ -141,6 +143,7 @@ public class ComboAndOffers extends AppCompatActivity {
                                                                     reference.child("Combo").child(comboName).child("totalRate").setValue("0");
 
                                                                     name.clear();
+                                                                    dishQuantity.clear();
                                                                     recyclerView.setAdapter(new comboAdapter(name));
                                                                     new KAlertDialog(ComboAndOffers.this, KAlertDialog.SUCCESS_TYPE)
                                                                             .setTitleText("Success")
@@ -324,13 +327,16 @@ public class ComboAndOffers extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.exists()){
                     name.clear();
+                    dishQuantity.clear();
 //                    Toast.makeText(ComboAndOffers.this, "Yes", Toast.LENGTH_SHORT).show();
                     for(DataSnapshot dataSnapshot : snapshot.getChildren()){
 //                       Toast.makeText(ComboAndOffers.this, ""+dataSnapshot.child("name").getValue(), Toast.LENGTH_SHORT).show();
                         name.add(String.valueOf(dataSnapshot.child("name").getValue()));
+                        dishQuantity.add(String.valueOf(dataSnapshot.child("quantity").getValue()));
                     }
                     createCombo.setVisibility(View.VISIBLE);
                     Log.i("log",name.toString());
+                    Log.i("log",dishQuantity.toString());
                     recyclerView.setLayoutManager(horizonatl);
                     recyclerView.setAdapter(new comboAdapter(name));
                 }else {
