@@ -26,6 +26,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.consumers.fastwayadmin.Info.MapsActivity;
 import com.consumers.fastwayadmin.Info.MapsActivity2;
 import com.consumers.fastwayadmin.Login.MainActivity;
+import com.consumers.fastwayadmin.NavFrags.EditCredClass;
 import com.consumers.fastwayadmin.NavFrags.EditVendorDetails;
 import com.consumers.fastwayadmin.NavFrags.VendorDetailsActivity;
 import com.consumers.fastwayadmin.R;
@@ -314,7 +315,9 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
                         break;
 
                     case 4:
-                        startActivity(new Intent(MyAccount.this, EditVendorDetails.class));
+                        Intent intent = new Intent(MyAccount.this, EditVendorDetails.class);
+                        startActivityForResult(intent,2);
+                        break;
 
 
                 }
@@ -641,6 +644,17 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
                            kAlertDialog.dismissWithAnimation();
                        }
                    }).show();
+        }else if(resultCode == 100){
+            new KAlertDialog(MyAccount.this,KAlertDialog.SUCCESS_TYPE)
+                    .setTitleText("Success")
+                    .setContentText("If Approved credentials will be changes in next 24hrs")
+                    .setConfirmText("Great")
+                    .setConfirmClickListener(new KAlertDialog.KAlertClickListener() {
+                        @Override
+                        public void onClick(KAlertDialog kAlertDialog) {
+                            kAlertDialog.dismissWithAnimation();
+                        }
+                    }).show();
         }
     }
 }

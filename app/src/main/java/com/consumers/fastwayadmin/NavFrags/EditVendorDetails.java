@@ -86,38 +86,41 @@ public class EditVendorDetails extends AppCompatActivity {
                         .setConfirmText("Yes")
                         .setCancelText("No, Wait")
                         .setConfirmClickListener(kAlertDialog1 -> {
-                            RequestQueue requestQueue = Volley.newRequestQueue(EditVendorDetails.this);
-                            StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
-                                @Override
-                                public void onResponse(String response) {
-                                    if(response != null){
-                                        Log.i("response",response);
-                                        Toast.makeText(EditVendorDetails.this, "Changes Saved Successfully", Toast.LENGTH_SHORT).show();
-                                        finish();
-                                    }
-                                }
-                            }, new Response.ErrorListener() {
-                                @Override
-                                public void onErrorResponse(VolleyError error) {
-                                    Log.i("error",error.getLocalizedMessage() + " ");
-                                }
-                            }){
-                                @NonNull
-                                @Override
-                                public Map<String, String> getParams() throws AuthFailureError {
-                                    Map<String,String> params = new HashMap<>();
-                                    params.put("name",name + "");
-                                    params.put("email",email + "");
-                                    params.put("phone",phone);
-                                    params.put("AccountNumber",acNumber);
-                                    params.put("AccountName",acName);
-                                    params.put("ifscCode",acIFSC);
-                                    params.put("vendorID",mauthId);
-                                    Log.i("details",name +  " " + mauthId + " ");
-                                    return params;
-                                }
-                            };
-                            requestQueue.add(stringRequest);
+                            EditCredClass editCredClass = new EditCredClass(name,email,acNumber,acName,acIFSC,phone,auth.getUid() + "");
+                            DatabaseReference changeCred = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Changes Credentials");
+                            changeCred.child(auth.getUid()).setValue(editCredClass);
+//                            RequestQueue requestQueue = Volley.newRequestQueue(EditVendorDetails.this);
+//                            StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+//                                @Override
+//                                public void onResponse(String response) {
+//                                    if(response != null){
+//                                        Log.i("response",response);
+//                                        Toast.makeText(EditVendorDetails.this, "Changes Saved Successfully", Toast.LENGTH_SHORT).show();
+//                                        finish();
+//                                    }
+//                                }
+//                            }, new Response.ErrorListener() {
+//                                @Override
+//                                public void onErrorResponse(VolleyError error) {
+//                                    Log.i("error",error.getLocalizedMessage() + " ");
+//                                }
+//                            }){
+//                                @NonNull
+//                                @Override
+//                                public Map<String, String> getParams() throws AuthFailureError {
+//                                    Map<String,String> params = new HashMap<>();
+//                                    params.put("name",name + "");
+//                                    params.put("email",email + "");
+//                                    params.put("phone",phone);
+//                                    params.put("AccountNumber",acNumber);
+//                                    params.put("AccountName",acName);
+//                                    params.put("ifscCode",acIFSC);
+//                                    params.put("vendorID",mauthId);
+//                                    Log.i("details",name +  " " + mauthId + " ");
+//                                    return params;
+//                                }
+//                            };
+//                            requestQueue.add(stringRequest);
                             VendorBankClass vendorBankClass = new VendorBankClass(name,email,acNumber,acName,acIFSC,phone,mauthId);
                             editor.putString("vendorDetails","yes");
                             editor.putString("accountNumber",acNumber);
@@ -125,7 +128,10 @@ public class EditVendorDetails extends AppCompatActivity {
                             editor.putString("ifscCode",acIFSC);
                             editor.apply();
                             reference.child("Bank Details").setValue(vendorBankClass);
+                            setResult(100);
                             kAlertDialog1.dismissWithAnimation();
+                            finish();
+
                         }).setCancelClickListener(new KAlertDialog.KAlertClickListener() {
                             @Override
                             public void onClick(KAlertDialog kAlertDialog) {
