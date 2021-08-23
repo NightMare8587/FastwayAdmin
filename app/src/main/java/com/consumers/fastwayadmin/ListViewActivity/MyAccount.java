@@ -26,6 +26,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.consumers.fastwayadmin.Info.MapsActivity;
 import com.consumers.fastwayadmin.Info.MapsActivity2;
 import com.consumers.fastwayadmin.Login.MainActivity;
+import com.consumers.fastwayadmin.NavFrags.EditVendorDetails;
+import com.consumers.fastwayadmin.NavFrags.VendorDetailsActivity;
 import com.consumers.fastwayadmin.R;
 import com.developer.kalert.KAlertDialog;
 import com.example.flatdialoglibrary.dialog.FlatDialog;
@@ -71,7 +73,7 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
     PhoneAuthCredential credential;
     ModalBottomSheetDialog modalBottomSheetDialog;
     TextView textView;
-    String[] names = {"Change Credentials (Admin)","Change Credentials (Restaurants)","Change Mobile Number","Delete Account"};
+    String[] names = {"Change Credentials (Admin)","Change Credentials (Restaurants)","Change Mobile Number","Delete Account","Change Bank Credentials"};
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -310,6 +312,9 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
                                     }
                                 }).show();
                         break;
+
+                    case 4:
+                        startActivity(new Intent(MyAccount.this, EditVendorDetails.class));
 
 
                 }
