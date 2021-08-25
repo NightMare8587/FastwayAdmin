@@ -215,8 +215,6 @@ public class TablesFrag extends Fragment {
                     table.setAdapter(tableView);
                     tableView.notifyDataSetChanged();
 
-                }else{
-                    Toast.makeText(getContext(), "Add Some Tables!!!", Toast.LENGTH_SHORT).show();
                 }
 
             }
@@ -231,19 +229,7 @@ public class TablesFrag extends Fragment {
     private class MyTask extends AsyncTask<Void,Void,Void>{
 
         @Override
-        protected void onProgressUpdate(Void... values) {
-            super.onProgressUpdate(values);
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-
-        @Override
-        protected void onPostExecute(Void unused) {
-            super.onPostExecute(unused);
+        protected Void doInBackground(Void... voids) {
             tableRef.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -264,8 +250,6 @@ public class TablesFrag extends Fragment {
                         table.setAdapter(tableView);
                         tableView.notifyDataSetChanged();
 
-                    }else{
-                        Toast.makeText(getContext(), "Add Some Tables!!!", Toast.LENGTH_SHORT).show();
                     }
 
                 }
@@ -275,10 +259,6 @@ public class TablesFrag extends Fragment {
 
                 }
             });
-        }
-
-        @Override
-        protected Void doInBackground(Void... voids) {
             return null;
         }
     }

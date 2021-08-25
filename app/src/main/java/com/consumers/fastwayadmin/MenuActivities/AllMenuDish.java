@@ -204,7 +204,6 @@ public class AllMenuDish extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(!snapshot.exists()){
-                    Toast.makeText(AllMenuDish.this, "Empty!! Add Some Dish", Toast.LENGTH_SHORT).show();
                     loading.setVisibility(View.INVISIBLE);
                 }else{
                     names.clear();

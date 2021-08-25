@@ -24,6 +24,7 @@
         android:name=".ServiceInitiatorClass"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar"
@@ -43,23 +44,34 @@
         <activity
             android:name=".RandomChatNoww"
             android:exported="true" />
-        <activity android:name=".HomeScreen.ReportSupport.ReportCustomer" />
-        <activity android:name=".MenuActivities.Combo.SelectDishForCurrentCombo" />
-        <activity android:name=".MenuActivities.Combo.AddDishToCurrentCombo" />
-        <activity android:name=".MenuActivities.Combo.AddRemoveItemCombo" />
-        <activity android:name=".NavFrags.homeFrag.ApproveCurrentOrder" />
+        <activity android:name=".HomeScreen.ReportSupport.ReportCustomer"
+            android:exported="true"/>
+        <activity android:name=".MenuActivities.Combo.SelectDishForCurrentCombo"
+            android:exported="true"/>
+        <activity android:name=".MenuActivities.Combo.AddDishToCurrentCombo"
+            android:exported="true"/>
+        <activity android:name=".MenuActivities.Combo.AddRemoveItemCombo"
+            android:exported="true"/>
+        <activity android:name=".NavFrags.homeFrag.ApproveCurrentOrder"
+            android:exported="true"/>
 
         <service
             android:name=".MyService"
             android:enabled="true"
             android:exported="true" />
 
-        <activity android:name=".HomeScreen.FaqActivity" />
-        <activity android:name=".MenuActivities.Combo.ComboMenuDish" />
-        <activity android:name=".HomeScreen.LiveChat.LiveChatActivity" />
-        <activity android:name=".SplashAndIntro.IntroActivity" />
-        <activity android:name=".HomeScreen.SupportActivity" />
-        <activity android:name=".Chat.DisplayAllAvaialbleChats" />
+        <activity android:name=".HomeScreen.FaqActivity"
+            android:exported="true"/>
+        <activity android:name=".MenuActivities.Combo.ComboMenuDish"
+            android:exported="true"/>
+        <activity android:name=".HomeScreen.LiveChat.LiveChatActivity"
+            android:exported="true"/>
+        <activity android:name=".SplashAndIntro.IntroActivity"
+            android:exported="true"/>
+        <activity android:name=".HomeScreen.SupportActivity"
+            android:exported="true"/>
+        <activity android:name=".Chat.DisplayAllAvaialbleChats"
+            android:exported="true"/>
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
@@ -74,27 +86,44 @@
 
         <activity
             android:name=".Info.MapsActivity2"
+            android:exported="true"
             android:label="@string/title_activity_maps2" />
-        <activity android:name=".DiscountCombo.SelectDishForCombo" />
+        <activity android:name=".DiscountCombo.SelectDishForCombo"
+            android:exported="true"/>
         <activity
             android:name=".Tables.ChatWithCustomer"
+            android:exported="true"
             android:windowSoftInputMode="adjustResize" />
-        <activity android:name=".DiscountCombo.CustomOffer" />
-        <activity android:name=".DiscountCombo.ComboAndOffers" />
-        <activity android:name=".DiscountCombo.DiscountActivity" />
-        <activity android:name=".MenuActivities.CustomDishImageSearch" />
-        <activity android:name=".ListViewActivity.MyOrders" />
-        <activity android:name=".ListViewActivity.MyAccount" />
-        <activity android:name=".MenuActivities.SearchYourDish" />
+        <activity android:name=".DiscountCombo.CustomOffer"
+            android:exported="true"/>
+        <activity android:name=".DiscountCombo.ComboAndOffers"
+            android:exported="true"/>
+        <activity android:name=".DiscountCombo.DiscountActivity"
+            android:exported="true"/>
+        <activity android:name=".MenuActivities.CustomDishImageSearch"
+            android:exported="true"/>
+        <activity android:name=".ListViewActivity.MyOrders"
+            android:exported="true"/>
+        <activity android:name=".ListViewActivity.MyAccount"
+            android:exported="true"/>
+        <activity android:name=".MenuActivities.SearchYourDish"
+            android:exported="true"/>
         <activity
             android:name=".Info.MapsActivity"
+            android:exported="true"
             android:label="@string/title_activity_maps" />
-        <activity android:name=".NotificationActivity" />
-        <activity android:name=".Login.AlreadyHavAccount" />
-        <activity android:name=".MenuActivities.EditMenu" />
-        <activity android:name=".Tables.AddTables" />
-        <activity android:name=".MenuActivities.CreateDish" />
-        <activity android:name=".MenuActivities.AllMenuDish" />
+        <activity android:name=".NotificationActivity"
+            android:exported="true"/>
+        <activity android:name=".Login.AlreadyHavAccount"
+            android:exported="true"/>
+        <activity android:name=".MenuActivities.EditMenu"
+            android:exported="true"/>
+        <activity android:name=".Tables.AddTables"
+            android:exported="true"/>
+        <activity android:name=".MenuActivities.CreateDish"
+            android:exported="true"/>
+        <activity android:name=".MenuActivities.AllMenuDish"
+            android:exported="true"/>
 
         <service
             android:name=".FirebaseNotification"
@@ -118,16 +147,20 @@
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
 
-        <activity android:name=".HomeScreen.HomeScreen" />
-        <activity android:name=".Info.Info" />
-        <activity android:name=".SplashAndIntro.SplashScreen">
+        <activity android:name=".HomeScreen.HomeScreen"
+            android:exported="true"/>
+        <activity android:name=".Info.Info"
+            android:exported="true"/>
+        <activity android:name=".SplashAndIntro.SplashScreen"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Login.MainActivity">
+        <activity android:name=".Login.MainActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
