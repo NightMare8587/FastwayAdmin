@@ -1,5 +1,6 @@
 package com.consumers.fastwayadmin.Dish.SearchDishFastway;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.view.LayoutInflater;
@@ -47,7 +48,7 @@ public class SearchFastwayClass extends RecyclerView.Adapter<SearchFastwayClass.
     }
 
     @Override
-    public void onBindViewHolder(@NonNull Holder holder, int position) {
+    public void onBindViewHolder(@NonNull Holder holder, @SuppressLint("RecyclerView") int position) {
         holder.name.setText(dishName.get(position));
         Picasso.get().load(dishImage.get(position)).centerCrop().resize(100,100).into(holder.imageView);
         holder.cardView.setOnClickListener(v -> {
