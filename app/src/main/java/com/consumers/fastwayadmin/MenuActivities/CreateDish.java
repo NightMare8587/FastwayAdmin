@@ -26,6 +26,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.consumers.fastwayadmin.Dish.DishInfo;
+import com.consumers.fastwayadmin.Dish.SearchDishFastway.SearchFastwayDatabase;
 import com.consumers.fastwayadmin.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -74,7 +75,9 @@ public class CreateDish extends AppCompatActivity {
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(getApplicationContext(),SearchYourDish.class));
+                Intent intent = new Intent(getApplicationContext(), SearchFastwayDatabase.class);
+                intent.putExtra("dish",menuType);
+                startActivity(intent);
             }
         });
 

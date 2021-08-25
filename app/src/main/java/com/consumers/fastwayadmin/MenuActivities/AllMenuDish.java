@@ -1,5 +1,12 @@
 package com.consumers.fastwayadmin.MenuActivities;
 
+import android.content.Intent;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.ProgressBar;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -7,15 +14,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import android.content.Intent;
-import android.os.AsyncTask;
-import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
-import android.widget.ProgressBar;
-import android.widget.Toast;
-
 import com.consumers.fastwayadmin.Dish.DishView;
+import com.consumers.fastwayadmin.Dish.SearchDishFastway.SearchFastwayDatabase;
 import com.consumers.fastwayadmin.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
@@ -129,6 +129,7 @@ public class AllMenuDish extends AppCompatActivity {
                 Intent intent = new Intent(getApplicationContext(),CreateDish.class);
                 intent.putExtra("Dish",getIntent().getStringExtra("Dish"));
                 startActivity(intent);
+
             }
         });
 
