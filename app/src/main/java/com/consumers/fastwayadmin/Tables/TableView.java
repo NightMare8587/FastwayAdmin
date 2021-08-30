@@ -12,6 +12,8 @@ import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -74,7 +76,7 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
 
     @SuppressLint("SetTextI18n")
     @Override
-    public void onBindViewHolder(@NonNull TableAdapter holder, int position) {
+    public void onBindViewHolder(@NonNull TableAdapter holder, @SuppressLint("RecyclerView") int position) {
         auth = FirebaseAuth.getInstance();
         reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(auth.getUid()).child("Tables");
         holder.tableNum.setText("Table Number : " + tables.get(position));
@@ -111,49 +113,73 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
                             .setConfirmClickListener(new KAlertDialog.KAlertClickListener() {
                                 @Override
                                 public void onClick(KAlertDialog kAlertDialog) {
-                                    RequestQueue requestQueue = Volley.newRequestQueue(view.getContext());
-                                    JSONObject main = new JSONObject();
-                                    try{
-                                        main.put("to","/topics/"+myList.get(0)+"");
-                                        JSONObject notification = new JSONObject();
-                                        notification.put("title","Cancelled" );
-                                        notification.put("click_action","Table Frag");
-                                        notification.put("body","Your Reserved Tables is cancelled by the owner");
-                                        main.put("notification",notification);
+                                    AlertDialog.Builder alertD = new AlertDialog.Builder(view.getContext());
+                                    alertD.setTitle("Important");
+                                    alertD.setMessage("Enter reason for cancellation of table below");
+                                    LinearLayout linearLayout = new LinearLayout(view.getContext());
+                                    EditText editText = new EditText(view.getContext());
+                                    editText.setMaxLines(200);
+                                    editText.setHint("Enter reason here");
+                                    linearLayout.addView(editText);
+                                    alertD.setView(linearLayout);
+                                    alertD.setPositiveButton("Proceed", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                            if(!editText.getText().toString().equals("")) {
+                                                RequestQueue requestQueue = Volley.newRequestQueue(view.getContext());
+                                                JSONObject main = new JSONObject();
+                                                try {
+                                                    main.put("to", "/topics/" + myList.get(0) + "");
+                                                    JSONObject notification = new JSONObject();
+                                                    notification.put("title", "Table Cancelled");
+                                                    notification.put("click_action", "Table Frag");
+                                                    notification.put("body", "Your Tables is cancelled by the owner\n" + editText.getText().toString() + "");
+                                                    main.put("notification", notification);
+                                                    dialogInterface.dismiss();
+                                                    JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, main, new Response.Listener<JSONObject>() {
+                                                        @Override
+                                                        public void onResponse(JSONObject response) {
 
-                                        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, main, new Response.Listener<JSONObject>() {
-                                            @Override
-                                            public void onResponse(JSONObject response) {
+                                                        }
+                                                    }, new Response.ErrorListener() {
+                                                        @Override
+                                                        public void onErrorResponse(VolleyError error) {
+                                                            Toast.makeText(view.getContext(), error.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
+                                                        }
+                                                    }) {
+                                                        @Override
+                                                        public Map<String, String> getHeaders() throws AuthFailureError {
+                                                            Map<String, String> header = new HashMap<>();
+                                                            header.put("content-type", "application/json");
+                                                            header.put("authorization", "key=AAAAsigSEMs:APA91bEUF9ZFwIu84Jctci56DQd0TQOepztGOIKIBhoqf7N3ueQrkClw0xBTlWZEWyvwprXZmZgW2MNywF1pNBFpq1jFBr0CmlrJ0wygbZIBOnoZ0jP1zZC6nPxqF2MAP6iF3wuBHD2R");
+                                                            return header;
+                                                        }
+                                                    };
 
-                                            }
-                                        }, new Response.ErrorListener() {
-                                            @Override
-                                            public void onErrorResponse(VolleyError error) {
-                                                Toast.makeText(view.getContext(), error.getLocalizedMessage()+"null", Toast.LENGTH_SHORT).show();
-                                            }
-                                        }){
-                                            @Override
-                                            public Map<String, String> getHeaders() throws AuthFailureError {
-                                                Map<String,String> header = new HashMap<>();
-                                                header.put("content-type","application/json");
-                                                header.put("authorization","key=AAAAsigSEMs:APA91bEUF9ZFwIu84Jctci56DQd0TQOepztGOIKIBhoqf7N3ueQrkClw0xBTlWZEWyvwprXZmZgW2MNywF1pNBFpq1jFBr0CmlrJ0wygbZIBOnoZ0jP1zZC6nPxqF2MAP6iF3wuBHD2R");
-                                                return header;
-                                            }
-                                        };
-
-                                        requestQueue.add(jsonObjectRequest);
-                                    }
-                                    catch (Exception e){
-                                        Toast.makeText(view.getContext(), e.getLocalizedMessage()+"null", Toast.LENGTH_SHORT).show();
-                                    }
-                                    reference.child(tables.get(position)).child("customerId").removeValue();
-                                    reference.child(tables.get(position)).child("status").setValue("available");
+                                                    requestQueue.add(jsonObjectRequest);
+                                                } catch (Exception e) {
+                                                    Toast.makeText(view.getContext(), e.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
+                                                }
+                                                reference.child(tables.get(position)).child("customerId").removeValue();
+                                                reference.child(tables.get(position)).child("status").setValue("available");
 //                                    reference.child(tables.get(position)).child("time").removeValue();
-                                    holder.chatWith.setVisibility(View.INVISIBLE);
-                                    holder.cancel.setVisibility(View.INVISIBLE);
-                                    holder.status.setText("available");
+                                                holder.chatWith.setVisibility(View.INVISIBLE);
+                                                holder.cancel.setVisibility(View.INVISIBLE);
+                                                holder.status.setText("available");
 //                                    holder.timeOfReserved.setVisibility(View.INVISIBLE);
-                                    kAlertDialog.dismissWithAnimation();
+                                                kAlertDialog.dismissWithAnimation();
+                                            }
+                                        }
+                                    });
+                                    alertD.setNegativeButton("No, Wait", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+
+                                        }
+                                    });
+
+                                    alertD.create().show();
+
 
                                 }
                             }).show();
@@ -195,49 +221,75 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
                             .setConfirmClickListener(new KAlertDialog.KAlertClickListener() {
                                 @Override
                                 public void onClick(KAlertDialog kAlertDialog) {
-                                    RequestQueue requestQueue = Volley.newRequestQueue(view.getContext());
-                                    JSONObject main = new JSONObject();
-                                    try{
-                                        main.put("to","/topics/"+myList.get(0)+"");
-                                        JSONObject notification = new JSONObject();
-                                        notification.put("title","Cancelled" );
-                                        notification.put("click_action","Table Frag");
-                                        notification.put("body","Your Reserved Tables is cancelled by the owner");
-                                        main.put("notification",notification);
-
-                                        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, main, new Response.Listener<JSONObject>() {
-                                            @Override
-                                            public void onResponse(JSONObject response) {
-
-                                            }
-                                        }, new Response.ErrorListener() {
-                                            @Override
-                                            public void onErrorResponse(VolleyError error) {
-                                                Toast.makeText(view.getContext(), error.getLocalizedMessage()+"null", Toast.LENGTH_SHORT).show();
-                                            }
-                                        }){
-                                            @Override
-                                            public Map<String, String> getHeaders() throws AuthFailureError {
-                                                Map<String,String> header = new HashMap<>();
-                                                header.put("content-type","application/json");
-                                                header.put("authorization","key=AAAAsigSEMs:APA91bEUF9ZFwIu84Jctci56DQd0TQOepztGOIKIBhoqf7N3ueQrkClw0xBTlWZEWyvwprXZmZgW2MNywF1pNBFpq1jFBr0CmlrJ0wygbZIBOnoZ0jP1zZC6nPxqF2MAP6iF3wuBHD2R");
-                                                return header;
-                                            }
-                                        };
-
-                                        requestQueue.add(jsonObjectRequest);
-                                    }
-                                    catch (Exception e){
-                                        Toast.makeText(view.getContext(), e.getLocalizedMessage()+"null", Toast.LENGTH_SHORT).show();
-                                    }
-                                    reference.child(tables.get(position)).child("customerId").removeValue();
-                                    reference.child(tables.get(position)).child("status").setValue("available");
-                                    reference.child(tables.get(position)).child("time").removeValue();
-                                    holder.chatWith.setVisibility(View.INVISIBLE);
-                                    holder.cancel.setVisibility(View.INVISIBLE);
-                                    holder.status.setText("available");
-                                    holder.timeOfReserved.setVisibility(View.INVISIBLE);
                                     kAlertDialog.dismissWithAnimation();
+                                    AlertDialog.Builder alertD = new AlertDialog.Builder(view.getContext());
+                                    alertD.setTitle("Important");
+                                    alertD.setMessage("Enter reason for cancellation of table below");
+                                    LinearLayout linearLayout = new LinearLayout(view.getContext());
+                                    EditText editText = new EditText(view.getContext());
+                                    linearLayout.setOrientation(LinearLayout.VERTICAL);
+                                    editText.setHint("Enter reason here");
+                                    linearLayout.addView(editText);
+                                    alertD.setView(linearLayout);
+                                    alertD.setPositiveButton("Proceed", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                            if(!editText.getText().toString().equals("")) {
+                                                RequestQueue requestQueue = Volley.newRequestQueue(view.getContext());
+                                                JSONObject main = new JSONObject();
+                                                try {
+                                                    main.put("to", "/topics/" + myList.get(0) + "");
+                                                    JSONObject notification = new JSONObject();
+                                                    notification.put("title", "Reserved Table Cancelled");
+                                                    notification.put("click_action", "Table Frag");
+                                                    notification.put("body", "Your Reserved Tables is cancelled by the owner\n" + editText.getText().toString() + "");
+                                                    main.put("notification", notification);
+                                                    dialogInterface.dismiss();
+                                                    JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, main, new Response.Listener<JSONObject>() {
+                                                        @Override
+                                                        public void onResponse(JSONObject response) {
+
+                                                        }
+                                                    }, new Response.ErrorListener() {
+                                                        @Override
+                                                        public void onErrorResponse(VolleyError error) {
+                                                            Toast.makeText(view.getContext(), error.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
+                                                        }
+                                                    }) {
+                                                        @Override
+                                                        public Map<String, String> getHeaders() throws AuthFailureError {
+                                                            Map<String, String> header = new HashMap<>();
+                                                            header.put("content-type", "application/json");
+                                                            header.put("authorization", "key=AAAAsigSEMs:APA91bEUF9ZFwIu84Jctci56DQd0TQOepztGOIKIBhoqf7N3ueQrkClw0xBTlWZEWyvwprXZmZgW2MNywF1pNBFpq1jFBr0CmlrJ0wygbZIBOnoZ0jP1zZC6nPxqF2MAP6iF3wuBHD2R");
+                                                            return header;
+                                                        }
+                                                    };
+
+                                                    requestQueue.add(jsonObjectRequest);
+                                                } catch (Exception e) {
+                                                    Toast.makeText(view.getContext(), e.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
+                                                }
+                                                reference.child(tables.get(position)).child("customerId").removeValue();
+                                                reference.child(tables.get(position)).child("status").setValue("available");
+//                                    reference.child(tables.get(position)).child("time").removeValue();
+                                                holder.chatWith.setVisibility(View.INVISIBLE);
+                                                holder.cancel.setVisibility(View.INVISIBLE);
+                                                holder.status.setText("available");
+//                                    holder.timeOfReserved.setVisibility(View.INVISIBLE);
+
+                                            }
+                                        }
+                                    });
+                                    alertD.setNegativeButton("No, Wait", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+
+                                        }
+                                    });
+
+                                    alertD.create().show();
+
+
 
                                 }
                             }).show();
