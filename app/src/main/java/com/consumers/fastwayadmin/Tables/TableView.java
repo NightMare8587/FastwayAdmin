@@ -120,15 +120,18 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
                                     EditText editText = new EditText(view.getContext());
                                     editText.setMaxLines(200);
                                     editText.setHint("Enter reason here");
+                                    linearLayout.setOrientation(LinearLayout.VERTICAL);
                                     linearLayout.addView(editText);
                                     alertD.setView(linearLayout);
                                     alertD.setPositiveButton("Proceed", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialogInterface, int i) {
                                             if(!editText.getText().toString().equals("")) {
+                                                kAlertDialog.dismissWithAnimation();
                                                 RequestQueue requestQueue = Volley.newRequestQueue(view.getContext());
                                                 JSONObject main = new JSONObject();
                                                 try {
+
                                                     main.put("to", "/topics/" + myList.get(0) + "");
                                                     JSONObject notification = new JSONObject();
                                                     notification.put("title", "Table Cancelled");
@@ -167,7 +170,7 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
                                                 holder.cancel.setVisibility(View.INVISIBLE);
                                                 holder.status.setText("available");
 //                                    holder.timeOfReserved.setVisibility(View.INVISIBLE);
-                                                kAlertDialog.dismissWithAnimation();
+
                                             }
                                         }
                                     });
