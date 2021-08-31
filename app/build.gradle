@@ -97,4 +97,7 @@ dependencies {
 
     implementation 'com.google.firebase:firebase-storage'
 
+    implementation 'com.google.firebase:firebase-dynamic-links'
+    implementation 'com.google.firebase:firebase-analytics'
+
 }

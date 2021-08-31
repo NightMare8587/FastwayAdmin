@@ -340,7 +340,7 @@ public class ComboAndOffers extends AppCompatActivity {
                     recyclerView.setLayoutManager(horizonatl);
                     recyclerView.setAdapter(new comboAdapter(name));
                 }else {
-                    Toast.makeText(ComboAndOffers.this, "Something Went Wrong", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(ComboAndOffers.this, "Something Went Wrong", Toast.LENGTH_SHORT).show();
                     createCombo.setVisibility(View.INVISIBLE);
                 }
             }
