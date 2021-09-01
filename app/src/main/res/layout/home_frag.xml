@@ -12,7 +12,7 @@
         android:id="@+id/comboDiscountImageView"
         android:layout_width="330dp"
         android:layout_height="120dp"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="10dp"
         android:scaleType="fitXY"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -22,7 +22,7 @@
     <LinearLayout
         android:id="@+id/mainFragLinearLayout"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="200dp"
         android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp"
         android:orientation="vertical"
@@ -88,25 +88,95 @@
 
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/secondFragLinearLayout"
+        android:layout_width="0dp"
+        android:layout_height="200dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="10dp"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/mainFragLinearLayout"
+        tools:ignore="HardcodedText">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_gravity="center"
+            android:layout_weight="0.2"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="14dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_weight="0.6"
+                android:padding="3dp"
+                android:text="Current Takeaway's"
+                android:textAlignment="textStart"
+                android:textAllCaps="true"
+                android:textColor="@color/black"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/refreshCurrentTakeAway"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginBottom="4dp"
+                android:layout_weight="0.3"
+                android:background="@null"
+                android:drawableStart="@drawable/ic_baseline_refresh_24"
+                android:text="Refresh"
+                android:textAlignment="center"
+                android:textColor="@color/quantum_cyan"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.8"
+            android:orientation="vertical">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/homeFragTakeAwayRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:reverseLayout="true" />
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/homeFragToolBar"
         android:layout_width="match_parent"
-        android:layout_height="58dp"
+        android:layout_height="55dp"
         android:background="@drawable/toolbar"
-        android:minHeight="55dp"
         android:maxHeight="60dp"
+        android:minHeight="55dp"
         android:theme="?attr/actionBarTheme"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:titleTextColor="@color/black"
-        app:title="Home" />
+        app:title="Home"
+        app:titleTextColor="@color/black" />
 
     <Switch
         android:id="@+id/restaurantOnOff"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="5dp"
         android:layout_marginEnd="33dp"
         android:layout_marginBottom="8dp"
         android:checked="true"

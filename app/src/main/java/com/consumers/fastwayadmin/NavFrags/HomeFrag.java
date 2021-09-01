@@ -41,6 +41,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.consumers.fastwayadmin.DiscountCombo.ComboAndOffers;
 import com.consumers.fastwayadmin.DiscountCombo.CustomOffer;
 import com.consumers.fastwayadmin.DiscountCombo.DiscountActivity;
+import com.consumers.fastwayadmin.NavFrags.CurrentTakeAwayOrders.CurrentTakeAway;
 import com.consumers.fastwayadmin.NavFrags.homeFrag.homeFragClass;
 import com.consumers.fastwayadmin.R;
 import com.example.flatdialoglibrary.dialog.FlatDialog;
@@ -80,8 +81,12 @@ import java.util.Objects;
 public class HomeFrag extends Fragment {
 
     FirebaseAuth auth;
-    RecyclerView recyclerView;
-    LinearLayout linearLayout;
+    RecyclerView recyclerView,homeFragTakeAwayRecucler;
+    List<String> currentTakeAwayAuth = new ArrayList<>();
+    List<String> dishNameCurrentTakeAway = new ArrayList<>();
+    List<String> dishQuantityCurrentTakeAway = new ArrayList<>();
+    List<String> userNameTakeAway = new ArrayList<>();
+    LinearLayout linearLayout,secondLinearLayout;
     DatabaseReference checkForBank;
     DatabaseReference onlineOrOfflineRestaurant;
     SharedPreferences accountInfo;
@@ -90,12 +95,12 @@ public class HomeFrag extends Fragment {
     SharedPreferences vendorIdCreated;
     SharedPreferences.Editor vendorIdEditor;
     LocationRequest locationRequest;
-    LinearLayoutManager horizonatl;
+    LinearLayoutManager horizonatl,anotherHori;
     ImageView comboImage;
     SharedPreferences.Editor statusEditor;
     List<List<String>> currentOrdersIfAvailable = new ArrayList<>();
     Toolbar toolbar;
-    Button refershRecyclerView;
+    Button refershRecyclerView,refreshTakeAway;
     List<String> isCurrentOrder = new ArrayList<>();
 //    homeAdapter homeAdapter;
     SharedPreferences sharedPreferences;
@@ -150,6 +155,8 @@ public class HomeFrag extends Fragment {
         statusEditor = restaurantStatus.edit();
         onlineOrOffline = view.findViewById(R.id.restaurantOnOff);
         linearLayout = view.findViewById(R.id.mainFragLinearLayout);
+        homeFragTakeAwayRecucler = view.findViewById(R.id.homeFragTakeAwayRecyclerView);
+        secondLinearLayout = view.findViewById(R.id.secondFragLinearLayout);
         vendorIdCreated = view.getContext().getSharedPreferences("VendorID",Context.MODE_PRIVATE);
         vendorIdEditor = vendorIdCreated.edit();
         new checkBank().execute();
@@ -161,6 +168,7 @@ public class HomeFrag extends Fragment {
         auth = FirebaseAuth.getInstance();
         onlineOrOfflineRestaurant = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid()));
         horizonatl = new LinearLayoutManager(view.getContext(),LinearLayoutManager.HORIZONTAL,false);
+        anotherHori = new LinearLayoutManager(view.getContext(),LinearLayoutManager.HORIZONTAL,false);;
         sharedPreferences = requireActivity().getSharedPreferences("locations current", Context.MODE_PRIVATE);
         reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid()));
         FirebaseMessaging.getInstance().subscribeToTopic(Objects.requireNonNull(auth.getUid()));
@@ -253,7 +261,6 @@ public class HomeFrag extends Fragment {
                 linearLayout.setVisibility(View.VISIBLE);
                 onlineOrOfflineRestaurant.child("status").setValue("online");
                 editor.putString("online","true");
-                editor.apply();
             }else{
                 statusEditor.putString("status","offline");
                 onlineOrOffline.setText("offline");
@@ -262,9 +269,36 @@ public class HomeFrag extends Fragment {
                 linearLayout.setVisibility(View.INVISIBLE);
                 onlineOrOfflineRestaurant.child("status").setValue("offline");
                 editor.putString("online","false");
-                editor.apply();
+            }
+            editor.apply();
+
+        });
+
+        reference.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                new TakeAwayClass().execute();
             }
 
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                new TakeAwayClass().execute();
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+                new TakeAwayClass().execute();
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                new TakeAwayClass().execute();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
         });
 
 
@@ -641,6 +675,53 @@ public class HomeFrag extends Fragment {
                         }).create();
 
                         alertDialog.show();
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+
+            return null;
+        }
+    }
+
+    public class TakeAwayClass extends AsyncTask<Void,Void,Void>{
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            FirebaseAuth auth = FirebaseAuth.getInstance();
+            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid())).child("Current TakeAway");
+            databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if(snapshot.exists()){
+                        currentTakeAwayAuth.clear();
+                        dishNameCurrentTakeAway.clear();
+                        userNameTakeAway.clear();
+                        dishQuantityCurrentTakeAway.clear();
+                        for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                            currentTakeAwayAuth.add(String.valueOf(dataSnapshot.getKey()));
+                            for(DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()){
+                                dishNameCurrentTakeAway.add(String.valueOf(dataSnapshot1.child("name").getValue()));
+                                dishQuantityCurrentTakeAway.add(String.valueOf(dataSnapshot1.child("timesOrdered").getValue()));
+                                userNameTakeAway.add(String.valueOf(dataSnapshot1.child("nameOfUser").getValue()));
+                            }
+                        }
+                        Log.i("Current",currentTakeAwayAuth.toString() + " " + dishNameCurrentTakeAway.toString() + " " + userNameTakeAway.toString());
+                        homeFragTakeAwayRecucler.setLayoutManager(anotherHori);
+                        homeFragTakeAwayRecucler.setAdapter(new CurrentTakeAway(currentTakeAwayAuth,dishNameCurrentTakeAway,dishQuantityCurrentTakeAway,userNameTakeAway));
+
+                    }else
+                    {
+                        currentTakeAwayAuth.clear();
+                        dishNameCurrentTakeAway.clear();
+                        userNameTakeAway.clear();
+                        dishQuantityCurrentTakeAway.clear();
+                        homeFragTakeAwayRecucler.setLayoutManager(anotherHori);
+                        homeFragTakeAwayRecucler.setAdapter(new CurrentTakeAway(currentTakeAwayAuth,dishNameCurrentTakeAway,dishQuantityCurrentTakeAway,userNameTakeAway));
                     }
                 }
 
