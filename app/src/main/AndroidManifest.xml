@@ -30,6 +30,9 @@
         android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         tools:replace="android:icon">
         <activity
+            android:name=".NavFrags.CurrentTakeAwayOrders.ApproveCurrentTakeAway"
+            android:exported="true" />
+        <activity
             android:name=".Dish.SearchDishFastway.SearchFastwayDatabase"
             android:exported="true" />
         <activity
@@ -177,17 +180,17 @@
 
         <activity
             android:name=".HomeScreen.HomeScreen"
-            android:exported="true" >
+            android:exported="true">
             <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
 
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
                 <data
                     android:host="example.com"
-                    android:scheme="https"/>
+                    android:scheme="https" />
             </intent-filter>
-
         </activity>
         <activity
             android:name=".Info.Info"
@@ -200,9 +203,7 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
         </activity>
-
         <activity
             android:name=".Login.MainActivity"
             android:exported="true">

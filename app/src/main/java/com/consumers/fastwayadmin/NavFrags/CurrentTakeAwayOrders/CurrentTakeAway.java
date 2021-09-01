@@ -1,6 +1,7 @@
 package com.consumers.fastwayadmin.NavFrags.CurrentTakeAwayOrders;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.text.Layout;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,12 +40,16 @@ public class CurrentTakeAway extends RecyclerView.Adapter<CurrentTakeAway.Holder
 
     @SuppressLint("SetTextI18n")
     @Override
-    public void onBindViewHolder(@NonNull Holder holder, int position) {
+    public void onBindViewHolder(@NonNull Holder holder, @SuppressLint("RecyclerView") int position) {
         holder.userName.setText("Name: " + userNameTakeAway.get(position));
         holder.checkOrder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                Intent intent = new Intent(view.getContext(),ApproveCurrentTakeAway.class);
+                intent.putExtra("id",currentTakeAwayAuth.get(position));
+                intent.putStringArrayListExtra("dishName", (ArrayList<String>) dishNameCurrentTakeAway);
+                intent.putStringArrayListExtra("DishQ",(ArrayList<String>) dishQuantityCurrentTakeAway);
+                view.getContext().startActivity(intent);
             }
         });
     }

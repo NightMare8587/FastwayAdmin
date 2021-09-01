@@ -38,7 +38,7 @@ public class homeFragClass extends RecyclerView.Adapter<homeFragClass.ViewHolder
 
     @SuppressLint("SetTextI18n")
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, @SuppressLint("RecyclerView") int position) {
         holder.tables.setText("Table Num: " + tableNum.get(position));
         holder.seats.setText("Seats: " + seats.get(position));
         holder.chat.setOnClickListener(new View.OnClickListener() {
