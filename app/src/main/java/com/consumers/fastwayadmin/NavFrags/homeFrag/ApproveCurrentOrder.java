@@ -39,12 +39,15 @@ import java.util.Objects;
 public class ApproveCurrentOrder extends AppCompatActivity {
     DatabaseReference databaseReference;
     FirebaseAuth auth;
-    ListView listView;
+    ListView listView,halfOrList;
     String URL = "https://fcm.googleapis.com/fcm/send";
     ProgressBar progressBar;
     String table;
     String id;
+    ListView dishQ;
     List<String> dishNames = new ArrayList<>();
+    List<String> dishQuantity = new ArrayList<>();
+    List<String> dishHalfOr = new ArrayList<>();
     Button approve,decline;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,14 +56,17 @@ public class ApproveCurrentOrder extends AppCompatActivity {
         table = getIntent().getStringExtra("table");
         id = getIntent().getStringExtra("id");
         initialise();
+        halfOrList = findViewById(R.id.halfOrFullCurrentORder);
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for(DataSnapshot dataSnapshot : snapshot.getChildren()){
                     dishNames.add(dataSnapshot.getKey().toString());
+                    dishQuantity.add(String.valueOf(dataSnapshot.child("timesOrdered").getValue()));
+                    dishHalfOr.add(String.valueOf(dataSnapshot.child("halfOr").getValue()));
                 }
                 progressBar.setVisibility(View.INVISIBLE);
-                uploadToArrayAdapter(dishNames);
+                uploadToArrayAdapter(dishNames,dishQuantity,dishHalfOr);
             }
 
             @Override
@@ -175,9 +181,15 @@ public class ApproveCurrentOrder extends AppCompatActivity {
 
     }
 
-    private void uploadToArrayAdapter(List<String> dishNames) {
+    private void uploadToArrayAdapter(List<String> dishNames,List<String> dishQuantity,List<String> dishHalfOr) {
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,dishNames);
         listView.setAdapter(arrayAdapter);
+
+        ArrayAdapter<String> arrayAdapter1 = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,dishQuantity);
+        dishQ.setAdapter(arrayAdapter1);
+
+        ArrayAdapter<String> arrayAdapter2 = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,dishHalfOr);
+        halfOrList.setAdapter(arrayAdapter2);
     }
 
     private void initialise() {
@@ -185,6 +197,7 @@ public class ApproveCurrentOrder extends AppCompatActivity {
         databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid())).child("Tables").child(table).child("Current Order");
         listView = findViewById(R.id.currentOrderListView);
         approve = findViewById(R.id.approveCurrentOrderButton);
+        dishQ = findViewById(R.id.quantityCurrentOrder);
         decline = findViewById(R.id.declineCurrentOrderButton);
         progressBar = findViewById(R.id.currentOrderProgressBar);
     }

@@ -62,13 +62,19 @@
             android:id="@+id/quantityTakeAwayListView"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="0.2" />
+            android:layout_weight="0.1" />
 
         <ListView
             android:id="@+id/DishNamesTakeAwayListView"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="0.8" />
+            android:layout_weight="0.7" />
+
+        <ListView
+            android:id="@+id/halfOrTakeAwayListView"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.2" />
 
     </LinearLayout>
 
@@ -76,7 +82,7 @@
         android:id="@+id/textView14"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="15dp"
+        android:layout_marginStart="10dp"
         android:text="Q"
         android:textColor="#000000"
         android:textSize="30sp"
@@ -89,13 +95,26 @@
         android:id="@+id/textView16"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="75dp"
-        android:text="TextView"
+        android:layout_marginStart="25dp"
+        android:text="Dish Names"
         android:textColor="#000000"
         android:textSize="25sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/trashLinearLayout"
         app:layout_constraintStart_toEndOf="@+id/textView14"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textView20"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="5dp"
+        android:text="Type"
+        android:textColor="#000000"
+        android:textSize="25sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/trashLinearLayout"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

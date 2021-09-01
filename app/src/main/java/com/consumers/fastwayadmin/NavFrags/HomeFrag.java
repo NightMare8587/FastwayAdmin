@@ -87,6 +87,7 @@ public class HomeFrag extends Fragment {
     List<String> dishQuantityCurrentTakeAway = new ArrayList<>();
     List<String> userNameTakeAway = new ArrayList<>();
     LinearLayout linearLayout,secondLinearLayout;
+    List<String> halfOr = new ArrayList<>();
     DatabaseReference checkForBank;
     DatabaseReference onlineOrOfflineRestaurant;
     SharedPreferences accountInfo;
@@ -701,27 +702,30 @@ public class HomeFrag extends Fragment {
                         currentTakeAwayAuth.clear();
                         dishNameCurrentTakeAway.clear();
                         userNameTakeAway.clear();
+                        halfOr.clear();
                         dishQuantityCurrentTakeAway.clear();
                         for(DataSnapshot dataSnapshot : snapshot.getChildren()){
                             currentTakeAwayAuth.add(String.valueOf(dataSnapshot.getKey()));
                             for(DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()){
                                 dishNameCurrentTakeAway.add(String.valueOf(dataSnapshot1.child("name").getValue()));
+                                halfOr.add(String.valueOf(dataSnapshot1.child("halfOr").getValue()));
                                 dishQuantityCurrentTakeAway.add(String.valueOf(dataSnapshot1.child("timesOrdered").getValue()));
                                 userNameTakeAway.add(String.valueOf(dataSnapshot1.child("nameOfUser").getValue()));
                             }
                         }
                         Log.i("Current",currentTakeAwayAuth.toString() + " " + dishNameCurrentTakeAway.toString() + " " + userNameTakeAway.toString());
                         homeFragTakeAwayRecucler.setLayoutManager(anotherHori);
-                        homeFragTakeAwayRecucler.setAdapter(new CurrentTakeAway(currentTakeAwayAuth,dishNameCurrentTakeAway,dishQuantityCurrentTakeAway,userNameTakeAway));
+                        homeFragTakeAwayRecucler.setAdapter(new CurrentTakeAway(currentTakeAwayAuth,dishNameCurrentTakeAway,dishQuantityCurrentTakeAway,userNameTakeAway,halfOr));
 
                     }else
                     {
                         currentTakeAwayAuth.clear();
                         dishNameCurrentTakeAway.clear();
                         userNameTakeAway.clear();
+                        halfOr.clear();
                         dishQuantityCurrentTakeAway.clear();
                         homeFragTakeAwayRecucler.setLayoutManager(anotherHori);
-                        homeFragTakeAwayRecucler.setAdapter(new CurrentTakeAway(currentTakeAwayAuth,dishNameCurrentTakeAway,dishQuantityCurrentTakeAway,userNameTakeAway));
+                        homeFragTakeAwayRecucler.setAdapter(new CurrentTakeAway(currentTakeAwayAuth,dishNameCurrentTakeAway,dishQuantityCurrentTakeAway,userNameTakeAway,halfOr));
                     }
                 }
 

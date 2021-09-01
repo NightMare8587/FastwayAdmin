@@ -21,11 +21,13 @@ public class CurrentTakeAway extends RecyclerView.Adapter<CurrentTakeAway.Holder
     List<String> currentTakeAwayAuth = new ArrayList<>();
     List<String> dishNameCurrentTakeAway = new ArrayList<>();
     List<String> dishQuantityCurrentTakeAway = new ArrayList<>();
+    List<String> halfOr = new ArrayList<>();
     List<String> userNameTakeAway = new ArrayList<>();
 
-    public CurrentTakeAway(List<String> currentTakeAwayAuth, List<String> dishNameCurrentTakeAway, List<String> dishQuantityCurrentTakeAway,List<String> userNameTakeAway) {
+    public CurrentTakeAway(List<String> currentTakeAwayAuth, List<String> dishNameCurrentTakeAway, List<String> dishQuantityCurrentTakeAway,List<String> userNameTakeAway,List<String> halfOr) {
         this.currentTakeAwayAuth = currentTakeAwayAuth;
         this.dishNameCurrentTakeAway = dishNameCurrentTakeAway;
+        this.halfOr = halfOr;
         this.userNameTakeAway = userNameTakeAway;
         this.dishQuantityCurrentTakeAway = dishQuantityCurrentTakeAway;
     }
@@ -49,6 +51,7 @@ public class CurrentTakeAway extends RecyclerView.Adapter<CurrentTakeAway.Holder
                 intent.putExtra("id",currentTakeAwayAuth.get(position));
                 intent.putStringArrayListExtra("dishName", (ArrayList<String>) dishNameCurrentTakeAway);
                 intent.putStringArrayListExtra("DishQ",(ArrayList<String>) dishQuantityCurrentTakeAway);
+                intent.putStringArrayListExtra("halfOr",(ArrayList<String>) halfOr);
                 view.getContext().startActivity(intent);
             }
         });

@@ -46,9 +46,10 @@ import karpuzoglu.enes.com.fastdialog.Type;
 public class ApproveCurrentTakeAway extends AppCompatActivity {
     List<String> quantity;
     List<String> dishName;
+    List<String> halfOr;
     Button decline,approve;
     String digitCode;
-    ListView listView,dishNames;
+    ListView listView,dishNames,halfOrList;
     String id;
     String URL = "https://fcm.googleapis.com/fcm/send";
     @Override
@@ -58,9 +59,11 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
         id = getIntent().getStringExtra("id");
         dishName = new ArrayList<>(getIntent().getStringArrayListExtra("dishName"));
         quantity = new ArrayList<>(getIntent().getStringArrayListExtra("DishQ"));
+        halfOr = new ArrayList<>(getIntent().getStringArrayListExtra("halfOr"));
         Log.i("name",dishName.toString());
         decline = findViewById(R.id.declineTakeAwayButton);
         listView = findViewById(R.id.quantityTakeAwayListView);
+        halfOrList = findViewById(R.id.halfOrTakeAwayListView);
         dishNames = findViewById(R.id.DishNamesTakeAwayListView);
         approve = findViewById(R.id.approveTakeAwayButton);
         DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(id);
@@ -80,6 +83,9 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
 
         ArrayAdapter<String> arrayAdapter1 = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,dishName);
         dishNames.setAdapter(arrayAdapter1);
+
+        ArrayAdapter<String> arrayAdapter2 = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,halfOr);
+        halfOrList.setAdapter(arrayAdapter2);
 
         approve.setOnClickListener(new View.OnClickListener() {
             @Override
