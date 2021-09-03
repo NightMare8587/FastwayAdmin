@@ -21,13 +21,15 @@ public class CurrentTakeAway extends RecyclerView.Adapter<CurrentTakeAway.Holder
     List<String> currentTakeAwayAuth = new ArrayList<>();
     List<String> dishNameCurrentTakeAway = new ArrayList<>();
     List<String> dishQuantityCurrentTakeAway = new ArrayList<>();
+    String paymentMode;
     List<String> halfOr = new ArrayList<>();
     List<String> userNameTakeAway = new ArrayList<>();
 
-    public CurrentTakeAway(List<String> currentTakeAwayAuth, List<String> dishNameCurrentTakeAway, List<String> dishQuantityCurrentTakeAway,List<String> userNameTakeAway,List<String> halfOr) {
+    public CurrentTakeAway(List<String> currentTakeAwayAuth, List<String> dishNameCurrentTakeAway, List<String> dishQuantityCurrentTakeAway,List<String> userNameTakeAway,List<String> halfOr,String paymentMode) {
         this.currentTakeAwayAuth = currentTakeAwayAuth;
         this.dishNameCurrentTakeAway = dishNameCurrentTakeAway;
         this.halfOr = halfOr;
+        this.paymentMode = paymentMode;
         this.userNameTakeAway = userNameTakeAway;
         this.dishQuantityCurrentTakeAway = dishQuantityCurrentTakeAway;
     }
@@ -44,6 +46,7 @@ public class CurrentTakeAway extends RecyclerView.Adapter<CurrentTakeAway.Holder
     @Override
     public void onBindViewHolder(@NonNull Holder holder, @SuppressLint("RecyclerView") int position) {
         holder.userName.setText("Name: " + userNameTakeAway.get(position));
+        holder.paymentMode.setText("Mode: " + paymentMode);
         holder.checkOrder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -52,6 +55,7 @@ public class CurrentTakeAway extends RecyclerView.Adapter<CurrentTakeAway.Holder
                 intent.putStringArrayListExtra("dishName", (ArrayList<String>) dishNameCurrentTakeAway);
                 intent.putStringArrayListExtra("DishQ",(ArrayList<String>) dishQuantityCurrentTakeAway);
                 intent.putStringArrayListExtra("halfOr",(ArrayList<String>) halfOr);
+                intent.putExtra("payment",paymentMode);
                 view.getContext().startActivity(intent);
             }
         });
@@ -63,12 +67,13 @@ public class CurrentTakeAway extends RecyclerView.Adapter<CurrentTakeAway.Holder
     }
 
     public class Holder extends RecyclerView.ViewHolder{
-        TextView userName;
+        TextView userName,paymentMode;
         Button checkOrder;
         public Holder(@NonNull View itemView) {
             super(itemView);
             userName = itemView.findViewById(R.id.nameTakeAwayCustomer);
             checkOrder = itemView.findViewById(R.id.takeAwayCurrentOrder);
+            paymentMode = itemView.findViewById(R.id.paymentModeTEakeaway);
         }
     }
 }

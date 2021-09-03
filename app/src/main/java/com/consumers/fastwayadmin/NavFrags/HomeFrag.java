@@ -86,6 +86,7 @@ public class HomeFrag extends Fragment {
     List<String> dishNameCurrentTakeAway = new ArrayList<>();
     List<String> dishQuantityCurrentTakeAway = new ArrayList<>();
     List<String> userNameTakeAway = new ArrayList<>();
+    String paymentMode;
     LinearLayout linearLayout,secondLinearLayout;
     List<String> halfOr = new ArrayList<>();
     DatabaseReference checkForBank;
@@ -709,13 +710,14 @@ public class HomeFrag extends Fragment {
                             for(DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()){
                                 dishNameCurrentTakeAway.add(String.valueOf(dataSnapshot1.child("name").getValue()));
                                 halfOr.add(String.valueOf(dataSnapshot1.child("halfOr").getValue()));
+                                paymentMode = String.valueOf(dataSnapshot1.child("paymmentMode").getValue());
                                 dishQuantityCurrentTakeAway.add(String.valueOf(dataSnapshot1.child("timesOrdered").getValue()));
                                 userNameTakeAway.add(String.valueOf(dataSnapshot1.child("nameOfUser").getValue()));
                             }
                         }
                         Log.i("Current",currentTakeAwayAuth.toString() + " " + dishNameCurrentTakeAway.toString() + " " + userNameTakeAway.toString());
                         homeFragTakeAwayRecucler.setLayoutManager(anotherHori);
-                        homeFragTakeAwayRecucler.setAdapter(new CurrentTakeAway(currentTakeAwayAuth,dishNameCurrentTakeAway,dishQuantityCurrentTakeAway,userNameTakeAway,halfOr));
+                        homeFragTakeAwayRecucler.setAdapter(new CurrentTakeAway(currentTakeAwayAuth,dishNameCurrentTakeAway,dishQuantityCurrentTakeAway,userNameTakeAway,halfOr,paymentMode));
 
                     }else
                     {
@@ -725,7 +727,7 @@ public class HomeFrag extends Fragment {
                         halfOr.clear();
                         dishQuantityCurrentTakeAway.clear();
                         homeFragTakeAwayRecucler.setLayoutManager(anotherHori);
-                        homeFragTakeAwayRecucler.setAdapter(new CurrentTakeAway(currentTakeAwayAuth,dishNameCurrentTakeAway,dishQuantityCurrentTakeAway,userNameTakeAway,halfOr));
+                        homeFragTakeAwayRecucler.setAdapter(new CurrentTakeAway(currentTakeAwayAuth,dishNameCurrentTakeAway,dishQuantityCurrentTakeAway,userNameTakeAway,halfOr,paymentMode));
                     }
                 }
 

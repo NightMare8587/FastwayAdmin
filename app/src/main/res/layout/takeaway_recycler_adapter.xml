@@ -29,8 +29,8 @@
             android:layout_marginTop="5dp"
             android:textColor="@color/slate_black"
             android:layout_marginLeft="9dp"
-            android:id="@+id/homeFragRecyclerViewSeats"
-            android:text="Seats: "
+            android:id="@+id/paymentModeTEakeaway"
+            android:text="Mode: "
             android:layout_height="wrap_content"/>
 
         <Button
