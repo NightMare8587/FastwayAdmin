@@ -4,8 +4,10 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -14,12 +16,15 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.consumers.fastwayadmin.CancelClass;
 import com.consumers.fastwayadmin.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -35,13 +40,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Random;
 
 public class ApproveCurrentOrder extends AppCompatActivity {
     DatabaseReference databaseReference;
     FirebaseAuth auth;
     ListView listView,halfOrList;
     String URL = "https://fcm.googleapis.com/fcm/send";
+    String url = "https://intercellular-stabi.000webhostapp.com/refunds/initiateRefund.php";
     ProgressBar progressBar;
+    DatabaseReference saveRefundInfo;
+    String orderID,orderAmount;
     String table;
     String id;
     ListView dishQ;
@@ -56,6 +65,7 @@ public class ApproveCurrentOrder extends AppCompatActivity {
         table = getIntent().getStringExtra("table");
         id = getIntent().getStringExtra("id");
         initialise();
+        saveRefundInfo = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(id);
         halfOrList = findViewById(R.id.halfOrFullCurrentORder);
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -64,6 +74,8 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                     dishNames.add(dataSnapshot.getKey().toString());
                     dishQuantity.add(String.valueOf(dataSnapshot.child("timesOrdered").getValue()));
                     dishHalfOr.add(String.valueOf(dataSnapshot.child("halfOr").getValue()));
+                    orderID = String.valueOf(dataSnapshot.child("orderID").getValue());
+                    orderAmount = String.valueOf(dataSnapshot.child("orderAmount").getValue());
                 }
                 progressBar.setVisibility(View.INVISIBLE);
                 uploadToArrayAdapter(dishNames,dishQuantity,dishHalfOr);
@@ -133,7 +145,7 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                 JSONObject main = new JSONObject();
                 FirebaseAuth auth = FirebaseAuth.getInstance();
                 DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid())).child("Tables").child(table);
-
+                new InitiateRefund().execute();
                 try{
                     main.put("to","/topics/"+id+"");
                     JSONObject notification = new JSONObject();
@@ -200,5 +212,53 @@ public class ApproveCurrentOrder extends AppCompatActivity {
         dishQ = findViewById(R.id.quantityCurrentOrder);
         decline = findViewById(R.id.declineCurrentOrderButton);
         progressBar = findViewById(R.id.currentOrderProgressBar);
+    }
+    public class InitiateRefund extends AsyncTask<Void,Void,Void> {
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            RequestQueue requestQueue = Volley.newRequestQueue(ApproveCurrentOrder.this);
+            StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    Log.i("res",response.toString());
+
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+
+                }
+            }){
+                @NonNull
+                @Override
+                protected Map<String, String> getParams() throws AuthFailureError {
+                    Map<String,String> params = new HashMap<>();
+                    FirebaseAuth auth = FirebaseAuth.getInstance();
+                    String referid = id;
+                    int value = Integer.parseInt(orderAmount);
+                    int finalValue = (int) (value * 0.2);
+                    value = value - finalValue;
+                    orderAmount = String.valueOf(value);
+                    Random random = new Random();
+                    referid = referid + String.valueOf(random.nextInt(1000 - 1) + 1);
+                    String finalReferIDForInfo = "refund_" + referid + "s";
+                    Log.i("refundID",referid);
+                    String time = String.valueOf(System.currentTimeMillis());
+                    CancelClass cancelClass = new CancelClass(finalReferIDForInfo,orderAmount + "",orderID + "");
+                    saveRefundInfo.child("Refunds").child(time).setValue(cancelClass);
+                    params.put("referID",referid + "");
+                    params.put("refundAmount",orderAmount);
+                    params.put("orderID",orderID);
+                    return params;
+                }
+            };
+            stringRequest.setRetryPolicy(new DefaultRetryPolicy(
+                    0,
+                    DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+            requestQueue.add(stringRequest);
+            return null;
+        }
     }
 }
