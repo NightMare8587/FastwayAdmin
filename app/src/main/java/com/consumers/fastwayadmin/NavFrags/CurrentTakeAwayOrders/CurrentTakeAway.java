@@ -71,7 +71,9 @@ public class CurrentTakeAway extends RecyclerView.Adapter<CurrentTakeAway.Holder
                 intent.putStringArrayListExtra("dishName", (ArrayList<String>) dishNameCurrentTakeAway);
                 intent.putStringArrayListExtra("DishQ",(ArrayList<String>) dishQuantityCurrentTakeAway);
                 intent.putStringArrayListExtra("halfOr",(ArrayList<String>) halfOr);
+                intent.putExtra("orderID",orderId.get(position));
                 intent.putExtra("payment",finalPayment.get(position));
+                intent.putExtra("orderAmount",orderAmount.get(position));
                 view.getContext().startActivity(intent);
             }
         });

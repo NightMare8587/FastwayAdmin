@@ -3,6 +3,7 @@ package com.consumers.fastwayadmin.NavFrags.CurrentTakeAwayOrders;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -13,12 +14,15 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.consumers.fastwayadmin.CancelClass;
 import com.consumers.fastwayadmin.NavFrags.homeFrag.ApproveCurrentOrder;
 import com.consumers.fastwayadmin.R;
 import com.developer.kalert.KAlertDialog;
@@ -36,6 +40,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Random;
 
 import karpuzoglu.enes.com.fastdialog.Animations;
 import karpuzoglu.enes.com.fastdialog.FastDialog;
@@ -51,16 +56,21 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
     FirebaseAuth auth = FirebaseAuth.getInstance();
     DatabaseReference databaseReference;
     List<String> halfOr;
+    String url = "https://intercellular-stabi.000webhostapp.com/refunds/initiateRefund.php";
+    DatabaseReference saveRefundInfo;
     Button decline,approve;
     String digitCode;
     ListView listView,dishNames,halfOrList;
-    String id;
+    String id,orderId,orderAmount;
     String URL = "https://fcm.googleapis.com/fcm/send";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_approve_current_take_away);
         id = getIntent().getStringExtra("id");
+        saveRefundInfo = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(id);
+        orderAmount = getIntent().getStringExtra("orderAmount");
+        orderId = getIntent().getStringExtra("orderID");
         paymentMode = getIntent().getStringExtra("payment");
         dishName = new ArrayList<>(getIntent().getStringArrayListExtra("dishName"));
         quantity = new ArrayList<>(getIntent().getStringArrayListExtra("DishQ"));
@@ -244,7 +254,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                 JSONObject main = new JSONObject();
                 FirebaseAuth auth = FirebaseAuth.getInstance();
                 DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid())).child("Current TakeAway").child(id);
-
+                new InitiateRefund().execute();
                 try{
                     main.put("to","/topics/"+id+"");
                     JSONObject notification = new JSONObject();
@@ -287,5 +297,51 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                 },1500);
             }
         });
+    }
+    public class InitiateRefund extends AsyncTask<Void,Void,Void> {
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            RequestQueue requestQueue = Volley.newRequestQueue(ApproveCurrentTakeAway.this);
+            StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    Log.i("res",response.toString());
+
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+
+                }
+            }){
+                @NonNull
+                @Override
+                protected Map<String, String> getParams() throws AuthFailureError {
+                    Map<String,String> params = new HashMap<>();
+                    FirebaseAuth auth = FirebaseAuth.getInstance();
+                    String referid = orderId;
+                    int value = Integer.parseInt(orderAmount);
+                    int finalValue = (int) (value * 0.2);
+                    value = value - finalValue;
+                    orderAmount = String.valueOf(value);
+                    String finalReferIDForInfo = "refund_" + referid + "s";
+                    Log.i("refundID",referid);
+                    String time = String.valueOf(System.currentTimeMillis());
+                    CancelClass cancelClass = new CancelClass(finalReferIDForInfo,orderAmount + "",orderId + "");
+                    saveRefundInfo.child("Refunds").child(time).setValue(cancelClass);
+                    params.put("referID",referid + "");
+                    params.put("refundAmount",orderAmount);
+                    params.put("orderID",orderId);
+                    return params;
+                }
+            };
+            stringRequest.setRetryPolicy(new DefaultRetryPolicy(
+                    0,
+                    DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+            requestQueue.add(stringRequest);
+            return null;
+        }
     }
 }
