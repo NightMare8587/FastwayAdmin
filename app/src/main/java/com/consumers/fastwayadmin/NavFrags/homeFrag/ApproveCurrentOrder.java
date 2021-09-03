@@ -1,9 +1,5 @@
 package com.consumers.fastwayadmin.NavFrags.homeFrag;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -14,6 +10,9 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
