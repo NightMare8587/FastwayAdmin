@@ -48,6 +48,8 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
     List<String> quantity;
     List<String> dishName;
     String paymentMode;
+    FirebaseAuth auth = FirebaseAuth.getInstance();
+    DatabaseReference databaseReference;
     List<String> halfOr;
     Button decline,approve;
     String digitCode;
