@@ -240,7 +240,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                     fastDialog.negativeClickListener(new NegativeClick() {
                         @Override
                         public void onClick(View view) {
-
+                            fastDialog.dismiss();
                         }
                     });
                 }
@@ -254,47 +254,81 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                 JSONObject main = new JSONObject();
                 FirebaseAuth auth = FirebaseAuth.getInstance();
                 DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid())).child("Current TakeAway").child(id);
-                new InitiateRefund().execute();
-                try{
-                    main.put("to","/topics/"+id+"");
-                    JSONObject notification = new JSONObject();
-                    notification.put("title","Order Declined" );
-                    notification.put("click_action","Table Frag");
-                    notification.put("body","Your order is declined by the owner. Refund will be initiated Shortly\nContact Restaurant why order got cancelled");
-                    main.put("notification",notification);
+                if (paymentMode.equals("online")) {
+                    new InitiateRefund().execute();
+                    try {
+                        main.put("to", "/topics/" + id + "");
+                        JSONObject notification = new JSONObject();
+                        notification.put("title", "Order Declined");
+                        notification.put("click_action", "Table Frag");
+                        notification.put("body", "Your order is declined by the owner. Refund will be initiated Shortly\nContact Restaurant why order got cancelled");
+                        main.put("notification", notification);
 
-                    JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, main, new Response.Listener<JSONObject>() {
-                        @Override
-                        public void onResponse(JSONObject response) {
+                        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, main, new Response.Listener<JSONObject>() {
+                            @Override
+                            public void onResponse(JSONObject response) {
 
-                        }
-                    }, new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            Toast.makeText(ApproveCurrentTakeAway.this, error.getLocalizedMessage()+"null", Toast.LENGTH_SHORT).show();
-                        }
-                    }){
-                        @Override
-                        public Map<String, String> getHeaders() throws AuthFailureError {
-                            Map<String,String> header = new HashMap<>();
-                            header.put("content-type","application/json");
-                            header.put("authorization","key=AAAAsigSEMs:APA91bEUF9ZFwIu84Jctci56DQd0TQOepztGOIKIBhoqf7N3ueQrkClw0xBTlWZEWyvwprXZmZgW2MNywF1pNBFpq1jFBr0CmlrJ0wygbZIBOnoZ0jP1zZC6nPxqF2MAP6iF3wuBHD2R");
-                            return header;
-                        }
-                    };
-                    reference.removeValue();
-                    userRef.child("digitCode").removeValue();
-                    requestQueue.add(jsonObjectRequest);
-                }
-                catch (Exception e){
-                    Toast.makeText(ApproveCurrentTakeAway.this, e.getLocalizedMessage()+"null", Toast.LENGTH_SHORT).show();
+                            }
+                        }, new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                Toast.makeText(ApproveCurrentTakeAway.this, error.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
+                            }
+                        }) {
+                            @Override
+                            public Map<String, String> getHeaders() throws AuthFailureError {
+                                Map<String, String> header = new HashMap<>();
+                                header.put("content-type", "application/json");
+                                header.put("authorization", "key=AAAAsigSEMs:APA91bEUF9ZFwIu84Jctci56DQd0TQOepztGOIKIBhoqf7N3ueQrkClw0xBTlWZEWyvwprXZmZgW2MNywF1pNBFpq1jFBr0CmlrJ0wygbZIBOnoZ0jP1zZC6nPxqF2MAP6iF3wuBHD2R");
+                                return header;
+                            }
+                        };
+                        reference.removeValue();
+                        userRef.child("digitCode").removeValue();
+                        requestQueue.add(jsonObjectRequest);
+                    } catch (Exception e) {
+                        Toast.makeText(ApproveCurrentTakeAway.this, e.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
+                    }
+                }else{
+                    try {
+                        main.put("to", "/topics/" + id + "");
+                        JSONObject notification = new JSONObject();
+                        notification.put("title", "Order Declined");
+                        notification.put("click_action", "Table Frag");
+                        notification.put("body", "Your order is declined by the owner. If you paid cash already then ask owner to refund it");
+                        main.put("notification", notification);
+
+                        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, main, new Response.Listener<JSONObject>() {
+                            @Override
+                            public void onResponse(JSONObject response) {
+
+                            }
+                        }, new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                Toast.makeText(ApproveCurrentTakeAway.this, error.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
+                            }
+                        }) {
+                            @Override
+                            public Map<String, String> getHeaders() throws AuthFailureError {
+                                Map<String, String> header = new HashMap<>();
+                                header.put("content-type", "application/json");
+                                header.put("authorization", "key=AAAAsigSEMs:APA91bEUF9ZFwIu84Jctci56DQd0TQOepztGOIKIBhoqf7N3ueQrkClw0xBTlWZEWyvwprXZmZgW2MNywF1pNBFpq1jFBr0CmlrJ0wygbZIBOnoZ0jP1zZC6nPxqF2MAP6iF3wuBHD2R");
+                                return header;
+                            }
+                        };
+                        reference.removeValue();
+                        requestQueue.add(jsonObjectRequest);
+                    } catch (Exception e) {
+                        Toast.makeText(ApproveCurrentTakeAway.this, e.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
+                    }
                 }
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         finish();
                     }
-                },1500);
+                }, 1500);
             }
         });
     }

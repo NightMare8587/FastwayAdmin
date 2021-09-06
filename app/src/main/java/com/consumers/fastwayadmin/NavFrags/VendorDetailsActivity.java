@@ -53,11 +53,13 @@ import karpuzoglu.enes.com.fastdialog.Type;
 
 public class VendorDetailsActivity extends AppCompatActivity {
     String name,email,phone,acNumber,acName,acIFSC;
-    String url = "https://intercellular-stabi.000webhostapp.com/addBankDetails.php";
+    String url = "https://intercellular-stabi.000webhostapp.com/CheckoutPayouts/addBenificiary.php";
     FirebaseAuth mAuth;
     String mauthId;
     SharedPreferences sharedPreferences;
+    String neftUrl = "https://intercellular-stabi.000webhostapp.com/CheckoutPayouts/payoutNeft.php";
     SharedPreferences.Editor editor;
+    String authToken = "https://intercellular-stabi.000webhostapp.com/CheckoutPayouts/authBEarerToken.php";
     String authURL = "https://payout-api.cashfree.com/payout/v1/authorize";
     Button proceed;
     EditText nameEdit,emailEdit,phoneEdit,accountNumber,accountName,IFSCcode;
@@ -193,7 +195,7 @@ public class VendorDetailsActivity extends AppCompatActivity {
         emailEdit = findViewById(R.id.emailVendorEditText);
         phoneEdit = findViewById(R.id.numberVendorEditText);
         proceed = findViewById(R.id.proceedVendorDetails);
-        accountName = findViewById(R.id.AccountHolderNameEditText);
+        accountName = findViewById(R.id.AccountHolderAddressEditText);
         accountNumber = findViewById(R.id.AccountnumberVendorEditText);
         IFSCcode = findViewById(R.id.AccountIFSCcodeVendor);
         nameEdit.setText(name);
