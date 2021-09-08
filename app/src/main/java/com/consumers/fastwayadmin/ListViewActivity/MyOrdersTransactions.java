@@ -23,7 +23,9 @@ import com.google.firebase.auth.FirebaseAuth;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import karpuzoglu.enes.com.fastdialog.Animations;
@@ -35,6 +37,8 @@ public class MyOrdersTransactions extends AppCompatActivity {
     String getBenStatus = "https://intercellular-stabi.000webhostapp.com/benStatusFolder/benStatus.php";
     String neftUrl = "https://intercellular-stabi.000webhostapp.com/CheckoutPayouts/payoutNeft.php";
     String genratedToken = "";
+    List<String> status = new ArrayList<>();
+    List<String> amount = new ArrayList<>();
     FastDialog fastDialog;
     String authToken = "https://intercellular-stabi.000webhostapp.com/CheckoutPayouts/authBEarerToken.php";
     @Override
@@ -113,7 +117,20 @@ public class MyOrdersTransactions extends AppCompatActivity {
             StringRequest stringRequest = new StringRequest(Request.Method.POST, getBenStatus, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
-                    Log.i("resp",response.toString());
+                    Log.i("resp", String.valueOf(response.toCharArray()));
+                    char[] arr = response.toCharArray();
+                    String[] array = response.split(",");
+                    for(int i=1;i<array.length;i = i+5){
+                        amount.add(String.valueOf(array[i]));
+                    }
+
+                    for(int i=4;i<array.length;i = i+5){
+                        status.add(String.valueOf(array[i]));
+                    }
+
+                    Log.i("resp",amount.toString());
+                    Log.i("resp",status.toString());
+
                 }
             }, new Response.ErrorListener() {
                 @Override
