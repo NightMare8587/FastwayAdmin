@@ -235,10 +235,6 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                     Map<String,String> params = new HashMap<>();
                     FirebaseAuth auth = FirebaseAuth.getInstance();
                     String referid = id;
-                    int value = Integer.parseInt(orderAmount);
-                    int finalValue = (int) (value * 0.2);
-                    value = value - finalValue;
-                    orderAmount = String.valueOf(value);
                     Random random = new Random();
                     referid = referid + String.valueOf(random.nextInt(1000 - 1) + 1);
                     String finalReferIDForInfo = "refund_" + referid + "s";

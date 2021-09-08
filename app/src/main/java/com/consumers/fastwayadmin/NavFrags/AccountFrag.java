@@ -23,6 +23,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
 import com.consumers.fastwayadmin.ListViewActivity.MyAccount;
+import com.consumers.fastwayadmin.ListViewActivity.MyOrdersTransactions;
 import com.consumers.fastwayadmin.Login.MainActivity;
 import com.consumers.fastwayadmin.MyService;
 import com.consumers.fastwayadmin.R;
@@ -37,7 +38,7 @@ import java.util.Objects;
 
 public class AccountFrag extends Fragment {
     ListView listView;
-    String[] names = {"My Account","Logout","Terms And Conditions","Privacy policy"};
+    String[] names = {"My Account","My Transactions","Logout","Terms And Conditions","Privacy policy"};
     GoogleSignInClient googleSignInClient;
 
     FirebaseAuth auth;
@@ -95,6 +96,9 @@ public class AccountFrag extends Fragment {
                         startActivity(new Intent(getActivity(), MyAccount.class));
                         break;
                     case 1:
+                        startActivity(new Intent(getActivity(), MyOrdersTransactions.class));
+                        break;
+                    case 2:
                         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                         builder.setTitle("Logout")
                                 .setMessage("Do you wanna logout?")
@@ -127,11 +131,11 @@ public class AccountFrag extends Fragment {
                         builder.show();
                         break;
 
-                    case 2:
+                    case 3:
                         Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.websitepolicies.com/policies/view/CpwDZziF"));
                         startActivity(browserIntent);
                         break;
-                    case 3:
+                    case 4:
                         Intent privacyIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://fastway.flycricket.io/privacy.html"));
                         startActivity(privacyIntent);
                         break;

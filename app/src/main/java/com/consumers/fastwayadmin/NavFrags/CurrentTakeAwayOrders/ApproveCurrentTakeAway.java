@@ -355,10 +355,6 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                     Map<String,String> params = new HashMap<>();
                     FirebaseAuth auth = FirebaseAuth.getInstance();
                     String referid = orderId;
-                    int value = Integer.parseInt(orderAmount);
-                    int finalValue = (int) (value * 0.2);
-                    value = value - finalValue;
-                    orderAmount = String.valueOf(value);
                     String finalReferIDForInfo = "refund_" + referid + "s";
                     Log.i("refundID",referid);
                     String time = String.valueOf(System.currentTimeMillis());

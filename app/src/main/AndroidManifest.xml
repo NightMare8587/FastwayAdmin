@@ -30,6 +30,9 @@
         android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         tools:replace="android:icon">
         <activity
+            android:name=".ListViewActivity.MyOrdersTransactions"
+            android:exported="true" />
+        <activity
             android:name=".NavFrags.CurrentTakeAwayOrders.ApproveCurrentTakeAway"
             android:exported="true" />
         <activity
