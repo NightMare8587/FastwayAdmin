@@ -19,7 +19,7 @@
         android:layout_marginBottom="40dp"
         android:background="@drawable/inreo_button_back"
         android:text="next"
-        android:textSize="16sp"
+        android:textSize="18sp"
         android:textStyle="bold|italic"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
@@ -28,7 +28,7 @@
         android:id="@+id/showPreviousIntro"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
+        android:layout_marginStart="18sp"
         android:layout_marginBottom="40dp"
         android:background="@drawable/inreo_button_next"
         android:text="back"
