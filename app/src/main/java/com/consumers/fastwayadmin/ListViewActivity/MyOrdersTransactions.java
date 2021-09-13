@@ -1,27 +1,21 @@
 package com.consumers.fastwayadmin.ListViewActivity;
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.consumers.fastwayadmin.NavFrags.VendorDetailsActivity;
 import com.consumers.fastwayadmin.R;
 import com.google.firebase.auth.FirebaseAuth;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,6 +30,7 @@ import karpuzoglu.enes.com.fastdialog.Type;
 public class MyOrdersTransactions extends AppCompatActivity {
     String getBenStatus = "https://intercellular-stabi.000webhostapp.com/benStatusFolder/benStatus.php";
     String neftUrl = "https://intercellular-stabi.000webhostapp.com/CheckoutPayouts/payoutNeft.php";
+    String singleBenStatus = "https://intercellular-stabi.000webhostapp.com/benStatusFolder/singleStatus.php";
     String genratedToken = "";
     List<String> status = new ArrayList<>();
     List<String> amount = new ArrayList<>();
@@ -114,22 +109,22 @@ public class MyOrdersTransactions extends AppCompatActivity {
         @Override
         protected Void doInBackground(Void... voids) {
             RequestQueue requestQueue = Volley.newRequestQueue(MyOrdersTransactions.this);
-            StringRequest stringRequest = new StringRequest(Request.Method.POST, getBenStatus, new Response.Listener<String>() {
+            StringRequest stringRequest = new StringRequest(Request.Method.POST, singleBenStatus, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
                     Log.i("resp", String.valueOf(response.toCharArray()));
-                    char[] arr = response.toCharArray();
-                    String[] array = response.split(",");
-                    for(int i=1;i<array.length;i = i+5){
-                        amount.add(String.valueOf(array[i]));
-                    }
-
-                    for(int i=4;i<array.length;i = i+5){
-                        status.add(String.valueOf(array[i]));
-                    }
-
-                    Log.i("resp",amount.toString());
-                    Log.i("resp",status.toString());
+//                    char[] arr = response.toCharArray();
+//                    String[] array = response.split(",");
+//                    for(int i=1;i<array.length;i = i+5){
+//                        amount.add(String.valueOf(array[i]));
+//                    }
+//
+//                    for(int i=4;i<array.length;i = i+5){
+//                        status.add(String.valueOf(array[i]));
+//                    }
+//
+//                    Log.i("resp",amount.toString());
+//                    Log.i("resp",status.toString());
 
                 }
             }, new Response.ErrorListener() {
@@ -144,7 +139,7 @@ public class MyOrdersTransactions extends AppCompatActivity {
                     Map<String,String> params = new HashMap<>();
                     FirebaseAuth auth = FirebaseAuth.getInstance();
                     params.put("token",genratedToken);
-                    params.put("benID",String.valueOf(auth.getUid()));
+                    params.put("benID","311370913");
                     return params;
                 }
             };
