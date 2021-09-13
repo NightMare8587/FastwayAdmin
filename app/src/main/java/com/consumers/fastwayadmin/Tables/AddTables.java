@@ -227,19 +227,20 @@ public class AddTables extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if(requestCode == 1){
-            if(grantResults[0] == PackageManager.PERMISSION_GRANTED){
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 1) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(this, "Permission Granted", Toast.LENGTH_SHORT).show();
-            }else{
+            } else {
                 AlertDialog.Builder builder = new AlertDialog.Builder(AddTables.this);
                 builder.setTitle("Important").setCancelable(false)
                         .setMessage("External storage is required for proper functioning of app. Wanna provide permission???")
                         .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                if(ContextCompat.checkSelfPermission(AddTables.this,Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+                                if (ContextCompat.checkSelfPermission(AddTables.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                                        requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},1);
+                                        requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
                                     }
                                 }
                             }
