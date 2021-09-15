@@ -53,6 +53,9 @@ import karpuzoglu.enes.com.fastdialog.PositiveClick;
 import karpuzoglu.enes.com.fastdialog.Type;
 
 public class VendorDetailsActivity extends AppCompatActivity {
+    String testPayoutToken = "https://intercellular-stabi.000webhostapp.com/CheckoutPayouts/testToken.php";
+    String testBearerToken = "https://intercellular-stabi.000webhostapp.com/CheckoutPayouts/test/testBearerToken.php";
+    String testPaymentToVendor = "https://intercellular-stabi.000webhostapp.com/CheckoutPayouts/test/addTEstBen.php";
     String name, email, phone, acNumber, acName, acIFSC;
     String url = "https://intercellular-stabi.000webhostapp.com/CheckoutPayouts/addBenificiary.php";
     FirebaseAuth mAuth;
@@ -162,7 +165,7 @@ public class VendorDetailsActivity extends AppCompatActivity {
         @Override
         protected Void doInBackground(Void... voids) {
             RequestQueue requestQueue = Volley.newRequestQueue(VendorDetailsActivity.this);
-            StringRequest stringRequest = new StringRequest(Request.Method.POST, neftUrl, new Response.Listener<String>() {
+            StringRequest stringRequest = new StringRequest(Request.Method.POST, testPayoutToken, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
                     Log.i("response",response);
@@ -185,7 +188,7 @@ public class VendorDetailsActivity extends AppCompatActivity {
         @Override
         protected Void doInBackground(Void... voids) {
             RequestQueue requestQueue = Volley.newRequestQueue(VendorDetailsActivity.this);
-            StringRequest stringRequest = new StringRequest(Request.Method.POST, authToken, new Response.Listener<String>() {
+            StringRequest stringRequest = new StringRequest(Request.Method.POST, testBearerToken, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
                     Log.i("response",response);
@@ -217,7 +220,7 @@ public class VendorDetailsActivity extends AppCompatActivity {
         @Override
         protected Void doInBackground(Void... voids) {
             RequestQueue requestQueue = Volley.newRequestQueue(VendorDetailsActivity.this);
-            StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+            StringRequest stringRequest = new StringRequest(Request.Method.POST, testPaymentToVendor, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
                     Log.i("response",response.trim());
