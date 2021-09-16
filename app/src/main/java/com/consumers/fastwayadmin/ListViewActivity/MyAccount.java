@@ -74,7 +74,7 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
     PhoneAuthCredential credential;
     ModalBottomSheetDialog modalBottomSheetDialog;
     TextView textView;
-    String[] names = {"Change Credentials (Admin)","Change Credentials (Restaurants)","Change Mobile Number","Delete Account","Change Bank Credentials"};
+    String[] names = {"Change Credentials (Admin)","Change Credentials (Restaurants)","Delete Account","Change Bank Credentials"};
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,141 +116,8 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
                                 .build();
                         modalBottomSheetDialog.show(getSupportFragmentManager(),"restaurant");
                         break;
+
                     case 2:
-                        auth = FirebaseAuth.getInstance();
-                        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(Objects.requireNonNull(auth.getUid()));
-                        reference.addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                if (snapshot.hasChild("number")) {
-                                    FastDialog fastDialog = new FastDialogBuilder(MyAccount.this, Type.DIALOG)
-                                            .setTitleText("Change Mobile Number ")
-                                            .setText("Enter New Mobile Number\n")
-                                            .setHint("Also Add Your Country Code")
-                                            .setAnimation(Animations.SLIDE_TOP)
-                                            .positiveText("Change")
-                                            .negativeText("Cancel")
-                                            .setTextMaxLength(13)
-                                            .cancelable(false)
-                                            .create();
-
-                                    fastDialog.positiveClickListener(new PositiveClick() {
-                                        @Override
-                                        public void onClick(View view) {
-                                            String inputV = fastDialog.getInputText();
-                                            if (inputV.length() <= 12) {
-                                                Toast.makeText(MyAccount.this, "Enter Valid Number", Toast.LENGTH_SHORT).show();
-                                                return;
-                                            } else {
-                                                reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(auth.getUid());
-
-                                                reference.addListenerForSingleValueEvent(new ValueEventListener() {
-                                                    @Override
-                                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                                        if (snapshot.child("number").getValue(String.class).equals(inputV)) {
-                                                            new KAlertDialog(MyAccount.this, KAlertDialog.ERROR_TYPE)
-                                                                    .setTitleText("Error")
-                                                                    .setContentText("Entered Mobile Number is same. Enter Different Mobile Number")
-                                                                    .setConfirmText("Ok")
-                                                                    .setConfirmClickListener(new KAlertDialog.KAlertClickListener() {
-                                                                        @Override
-                                                                        public void onClick(KAlertDialog kAlertDialog) {
-                                                                            kAlertDialog.dismissWithAnimation();
-                                                                        }
-                                                                    }).show();
-                                                        }else{
-                                                            fastDialog.dismiss();
-                                                            FastDialog fastDialog1 = new FastDialogBuilder(MyAccount.this, Type.DIALOG)
-                                                                    .setTitleText("Code Sent")
-                                                                    .setText("Enter 6 Digit Code\n")
-                                                                    .setHint("Here")
-                                                                    .setAnimation(Animations.SLIDE_TOP)
-                                                                    .positiveText("Confirm")
-                                                                    .negativeText("Cancel")
-                                                                    .setTextMaxLength(6)
-                                                                    .cancelable(false)
-                                                                    .create();
-                                                            fastDialog1.show();
-                                                            auth = FirebaseAuth.getInstance();
-                                                            PhoneAuthOptions options =  PhoneAuthOptions.newBuilder(auth)
-                                                                    .setPhoneNumber(inputV)
-                                                                    .setActivity(MyAccount.this)
-                                                                    .setTimeout(60L, TimeUnit.SECONDS)
-                                                                    .setCallbacks(new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
-                                                                        @Override
-                                                                        public void onVerificationCompleted(@NonNull PhoneAuthCredential phoneAuthCredential) {
-
-                                                                            credential = phoneAuthCredential;
-                                                                            Toast.makeText(MyAccount.this, "I am here", Toast.LENGTH_SHORT).show();
-
-                                                                        }
-
-                                                                        @Override
-                                                                        public void onVerificationFailed(@NonNull FirebaseException e) {
-                                                                            Toast.makeText(MyAccount.this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
-
-                                                                        }
-
-                                                                        @Override
-                                                                        public void onCodeSent(@NonNull String s, @NonNull PhoneAuthProvider.ForceResendingToken forceResendingToken) {
-                                                                            Toast.makeText(MyAccount.this, "Code sent", Toast.LENGTH_SHORT).show();
-                                                                                verId = s;
-                                                                        }
-                                                                    }).build();
-
-                                                            fastDialog1.positiveClickListener(new PositiveClick() {
-                                                                @Override
-                                                                public void onClick(View view) {
-                                                                    credential = PhoneAuthProvider.getCredential(verId,fastDialog1.getInputText());
-                                                                    auth.signInWithCredential(credential).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                                                                        @Override
-                                                                        public void onComplete(@NonNull Task<AuthResult> task) {
-                                                                            if(task.isSuccessful()){
-                                                                                FirebaseUser user = auth.getCurrentUser();
-                                                                                user.updatePhoneNumber(credential).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                                                    @Override
-                                                                                    public void onComplete(@NonNull Task<Void> task) {
-                                                                                        if(task.isSuccessful())
-                                                                                            Toast.makeText(MyAccount.this, "Success", Toast.LENGTH_SHORT).show();
-                                                                                        else
-                                                                                            Toast.makeText(MyAccount.this, "Faliure", Toast.LENGTH_SHORT).show();
-                                                                                    }
-                                                                                });
-                                                                            }
-                                                                        }
-                                                                    });
-                                                                }
-                                                            });
-
-                                                            PhoneAuthProvider.verifyPhoneNumber(options);
-                                                        }
-
-                                                    }
-
-                                                    @Override
-                                                    public void onCancelled(@NonNull DatabaseError error) {
-
-                                                    }
-                                                });
-                                            }
-                                        }
-                                    });
-
-                                    fastDialog.show();
-
-                                } else {
-                                    Toast.makeText(MyAccount.this, "No", Toast.LENGTH_SHORT).show();
-                                }
-                            }
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError error) {
-
-                            }
-                        });
-                        break;
-
-                    case 3:
                         new KAlertDialog(MyAccount.this,KAlertDialog.WARNING_TYPE)
                                 .setTitleText("Delete Account")
                                 .setContentText("Do you sure wanna delete your account!!!\n"+"This action can't be revert")
@@ -314,7 +181,7 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
                                 }).show();
                         break;
 
-                    case 4:
+                    case 3:
                         Intent intent = new Intent(MyAccount.this, EditVendorDetails.class);
                         startActivityForResult(intent,2);
                         break;
