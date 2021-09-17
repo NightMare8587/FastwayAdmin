@@ -173,6 +173,8 @@ public class HomeFrag extends Fragment {
         vendorIdEditor = vendorIdCreated.edit();
         new checkBank().execute();
 
+
+
         recyclerView = view.findViewById(R.id.homeFragRecyclerView);
         refershRecyclerView = view.findViewById(R.id.refreshCurrentTables);
 //        recyclerView.setLayoutManager(new LinearLayoutManager(view.getContext(),LinearLayoutManager.HORIZONTAL),true);
