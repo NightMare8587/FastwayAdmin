@@ -2,6 +2,7 @@ package com.consumers.fastwayadmin.HomeScreen;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -34,7 +35,9 @@ import com.google.firebase.messaging.FirebaseMessaging;
 
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Timer;
@@ -46,6 +49,7 @@ public class HomeScreen extends AppCompatActivity {
     String URL = "https://fcm.googleapis.com/fcm/send";
     FragmentManager manager;
     FirebaseAuth auth;
+    DatabaseReference reference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -141,6 +145,8 @@ public class HomeScreen extends AppCompatActivity {
                 });
             }
         },0,5000);
+
+
     }
 
     @Override
@@ -194,5 +200,6 @@ public class HomeScreen extends AppCompatActivity {
         bubble = findViewById(R.id.top_navigation_constraint);
         manager = getSupportFragmentManager();
         FirebaseMessaging.getInstance().subscribeToTopic(Objects.requireNonNull(auth.getUid()));
+        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid());
     }
 }

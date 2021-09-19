@@ -4,6 +4,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -15,12 +16,19 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.consumers.fastwayadmin.R;
+import com.developer.kalert.KAlertDialog;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import karpuzoglu.enes.com.fastdialog.Animations;
 import karpuzoglu.enes.com.fastdialog.FastDialog;
@@ -34,6 +42,13 @@ public class MyOrdersTransactions extends AppCompatActivity {
     String genratedToken = "";
     List<String> status = new ArrayList<>();
     List<String> amount = new ArrayList<>();
+    List<String> time = new ArrayList<>();
+    String currentTransID;
+    List<String> transID = new ArrayList<>();
+    FirebaseAuth auth = FirebaseAuth.getInstance();
+    DatabaseReference reference;
+    String testPayoutToken = "https://intercellular-stabi.000webhostapp.com/CheckoutPayouts/testToken.php";
+    String testBearerToken = "https://intercellular-stabi.000webhostapp.com/CheckoutPayouts/test/testBearerToken.php";
     FastDialog fastDialog;
     String authToken = "https://intercellular-stabi.000webhostapp.com/CheckoutPayouts/authBEarerToken.php";
     @Override
@@ -45,15 +60,48 @@ public class MyOrdersTransactions extends AppCompatActivity {
                 .setAnimation(Animations.SLIDE_TOP)
                 .create();
         fastDialog.show();
-        new MakePayout().execute();
+        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
+        reference.child("Transactions").limitToLast(25).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists()){
+                    time.clear();
+                    amount.clear();
+                    transID.clear();
+                    status.clear();
+
+                    for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                        time.add(String.valueOf(dataSnapshot.getKey()));
+                        transID.add(String.valueOf(dataSnapshot.child("transID").getValue()));
+                    }
+
+                    new MakePayout().execute();
+
+                }else{
+                    new KAlertDialog(MyOrdersTransactions.this,KAlertDialog.ERROR_TYPE)
+                            .setTitleText("Error")
+                            .setContentText("No transaction found")
+                            .setConfirmText("Exit")
+                            .setConfirmClickListener(KAlertDialog::dismissWithAnimation).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
     }
 
+
     public class MakePayout extends AsyncTask<Void,Void,Void> {
+
 
         @Override
         protected Void doInBackground(Void... voids) {
             RequestQueue requestQueue = Volley.newRequestQueue(MyOrdersTransactions.this);
-            StringRequest stringRequest = new StringRequest(Request.Method.POST, neftUrl, new Response.Listener<String>() {
+            StringRequest stringRequest = new StringRequest(Request.Method.POST, testPayoutToken, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
                     Log.i("response",response);
@@ -76,12 +124,17 @@ public class MyOrdersTransactions extends AppCompatActivity {
         @Override
         protected Void doInBackground(Void... voids) {
             RequestQueue requestQueue = Volley.newRequestQueue(MyOrdersTransactions.this);
-            StringRequest stringRequest = new StringRequest(Request.Method.POST, authToken, new Response.Listener<String>() {
+            StringRequest stringRequest = new StringRequest(Request.Method.POST, testBearerToken, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
                     Log.i("response",response);
                     if(response.trim().equals("Token is valid")){
-                        new fetchBenDetails().execute();
+                        for(int i=0;i<time.size();i++){
+                            currentTransID = transID.get(i);
+                            Log.i("id",currentTransID);
+                            new fetchBenDetails().execute();
+                        }
+                        Log.i("value",transID.toString());
                         fastDialog.dismiss();
                     }
                 }
@@ -112,19 +165,7 @@ public class MyOrdersTransactions extends AppCompatActivity {
             StringRequest stringRequest = new StringRequest(Request.Method.POST, singleBenStatus, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
-                    Log.i("resp", String.valueOf(response.toCharArray()));
-//                    char[] arr = response.toCharArray();
-//                    String[] array = response.split(",");
-//                    for(int i=1;i<array.length;i = i+5){
-//                        amount.add(String.valueOf(array[i]));
-//                    }
-//
-//                    for(int i=4;i<array.length;i = i+5){
-//                        status.add(String.valueOf(array[i]));
-//                    }
-//
-//                    Log.i("resp",amount.toString());
-//                    Log.i("resp",status.toString());
+                    Log.i("resp", response);
 
                 }
             }, new Response.ErrorListener() {
@@ -135,35 +176,17 @@ public class MyOrdersTransactions extends AppCompatActivity {
             }){
                 @Nullable
                 @Override
-                protected Map<String, String> getParams() throws AuthFailureError {
+                protected Map<String, String> getParams() {
                     Map<String,String> params = new HashMap<>();
                     FirebaseAuth auth = FirebaseAuth.getInstance();
                     params.put("token",genratedToken);
-                    params.put("benID","311370913");
+                    params.put("benID",currentTransID);
+
                     return params;
                 }
             };
             requestQueue.add(stringRequest);
-//            JSONObject jsonObject = new JSONObject();
-//            try {
-//                FirebaseAuth auth =FirebaseAuth.getInstance();
-//                jsonObject.put("token",String.valueOf(genratedToken));
-//                jsonObject.put("benID",String.valueOf(auth.getUid()));
-//            } catch (JSONException e) {
-//                e.printStackTrace();
-//            }
-//            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, getBenStatus, jsonObject, new Response.Listener<JSONObject>() {
-//                @Override
-//                public void onResponse(JSONObject response) {
-//                    Log.i("resp",response.toString());
-//                }
-//            }, new Response.ErrorListener() {
-//                @Override
-//                public void onErrorResponse(VolleyError error) {
-//
-//                }
-//            });
-//            requestQueue.add(jsonObjectRequest);
+
             return null;
         }
     }
