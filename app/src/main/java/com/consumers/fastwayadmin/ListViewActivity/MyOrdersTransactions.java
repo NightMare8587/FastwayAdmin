@@ -9,6 +9,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -41,6 +42,7 @@ public class MyOrdersTransactions extends AppCompatActivity {
     String singleBenStatus = "https://intercellular-stabi.000webhostapp.com/benStatusFolder/singleStatus.php";
     String genratedToken = "";
     List<String> status = new ArrayList<>();
+    int count = 0;
     List<String> amount = new ArrayList<>();
     List<String> time = new ArrayList<>();
     String currentTransID;
@@ -61,7 +63,7 @@ public class MyOrdersTransactions extends AppCompatActivity {
                 .create();
         fastDialog.show();
         reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
-        reference.child("Transactions").limitToLast(25).addListenerForSingleValueEvent(new ValueEventListener() {
+        reference.child("Transactions").limitToLast(4).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.exists()){
@@ -132,7 +134,39 @@ public class MyOrdersTransactions extends AppCompatActivity {
                         for(int i=0;i<time.size();i++){
                             currentTransID = transID.get(i);
                             Log.i("id",currentTransID);
-                            new fetchBenDetails().execute();
+                            count++;
+//                            new fetchBenDetails().execute();
+                            RequestQueue requestQueue = Volley.newRequestQueue(MyOrdersTransactions.this);
+                            int finalI = i;
+                            StringRequest stringRequest = new StringRequest(Request.Method.POST, singleBenStatus, new Response.Listener<String>() {
+                                @Override
+                                public void onResponse(String response) {
+                                    Log.i("resp", response);
+
+                                }
+                            }, new Response.ErrorListener() {
+                                @Override
+                                public void onErrorResponse(VolleyError error) {
+
+                                }
+                            }){
+                                @Nullable
+                                @Override
+                                protected Map<String, String> getParams() {
+                                    Map<String,String> params = new HashMap<>();
+                                    FirebaseAuth auth = FirebaseAuth.getInstance();
+                                    params.put("token",genratedToken);
+                                    params.put("benID",transID.get(finalI));
+                                    Log.i("count",count + "");
+                                    return params;
+
+                                }
+                            };
+                            requestQueue.add(stringRequest);
+                            stringRequest.setRetryPolicy(new DefaultRetryPolicy(
+                                    0,
+                                    DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
                         }
                         Log.i("value",transID.toString());
                         fastDialog.dismiss();
@@ -161,32 +195,36 @@ public class MyOrdersTransactions extends AppCompatActivity {
 
         @Override
         protected Void doInBackground(Void... voids) {
-            RequestQueue requestQueue = Volley.newRequestQueue(MyOrdersTransactions.this);
-            StringRequest stringRequest = new StringRequest(Request.Method.POST, singleBenStatus, new Response.Listener<String>() {
-                @Override
-                public void onResponse(String response) {
-                    Log.i("resp", response);
-
-                }
-            }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-
-                }
-            }){
-                @Nullable
-                @Override
-                protected Map<String, String> getParams() {
-                    Map<String,String> params = new HashMap<>();
-                    FirebaseAuth auth = FirebaseAuth.getInstance();
-                    params.put("token",genratedToken);
-                    params.put("benID",currentTransID);
-
-                    return params;
-                }
-            };
-            requestQueue.add(stringRequest);
-
+//            RequestQueue requestQueue = Volley.newRequestQueue(MyOrdersTransactions.this);
+//            StringRequest stringRequest = new StringRequest(Request.Method.POST, singleBenStatus, new Response.Listener<String>() {
+//                @Override
+//                public void onResponse(String response) {
+//                    Log.i("resp", response);
+//
+//                }
+//            }, new Response.ErrorListener() {
+//                @Override
+//                public void onErrorResponse(VolleyError error) {
+//
+//                }
+//            }){
+//                @Nullable
+//                @Override
+//                protected Map<String, String> getParams() {
+//                    Map<String,String> params = new HashMap<>();
+//                    FirebaseAuth auth = FirebaseAuth.getInstance();
+//                    params.put("token",genratedToken);
+//                    params.put("benID",currentTransID);
+//                    Log.i("count",count + "");
+//                    return params;
+//
+//                }
+//            };
+//            requestQueue.add(stringRequest);
+//            stringRequest.setRetryPolicy(new DefaultRetryPolicy(
+//                    0,
+//                    DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+//                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
             return null;
         }
     }
