@@ -63,7 +63,7 @@ public class MyOrdersTransactions extends AppCompatActivity {
                 .create();
         fastDialog.show();
         reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
-        reference.child("Transactions").limitToLast(4).addListenerForSingleValueEvent(new ValueEventListener() {
+        reference.child("Transactions").limitToLast(25).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.exists()){
