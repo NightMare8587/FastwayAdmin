@@ -1,20 +1,22 @@
 package com.consumers.fastwayadmin.DiscountCombo;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.consumers.fastwayadmin.R;
 import com.developer.kalert.KAlertDialog;
+import com.example.flatdialoglibrary.dialog.FlatDialog;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -27,12 +29,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import karpuzoglu.enes.com.fastdialog.Animations;
-import karpuzoglu.enes.com.fastdialog.FastDialog;
-import karpuzoglu.enes.com.fastdialog.FastDialogBuilder;
-import karpuzoglu.enes.com.fastdialog.NegativeClick;
-import karpuzoglu.enes.com.fastdialog.PositiveClick;
-import karpuzoglu.enes.com.fastdialog.Type;
 import mehdi.sakout.fancybuttons.FancyButton;
 
 public class CustomOffer extends AppCompatActivity {
@@ -75,7 +71,24 @@ public class CustomOffer extends AppCompatActivity {
         proceed.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                final FlatDialog flatDialog = new FlatDialog(CustomOffer.this);
+                flatDialog.setCanceledOnTouchOutside(true);
+                flatDialog.setTitle("Choose One Option")
+                        .setTitleColor(Color.BLACK)
+                        .setBackgroundColor(Color.parseColor("#f9fce1"))
+                        .setFirstButtonColor(Color.parseColor("#d3f6f3"))
+                        .setFirstButtonTextColor(Color.parseColor("#000000"))
+                        .setFirstButtonText("ADD CUSTOM DISCOUNT")
+                        .setSecondButtonColor(Color.parseColor("#fee9b2"))
+                        .setSecondButtonTextColor(Color.parseColor("#000000"))
+                        .setSecondButtonText("ADD FREE DISH")
+                        .withFirstButtonListner(view11 -> {
+                            flatDialog.dismiss();
+                        })
+                        .withSecondButtonListner(view112 -> {
+                            flatDialog.dismiss();
+                        })
+                        .show();
             }
         });
         reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid()));

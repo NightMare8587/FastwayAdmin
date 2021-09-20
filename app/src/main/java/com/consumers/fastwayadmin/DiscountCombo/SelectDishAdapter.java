@@ -2,6 +2,7 @@ package com.consumers.fastwayadmin.DiscountCombo;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -81,26 +82,30 @@ public class SelectDishAdapter extends RecyclerView.Adapter<SelectDishAdapter.ho
                         if(fastDialog.getInputText().equals("")){
                             Toast.makeText(view.getContext(), "Field can't be empty", Toast.LENGTH_SHORT).show();
                         }else{
-                            fastDialog.dismiss();
-                            String inputText = fastDialog.getInputText();
-                            new KAlertDialog(context,KAlertDialog.WARNING_TYPE)
-                                    .setTitleText("Add To Combo")
-                                    .setContentText("You sure wanna add this to combo")
-                                    .setConfirmText("Yes, Add it")
-                                    .setConfirmClickListener(new KAlertDialog.KAlertClickListener() {
-                                        @Override
-                                        public void onClick(KAlertDialog kAlertDialog) {
-                                            reference.child("Current combo").child(name.get(position)).child("name").setValue(name.get(position));
-                                            reference.child("Current combo").child(name.get(position)).child("quantity").setValue(inputText);
-                                            kAlertDialog.dismissWithAnimation();
-                                        }
-                                    }).setCancelText("No, Wait").setCancelClickListener(new KAlertDialog.KAlertClickListener() {
-                                @Override
-                                public void onClick(KAlertDialog kAlertDialog) {
-                                    kAlertDialog.dismissWithAnimation();
-                                }
-                            }).show();
-
+                            if(TextUtils.isDigitsOnly(fastDialog.getInputText())) {
+                                fastDialog.dismiss();
+                                String inputText = fastDialog.getInputText();
+                                new KAlertDialog(context, KAlertDialog.WARNING_TYPE)
+                                        .setTitleText("Add To Combo")
+                                        .setContentText("You sure wanna add this to combo")
+                                        .setConfirmText("Yes, Add it")
+                                        .setConfirmClickListener(new KAlertDialog.KAlertClickListener() {
+                                            @Override
+                                            public void onClick(KAlertDialog kAlertDialog) {
+                                                reference.child("Current combo").child(name.get(position)).child("name").setValue(name.get(position));
+                                                reference.child("Current combo").child(name.get(position)).child("quantity").setValue(inputText);
+                                                kAlertDialog.dismissWithAnimation();
+                                            }
+                                        }).setCancelText("No, Wait").setCancelClickListener(new KAlertDialog.KAlertClickListener() {
+                                    @Override
+                                    public void onClick(KAlertDialog kAlertDialog) {
+                                        kAlertDialog.dismissWithAnimation();
+                                    }
+                                }).show();
+                            }else{
+                                Toast.makeText(view.getContext(), "Wrong Input", Toast.LENGTH_SHORT).show();
+                                return;
+                            }
                         }
                     }
                 });
