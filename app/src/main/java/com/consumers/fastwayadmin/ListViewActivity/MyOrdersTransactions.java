@@ -7,6 +7,8 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
@@ -44,6 +46,8 @@ public class MyOrdersTransactions extends AppCompatActivity {
     List<String> status = new ArrayList<>();
     int count = 0;
     List<String> amount = new ArrayList<>();
+    RecyclerView recyclerView;
+    int finalI;
     List<String> time = new ArrayList<>();
     String currentTransID;
     List<String> transID = new ArrayList<>();
@@ -62,6 +66,7 @@ public class MyOrdersTransactions extends AppCompatActivity {
                 .setAnimation(Animations.SLIDE_TOP)
                 .create();
         fastDialog.show();
+        recyclerView = findViewById(R.id.orderTransRecyclerView);
         reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
         reference.child("Transactions").limitToLast(25).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -129,20 +134,28 @@ public class MyOrdersTransactions extends AppCompatActivity {
             StringRequest stringRequest = new StringRequest(Request.Method.POST, testBearerToken, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
+
                     Log.i("response",response);
                     if(response.trim().equals("Token is valid")){
                         for(int i=0;i<time.size();i++){
                             currentTransID = transID.get(i);
-                            Log.i("id",currentTransID);
-                            count++;
 //                            new fetchBenDetails().execute();
                             RequestQueue requestQueue = Volley.newRequestQueue(MyOrdersTransactions.this);
-                            int finalI = i;
+                             finalI = i;
                             StringRequest stringRequest = new StringRequest(Request.Method.POST, singleBenStatus, new Response.Listener<String>() {
                                 @Override
                                 public void onResponse(String response) {
                                     Log.i("resp", response);
-
+                                    String[] resp = response.trim().split(",");
+                                    Log.i("infoss",resp[0]);
+                                    status.add(resp[0]);
+                                    amount.add(resp[1]);
+                                    count++;
+                                    if(count == finalI){
+                                        fastDialog.dismiss();
+                                        recyclerView.setLayoutManager(new LinearLayoutManager(MyOrdersTransactions.this));
+                                        recyclerView.setAdapter(new MyOrderAdapter(amount,time,transID,status,MyOrdersTransactions.this));
+                                    }
                                 }
                             }, new Response.ErrorListener() {
                                 @Override
@@ -157,7 +170,6 @@ public class MyOrdersTransactions extends AppCompatActivity {
                                     FirebaseAuth auth = FirebaseAuth.getInstance();
                                     params.put("token",genratedToken);
                                     params.put("benID",transID.get(finalI));
-                                    Log.i("count",count + "");
                                     return params;
 
                                 }
@@ -169,7 +181,6 @@ public class MyOrdersTransactions extends AppCompatActivity {
                                     DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
                         }
                         Log.i("value",transID.toString());
-                        fastDialog.dismiss();
                     }
                 }
             }, new Response.ErrorListener() {
@@ -187,44 +198,6 @@ public class MyOrdersTransactions extends AppCompatActivity {
                 }
             };
             requestQueue.add(stringRequest);
-            return null;
-        }
-    }
-
-    public class fetchBenDetails extends AsyncTask<Void,Void,Void>{
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-//            RequestQueue requestQueue = Volley.newRequestQueue(MyOrdersTransactions.this);
-//            StringRequest stringRequest = new StringRequest(Request.Method.POST, singleBenStatus, new Response.Listener<String>() {
-//                @Override
-//                public void onResponse(String response) {
-//                    Log.i("resp", response);
-//
-//                }
-//            }, new Response.ErrorListener() {
-//                @Override
-//                public void onErrorResponse(VolleyError error) {
-//
-//                }
-//            }){
-//                @Nullable
-//                @Override
-//                protected Map<String, String> getParams() {
-//                    Map<String,String> params = new HashMap<>();
-//                    FirebaseAuth auth = FirebaseAuth.getInstance();
-//                    params.put("token",genratedToken);
-//                    params.put("benID",currentTransID);
-//                    Log.i("count",count + "");
-//                    return params;
-//
-//                }
-//            };
-//            requestQueue.add(stringRequest);
-//            stringRequest.setRetryPolicy(new DefaultRetryPolicy(
-//                    0,
-//                    DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-//                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
             return null;
         }
     }
