@@ -51,9 +51,6 @@ public class MyOrderAdapter extends RecyclerView.Adapter<MyOrderAdapter.Holder> 
             holder.statusTransaction.setTextColor(Color.RED);
             holder.statusTransaction.setText(status.get(position));
         }
-        long yourmilliseconds = System.currentTimeMillis();
-        SimpleDateFormat sdf = new SimpleDateFormat("MMM dd,yyyy HH:mm");
-        Date resultdate = new Date(yourmilliseconds);
         holder.date.setText(DateFormat.getInstance().format(Long.parseLong(time.get(position))));
         holder.orderAmount.setText("\u20B9" + amount.get(position));
     }
