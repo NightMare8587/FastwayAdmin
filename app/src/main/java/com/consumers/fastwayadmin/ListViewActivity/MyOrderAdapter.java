@@ -23,11 +23,14 @@ public class MyOrderAdapter extends RecyclerView.Adapter<MyOrderAdapter.Holder> 
     List<String> time;
     List<String> transID;
     List<String> status;
+    int amounts,days;
     Context context;
 
-    public MyOrderAdapter(List<String> amount, List<String> time, List<String> transID, List<String> status,Context context) {
+    public MyOrderAdapter(List<String> amount, List<String> time, List<String> transID, List<String> status,Context context,int amounts,int days) {
         this.amount = amount;
         this.time = time;
+        this.amounts = amounts;
+        this.days = days;
         this.transID = transID;
         this.status = status;
         this.context = context;
