@@ -51,7 +51,11 @@ public class CurrentTakeAway extends RecyclerView.Adapter<CurrentTakeAway.Holder
     @Override
     public void onBindViewHolder(@NonNull Holder holder, @SuppressLint("RecyclerView") int position) {
         holder.userName.setText("Name: " + finalUserNames.get(position));
+        if(finalPayment.get(position).equals("online"))
         holder.paymentMode.setText("Mode: " + finalPayment.get(position));
+        else{
+            holder.paymentMode.setText("Mode: " + finalPayment.get(position) + " (\u20B9" + orderAmount.get(position) + ")");
+        }
         holder.chatWithCustomer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
