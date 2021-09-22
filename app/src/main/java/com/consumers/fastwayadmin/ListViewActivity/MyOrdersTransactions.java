@@ -151,9 +151,11 @@ public class MyOrdersTransactions extends AppCompatActivity {
                     if(response.trim().equals("Token is valid")){
                         for(int i=0;i<time.size();i++){
                             currentTransID = transID.get(i);
+                            Log.i("transID",currentTransID + "");
 //                            new fetchBenDetails().execute();
                             RequestQueue requestQueue = Volley.newRequestQueue(MyOrdersTransactions.this);
                              finalI = i;
+                            int finalI1 = i;
                             StringRequest stringRequest = new StringRequest(Request.Method.POST, singleBenStatus, new Response.Listener<String>() {
                                 @SuppressLint("SetTextI18n")
                                 @Override
@@ -196,7 +198,9 @@ public class MyOrdersTransactions extends AppCompatActivity {
                                     Map<String,String> params = new HashMap<>();
                                     FirebaseAuth auth = FirebaseAuth.getInstance();
                                     params.put("token",genratedToken);
-                                    params.put("benID",transID.get(finalI));
+                                    params.put("benID",transID.get(finalI1));
+
+                                    Log.i("customTrans",transID.get(finalI1) + "");
                                     return params;
 
                                 }
