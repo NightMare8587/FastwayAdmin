@@ -50,6 +50,7 @@ public class ChatWithCustomer extends AppCompatActivity {
     RecyclerView recyclerView;
     List<String> message = new ArrayList<>();
     List<String> time = new ArrayList<>();
+    SharedPreferences sharedPreferences;
     LinearLayoutManager linearLayoutManager;
     DatabaseReference resName;
     List<String> leftOrRight = new ArrayList<>();
@@ -60,13 +61,14 @@ public class ChatWithCustomer extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_with_customer);
         auth = FirebaseAuth.getInstance();
+        sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
         editText = findViewById(R.id.sendMessageEditText);
         sendME = findViewById(R.id.sendMessageButton);
         linearLayoutManager = new LinearLayoutManager(getApplicationContext());
         reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
         recyclerView = findViewById(R.id.messageRecyclerView);
          id = getIntent().getStringExtra("id");
-        resName = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(auth.getUid());
+        resName = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(auth.getUid());
         resName.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull  DataSnapshot snapshot) {
@@ -124,7 +126,6 @@ public class ChatWithCustomer extends AppCompatActivity {
 
             @Override
             public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                updateChat();
             }
 
             @Override

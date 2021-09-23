@@ -63,6 +63,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     FloatingActionButton actionButton;
     LocationRequest locationRequest;
     SharedPreferences currentLocation;
+    SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
     EditText editText;
     ImageButton imageButton;
@@ -76,6 +77,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         checkRequiredPermission();
+        sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
         currentLocation = getSharedPreferences("locations current",MODE_PRIVATE);
         editor = currentLocation.edit();
         auth = FirebaseAuth.getInstance();
@@ -118,7 +120,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         proceed.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ref = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid()));
+                ref = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
                 RestLocation restLocation = new RestLocation(String.valueOf(latitude),String.valueOf(longitude));
                 ref.child("location").setValue(restLocation);
                 startActivity(new Intent(getApplicationContext(), HomeScreen.class));

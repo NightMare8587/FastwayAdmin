@@ -53,6 +53,7 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 public class MapsActivity2 extends FragmentActivity implements OnMapReadyCallback {
@@ -62,8 +63,10 @@ public class MapsActivity2 extends FragmentActivity implements OnMapReadyCallbac
     FloatingActionButton actionButton;
     LocationRequest locationRequest;
     SharedPreferences currentLocation;
+    SharedPreferences resLocationInfo;
     SharedPreferences.Editor editor;
     EditText editText;
+    SharedPreferences.Editor locationEditor;
     ImageButton imageButton;
     FirebaseAuth auth;
     DatabaseReference ref;
@@ -75,6 +78,8 @@ public class MapsActivity2 extends FragmentActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         checkRequiredPermission();
+        resLocationInfo = getSharedPreferences("loginInfo",MODE_PRIVATE);
+        locationEditor = resLocationInfo.edit();
         currentLocation = getSharedPreferences("locations current",MODE_PRIVATE);
         editor = currentLocation.edit();
         auth = FirebaseAuth.getInstance();
@@ -117,7 +122,7 @@ public class MapsActivity2 extends FragmentActivity implements OnMapReadyCallbac
         proceed.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ref = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid()));
+                ref = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(resLocationInfo.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
                 RestLocation restLocation = new RestLocation(String.valueOf(latitude),String.valueOf(longitude));
                 ref.child("location").setValue(restLocation);
                 setResult(69);
@@ -221,6 +226,20 @@ public class MapsActivity2 extends FragmentActivity implements OnMapReadyCallbac
                 editor.putString("longi",String.valueOf(latitude));
                 editor.putString("lati",String.valueOf(longitude));
                 editor.apply();
+                Geocoder geocoder = new Geocoder(MapsActivity2.this, Locale.getDefault());
+                List<Address> addresses = null;
+                String cityName;
+                String stateName;
+                String countryName;
+                try {
+                    addresses = geocoder.getFromLocation(latitude, longitude, 1);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                cityName = addresses.get(0).getLocality();
+
+                locationEditor.putString("state",cityName);
+                locationEditor.apply();
 //               RestLocation restLocation = new RestLocation(String.valueOf(latitude),String.valueOf(longitude));
 //               ref = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants");
 //               ref.child("Locations").child(auth.getUid()).setValue(restLocation);

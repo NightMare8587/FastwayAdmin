@@ -9,10 +9,14 @@ import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,7 +41,10 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.ResolvableApiException;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResponse;
@@ -65,7 +72,10 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.hbb20.CountryCodePicker;
 
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -83,8 +93,10 @@ public class MainActivity extends AppCompatActivity {
     String body = "Haha you nigga";
     FirebaseAuth loginAuth;
     String reciverMailID;
+    double longi,lati;
     LocationRequest locationRequest;
     GoogleSignInOptions gso;
+    FusedLocationProviderClient clientsLocation;
     FastDialog verifyCodeDialog,fastDialog;
     GoogleSignInAccount account;
     GoogleSignInClient client;
@@ -132,6 +144,7 @@ public class MainActivity extends AppCompatActivity {
         // checking is user is currently logged in
         if(currentUser != null){
             startActivity(new Intent(getApplicationContext(),Info.class));
+            clientsLocation.removeLocationUpdates(mLocationCallback);
             finish();
         }
 
@@ -227,14 +240,15 @@ public class MainActivity extends AppCompatActivity {
 
     private void createLocationRequest() {
          locationRequest = LocationRequest.create();
-        locationRequest.setInterval(10000);
+        locationRequest.setInterval(1000);
         locationRequest.setFastestInterval(5000);
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
                 .addLocationRequest(locationRequest);
 
-
+        clientsLocation = LocationServices.getFusedLocationProviderClient(MainActivity.this);
+        clientsLocation.requestLocationUpdates(locationRequest,mLocationCallback, Looper.myLooper());
         SettingsClient client = LocationServices.getSettingsClient(this);
         Task<LocationSettingsResponse> task = client.checkLocationSettings(builder.build());
 
@@ -274,6 +288,35 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
+    private final LocationCallback mLocationCallback = new LocationCallback() {
+
+        @Override
+        public void onLocationResult(LocationResult locationResult) {
+            Location mLastLocation = locationResult.getLastLocation();
+            longi = mLastLocation.getLongitude();
+            lati = mLastLocation.getLatitude();
+            editor.putString("longi",String.valueOf(longi));
+            editor.putString("lati",String.valueOf(lati));
+            Geocoder geocoder = new Geocoder(MainActivity.this, Locale.getDefault());
+            List<Address> addresses = null;
+            String cityName;
+            String stateName;
+            String countryName;
+            try {
+                addresses = geocoder.getFromLocation(lati, longi, 1);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            cityName = addresses.get(0).getLocality();
+
+            editor.putString("state",cityName);
+            editor.apply();
+            Log.i("info", cityName + " " );
+            Log.i("location",longi + " " + lati);
+
+        }
+    };
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     private void checkPermissions() {
@@ -473,6 +516,7 @@ public class MainActivity extends AppCompatActivity {
                 case Activity.RESULT_OK:
                     // All required changes were successfully made
                     Toast.makeText(MainActivity.this, states.isLocationPresent() + "", Toast.LENGTH_SHORT).show();
+                    createLocationRequest();
                     break;
                 case Activity.RESULT_CANCELED:
                     // The user was asked to change settings, but chose not to
@@ -534,8 +578,9 @@ public class MainActivity extends AppCompatActivity {
 
                                 }
                             });
-
+                            clientsLocation.removeLocationUpdates(mLocationCallback);
                             startActivity(new Intent(MainActivity.this,Info.class));
+                            finish();
 //                            updateUI(user);
                         } else {
                             // If sign in fails, display a message to the user.

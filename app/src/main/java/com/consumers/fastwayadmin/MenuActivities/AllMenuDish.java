@@ -1,6 +1,7 @@
 package com.consumers.fastwayadmin.MenuActivities;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -35,6 +36,7 @@ public class AllMenuDish extends AppCompatActivity {
     FloatingActionButton search;
     SwipeRefreshLayout swipeRefreshLayout;
     FirebaseAuth menuAuth;
+    SharedPreferences sharedPreferences;
     DatabaseReference menuRef;
     RecyclerView recyclerView;
     String dish;
@@ -51,7 +53,6 @@ public class AllMenuDish extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_all_menu_dish);
         initialise();
-
         menuRef.child(Objects.requireNonNull(menuAuth.getUid())).child("List of Dish").child(dish).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -96,7 +97,7 @@ public class AllMenuDish extends AppCompatActivity {
 
             }
         });
-        DatabaseReference childref = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(menuAuth.getUid()).child("List of Dish");
+        DatabaseReference childref = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(menuAuth.getUid()).child("List of Dish");
         menuRef.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull  DataSnapshot snapshot, @Nullable  String previousChildName) {
@@ -188,11 +189,12 @@ public class AllMenuDish extends AppCompatActivity {
     }
 
     private void initialise() {
+        sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
         allMenu = FirebaseDatabase.getInstance().getReference().getRoot();
         search = (FloatingActionButton)findViewById(R.id.floatingActionButton2);
         loading = findViewById(R.id.loading);
         menuAuth = FirebaseAuth.getInstance();
-        menuRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants");
+        menuRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state",""));
         recyclerView = findViewById(R.id.dishRecycler);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         dish = getIntent().getStringExtra("Dish");

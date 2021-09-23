@@ -87,6 +87,7 @@ public class HomeFrag extends Fragment {
     List<String> finalPayment = new ArrayList<>();
     List<String> orderIDs = new ArrayList<>();
     List<String> orderAmounts = new ArrayList<>();
+    SharedPreferences resInfoShared;
     String usernameOfTakeAway;
     String orderId,orderAmount;
     List<String> finalUserNames = new ArrayList<>();
@@ -163,6 +164,7 @@ public class HomeFrag extends Fragment {
         inAppUpdateInfo();
         SharedPreferences stopServices = requireActivity().getSharedPreferences("Stop Services",Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = stopServices.edit();
+        resInfoShared = view.getContext().getSharedPreferences("loginInfo",Context.MODE_PRIVATE);
         restaurantStatus = view.getContext().getSharedPreferences("RestaurantStatus",Context.MODE_PRIVATE);
         statusEditor = restaurantStatus.edit();
         onlineOrOffline = view.findViewById(R.id.restaurantOnOff);
@@ -180,11 +182,11 @@ public class HomeFrag extends Fragment {
 //        recyclerView.setLayoutManager(new LinearLayoutManager(view.getContext(),LinearLayoutManager.HORIZONTAL),true);
         comboImage = view.findViewById(R.id.comboDiscountImageView);
         auth = FirebaseAuth.getInstance();
-        onlineOrOfflineRestaurant = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid()));
+        onlineOrOfflineRestaurant = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(resInfoShared.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
         horizonatl = new LinearLayoutManager(view.getContext(),LinearLayoutManager.HORIZONTAL,false);
         anotherHori = new LinearLayoutManager(view.getContext(),LinearLayoutManager.HORIZONTAL,false);;
         sharedPreferences = requireActivity().getSharedPreferences("locations current", Context.MODE_PRIVATE);
-        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid()));
+        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(resInfoShared.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
         FirebaseMessaging.getInstance().subscribeToTopic(Objects.requireNonNull(auth.getUid()));
         if(restaurantStatus.contains("status")){
             if(restaurantStatus.getString("status","").equals("offline")){
@@ -306,7 +308,6 @@ public class HomeFrag extends Fragment {
 
             @Override
             public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                new TakeAwayClass().execute();
             }
 
             @Override
@@ -616,7 +617,7 @@ public class HomeFrag extends Fragment {
         protected void onPostExecute(Void unused) {
             super.onPostExecute(unused);
             FirebaseAuth auth = FirebaseAuth.getInstance();
-            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(auth.getUid()).child("Tables");
+            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(resInfoShared.getString("state","")).child(auth.getUid()).child("Tables");
             databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -707,7 +708,7 @@ public class HomeFrag extends Fragment {
         @Override
         protected Void doInBackground(Void... voids) {
             FirebaseAuth auth = FirebaseAuth.getInstance();
-            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid())).child("Current TakeAway");
+            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(resInfoShared.getString("state","")).child(Objects.requireNonNull(auth.getUid())).child("Current TakeAway");
             databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {

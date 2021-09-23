@@ -1,6 +1,8 @@
 package com.consumers.fastwayadmin.NavFrags;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -40,6 +42,7 @@ public class TablesFrag extends Fragment {
     FloatingActionButton addTable;
     TableView tableView;
     FirebaseAuth tableAuth;
+    SharedPreferences sharedPreferences;
     SwipeRefreshLayout layout;
     DatabaseReference tableRef;
     List<String> tableNumber = new ArrayList<>();
@@ -79,14 +82,14 @@ public class TablesFrag extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         tableBar = view.findViewById(R.id.tableBar);
-
+        sharedPreferences = view.getContext().getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
         addTable = view.findViewById(R.id.addTables);
         layout = view.findViewById(R.id.tableRefreshLayout);
         table = view.findViewById(R.id.tableRecyclerView);
         table.setLayoutManager(new LinearLayoutManager(view.getContext()));
 //        Toast.makeText(getActivity(), "Swipe down to refresh", Toast.LENGTH_SHORT).show();
         tableAuth = FirebaseAuth.getInstance();
-        tableRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(tableAuth.getUid())).child("Tables");
+        tableRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(tableAuth.getUid())).child("Tables");
         tableNumber.clear();
         status.clear();
 //        new MyTask().execute();
@@ -140,7 +143,7 @@ public class TablesFrag extends Fragment {
 
             @Override
             public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                updateChild();
+
             }
 
             @Override

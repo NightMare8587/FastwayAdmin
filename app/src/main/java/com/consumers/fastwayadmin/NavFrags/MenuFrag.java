@@ -27,6 +27,7 @@ import mehdi.sakout.fancybuttons.FancyButton;
 public class MenuFrag extends Fragment {
     FancyButton mainCourse,breads,snacks,deserts,combo,drinks;
     Toolbar menuBar;
+    SharedPreferences sharedPreferences;
     int count = 0;
     boolean pressed = false;
     int total = 0;
@@ -48,7 +49,7 @@ public class MenuFrag extends Fragment {
                 Toast.makeText(getContext(), "Press again to exit", Toast.LENGTH_SHORT).show();
 
                 if(count == 2 && pressed)
-                    Objects.requireNonNull(getActivity()).finish();
+                    requireActivity().finish();
 
                 new Handler().postDelayed(() -> {
                     pressed = false;
@@ -65,6 +66,7 @@ public class MenuFrag extends Fragment {
         menuBar = view.findViewById(R.id.menuFragBar);
         mainCourse = view.findViewById(R.id.MainCourse);
         breads = view.findViewById(R.id.Breads);
+        sharedPreferences = view.getContext().getSharedPreferences("loginInfo",Context.MODE_PRIVATE);
         snacks = view.findViewById(R.id.Snacks);
         deserts = view.findViewById(R.id.Deserts);
         combo = view.findViewById(R.id.Combo);

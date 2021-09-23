@@ -3,6 +3,7 @@ package com.consumers.fastwayadmin.Tables;
 import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -56,7 +57,7 @@ public class AddTables extends AppCompatActivity {
     EditText tableNumber;
     EditText numberOfSeats;
     Button generateQrCode;
-
+    SharedPreferences sharedPreferences;
     FirebaseAuth tableAuth;
     DatabaseReference tableRef;
     FirebaseStorage storage;
@@ -185,7 +186,7 @@ public class AddTables extends AppCompatActivity {
                     return;
                 }
                 tableClass tableClass = new tableClass(numberOfSeats.getText().toString(),tableNumber.getText().toString());
-                tableRef.child("Restaurants").child(Objects.requireNonNull(Objects.requireNonNull(tableAuth.getCurrentUser()).getUid())).child("Tables").child(tableNumber.getText().toString())
+                tableRef.child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(Objects.requireNonNull(tableAuth.getCurrentUser()).getUid())).child("Tables").child(tableNumber.getText().toString())
                         .setValue(tableClass)
                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
@@ -205,7 +206,7 @@ public class AddTables extends AppCompatActivity {
 
                 QRCodeWriter writer = new QRCodeWriter();
                 try {
-                    BitMatrix bitMatrix = writer.encode(tableAuth.getUid() + "," + tableNumber.getText().toString(), BarcodeFormat.QR_CODE, 512, 512);
+                    BitMatrix bitMatrix = writer.encode(tableAuth.getUid() + "," + tableNumber.getText().toString() + "," + sharedPreferences.getString("state",""), BarcodeFormat.QR_CODE, 512, 512);
                     int width = bitMatrix.getWidth();
                     int height = bitMatrix.getHeight();
                     Bitmap bmp = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
@@ -257,6 +258,7 @@ public class AddTables extends AppCompatActivity {
     }
 
     private void initialise() {
+        sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
         tableNumber = findViewById(R.id.tableNumber);
         numberOfSeats = findViewById(R.id.numberOfSeats);
         generateQrCode = findViewById(R.id.genrateCode);

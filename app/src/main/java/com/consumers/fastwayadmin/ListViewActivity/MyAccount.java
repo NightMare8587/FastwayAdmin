@@ -70,6 +70,7 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
     FirebaseAuth auth;
     GoogleSignInClient client;
     GoogleSignInOptions gso;
+    SharedPreferences sharedPreferences;
     String verId;
     PhoneAuthCredential credential;
     ModalBottomSheetDialog modalBottomSheetDialog;
@@ -192,6 +193,7 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
         });
     }
     private void initialise() {
+        sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
         textView = findViewById(R.id.account_activity_text);
         listView = findViewById(R.id.accountActivityListView);
         auth = FirebaseAuth.getInstance();
@@ -284,7 +286,7 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
                     throw new IllegalStateException("Unexpected value: " + id);
             }
         }else if(tag.equals("restaurant")){
-            reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid()));
+            reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
             int id = item.getId();
             switch (id){
                 case R.id.changeNameBottomSheetRestaurant:

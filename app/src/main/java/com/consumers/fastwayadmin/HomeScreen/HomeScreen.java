@@ -1,6 +1,7 @@
 package com.consumers.fastwayadmin.HomeScreen;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -48,6 +49,7 @@ public class HomeScreen extends AppCompatActivity {
     BubbleNavigationConstraintView bubble;
     String URL = "https://fcm.googleapis.com/fcm/send";
     FragmentManager manager;
+    SharedPreferences sharedPreferences;
     FirebaseAuth auth;
     DatabaseReference reference;
 
@@ -56,7 +58,7 @@ public class HomeScreen extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_screen);
         initialise();
-
+        sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
         manager.beginTransaction().replace(R.id.homescreen,new HomeFrag()).commit();
         bubble.setNavigationChangeListener((view, position) -> {
             switch (position){
@@ -78,7 +80,7 @@ public class HomeScreen extends AppCompatActivity {
             }
         });
         FirebaseAuth auth = FirebaseAuth.getInstance();
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid())).child("Tables");
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid())).child("Tables");
         new Timer().scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
