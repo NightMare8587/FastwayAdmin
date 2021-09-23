@@ -2,6 +2,7 @@ package com.consumers.fastwayadmin.DiscountCombo;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,12 +39,14 @@ import karpuzoglu.enes.com.fastdialog.Type;
 public class SelectDishAdapter extends RecyclerView.Adapter<SelectDishAdapter.holder> {
     List<String> name = new ArrayList<>();
     List<String> image = new ArrayList<>();
+    String state;
     Context context;
 
-    public SelectDishAdapter(List<String> name, List<String> image,Context context) {
+    public SelectDishAdapter(List<String> name, List<String> image,Context context,String state) {
         this.name = name;
         this.image = image;
         this.context = context;
+        this.state = state;
     }
 
     @NonNull
@@ -57,7 +60,7 @@ public class SelectDishAdapter extends RecyclerView.Adapter<SelectDishAdapter.ho
     @Override
     public void onBindViewHolder(@NonNull holder holder, @SuppressLint("RecyclerView") int position) {
         FirebaseAuth auth = FirebaseAuth.getInstance();
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid()));
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(Objects.requireNonNull(auth.getUid()));
         holder.nameOfDish.setText(name.get(position));
         if(!image.get(position).equals("")){
             Picasso.get().load(image.get(position)).centerCrop().resize(100,100).into(holder.imageView);

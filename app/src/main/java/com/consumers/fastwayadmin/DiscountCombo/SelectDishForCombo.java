@@ -24,6 +24,7 @@ public class SelectDishForCombo extends AppCompatActivity {
     RecyclerView recyclerView;
     FirebaseAuth auth;
     Toolbar toolbar;
+    String state;
     List<String> name = new ArrayList<>();
     List<String> image = new ArrayList<>();
     DatabaseReference reference;
@@ -37,7 +38,8 @@ public class SelectDishForCombo extends AppCompatActivity {
         recyclerView = findViewById(R.id.selectDishComboRecyclerView);
         auth = FirebaseAuth.getInstance();
         type = getIntent().getStringExtra("dishType");
-        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid())).child("List of Dish");
+        state = getIntent().getStringExtra("state");
+        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(Objects.requireNonNull(auth.getUid())).child("List of Dish");
         reference.child(type).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -47,7 +49,7 @@ public class SelectDishForCombo extends AppCompatActivity {
                         image.add(String.valueOf(dataSnapshot.child("image").getValue()));
                     }
                     recyclerView.setLayoutManager(new LinearLayoutManager(SelectDishForCombo.this));
-                    recyclerView.setAdapter(new SelectDishAdapter(name,image,SelectDishForCombo.this));
+                    recyclerView.setAdapter(new SelectDishAdapter(name,image,SelectDishForCombo.this,state));
                 }
             }
 

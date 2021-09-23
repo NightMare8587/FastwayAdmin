@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -43,14 +44,18 @@ public class ComboAndOffers extends AppCompatActivity {
     List<String> dishQuantity = new ArrayList<>();
     DatabaseReference reference;
     Button createCombo;
+    SharedPreferences sharedPreferences;
     List<String> name = new ArrayList<>();
     FirebaseAuth auth;
+    String state;
     LinearLayoutManager horizonatl;
     Toolbar menuBar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_combo_and_offers);
+        sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
+        state = sharedPreferences.getString("state","");
         initialise();
         horizonatl = new LinearLayoutManager(ComboAndOffers.this,LinearLayoutManager.HORIZONTAL,false);
         mainCourse.setOnClickListener(new View.OnClickListener() {
@@ -66,6 +71,7 @@ public class ComboAndOffers extends AppCompatActivity {
                                 kAlertDialog.dismissWithAnimation();
                                 Intent intent = new Intent(ComboAndOffers.this,SelectDishForCombo.class);
                                 intent.putExtra("dishType","Main Course");
+                                intent.putExtra("state",state);
                                 startActivity(intent);
                             }
                         }).show();
@@ -120,7 +126,7 @@ public class ComboAndOffers extends AppCompatActivity {
                                                 public void onClick(View view) {
                                                     if(!(priceDialog.getInputText().length() == 0)) {
 
-                                                        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid())).child("Current combo");
+                                                        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(Objects.requireNonNull(auth.getUid())).child("Current combo");
                                                         reference.addListenerForSingleValueEvent(new ValueEventListener() {
                                                             @Override
                                                             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -129,9 +135,9 @@ public class ComboAndOffers extends AppCompatActivity {
                                                                         name.add(dataSnapshot.child("name").getValue(String.class));
                                                                         dishQuantity.add(dataSnapshot.child("quantity").getValue(String.class));
                                                                     }
-                                                                    reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid()));
+                                                                    reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(Objects.requireNonNull(auth.getUid()));
                                                                     reference.child("Current combo").removeValue();
-                                                                    reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid())).child("List of Dish");
+                                                                    reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(Objects.requireNonNull(auth.getUid())).child("List of Dish");
                                                                     for (int i = 0; i < name.size(); i++) {
                                                                         combo combo = new combo(name.get(i),dishQuantity.get(i));
                                                                         reference.child("Combo").child(comboName).child(name.get(i)).child("name").setValue(combo);
@@ -208,7 +214,7 @@ public class ComboAndOffers extends AppCompatActivity {
 
             @Override
             public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                updateChild();
+
             }
 
             @Override
@@ -255,6 +261,7 @@ public class ComboAndOffers extends AppCompatActivity {
                                 kAlertDialog.dismissWithAnimation();
                                 Intent intent = new Intent(ComboAndOffers.this,SelectDishForCombo.class);
                                 intent.putExtra("dishType","Breads");
+                                intent.putExtra("state",state);
                                 startActivity(intent);
 //                                kAlertDialog.dismissWithAnimation();
                             }
@@ -275,6 +282,7 @@ public class ComboAndOffers extends AppCompatActivity {
                                 kAlertDialog.dismissWithAnimation();
                                 Intent intent = new Intent(ComboAndOffers.this,SelectDishForCombo.class);
                                 intent.putExtra("dishType","Deserts");
+                                intent.putExtra("state",state);
                                 startActivity(intent);
 //                                kAlertDialog.dismissWithAnimation();
                             }
@@ -294,6 +302,7 @@ public class ComboAndOffers extends AppCompatActivity {
                                 kAlertDialog.dismissWithAnimation();
                                 Intent intent = new Intent(ComboAndOffers.this,SelectDishForCombo.class);
                                 intent.putExtra("dishType","Snacks");
+                                intent.putExtra("state",state);
                                 startActivity(intent);
 //                                kAlertDialog.dismissWithAnimation();
                             }
@@ -313,6 +322,7 @@ public class ComboAndOffers extends AppCompatActivity {
                                 kAlertDialog.dismissWithAnimation();
                                 Intent intent = new Intent(ComboAndOffers.this,SelectDishForCombo.class);
                                 intent.putExtra("dishType","Drinks");
+                                intent.putExtra("state",state);
                                 startActivity(intent);
 //                                kAlertDialog.dismissWithAnimation();
                             }
@@ -361,7 +371,7 @@ public class ComboAndOffers extends AppCompatActivity {
         recyclerView = findViewById(R.id.comboAndOfferRecyclerView);
         createCombo = findViewById(R.id.addToComboButton);
         auth = FirebaseAuth.getInstance();
-        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid()));
+        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(Objects.requireNonNull(auth.getUid()));
 
     }
 }

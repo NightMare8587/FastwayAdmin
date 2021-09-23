@@ -138,6 +138,7 @@ public class MenuFrag extends Fragment {
                 editor.apply();
                 Intent intent = new Intent(getActivity(), ComboMenuDish.class);
                 intent.putExtra("Dish","Combo");
+                intent.putExtra("state",sharedPreferences.getString("state",""));
                 startActivity(intent);
             }
         });
