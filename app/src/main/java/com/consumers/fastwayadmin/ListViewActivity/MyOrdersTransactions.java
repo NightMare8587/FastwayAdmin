@@ -46,11 +46,14 @@ public class MyOrdersTransactions extends AppCompatActivity {
     String singleBenStatus = "https://intercellular-stabi.000webhostapp.com/benStatusFolder/singleStatus.php";
     String genratedToken = "";
     List<String> status = new ArrayList<>();
+    List<String> allTransID = new ArrayList<>();
+    List<String> allTimeID = new ArrayList<>();
     int count = 1;
     List<Integer> amountList = new ArrayList<>();
     List<Integer> daysList = new ArrayList<>();
     List<String> amount = new ArrayList<>();
     int totalAmount=0;
+    HashMap<String,String> map = new HashMap<>();
     TextView numberOfTransactions,earningAmount;
     int days = 1;
     RecyclerView recyclerView;
@@ -87,11 +90,15 @@ public class MyOrdersTransactions extends AppCompatActivity {
                     amountList.clear();
                     transID.clear();
                     status.clear();
+                    allTransID.clear();
+                    map.clear();
+                    allTimeID.clear();
                     totalAmount = 0;
                     days = 0;
                     for(DataSnapshot dataSnapshot : snapshot.getChildren()){
                         time.add(String.valueOf(dataSnapshot.getKey()));
                         transID.add(String.valueOf(dataSnapshot.child("transID").getValue()));
+                        map.put(String.valueOf(dataSnapshot.child("transID").getValue()),String.valueOf(dataSnapshot.child("customerID").getValue()));
                     }
 
                     new MakePayout().execute();
@@ -174,11 +181,13 @@ public class MyOrdersTransactions extends AppCompatActivity {
                                     daysList.add(days);
                                     Log.i("value",totalAmount + "");
                                     count++;
-                                    if(count == finalI){
+                                    if(amountList.size() == time.size()){
                                         fastDialog.dismiss();
-
+                                        Log.i("infoMap",map.toString());
+                                        Log.i("infoMap",allTransID.toString());
+                                        Log.i("infoMap",allTimeID.toString());
                                         recyclerView.setLayoutManager(new LinearLayoutManager(MyOrdersTransactions.this));
-                                        recyclerView.setAdapter(new MyOrderAdapter(amount,time,transID,status,MyOrdersTransactions.this,totalAmount,days));
+                                        recyclerView.setAdapter(new MyOrderAdapter(amount,allTimeID,allTransID,status,MyOrdersTransactions.this,totalAmount,days,map));
                                     }
 
                                     if(amountList.size() == time.size()){
@@ -199,7 +208,8 @@ public class MyOrdersTransactions extends AppCompatActivity {
                                     FirebaseAuth auth = FirebaseAuth.getInstance();
                                     params.put("token",genratedToken);
                                     params.put("benID",transID.get(finalI1));
-
+                                    allTransID.add(transID.get(finalI1));
+                                    allTimeID.add(time.get(finalI1));
                                     Log.i("customTrans",transID.get(finalI1) + "");
                                     return params;
 
