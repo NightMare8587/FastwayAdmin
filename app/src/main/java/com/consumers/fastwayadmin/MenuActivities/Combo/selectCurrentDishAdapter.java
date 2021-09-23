@@ -1,6 +1,8 @@
 package com.consumers.fastwayadmin.MenuActivities.Combo;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,11 +28,13 @@ public class selectCurrentDishAdapter extends RecyclerView.Adapter<selectCurrent
         List<String> image = new ArrayList<>();
         Context context;
         String comboName;
+        String state;
 
-public selectCurrentDishAdapter(List<String> name, List<String> image,Context context,String comboName) {
+public selectCurrentDishAdapter(List<String> name, List<String> image,Context context,String comboName,String state) {
         this.name = name;
         this.image = image;
         this.context = context;
+        this.state = state;
         this.comboName = comboName;
         }
 
@@ -43,9 +47,9 @@ public holder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         }
 
 @Override
-public void onBindViewHolder(@NonNull holder holder, int position) {
+public void onBindViewHolder(@NonNull holder holder, @SuppressLint("RecyclerView") int position) {
         FirebaseAuth auth = FirebaseAuth.getInstance();
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid())).child("List of Dish");
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(Objects.requireNonNull(auth.getUid())).child("List of Dish");
         holder.nameOfDish.setText(name.get(position));
         if(!image.get(position).equals("")){
         Picasso.get().load(image.get(position)).centerCrop().resize(100,100).into(holder.imageView);

@@ -1,9 +1,11 @@
 package com.consumers.fastwayadmin.MenuActivities.Combo;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,7 +50,7 @@ public class ComboRecyclerView extends RecyclerView.Adapter<ComboRecyclerView.Ho
     }
 
     @Override
-    public void onBindViewHolder(@NonNull Holder holder, int position) {
+    public void onBindViewHolder(@NonNull Holder holder, @SuppressLint("RecyclerView") int position) {
         holder.comboName.setText(comboName.get(position));
         holder.price.setText(price.get(position));
         List<String> current = new ArrayList<>(dishName.get(position));
@@ -84,7 +86,8 @@ public class ComboRecyclerView extends RecyclerView.Adapter<ComboRecyclerView.Ho
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 FirebaseAuth auth = FirebaseAuth.getInstance();
-                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("Restaurants").child(Objects.requireNonNull(auth.getUid())).child("List of Dish").child("Combo");
+                SharedPreferences sharedPreferences = buttonView.getContext().getSharedPreferences("loginInfo",Context.MODE_PRIVATE);
+                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid())).child("List of Dish").child("Combo");
                 if(isChecked){
                     databaseReference.child(comboName.get(position)).child("enable").setValue("yes");
                     holder.checkBox.setText("Enabled");

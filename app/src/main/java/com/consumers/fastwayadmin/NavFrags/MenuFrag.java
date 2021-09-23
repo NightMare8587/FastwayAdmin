@@ -78,6 +78,7 @@ public class MenuFrag extends Fragment {
                 SharedPreferences preferences = view.getContext().getSharedPreferences("DishType", Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = preferences.edit();
                 editor.putString("Type","Main Course");
+                editor.putString("state",sharedPreferences.getString("state",""));
                 editor.apply();
                 Intent intent = new Intent(getActivity(), AllMenuDish.class);
                 intent.putExtra("Dish","Main Course");
@@ -91,6 +92,7 @@ public class MenuFrag extends Fragment {
                 SharedPreferences preferences = view.getContext().getSharedPreferences("DishType", Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = preferences.edit();
                 editor.putString("Type","Breads");
+                editor.putString("state",sharedPreferences.getString("state",""));
                 editor.apply();
                 Intent intent = new Intent(getActivity(),AllMenuDish.class);
                 intent.putExtra("Dish","Breads");
@@ -104,6 +106,7 @@ public class MenuFrag extends Fragment {
                 SharedPreferences preferences = view.getContext().getSharedPreferences("DishType", Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = preferences.edit();
                 editor.putString("Type","Snacks");
+                editor.putString("state",sharedPreferences.getString("state",""));
                 editor.apply();
                 Intent intent = new Intent(getActivity(),AllMenuDish.class);
                 intent.putExtra("Dish","Snacks");
@@ -117,6 +120,7 @@ public class MenuFrag extends Fragment {
                 SharedPreferences preferences = view.getContext().getSharedPreferences("DishType", Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = preferences.edit();
                 editor.putString("Type","Deserts");
+                editor.putString("state",sharedPreferences.getString("state",""));
                 editor.apply();
                 Intent intent = new Intent(getActivity(),AllMenuDish.class);
                 intent.putExtra("Dish","Deserts");
@@ -130,6 +134,7 @@ public class MenuFrag extends Fragment {
                 SharedPreferences preferences = view.getContext().getSharedPreferences("DishType", Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = preferences.edit();
                 editor.putString("Type","Combo");
+                editor.putString("state",sharedPreferences.getString("state",""));
                 editor.apply();
                 Intent intent = new Intent(getActivity(), ComboMenuDish.class);
                 intent.putExtra("Dish","Combo");
@@ -143,6 +148,7 @@ public class MenuFrag extends Fragment {
                 SharedPreferences preferences = view.getContext().getSharedPreferences("DishType", Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = preferences.edit();
                 editor.putString("Type","Drinks");
+                editor.putString("state",sharedPreferences.getString("state",""));
                 editor.apply();
                 Intent intent = new Intent(getActivity(),AllMenuDish.class);
                 intent.putExtra("Dish","Drinks");

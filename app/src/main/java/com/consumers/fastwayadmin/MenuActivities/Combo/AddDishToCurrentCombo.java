@@ -5,6 +5,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -25,7 +26,7 @@ import mehdi.sakout.fancybuttons.FancyButton;
 
 public class AddDishToCurrentCombo extends AppCompatActivity {
     FancyButton mainCourse,breads,snacks,deserts,drinks;
-
+    SharedPreferences sharedPreferences;
     DatabaseReference reference;
     List<String> name = new ArrayList<>();
     FirebaseAuth auth;
@@ -37,7 +38,8 @@ public class AddDishToCurrentCombo extends AppCompatActivity {
         setContentView(R.layout.activity_add_dish_to_current_combo);
         comboName = getIntent().getStringExtra("name");
         auth = FirebaseAuth.getInstance();
-        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid()));
+        sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
+        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
         mainCourse = findViewById(R.id.comboMainCourse);
         breads = findViewById(R.id.comboBreads);
         snacks = findViewById(R.id.comboSnacks);
@@ -57,6 +59,7 @@ public class AddDishToCurrentCombo extends AppCompatActivity {
                                 Intent intent = new Intent(AddDishToCurrentCombo.this,SelectDishForCurrentCombo.class);
                                 intent.putExtra("dishType","Main Course");
                                 intent.putExtra("comboName",comboName);
+                                intent.putExtra("state",sharedPreferences.getString("state",""));
                                 startActivity(intent);
                             }
                         }).show();
@@ -76,6 +79,7 @@ public class AddDishToCurrentCombo extends AppCompatActivity {
                                 Intent intent = new Intent(AddDishToCurrentCombo.this, SelectDishForCurrentCombo.class);
                                 intent.putExtra("dishType","Breads");
                                 intent.putExtra("comboName",comboName);
+                                intent.putExtra("state",sharedPreferences.getString("state",""));
                                 startActivity(intent);
 
 //                                kAlertDialog.dismissWithAnimation();
@@ -98,6 +102,7 @@ public class AddDishToCurrentCombo extends AppCompatActivity {
                                 Intent intent = new Intent(AddDishToCurrentCombo.this,SelectDishForCurrentCombo.class);
                                 intent.putExtra("dishType","Deserts");
                                 intent.putExtra("comboName",comboName);
+                                intent.putExtra("state",sharedPreferences.getString("state",""));
                                 startActivity(intent);
 //                                kAlertDialog.dismissWithAnimation();
                             }
@@ -118,6 +123,7 @@ public class AddDishToCurrentCombo extends AppCompatActivity {
                                 Intent intent = new Intent(AddDishToCurrentCombo.this,SelectDishForCurrentCombo.class);
                                 intent.putExtra("dishType","Snacks");
                                 intent.putExtra("comboName",comboName);
+                                intent.putExtra("state",sharedPreferences.getString("state",""));
                                 startActivity(intent);
 //                                kAlertDialog.dismissWithAnimation();
                             }
@@ -138,6 +144,7 @@ public class AddDishToCurrentCombo extends AppCompatActivity {
                                 Intent intent = new Intent(AddDishToCurrentCombo.this,SelectDishForCurrentCombo.class);
                                 intent.putExtra("dishType","Drinks");
                                 intent.putExtra("comboName",comboName);
+                                intent.putExtra("state",sharedPreferences.getString("state",""));
                                 startActivity(intent);
 //                                kAlertDialog.dismissWithAnimation();
                             }

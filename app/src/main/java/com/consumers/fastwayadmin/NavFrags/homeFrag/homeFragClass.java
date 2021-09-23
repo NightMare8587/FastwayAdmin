@@ -1,7 +1,9 @@
 package com.consumers.fastwayadmin.NavFrags.homeFrag;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -53,8 +55,10 @@ public class homeFragClass extends RecyclerView.Adapter<homeFragClass.ViewHolder
         holder.isCurrentOrderMade.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                SharedPreferences sharedPreferences = v.getContext().getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
                 Intent intent = new Intent(v.getContext(),ApproveCurrentOrder.class);
                 intent.putExtra("table",tableNum.get(position));
+                intent.putExtra("state",sharedPreferences.getString("state",""));
                 intent.putExtra("id",resId.get(position));
                 v.getContext().startActivity(intent);
             }

@@ -30,6 +30,7 @@ public class ComboMenuDish extends AppCompatActivity {
     FirebaseAuth auth;
     RecyclerView recyclerView;
     FloatingActionButton add;
+    String state;
     List<String> dish = new ArrayList<>();
     List<String> price = new ArrayList<>();
     DatabaseReference reference;
@@ -40,8 +41,9 @@ public class ComboMenuDish extends AppCompatActivity {
         setContentView(R.layout.activity_combo_menu_dish);
         auth = FirebaseAuth.getInstance();
         add = findViewById(R.id.addNewComboButton);
+        state = getIntent().getStringExtra("state");
         recyclerView = findViewById(R.id.comboAdapterRecyclerView);
-        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid())).child("List of Dish");
+        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(Objects.requireNonNull(auth.getUid())).child("List of Dish");
         reference.child("Combo").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {

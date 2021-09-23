@@ -51,6 +51,7 @@ public class ApproveCurrentOrder extends AppCompatActivity {
     DatabaseReference saveRefundInfo;
     String orderID,orderAmount;
     String table;
+    String state;
     String id;
     ListView dishQ;
     List<String> dishNames = new ArrayList<>();
@@ -63,7 +64,9 @@ public class ApproveCurrentOrder extends AppCompatActivity {
         setContentView(R.layout.activity_approve_current_order);
         table = getIntent().getStringExtra("table");
         id = getIntent().getStringExtra("id");
+        state = getIntent().getStringExtra("state");
         initialise();
+
         saveRefundInfo = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(id);
         halfOrList = findViewById(R.id.halfOrFullCurrentORder);
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -92,7 +95,7 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                 RequestQueue requestQueue = Volley.newRequestQueue(ApproveCurrentOrder.this);
                 JSONObject main = new JSONObject();
                 FirebaseAuth auth = FirebaseAuth.getInstance();
-                DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid())).child("Tables").child(table);
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(Objects.requireNonNull(auth.getUid())).child("Tables").child(table);
 
                 try{
                     main.put("to","/topics/"+id+"");
@@ -143,7 +146,7 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                 RequestQueue requestQueue = Volley.newRequestQueue(ApproveCurrentOrder.this);
                 JSONObject main = new JSONObject();
                 FirebaseAuth auth = FirebaseAuth.getInstance();
-                DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid())).child("Tables").child(table);
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(Objects.requireNonNull(auth.getUid())).child("Tables").child(table);
                 new InitiateRefund().execute();
                 try{
                     main.put("to","/topics/"+id+"");
@@ -205,7 +208,7 @@ public class ApproveCurrentOrder extends AppCompatActivity {
 
     private void initialise() {
         auth = FirebaseAuth.getInstance();
-        databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid())).child("Tables").child(table).child("Current Order");
+        databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(Objects.requireNonNull(auth.getUid())).child("Tables").child(table).child("Current Order");
         listView = findViewById(R.id.currentOrderListView);
         approve = findViewById(R.id.approveCurrentOrderButton);
         dishQ = findViewById(R.id.quantityCurrentOrder);

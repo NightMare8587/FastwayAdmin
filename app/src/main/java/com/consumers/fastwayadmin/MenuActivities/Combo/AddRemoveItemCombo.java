@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -24,6 +25,7 @@ public class AddRemoveItemCombo extends AppCompatActivity {
     DatabaseReference reference;
     FirebaseAuth auth;
     ListView listView;
+    SharedPreferences sharedPreferences;
     FloatingActionButton floatingActionButton;
     String comboName;
     ArrayList<String> dishNames;
@@ -31,6 +33,7 @@ public class AddRemoveItemCombo extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_remove_item_combo);
+        sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
         comboName = getIntent().getStringExtra("name");
         dishNames = getIntent().getStringArrayListExtra("dishName");
         initialise();
@@ -75,7 +78,7 @@ public class AddRemoveItemCombo extends AppCompatActivity {
 
     private void initialise() {
         auth = FirebaseAuth.getInstance();
-        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid())).child("List of Dish").child("Combo").child(comboName);
+        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid())).child("List of Dish").child("Combo").child(comboName);
         listView = findViewById(R.id.comboAddRemoveListView);
         floatingActionButton = findViewById(R.id.addDishComboButton);
     }

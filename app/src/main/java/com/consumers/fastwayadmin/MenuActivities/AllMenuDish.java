@@ -40,6 +40,7 @@ public class AllMenuDish extends AppCompatActivity {
     DatabaseReference menuRef;
     RecyclerView recyclerView;
     String dish;
+    String state;
     ProgressBar loading;
     List<String> names = new ArrayList<String>();
     List<String> before = new ArrayList<>();
@@ -111,7 +112,7 @@ public class AllMenuDish extends AppCompatActivity {
 
             @Override
             public void onChildRemoved(@NonNull  DataSnapshot snapshot) {
-
+                updateChild();
             }
 
             @Override
@@ -129,6 +130,7 @@ public class AllMenuDish extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(),CreateDish.class);
                 intent.putExtra("Dish",getIntent().getStringExtra("Dish"));
+                intent.putExtra("state",sharedPreferences.getString("state",""));
                 startActivity(intent);
 
             }

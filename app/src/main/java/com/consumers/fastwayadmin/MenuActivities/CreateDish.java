@@ -56,6 +56,7 @@ public class CreateDish extends AppCompatActivity {
     String nameOfDishes;
     String mrp;
     FirebaseStorage storage;
+    String state;
     StorageReference storageReference;
     Button createDish,chooseImage;
     FloatingActionButton floatingActionButton;
@@ -153,7 +154,7 @@ public class CreateDish extends AppCompatActivity {
     private void addToDatabase(String name, String half, String full,String image,String mrp) {
         DishInfo info = new DishInfo(name,half,full,image,mrp,"0","0","0","yes");
         try {
-            dish.child("Restaurants").child(Objects.requireNonNull(dishAuth.getUid())).child("List of Dish").child(menuType).child(name).setValue(info);
+            dish.child("Restaurants").child(state).child(Objects.requireNonNull(dishAuth.getUid())).child("List of Dish").child(menuType).child(name).setValue(info);
             new Upload().execute();
             Toast.makeText(this, "Dish Added Successfully", Toast.LENGTH_SHORT).show();
         }catch (Exception e){
@@ -221,6 +222,7 @@ public class CreateDish extends AppCompatActivity {
         nameOfDish = findViewById(R.id.dishName);
         halfPlate = findViewById(R.id.halfPlatePrice);
         floatingActionButton = findViewById(R.id.searchOurDatabase);
+        state = getIntent().getStringExtra("state");
         fullPlate = findViewById(R.id.fullPlatePrice);
         createDish = findViewById(R.id.saveDishInfo);
         dishAuth = FirebaseAuth.getInstance();
@@ -244,7 +246,7 @@ public class CreateDish extends AppCompatActivity {
             reference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                 @Override
                 public void onSuccess(@NonNull Uri uri) {
-                    dish.child("Restaurants").child(Objects.requireNonNull(dishAuth.getUid())).child("List of Dish").child(menuType).child(name).child("image").setValue(uri + "");
+                    dish.child("Restaurants").child(state).child(Objects.requireNonNull(dishAuth.getUid())).child("List of Dish").child(menuType).child(name).child("image").setValue(uri + "");
                 }
             });
             return null;
