@@ -1,6 +1,7 @@
 package com.consumers.fastwayadmin.ListViewActivity;
 
 import android.annotation.SuppressLint;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -59,6 +60,7 @@ public class MyOrdersTransactions extends AppCompatActivity {
     RecyclerView recyclerView;
     int finalI;
     List<String> time = new ArrayList<>();
+    SharedPreferences sharedPreferences;
     String currentTransID;
     List<String> transID = new ArrayList<>();
     FirebaseAuth auth = FirebaseAuth.getInstance();
@@ -71,6 +73,7 @@ public class MyOrdersTransactions extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_orders_transactions);
+        sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
         fastDialog = new FastDialogBuilder(MyOrdersTransactions.this, Type.PROGRESS)
                 .progressText("Fetching Details...")
                 .setAnimation(Animations.SLIDE_TOP)
