@@ -3,6 +3,7 @@ package com.consumers.fastwayadmin.NavFrags.CurrentTakeAwayOrders;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -59,15 +60,19 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
     String url = "https://intercellular-stabi.000webhostapp.com/refunds/initiateRefund.php";
     DatabaseReference saveRefundInfo;
     Button decline,approve;
+    SharedPreferences sharedPreferences;
     String digitCode;
     ListView listView,dishNames,halfOrList;
     String id,orderId,orderAmount;
     String URL = "https://fcm.googleapis.com/fcm/send";
+    String state;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_approve_current_take_away);
         id = getIntent().getStringExtra("id");
+        sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
+        state = sharedPreferences.getString("state","");
         saveRefundInfo = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(id);
         orderAmount = getIntent().getStringExtra("orderAmount");
         orderId = getIntent().getStringExtra("orderID");
@@ -118,7 +123,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                                     RequestQueue requestQueue = Volley.newRequestQueue(ApproveCurrentTakeAway.this);
                                     JSONObject main = new JSONObject();
                                     FirebaseAuth auth = FirebaseAuth.getInstance();
-                                    DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid())).child("Current TakeAway").child(id);
+                                    DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(Objects.requireNonNull(auth.getUid())).child("Current TakeAway").child(id);
 
                                     try {
                                         main.put("to", "/topics/" + id + "");
@@ -190,7 +195,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                                 fastDialog.dismiss();
                                 JSONObject main = new JSONObject();
                                 FirebaseAuth auth = FirebaseAuth.getInstance();
-                                DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid())).child("Current TakeAway").child(id);
+                                DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(Objects.requireNonNull(auth.getUid())).child("Current TakeAway").child(id);
 
                                 try {
                                     main.put("to", "/topics/" + id + "");
@@ -253,7 +258,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                 RequestQueue requestQueue = Volley.newRequestQueue(ApproveCurrentTakeAway.this);
                 JSONObject main = new JSONObject();
                 FirebaseAuth auth = FirebaseAuth.getInstance();
-                DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid())).child("Current TakeAway").child(id);
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(Objects.requireNonNull(auth.getUid())).child("Current TakeAway").child(id);
                 if (paymentMode.equals("online")) {
                     new InitiateRefund().execute();
                     try {
