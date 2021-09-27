@@ -79,8 +79,8 @@ import java.util.Objects;
 //import com.consumers.fastwayadmin.NavFrags.homeFrag.homeModel;
 
 public class HomeFrag extends Fragment {
-
-
+    String currentTime;
+    List<String> time = new ArrayList<>();
     List<List<String>> finalDishNames = new ArrayList<>();
     List<List<String>> finalDishQuantity = new ArrayList<>();
     List<List<String>> finalHalfOr = new ArrayList<>();
@@ -706,6 +706,7 @@ public class HomeFrag extends Fragment {
 
         @Override
         protected Void doInBackground(Void... voids) {
+
             FirebaseAuth auth = FirebaseAuth.getInstance();
             DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(resInfoShared.getString("state","")).child(Objects.requireNonNull(auth.getUid())).child("Current TakeAway");
             databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -719,6 +720,7 @@ public class HomeFrag extends Fragment {
                         dishQuantityCurrentTakeAway.clear();
                         finalDishQuantity.clear();
                         finalPayment.clear();
+                        time.clear();
                         finalUserNames.clear();
                         finalHalfOr.clear();
                         finalDishNames.clear();
@@ -733,7 +735,9 @@ public class HomeFrag extends Fragment {
                                 dishQuantityCurrentTakeAway.add(String.valueOf(dataSnapshot1.child("timesOrdered").getValue()));
                                 userNameTakeAway.add(String.valueOf(dataSnapshot1.child("nameOfUser").getValue()));
                                 usernameOfTakeAway = String.valueOf(dataSnapshot1.child("nameOfUser").getValue());
+                                currentTime = String.valueOf(dataSnapshot1.child("time").getValue());
                             }
+                            time.add(currentTime);
                             finalDishNames.add(new ArrayList<>(dishNameCurrentTakeAway));
                             finalDishQuantity.add(new ArrayList<>(dishQuantityCurrentTakeAway));
                             finalHalfOr.add(new ArrayList<>(halfOr));
@@ -745,11 +749,12 @@ public class HomeFrag extends Fragment {
                             orderAmounts.add(orderAmount);
                             halfOr.clear();
                         }
+                        Log.i("time",time.toString());
 //                        Log.i("Current",currentTakeAwayAuth.toString() + " " + dishNameCurrentTakeAway.toString() + " " + userNameTakeAway.toString());
                         homeFragTakeAwayRecucler.setLayoutManager(anotherHori);
                         Log.i("message",finalDishNames.toString() + "\n" + finalPayment.toString() + "\n" + finalDishQuantity.toString());
 //                        homeFragTakeAwayRecucler.setAdapter(new CurrentTakeAway(currentTakeAwayAuth,dishNameCurrentTakeAway,dishQuantityCurrentTakeAway,userNameTakeAway,halfOr,paymentMode));
-                            homeFragTakeAwayRecucler.setAdapter(new CurrentTakeAway(finalDishNames,finalDishQuantity,finalHalfOr,finalUserNames,finalPayment,orderIDs,orderAmounts,currentTakeAwayAuth));
+                            homeFragTakeAwayRecucler.setAdapter(new CurrentTakeAway(finalDishNames,finalDishQuantity,finalHalfOr,finalUserNames,finalPayment,orderIDs,orderAmounts,currentTakeAwayAuth,time));
                     }else
                     {
                         currentTakeAwayAuth.clear();
@@ -762,10 +767,11 @@ public class HomeFrag extends Fragment {
                         finalUserNames.clear();
                         orderIDs.clear();
                         orderAmounts.clear();
+                        time.clear();
                         finalHalfOr.clear();
                         dishQuantityCurrentTakeAway.clear();
                         homeFragTakeAwayRecucler.setLayoutManager(anotherHori);
-                        homeFragTakeAwayRecucler.setAdapter(new CurrentTakeAway(finalDishNames,finalDishQuantity,finalHalfOr,finalUserNames,finalPayment,orderIDs,orderAmounts,currentTakeAwayAuth));
+                        homeFragTakeAwayRecucler.setAdapter(new CurrentTakeAway(finalDishNames,finalDishQuantity,finalHalfOr,finalUserNames,finalPayment,orderIDs,orderAmounts,currentTakeAwayAuth,time));
 
                     }
                 }

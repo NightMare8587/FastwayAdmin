@@ -25,6 +25,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.consumers.fastwayadmin.CancelClass;
 import com.consumers.fastwayadmin.NavFrags.homeFrag.ApproveCurrentOrder;
+import com.consumers.fastwayadmin.PaymentClass;
 import com.consumers.fastwayadmin.R;
 import com.developer.kalert.KAlertDialog;
 import com.google.firebase.auth.FirebaseAuth;
@@ -54,6 +55,10 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
     List<String> quantity;
     List<String> dishName;
     String paymentMode;
+    String genratedToken;
+    String testPayoutToken = "https://intercellular-stabi.000webhostapp.com/CheckoutPayouts/testToken.php";
+    String testBearerToken = "https://intercellular-stabi.000webhostapp.com/CheckoutPayouts/test/testBearerToken.php";
+    String testPaymentToVendor = "https://intercellular-stabi.000webhostapp.com/CheckoutPayouts/test/testPayment.php";
     FirebaseAuth auth = FirebaseAuth.getInstance();
     DatabaseReference databaseReference;
     List<String> halfOr;
@@ -61,7 +66,9 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
     DatabaseReference saveRefundInfo;
     Button decline,approve;
     SharedPreferences sharedPreferences;
+    MakePaymentToVendor makePaymentToVendor = new MakePaymentToVendor();
     String digitCode;
+    String time;
     ListView listView,dishNames,halfOrList;
     String id,orderId,orderAmount;
     String URL = "https://fcm.googleapis.com/fcm/send";
@@ -76,6 +83,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
         saveRefundInfo = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(id);
         orderAmount = getIntent().getStringExtra("orderAmount");
         orderId = getIntent().getStringExtra("orderID");
+        time = getIntent().getStringExtra("time");
         paymentMode = getIntent().getStringExtra("payment");
         dishName = new ArrayList<>(getIntent().getStringArrayListExtra("dishName"));
         quantity = new ArrayList<>(getIntent().getStringArrayListExtra("DishQ"));
@@ -86,11 +94,13 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
         halfOrList = findViewById(R.id.halfOrTakeAwayListView);
         dishNames = findViewById(R.id.DishNamesTakeAwayListView);
         approve = findViewById(R.id.approveTakeAwayButton);
+
         DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(id);
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 digitCode = String.valueOf(snapshot.child("digitCode").getValue());
+
             }
 
             @Override
@@ -191,6 +201,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                                 fastDialog.dismiss();
                             } else if (fastDialog.getInputText().equals(digitCode.trim())) {
                                 Toast.makeText(ApproveCurrentTakeAway.this, "Order Confirmed", Toast.LENGTH_SHORT).show();
+                                new MakePayout().execute();
                                 RequestQueue requestQueue = Volley.newRequestQueue(ApproveCurrentTakeAway.this);
                                 fastDialog.dismiss();
                                 JSONObject main = new JSONObject();
@@ -377,6 +388,115 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                     DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
             requestQueue.add(stringRequest);
             return null;
+        }
+    }
+    public class MakePayout extends AsyncTask<Void,Void,Void>{
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            RequestQueue requestQueue = Volley.newRequestQueue(ApproveCurrentTakeAway.this);
+            StringRequest stringRequest = new StringRequest(Request.Method.POST, testPayoutToken, response -> {
+                Log.i("response",response);
+                genratedToken = response.trim();
+                new AuthorizeToken().execute();
+            }, error -> {
+
+            });
+            requestQueue.add(stringRequest);
+            return null;
+        }
+    }
+
+    public class AuthorizeToken extends AsyncTask<Void,Void,Void>{
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            RequestQueue requestQueue = Volley.newRequestQueue(ApproveCurrentTakeAway.this);
+            StringRequest stringRequest = new StringRequest(Request.Method.POST, testBearerToken, response -> {
+                Log.i("response",response);
+                if(response.trim().equals("Token is valid")){
+
+                    makePaymentToVendor.execute();
+                }
+            }, error -> {
+
+            }){
+                @NonNull
+                @Override
+                protected Map<String, String> getParams() throws AuthFailureError {
+                    Map<String,String> params = new HashMap<>();
+                    params.put("token",genratedToken);
+                    return params;
+                }
+            };
+            requestQueue.add(stringRequest);
+            return null;
+        }
+    }
+
+    public class MakePaymentToVendor extends AsyncTask<Void,Void,Void>{
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            Log.i("statusTwo", String.valueOf(makePaymentToVendor.getStatus()));
+            RequestQueue requestQueue = Volley.newRequestQueue(ApproveCurrentTakeAway.this);
+            StringRequest stringRequest = new StringRequest(Request.Method.POST, testPaymentToVendor, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    Log.i("response",response);
+                    Log.i("statusOne", String.valueOf(makePaymentToVendor.getStatus()));
+                }
+            }, error -> {
+
+            }){
+                @NonNull
+                @Override
+                protected Map<String, String> getParams() {
+                    Map<String,String> params = new HashMap<>();
+                    params.put("benID",id);
+                    String genratedID = ApproveCurrentTakeAway.RandomString
+                            .getAlphaNumericString(8);
+                    genratedID = genratedID + String.valueOf(System.currentTimeMillis());
+                    params.put("transID",genratedID);
+                    params.put("token",genratedToken);
+                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(id).child("Transactions");
+                    PaymentClass paymentClass = new PaymentClass(genratedID,auth.getUid() + "");
+                    databaseReference.child(time).setValue(paymentClass);
+                    params.put("amount",String.valueOf(orderAmount));
+                    return params;
+                }
+            };
+            requestQueue.add(stringRequest);
+            return null;
+        }
+    }
+    public static class RandomString {
+
+        // function to generate a random string of length n
+        static String getAlphaNumericString(int n) {
+
+            // chose a Character random from this String
+            String AlphaNumericString = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                    + "0123456789"
+                    + "abcdefghijklmnopqrstuvxyz";
+
+            // create StringBuffer size of AlphaNumericString
+            StringBuilder sb = new StringBuilder(n);
+
+            for (int i = 0; i < n; i++) {
+
+                // generate a random number between
+                // 0 to AlphaNumericString variable length
+                int index
+                        = (int) (AlphaNumericString.length()
+                        * Math.random());
+
+                // add Character one by one in end of sb
+                sb.append(AlphaNumericString
+                        .charAt(index));
+            }
+
+            return sb.toString();
         }
     }
 }

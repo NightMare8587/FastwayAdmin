@@ -26,11 +26,13 @@ public class CurrentTakeAway extends RecyclerView.Adapter<CurrentTakeAway.Holder
     List<String> finalUserNames = new ArrayList<>();
     List<String> orderId = new ArrayList<>();
     List<String> orderAmount = new ArrayList<>();
+    List<String> time;
 
-    public CurrentTakeAway(List<List<String>> finalDishNames, List<List<String>> finalDishQuantity, List<List<String>> finalHalfOr, List<String> finalUserNames, List<String> finalPayment,List<String> orderId,List<String> orderAmount,List<String> currentTakeAwayAuth) {
+    public CurrentTakeAway(List<List<String>> finalDishNames, List<List<String>> finalDishQuantity, List<List<String>> finalHalfOr, List<String> finalUserNames, List<String> finalPayment,List<String> orderId,List<String> orderAmount,List<String> currentTakeAwayAuth,List<String> time) {
         this.finalDishNames = finalDishNames;
         this.finalDishQuantity = finalDishQuantity;
         this.finalHalfOr = finalHalfOr;
+        this.time = time;
         this.finalUserNames = finalUserNames;
         this.orderAmount = orderAmount;
         this.currentTakeAwayAuth = currentTakeAwayAuth;
@@ -77,6 +79,7 @@ public class CurrentTakeAway extends RecyclerView.Adapter<CurrentTakeAway.Holder
                 intent.putStringArrayListExtra("halfOr",(ArrayList<String>) halfOr);
                 intent.putExtra("orderID",orderId.get(position));
                 intent.putExtra("payment",finalPayment.get(position));
+                intent.putExtra("time",time.get(position));
                 intent.putExtra("orderAmount",orderAmount.get(position));
                 view.getContext().startActivity(intent);
             }
