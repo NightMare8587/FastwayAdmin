@@ -515,8 +515,8 @@ public class MainActivity extends AppCompatActivity {
             switch (resultCode) {
                 case Activity.RESULT_OK:
                     // All required changes were successfully made
-                    Toast.makeText(MainActivity.this, states.isLocationPresent() + "", Toast.LENGTH_SHORT).show();
-                    createLocationRequest();
+//                    Toast.makeText(MainActivity.this, states.isLocationPresent() + "", Toast.LENGTH_SHORT).show();
+//                    createLocationRequest();
                     break;
                 case Activity.RESULT_CANCELED:
                     // The user was asked to change settings, but chose not to

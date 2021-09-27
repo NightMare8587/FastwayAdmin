@@ -293,7 +293,26 @@ public class Info extends AppCompatActivity {
             editor.apply();
             Log.i("infoses", cityName + " " );
             Log.i("locationes",longi + " " + lati);
+            checkRef = FirebaseDatabase.getInstance().getReference().getRoot();
+            checkRef.child("Restaurants").child(sharedPreferences.getString("state","")).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if(snapshot.child(Objects.requireNonNull(infoAuth.getUid())).exists()){
+//                   progressBar.setVisibility(View.INVISIBLE);
+                        startActivity(new Intent(Info.this, HomeScreen.class));
+                        clientsLocation.removeLocationUpdates(mLocationCallback);
+                        fastDialog.dismiss();
+                        finish();
+                    }else
+                        fastDialog.dismiss();
 
+//               progressBar.setVisibility(View.INVISIBLE);
+                }
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
         }
     };
 }
