@@ -22,15 +22,17 @@
 
     <application
         android:name=".ServiceInitiatorClass"
+        android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:allowBackup="false"
-
         android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         tools:replace="android:icon,android:allowBackup">
+        <activity
+            android:name=".NavFrags.Reviews.RestaurantsReviews"
+            android:exported="true" />
         <activity
             android:name=".ListViewActivity.MyOrdersTransactions"
             android:exported="true" />

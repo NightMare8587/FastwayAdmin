@@ -26,6 +26,7 @@ import com.consumers.fastwayadmin.ListViewActivity.MyAccount;
 import com.consumers.fastwayadmin.ListViewActivity.MyOrdersTransactions;
 import com.consumers.fastwayadmin.Login.MainActivity;
 import com.consumers.fastwayadmin.MyService;
+import com.consumers.fastwayadmin.NavFrags.Reviews.RestaurantsReviews;
 import com.consumers.fastwayadmin.R;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -38,7 +39,7 @@ import java.util.Objects;
 
 public class AccountFrag extends Fragment {
     ListView listView;
-    String[] names = {"My Account","My Transactions","Logout","Terms And Conditions","Privacy policy"};
+    String[] names = {"My Account","My Transactions","Logout","Terms And Conditions","Privacy policy","Restaurant Reviews"};
     GoogleSignInClient googleSignInClient;
 
     FirebaseAuth auth;
@@ -139,6 +140,9 @@ public class AccountFrag extends Fragment {
                         Intent privacyIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://fastway.flycricket.io/privacy.html"));
                         startActivity(privacyIntent);
                         break;
+                    case 5:
+                    startActivity(new Intent(requireContext(), RestaurantsReviews.class));
+                    break;
                 }
             }
         });
