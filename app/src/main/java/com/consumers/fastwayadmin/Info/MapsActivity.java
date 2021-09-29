@@ -120,10 +120,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         proceed.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                SharedPreferences locationShared = getSharedPreferences("LocationMaps",MODE_PRIVATE);
+                SharedPreferences.Editor editor = locationShared.edit();
                 ref = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
                 RestLocation restLocation = new RestLocation(String.valueOf(latitude),String.valueOf(longitude));
                 ref.child("location").setValue(restLocation);
                 startActivity(new Intent(getApplicationContext(), HomeScreen.class));
+                editor.putString("location","yes");
+                editor.apply();
                 finish();
             }
         });

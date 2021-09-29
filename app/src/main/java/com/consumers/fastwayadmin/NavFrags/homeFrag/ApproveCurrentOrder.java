@@ -330,14 +330,14 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                 @Override
                 protected Map<String, String> getParams() {
                     Map<String,String> params = new HashMap<>();
-                    params.put("benID",id);
+                    params.put("benID",auth.getUid());
                     String genratedID = ApproveCurrentOrder.RandomString
                             .getAlphaNumericString(8);
                     genratedID = genratedID + String.valueOf(System.currentTimeMillis());
                     params.put("transID",genratedID);
                     params.put("token",genratedToken);
-                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(id).child("Transactions");
-                    PaymentClass paymentClass = new PaymentClass(genratedID,auth.getUid() + "");
+                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid())).child("Transactions");
+                    PaymentClass paymentClass = new PaymentClass(genratedID,id);
                     databaseReference.child(time).setValue(paymentClass);
                     params.put("amount",String.valueOf(orderAmount));
                     return params;

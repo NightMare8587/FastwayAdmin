@@ -60,26 +60,24 @@ public class Info extends AppCompatActivity {
 
     EditText nameOfRestaurant,AddressOfRestaurant,nearbyPlace,pinCode,contactNumber;
     Button proceed;
-    ViewGroup group;
     LocationRequest locationRequest;
     FusedLocationProviderClient clientsLocation;
     double longi,lati;
-    protected boolean isProgressShowing = false;
     CountryCodePicker codePicker;
     FirebaseAuth infoAuth;
     DatabaseReference infoRef;
-    DatabaseReference checkRef;
     FastDialog fastDialog;
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
     String name,address,nearby,pin,number;
-//    ProgressBar progressBar;
+    SharedPreferences checkLocationInfo;
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_info);
         initialise();
+        checkLocationInfo = getSharedPreferences("LocationMaps",MODE_PRIVATE);
         checkPermissions();
         sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
         editor = sharedPreferences.edit();
@@ -92,48 +90,16 @@ public class Info extends AppCompatActivity {
             fastDialog.dismiss();
             createLocationRequest();
         }else{
-            checkRef = FirebaseDatabase.getInstance().getReference().getRoot();
-            checkRef.child("Restaurants").child(sharedPreferences.getString("state","")).addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    if(snapshot.child(Objects.requireNonNull(infoAuth.getUid())).exists()){
-//                   progressBar.setVisibility(View.INVISIBLE);
-                        startActivity(new Intent(Info.this, HomeScreen.class));
-                        clientsLocation.removeLocationUpdates(mLocationCallback);
-                        fastDialog.dismiss();
-                        finish();
-                    }else
-                        fastDialog.dismiss();
-
-//               progressBar.setVisibility(View.INVISIBLE);
-                }
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-
-                }
-            });
+            if(checkLocationInfo.contains("location")){
+                startActivity(new Intent(Info.this,HomeScreen.class));
+                fastDialog.dismiss();
+                finish();
+            }
+            fastDialog.dismiss();
         }
         Log.i("myLocation",sharedPreferences.getString("state",""));
 
-//        checkRef = FirebaseDatabase.getInstance().getReference().getRoot();
-//        checkRef.child("Restaurants").addListenerForSingleValueEvent(new ValueEventListener() {
-//           @Override
-//           public void onDataChange(@NonNull DataSnapshot snapshot) {
-//               if(snapshot.child(Objects.requireNonNull(infoAuth.getUid())).exists()){
-////                   progressBar.setVisibility(View.INVISIBLE);
-//                   startActivity(new Intent(Info.this, HomeScreen.class));
-//                   fastDialog.dismiss();
-//                   finish();
-//               }else
-//                   fastDialog.dismiss();
-//
-////               progressBar.setVisibility(View.INVISIBLE);
-//           }
-//           @Override
-//           public void onCancelled(@NonNull DatabaseError error) {
-//
-//           }
-//       });
+
 
         proceed.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -154,7 +120,7 @@ public class Info extends AppCompatActivity {
                     nearbyPlace.requestFocus();
                     nearbyPlace.setError("Field can't be Empty");
                     return;
-                }else if(contactNumber.length() <= 9){
+                }else if(contactNumber.length() <= 9 && contactNumber.length() >= 11){
                     contactNumber.requestFocus();
                     contactNumber.setError("Invalid Number");
                     return;
@@ -293,26 +259,6 @@ public class Info extends AppCompatActivity {
             editor.apply();
             Log.i("infoses", cityName + " " );
             Log.i("locationes",longi + " " + lati);
-            checkRef = FirebaseDatabase.getInstance().getReference().getRoot();
-            checkRef.child("Restaurants").child(sharedPreferences.getString("state","")).addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    if(snapshot.child(Objects.requireNonNull(infoAuth.getUid())).exists()){
-//                   progressBar.setVisibility(View.INVISIBLE);
-                        startActivity(new Intent(Info.this, HomeScreen.class));
-                        clientsLocation.removeLocationUpdates(mLocationCallback);
-                        fastDialog.dismiss();
-                        finish();
-                    }else
-                        fastDialog.dismiss();
-
-//               progressBar.setVisibility(View.INVISIBLE);
-                }
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-
-                }
-            });
         }
     };
 }
