@@ -192,11 +192,13 @@ public class HomeFrag extends Fragment {
             if(restaurantStatus.getString("status","").equals("offline")){
                 comboImage.setVisibility(View.INVISIBLE);
                 linearLayout.setVisibility(View.INVISIBLE);
+                secondLinearLayout.setVisibility(View.INVISIBLE);
                 onlineOrOffline.setChecked(false);
                 onlineOrOffline.setText("offline");
             }else{
                 comboImage.setVisibility(View.VISIBLE);
                 linearLayout.setVisibility(View.VISIBLE);
+                secondLinearLayout.setVisibility(View.VISIBLE);
                 onlineOrOffline.setChecked(true);
                 onlineOrOffline.setText("online");
             }
@@ -272,6 +274,7 @@ public class HomeFrag extends Fragment {
             if(isChecked){
                 statusEditor.putString("status","online");
                 onlineOrOffline.setText("online");
+                secondLinearLayout.setVisibility(View.VISIBLE);
                 statusEditor.apply();
                 comboImage.setVisibility(View.VISIBLE);
                 linearLayout.setVisibility(View.VISIBLE);
@@ -283,6 +286,7 @@ public class HomeFrag extends Fragment {
                 statusEditor.apply();
                 comboImage.setVisibility(View.INVISIBLE);
                 linearLayout.setVisibility(View.INVISIBLE);
+                secondLinearLayout.setVisibility(View.INVISIBLE);
                 onlineOrOfflineRestaurant.child("status").setValue("offline");
                 editor.putString("online","false");
             }
