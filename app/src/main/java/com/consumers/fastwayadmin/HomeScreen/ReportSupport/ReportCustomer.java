@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
@@ -37,6 +38,7 @@ public class ReportCustomer extends AppCompatActivity {
     List<String> foodOrderTime = new ArrayList<>();
     int count = 1;
     DatabaseReference reference;
+    SharedPreferences sharedPreferences;
     RecyclerView recyclerView;
     FirebaseAuth auth;
     @Override
@@ -44,6 +46,7 @@ public class ReportCustomer extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_report_customer);
         initialise();
+
         reference.child("Recent Orders").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -116,7 +119,6 @@ public class ReportCustomer extends AppCompatActivity {
 
             @Override
             public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                updateChild();
             }
 
             @Override
@@ -181,7 +183,8 @@ public class ReportCustomer extends AppCompatActivity {
 
     private void initialise() {
         auth = FirebaseAuth.getInstance();
-        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid()));
+        sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
+        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
         recyclerView = findViewById(R.id.myOrderRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
     }
