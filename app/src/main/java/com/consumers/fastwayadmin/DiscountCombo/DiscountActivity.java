@@ -1,6 +1,7 @@
 package com.consumers.fastwayadmin.DiscountCombo;
 
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
@@ -35,6 +36,7 @@ public class DiscountActivity extends AppCompatActivity {
     DatabaseReference dis;
     DatabaseReference addToDB;
     FirebaseAuth auth;
+    SharedPreferences sharedPreferences;
     List<String> name = new ArrayList<>();
     RecyclerView recyclerView;
 
@@ -42,7 +44,10 @@ public class DiscountActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_discount);
+        sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
         initialise();
+
+
         name.clear();
         reference.child("List of Dish").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -152,7 +157,7 @@ public class DiscountActivity extends AppCompatActivity {
 
     private void customDiscount(String firstTextField) {
         auth = FirebaseAuth.getInstance();
-        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid()));
+        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
         reference.child("List of Dish").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -205,7 +210,8 @@ public class DiscountActivity extends AppCompatActivity {
 
     private void fourtyDiscount() {
         auth = FirebaseAuth.getInstance();
-        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid()));
+        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
+
         reference.child("List of Dish").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -257,20 +263,20 @@ public class DiscountActivity extends AppCompatActivity {
 
     private void addToDiscountDatabase(String discount) {
         auth = FirebaseAuth.getInstance();
-        addToDB = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid()));
+        addToDB = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
         addToDB.child("Discount").child("available").setValue("yes");
     }
 
     private void beforeDiscount(int price,int after, int discount,String type,String name) {
         DisInfo disInfo = new DisInfo(String.valueOf(price),String.valueOf(after),String.valueOf(discount));
-        dis = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid()));
+        dis = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
         dis.child("List of Dish").child(type).child(name).child("Discount").child(name).setValue(disInfo);
     }
 
 
     private void fiftyDiscount() {
         auth = FirebaseAuth.getInstance();
-        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid()));
+        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
         reference.child("List of Dish").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -323,7 +329,7 @@ public class DiscountActivity extends AppCompatActivity {
     private void initialise() {
         recyclerView = findViewById(R.id.discountActivityRecyclerView);
         auth = FirebaseAuth.getInstance();
-        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid()));
+        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
         dis = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
 
     }
