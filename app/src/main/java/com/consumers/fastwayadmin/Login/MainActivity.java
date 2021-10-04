@@ -240,8 +240,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void createLocationRequest() {
          locationRequest = LocationRequest.create();
-        locationRequest.setInterval(1000);
-        locationRequest.setFastestInterval(5000);
+        locationRequest.setInterval(10000);
+        locationRequest.setFastestInterval(50000);
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
@@ -388,7 +388,7 @@ public class MainActivity extends AppCompatActivity {
                             Toast.makeText(MainActivity.this, e.getLocalizedMessage()+"", Toast.LENGTH_SHORT).show();
                         }
                     });
-
+                    clientsLocation.removeLocationUpdates(mLocationCallback);
                     reference.child("Admin").child(loginAuth.getUid()+"").setValue(user);
                     startActivity(new Intent(MainActivity.this, Info.class));
                     finish();
@@ -458,6 +458,7 @@ public class MainActivity extends AppCompatActivity {
 
                                     }
                                 });
+                                clientsLocation.removeLocationUpdates(mLocationCallback);
                                 startActivity(new Intent(getApplicationContext(),Info.class));
                                 finish();
                             }else{

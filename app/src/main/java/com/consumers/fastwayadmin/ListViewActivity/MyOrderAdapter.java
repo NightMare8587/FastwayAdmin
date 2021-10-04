@@ -4,6 +4,8 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
@@ -15,6 +17,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,6 +34,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.protobuf.StringValue;
+import com.itextpdf.text.pdf.parser.Line;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -141,7 +146,72 @@ public class MyOrderAdapter extends RecyclerView.Adapter<MyOrderAdapter.Holder> 
             databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    Log.i("info",snapshot.child("name").getValue(String.class));
+                    AlertDialog.Builder alert = new AlertDialog.Builder(click.getContext());
+                    alert.setTitle("Customer Details");
+                    Toast.makeText(click.getContext(), "Long press to copy text", Toast.LENGTH_SHORT).show();
+                    TextView contact = new TextView(click.getContext());
+                    TextView email = new TextView(click.getContext());
+                    TextView name = new TextView(click.getContext());
+                    LinearLayout linearLayout = new LinearLayout(click.getContext());
+                    linearLayout.setOrientation(LinearLayout.VERTICAL);
+                    contact.setTextSize(18);
+                    email.setTextSize(18);
+                    name.setTextSize(18);
+                    name.setPadding(6,6,6,6);
+                    email.setPadding(6,6,6,6);
+                    contact.setPadding(6,6,6,6);
+                    name.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+                    email.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+                    contact.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+
+                    if(snapshot.hasChild("name")){
+                        name.setText(String.valueOf(snapshot.child("name").getValue()));
+                        linearLayout.addView(name);
+
+                    }
+
+                    if(snapshot.hasChild("email")){
+                        email.setText(String.valueOf(snapshot.child("email").getValue()));
+                        linearLayout.addView(email);
+
+                    }
+
+                    if(snapshot.hasChild("number")){
+                        contact.setText(String.valueOf(snapshot.child("number").getValue()));
+                        linearLayout.addView(contact);
+                    }
+
+                    name.setOnLongClickListener(click -> {
+                        Toast.makeText(click.getContext(), "Text Copied", Toast.LENGTH_SHORT).show();
+                        ClipboardManager clipboard = (ClipboardManager) click.getContext().getSystemService(Context.CLIPBOARD_SERVICE);
+                        ClipData clip = ClipData.newPlainText("Text Copied", name.getText().toString());
+                        clipboard.setPrimaryClip(clip);
+                        return true;
+                    });
+                    email.setOnLongClickListener(click -> {
+                        Toast.makeText(click.getContext(), "Text Copied", Toast.LENGTH_SHORT).show();
+                        ClipboardManager clipboard = (ClipboardManager) click.getContext().getSystemService(Context.CLIPBOARD_SERVICE);
+                        ClipData clip = ClipData.newPlainText("Text Copied", email.getText().toString());
+                        clipboard.setPrimaryClip(clip);
+                        return true;
+                    });
+                    contact.setOnLongClickListener(click -> {
+                        Toast.makeText(click.getContext(), "Text Copied", Toast.LENGTH_SHORT).show();
+                        ClipboardManager clipboard = (ClipboardManager) click.getContext().getSystemService(Context.CLIPBOARD_SERVICE);
+                        ClipData clip = ClipData.newPlainText("Text Copied", contact.getText().toString());
+                        clipboard.setPrimaryClip(clip);
+                        return true;
+                    });
+
+                    alert.setView(linearLayout);
+                    alert.setPositiveButton("ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.dismiss();
+                        }
+                    });
+                    alert.create().show();
+
                 }
 
                 @Override
@@ -159,7 +229,7 @@ public class MyOrderAdapter extends RecyclerView.Adapter<MyOrderAdapter.Holder> 
     public class Holder extends RecyclerView.ViewHolder{
         TextView orderAmount,date,statusTransaction;
         CardView cardView;
-        Button customerDetails;
+        Button customerDetails,orderDetails;
         public Holder(@NonNull View itemView) {
             super(itemView);
             orderAmount = itemView.findViewById(R.id.orderAmountTransactionCardView);
@@ -167,6 +237,7 @@ public class MyOrderAdapter extends RecyclerView.Adapter<MyOrderAdapter.Holder> 
             date = itemView.findViewById(R.id.dateOfTransactionCardView);
             statusTransaction = itemView.findViewById(R.id.statusOrderTransCard);
             customerDetails = itemView.findViewById(R.id.customerDetailsTransCard);
+            orderDetails = itemView.findViewById(R.id.orderDetailsCardButton);
         }
     }
 }

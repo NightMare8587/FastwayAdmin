@@ -127,6 +127,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 ref.child("location").setValue(restLocation);
                 startActivity(new Intent(getApplicationContext(), HomeScreen.class));
                 editor.putString("location","yes");
+                client.removeLocationUpdates(mLocationCallback);
                 editor.apply();
                 finish();
             }
