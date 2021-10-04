@@ -100,6 +100,7 @@ public class ReportOptionsActivity extends AppCompatActivity {
                                             }
                                             SharedPreferences sharedPreferences = getSharedPreferences("RestaurantInfo",MODE_PRIVATE);
                                             addToBlockList.child("authId").setValue(userID);
+                                            updateReportValue(userID);
                                             OtherReportClass otherReportClass = new OtherReportClass(issueName,issueDetail,userName,userEmail,userID,sharedPreferences.getString("hotelName",""));
                                             reportRef.child(Objects.requireNonNull(auth.getUid())).setValue(otherReportClass);
                                             generateNotification();
@@ -124,6 +125,7 @@ public class ReportOptionsActivity extends AppCompatActivity {
                                             SharedPreferences sharedPreferences = getSharedPreferences("RestaurantInfo",MODE_PRIVATE);
                                             OtherReportClass otherReportClass = new OtherReportClass(issueName,issueDetail,userName,userEmail,userID,sharedPreferences.getString("hotelName",""));
                                             reportRef.child(Objects.requireNonNull(auth.getUid())).setValue(otherReportClass);
+                                            updateReportValue(userID);
                                             generateNotification();
                                             Toast.makeText(ReportOptionsActivity.this, "Report Submitted Successfully", Toast.LENGTH_SHORT).show();
                                             kAlertDialog.dismissWithAnimation();
@@ -146,6 +148,28 @@ public class ReportOptionsActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    private void updateReportValue(String userID) {
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(userID);
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(!snapshot.hasChild("reports")){
+                    databaseReference.child("reports").setValue("1");
+                }else
+                {
+                    int num = Integer.parseInt(String.valueOf(snapshot.child("reports").getValue()));
+                    num = num + 1;
+                    databaseReference.child("reports").setValue(num + "");
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
     private void generateNotification() {
