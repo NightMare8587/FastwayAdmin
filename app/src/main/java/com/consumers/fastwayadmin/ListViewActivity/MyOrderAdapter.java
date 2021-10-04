@@ -90,7 +90,7 @@ public class MyOrderAdapter extends RecyclerView.Adapter<MyOrderAdapter.Holder> 
                         SharedPreferences resInfo = context.getSharedPreferences("RestaurantInfo",Context.MODE_PRIVATE);
                         SharedPreferences accountIfo = context.getSharedPreferences("loginInfo",Context.MODE_PRIVATE);
                         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Payouts");
-                        PayoutFailedClass payoutFailedClass = new PayoutFailedClass(accountIfo.getString("name",""),resInfo.getString("hotelName",""),transID.get(position),map.get(transID.get(position)),accountIfo.getString("email",""),auth.getUid());
+                        PayoutFailedClass payoutFailedClass = new PayoutFailedClass(accountIfo.getString("name",""),resInfo.getString("hotelName",""),transID.get(position),map.get(transID.get(position)),accountIfo.getString("email",""),auth.getUid(),accountIfo.getString("state",""));
                         databaseReference.child(Objects.requireNonNull(auth.getUid())).setValue(payoutFailedClass);
                         Toast.makeText(context, "Report Submitted Successfully", Toast.LENGTH_SHORT).show();
                         NotificationCompat.Builder builder
