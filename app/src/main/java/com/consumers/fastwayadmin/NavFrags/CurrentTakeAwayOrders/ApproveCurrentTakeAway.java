@@ -1,8 +1,6 @@
 package com.consumers.fastwayadmin.NavFrags.CurrentTakeAwayOrders;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -11,8 +9,14 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
@@ -24,7 +28,6 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.consumers.fastwayadmin.CancelClass;
-import com.consumers.fastwayadmin.NavFrags.homeFrag.ApproveCurrentOrder;
 import com.consumers.fastwayadmin.PaymentClass;
 import com.consumers.fastwayadmin.R;
 import com.developer.kalert.KAlertDialog;
@@ -42,7 +45,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Random;
 
 import karpuzoglu.enes.com.fastdialog.Animations;
 import karpuzoglu.enes.com.fastdialog.FastDialog;
@@ -265,86 +267,113 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
 
         decline.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                RequestQueue requestQueue = Volley.newRequestQueue(ApproveCurrentTakeAway.this);
-                JSONObject main = new JSONObject();
-                FirebaseAuth auth = FirebaseAuth.getInstance();
-                DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(Objects.requireNonNull(auth.getUid())).child("Current TakeAway").child(id);
-                if (paymentMode.equals("online")) {
-                    new InitiateRefund().execute();
-                    try {
-                        main.put("to", "/topics/" + id + "");
-                        JSONObject notification = new JSONObject();
-                        notification.put("title", "Order Declined");
-                        notification.put("click_action", "Table Frag");
-                        notification.put("body", "Your order is declined by the owner. Refund will be initiated Shortly\nContact Restaurant why order got cancelled");
-                        main.put("notification", notification);
+            public void onClick(View v) {
+                AlertDialog.Builder alert  = new AlertDialog.Builder(v.getContext());
+                alert.setTitle("Reason");
+                alert.setMessage("Enter reason for order cancellation below");
+                EditText editText = new EditText(v.getContext());
+                editText.setMaxLines(200);
+                editText.setHint("Enter reason here");
+                LinearLayout linearLayout = new LinearLayout(v.getContext());
+                linearLayout.setOrientation(LinearLayout.VERTICAL);
+                linearLayout.addView(editText);
+                alert.setView(linearLayout);
 
-                        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, main, new Response.Listener<JSONObject>() {
-                            @Override
-                            public void onResponse(JSONObject response) {
-
-                            }
-                        }, new Response.ErrorListener() {
-                            @Override
-                            public void onErrorResponse(VolleyError error) {
-                                Toast.makeText(ApproveCurrentTakeAway.this, error.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
-                            }
-                        }) {
-                            @Override
-                            public Map<String, String> getHeaders() throws AuthFailureError {
-                                Map<String, String> header = new HashMap<>();
-                                header.put("content-type", "application/json");
-                                header.put("authorization", "key=AAAAsigSEMs:APA91bEUF9ZFwIu84Jctci56DQd0TQOepztGOIKIBhoqf7N3ueQrkClw0xBTlWZEWyvwprXZmZgW2MNywF1pNBFpq1jFBr0CmlrJ0wygbZIBOnoZ0jP1zZC6nPxqF2MAP6iF3wuBHD2R");
-                                return header;
-                            }
-                        };
-                        reference.removeValue();
-                        userRef.child("digitCode").removeValue();
-                        requestQueue.add(jsonObjectRequest);
-                    } catch (Exception e) {
-                        Toast.makeText(ApproveCurrentTakeAway.this, e.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
-                    }
-                }else{
-                    try {
-                        main.put("to", "/topics/" + id + "");
-                        JSONObject notification = new JSONObject();
-                        notification.put("title", "Order Declined");
-                        notification.put("click_action", "Table Frag");
-                        notification.put("body", "Your order is declined by the owner. If you paid cash already then ask owner to refund it");
-                        main.put("notification", notification);
-
-                        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, main, new Response.Listener<JSONObject>() {
-                            @Override
-                            public void onResponse(JSONObject response) {
-
-                            }
-                        }, new Response.ErrorListener() {
-                            @Override
-                            public void onErrorResponse(VolleyError error) {
-                                Toast.makeText(ApproveCurrentTakeAway.this, error.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
-                            }
-                        }) {
-                            @Override
-                            public Map<String, String> getHeaders() throws AuthFailureError {
-                                Map<String, String> header = new HashMap<>();
-                                header.put("content-type", "application/json");
-                                header.put("authorization", "key=AAAAsigSEMs:APA91bEUF9ZFwIu84Jctci56DQd0TQOepztGOIKIBhoqf7N3ueQrkClw0xBTlWZEWyvwprXZmZgW2MNywF1pNBFpq1jFBr0CmlrJ0wygbZIBOnoZ0jP1zZC6nPxqF2MAP6iF3wuBHD2R");
-                                return header;
-                            }
-                        };
-                        reference.removeValue();
-                        requestQueue.add(jsonObjectRequest);
-                    } catch (Exception e) {
-                        Toast.makeText(ApproveCurrentTakeAway.this, e.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
-                    }
-                }
-                new Handler().postDelayed(new Runnable() {
+                alert.setPositiveButton("submit", new DialogInterface.OnClickListener() {
                     @Override
-                    public void run() {
-                        finish();
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        if(!editText.getText().toString().equals("")) {
+                            RequestQueue requestQueue = Volley.newRequestQueue(ApproveCurrentTakeAway.this);
+                            JSONObject main = new JSONObject();
+                            FirebaseAuth auth = FirebaseAuth.getInstance();
+                            DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(Objects.requireNonNull(auth.getUid())).child("Current TakeAway").child(id);
+                            if (paymentMode.equals("online")) {
+                                new InitiateRefund().execute();
+                                try {
+                                    main.put("to", "/topics/" + id + "");
+                                    JSONObject notification = new JSONObject();
+                                    notification.put("title", "Order Declined");
+                                    notification.put("click_action", "Table Frag");
+                                    notification.put("body", "Your order is declined by the owner. Refund will be initiated Shortly\n" + editText.getText().toString());
+                                    main.put("notification", notification);
+
+                                    JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, main, new Response.Listener<JSONObject>() {
+                                        @Override
+                                        public void onResponse(JSONObject response) {
+
+                                        }
+                                    }, new Response.ErrorListener() {
+                                        @Override
+                                        public void onErrorResponse(VolleyError error) {
+                                            Toast.makeText(ApproveCurrentTakeAway.this, error.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }) {
+                                        @Override
+                                        public Map<String, String> getHeaders() throws AuthFailureError {
+                                            Map<String, String> header = new HashMap<>();
+                                            header.put("content-type", "application/json");
+                                            header.put("authorization", "key=AAAAsigSEMs:APA91bEUF9ZFwIu84Jctci56DQd0TQOepztGOIKIBhoqf7N3ueQrkClw0xBTlWZEWyvwprXZmZgW2MNywF1pNBFpq1jFBr0CmlrJ0wygbZIBOnoZ0jP1zZC6nPxqF2MAP6iF3wuBHD2R");
+                                            return header;
+                                        }
+                                    };
+                                    reference.removeValue();
+                                    userRef.child("digitCode").removeValue();
+                                    requestQueue.add(jsonObjectRequest);
+                                } catch (Exception e) {
+                                    Toast.makeText(ApproveCurrentTakeAway.this, e.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
+                                }
+                            } else {
+                                try {
+                                    main.put("to", "/topics/" + id + "");
+                                    JSONObject notification = new JSONObject();
+                                    notification.put("title", "Order Declined");
+                                    notification.put("click_action", "Table Frag");
+                                    notification.put("body", "Your order is declined by the owner. If you paid cash already then ask owner to refund it");
+                                    main.put("notification", notification);
+
+                                    JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, main, new Response.Listener<JSONObject>() {
+                                        @Override
+                                        public void onResponse(JSONObject response) {
+
+                                        }
+                                    }, new Response.ErrorListener() {
+                                        @Override
+                                        public void onErrorResponse(VolleyError error) {
+                                            Toast.makeText(ApproveCurrentTakeAway.this, error.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }) {
+                                        @Override
+                                        public Map<String, String> getHeaders() throws AuthFailureError {
+                                            Map<String, String> header = new HashMap<>();
+                                            header.put("content-type", "application/json");
+                                            header.put("authorization", "key=AAAAsigSEMs:APA91bEUF9ZFwIu84Jctci56DQd0TQOepztGOIKIBhoqf7N3ueQrkClw0xBTlWZEWyvwprXZmZgW2MNywF1pNBFpq1jFBr0CmlrJ0wygbZIBOnoZ0jP1zZC6nPxqF2MAP6iF3wuBHD2R");
+                                            return header;
+                                        }
+                                    };
+                                    reference.removeValue();
+                                    requestQueue.add(jsonObjectRequest);
+                                } catch (Exception e) {
+                                    Toast.makeText(ApproveCurrentTakeAway.this, e.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                            new Handler().postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    finish();
+                                }
+                            }, 1500);
+                        }else
+                            Toast.makeText(v.getContext(), "Enter reason for table cancellation", Toast.LENGTH_SHORT).show();
                     }
-                }, 1500);
+                }).setNegativeButton("back", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+                });
+
+                alert.create().show();
+
             }
         });
     }
