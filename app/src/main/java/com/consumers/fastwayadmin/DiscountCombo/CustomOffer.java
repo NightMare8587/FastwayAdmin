@@ -1,6 +1,7 @@
 package com.consumers.fastwayadmin.DiscountCombo;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
@@ -38,6 +39,7 @@ public class CustomOffer extends AppCompatActivity {
     Button proceed;
     RecyclerView recyclerView;
     List<String> dishQuantity = new ArrayList<>();
+    SharedPreferences sharedPreferences;
     LinearLayoutManager horizonatl;
     DatabaseReference reference;
     DatabaseReference databaseReference;
@@ -46,8 +48,9 @@ public class CustomOffer extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_custom_offer);
         auth = FirebaseAuth.getInstance();
+        sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
         horizonatl = new LinearLayoutManager(CustomOffer.this,LinearLayoutManager.HORIZONTAL,false);
-        databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid())).child("List of Dish");
+        databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid())).child("List of Dish");
         initialise();
 
         mainCourse.setOnClickListener(new View.OnClickListener() {
@@ -63,6 +66,7 @@ public class CustomOffer extends AppCompatActivity {
                                 kAlertDialog.dismissWithAnimation();
                                 Intent intent = new Intent(CustomOffer.this,SelectDishForCombo.class);
                                 intent.putExtra("dishType","Main Course");
+                                intent.putExtra("state",sharedPreferences.getString("state",""));
                                 startActivity(intent);
                             }
                         }).show();
@@ -91,7 +95,7 @@ public class CustomOffer extends AppCompatActivity {
                         .show();
             }
         });
-        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid()));
+        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
         reference.child("Current combo").addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
@@ -110,7 +114,7 @@ public class CustomOffer extends AppCompatActivity {
 
             @Override
             public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                updateChild();
+
             }
 
             @Override
@@ -160,6 +164,7 @@ public class CustomOffer extends AppCompatActivity {
                                 kAlertDialog.dismissWithAnimation();
                                 Intent intent = new Intent(CustomOffer.this,SelectDishForCombo.class);
                                 intent.putExtra("dishType","Breads");
+                                intent.putExtra("state",sharedPreferences.getString("state",""));
                                 startActivity(intent);
 //                                kAlertDialog.dismissWithAnimation();
                             }
@@ -180,6 +185,7 @@ public class CustomOffer extends AppCompatActivity {
                                 kAlertDialog.dismissWithAnimation();
                                 Intent intent = new Intent(CustomOffer.this,SelectDishForCombo.class);
                                 intent.putExtra("dishType","Deserts");
+                                intent.putExtra("state",sharedPreferences.getString("state",""));
                                 startActivity(intent);
 //                                kAlertDialog.dismissWithAnimation();
                             }
@@ -199,6 +205,7 @@ public class CustomOffer extends AppCompatActivity {
                                 kAlertDialog.dismissWithAnimation();
                                 Intent intent = new Intent(CustomOffer.this,SelectDishForCombo.class);
                                 intent.putExtra("dishType","Snacks");
+                                intent.putExtra("state",sharedPreferences.getString("state",""));
                                 startActivity(intent);
 //                                kAlertDialog.dismissWithAnimation();
                             }
@@ -218,6 +225,7 @@ public class CustomOffer extends AppCompatActivity {
                                 kAlertDialog.dismissWithAnimation();
                                 Intent intent = new Intent(CustomOffer.this,SelectDishForCombo.class);
                                 intent.putExtra("dishType","Drinks");
+                                intent.putExtra("state",sharedPreferences.getString("state",""));
                                 startActivity(intent);
 //                                kAlertDialog.dismissWithAnimation();
                             }

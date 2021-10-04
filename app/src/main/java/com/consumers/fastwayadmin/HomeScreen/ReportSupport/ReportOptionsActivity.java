@@ -209,7 +209,8 @@ public class ReportOptionsActivity extends AppCompatActivity {
         submitReport = findViewById(R.id.SubmitOthersReport);
         userID = getIntent().getStringExtra("ID");
         Log.i("id",userID);
-        addToBlockList = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid())).child("Blocked List").child(userID);
+        SharedPreferences sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
+        addToBlockList = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid())).child("Blocked List").child(userID);
         reportRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Admin");
     }
 }
