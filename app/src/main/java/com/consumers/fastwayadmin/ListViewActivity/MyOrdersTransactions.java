@@ -54,6 +54,7 @@ public class MyOrdersTransactions extends AppCompatActivity {
     List<Integer> daysList = new ArrayList<>();
     List<String> amount = new ArrayList<>();
     int totalAmount=0;
+    int pendingamount = 0;
     HashMap<String,String> map = new HashMap<>();
     TextView numberOfTransactions,earningAmount;
     int days = 1;
