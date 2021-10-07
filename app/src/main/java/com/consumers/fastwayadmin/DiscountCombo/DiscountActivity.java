@@ -115,6 +115,7 @@ public class DiscountActivity extends AppCompatActivity {
                                 .setFirstTextFieldHint("Enter How much discount!!")
                                 .setFirstTextFieldBorderColor(Color.BLACK)
                                 .setFirstTextFieldHintColor(Color.BLACK)
+                                .setFirstTextFieldTextColor(Color.BLACK)
                                 .withFirstButtonListner(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View view) {

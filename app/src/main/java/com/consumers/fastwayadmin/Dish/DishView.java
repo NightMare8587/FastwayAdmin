@@ -1,8 +1,10 @@
 package com.consumers.fastwayadmin.Dish;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Paint;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -79,7 +81,8 @@ public class DishView extends RecyclerView.Adapter<DishView.DishAdapter> {
             @Override
             public void onClick(View v) {
                 FirebaseAuth auth = FirebaseAuth.getInstance();
-                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid())).child("List of Dish").child(type).child(names.get(position));
+                SharedPreferences sharedPreferences = v.getContext().getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
+                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid())).child("List of Dish").child(type).child(names.get(position));
                 databaseReference.child("Discount").addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {

@@ -20,7 +20,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="21dp"
-            android:layout_marginTop="40dp"
+            android:layout_marginTop="20dp"
             android:text="Pakwaan"
             android:textSize="18sp"
             android:textStyle="bold"
@@ -38,7 +38,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.367" />
+            app:layout_constraintVertical_bias="0.171" />
 
         <TextView
             android:id="@+id/availableOr"
@@ -66,7 +66,7 @@
             android:id="@+id/discountedPrice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
+            android:layout_marginTop="10dp"
             android:layout_marginEnd="25dp"
             android:text="000"
             android:textSize="16sp"
@@ -80,7 +80,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="15dp"
-            android:layout_marginBottom="2dp"
+            android:layout_marginBottom="7dp"
             android:checked="true"
             android:text="Enabled"
             app:layout_constraintBottom_toBottomOf="parent"
