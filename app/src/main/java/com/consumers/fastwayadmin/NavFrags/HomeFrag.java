@@ -179,6 +179,7 @@ public class HomeFrag extends Fragment {
 
         recyclerView = view.findViewById(R.id.homeFragRecyclerView);
         refershRecyclerView = view.findViewById(R.id.refreshCurrentTables);
+        refreshTakeAway = view.findViewById(R.id.refreshCurrentTakeAway);
 //        recyclerView.setLayoutManager(new LinearLayoutManager(view.getContext(),LinearLayoutManager.HORIZONTAL),true);
         comboImage = view.findViewById(R.id.comboDiscountImageView);
         auth = FirebaseAuth.getInstance();
@@ -349,6 +350,83 @@ public class HomeFrag extends Fragment {
         });
 
 
+
+        refreshTakeAway.setOnClickListener(click -> {
+            FirebaseAuth auth = FirebaseAuth.getInstance();
+            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(resInfoShared.getString("state","")).child(Objects.requireNonNull(auth.getUid())).child("Current TakeAway");
+            databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if(snapshot.exists()){
+                        currentTakeAwayAuth.clear();
+                        dishNameCurrentTakeAway.clear();
+                        userNameTakeAway.clear();
+                        halfOr.clear();
+                        dishQuantityCurrentTakeAway.clear();
+                        finalDishQuantity.clear();
+                        finalPayment.clear();
+                        time.clear();
+                        finalUserNames.clear();
+                        finalHalfOr.clear();
+                        finalDishNames.clear();
+                        for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                            currentTakeAwayAuth.add(String.valueOf(dataSnapshot.getKey()));
+                            for(DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()){
+                                dishNameCurrentTakeAway.add(String.valueOf(dataSnapshot1.child("name").getValue()));
+                                halfOr.add(String.valueOf(dataSnapshot1.child("halfOr").getValue()));
+                                orderAmount = String.valueOf(dataSnapshot1.child("orderAmount").getValue());
+                                orderId = String.valueOf(dataSnapshot1.child("orderID").getValue());
+                                paymentMode = String.valueOf(dataSnapshot1.child("paymmentMode").getValue());
+                                dishQuantityCurrentTakeAway.add(String.valueOf(dataSnapshot1.child("timesOrdered").getValue()));
+                                userNameTakeAway.add(String.valueOf(dataSnapshot1.child("nameOfUser").getValue()));
+                                usernameOfTakeAway = String.valueOf(dataSnapshot1.child("nameOfUser").getValue());
+                                currentTime = String.valueOf(dataSnapshot1.child("time").getValue());
+                            }
+                            time.add(currentTime);
+                            finalDishNames.add(new ArrayList<>(dishNameCurrentTakeAway));
+                            finalDishQuantity.add(new ArrayList<>(dishQuantityCurrentTakeAway));
+                            finalHalfOr.add(new ArrayList<>(halfOr));
+                            finalPayment.add(paymentMode);
+                            finalUserNames.add(usernameOfTakeAway);
+                            dishNameCurrentTakeAway.clear();
+                            dishQuantityCurrentTakeAway.clear();
+                            orderIDs.add(orderId);
+                            orderAmounts.add(orderAmount);
+                            halfOr.clear();
+                        }
+                        Log.i("time",time.toString());
+//                        Log.i("Current",currentTakeAwayAuth.toString() + " " + dishNameCurrentTakeAway.toString() + " " + userNameTakeAway.toString());
+                        homeFragTakeAwayRecucler.setLayoutManager(anotherHori);
+                        Log.i("message",finalDishNames.toString() + "\n" + finalPayment.toString() + "\n" + finalDishQuantity.toString());
+//                        homeFragTakeAwayRecucler.setAdapter(new CurrentTakeAway(currentTakeAwayAuth,dishNameCurrentTakeAway,dishQuantityCurrentTakeAway,userNameTakeAway,halfOr,paymentMode));
+                        homeFragTakeAwayRecucler.setAdapter(new CurrentTakeAway(finalDishNames,finalDishQuantity,finalHalfOr,finalUserNames,finalPayment,orderIDs,orderAmounts,currentTakeAwayAuth,time));
+                    }else
+                    {
+                        currentTakeAwayAuth.clear();
+                        finalDishNames.clear();
+                        dishNameCurrentTakeAway.clear();
+                        userNameTakeAway.clear();
+                        halfOr.clear();
+                        finalDishQuantity.clear();
+                        finalPayment.clear();
+                        finalUserNames.clear();
+                        orderIDs.clear();
+                        orderAmounts.clear();
+                        time.clear();
+                        finalHalfOr.clear();
+                        dishQuantityCurrentTakeAway.clear();
+                        homeFragTakeAwayRecucler.setLayoutManager(anotherHori);
+                        homeFragTakeAwayRecucler.setAdapter(new CurrentTakeAway(finalDishNames,finalDishQuantity,finalHalfOr,finalUserNames,finalPayment,orderIDs,orderAmounts,currentTakeAwayAuth,time));
+
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+        });
 
 
         refershRecyclerView.setOnClickListener(view12 -> {

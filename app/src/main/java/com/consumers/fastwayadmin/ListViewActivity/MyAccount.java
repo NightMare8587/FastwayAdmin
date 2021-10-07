@@ -72,6 +72,7 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
     GoogleSignInOptions gso;
     SharedPreferences sharedPreferences;
     String verId;
+    TextView resNameText;
     PhoneAuthCredential credential;
     ModalBottomSheetDialog modalBottomSheetDialog;
     TextView textView;
@@ -82,10 +83,31 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_account);
         initialise();
-
+        SharedPreferences resInfoSharedPref = getSharedPreferences("RestaurantInfo",MODE_PRIVATE);
         ArrayAdapter arrayAdapter = new ArrayAdapter<String>(this, R.layout.list,names);
         listView.setAdapter(arrayAdapter);
         SharedPreferences sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
+        if(resInfoSharedPref.contains("hotelName")) {
+            resNameText.setText(resInfoSharedPref.getString("hotelName", ""));
+        }else{
+            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
+            databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if(snapshot.exists()){
+                        SharedPreferences.Editor editor = resInfoSharedPref.edit();
+                        editor.putString("hotelName",snapshot.child("name").getValue(String.class));
+                        editor.apply();
+                        resNameText.setText(resInfoSharedPref.getString("hotelName", ""));
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+        }
         textView.setText("Hi, " + sharedPreferences.getString("name",""));
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -195,6 +217,7 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
     private void initialise() {
         sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
         textView = findViewById(R.id.account_activity_text);
+        resNameText = findViewById(R.id.resNameAccountFrag);
         listView = findViewById(R.id.accountActivityListView);
         auth = FirebaseAuth.getInstance();
         reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
