@@ -19,7 +19,7 @@
         android:layout_marginBottom="40dp"
         android:background="@drawable/inreo_button_back"
         android:text="next"
-        android:textSize="18sp"
+        android:textSize="20sp"
         android:textStyle="bold|italic"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
@@ -32,7 +32,7 @@
         android:layout_marginBottom="40dp"
         android:background="@drawable/inreo_button_next"
         android:text="back"
-        android:textSize="16sp"
+        android:textSize="20sp"
         android:textStyle="bold|italic"
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"

@@ -40,7 +40,7 @@
         android:layout_width="137dp"
         android:layout_height="47dp"
         android:layout_marginStart="10dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="13dp"
         android:layout_marginEnd="10dp"
         app:layout_constraintEnd_toStartOf="@+id/phoneNumber"
         app:layout_constraintStart_toStartOf="parent"

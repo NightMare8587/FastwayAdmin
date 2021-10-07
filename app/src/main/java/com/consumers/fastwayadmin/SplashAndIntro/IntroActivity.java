@@ -64,18 +64,20 @@ public class IntroActivity extends AppCompatActivity {
                     View myView = getLayoutInflater().inflate(R.layout.terms_condition_layout,null);
                     alertDialog.setCancelable(false);
                     Button accept = (Button) myView.findViewById(R.id.acceptTermsAndC);
-
+                    AlertDialog alertDialog1;
+                    alertDialog.setView(myView);
+                    alertDialog1 = alertDialog.create();
+                    alertDialog1.show();
                     accept.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             startActivity(new Intent(IntroActivity.this, MainActivity.class));
                             editor.putString("done","yes");
                             editor.apply();
+                            alertDialog1.dismiss();
                             finish();
                         }
                     });
-                    alertDialog.setView(myView);
-                    alertDialog.create().show();
                 }
 
                switch (count){

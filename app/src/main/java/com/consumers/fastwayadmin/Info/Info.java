@@ -68,6 +68,7 @@ public class Info extends AppCompatActivity {
     DatabaseReference infoRef;
     FastDialog fastDialog;
     SharedPreferences sharedPreferences;
+    DatabaseReference checkRef;
     SharedPreferences.Editor editor;
     String name,address,nearby,pin,number;
     SharedPreferences checkLocationInfo;
@@ -86,18 +87,46 @@ public class Info extends AppCompatActivity {
                 .setAnimation(Animations.SLIDE_TOP)
                 .create();
         fastDialog.show();
-        if(!sharedPreferences.contains("state")){
-            fastDialog.dismiss();
+
+        if(sharedPreferences.contains("state")){
+            SharedPreferences location = getSharedPreferences("LocationMaps",MODE_PRIVATE);
+            checkRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state",""));
+            checkRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if(snapshot.hasChild(Objects.requireNonNull(infoAuth.getUid()))){
+                        if(location.contains("location")){
+                            startActivity(new Intent(Info.this,HomeScreen.class));
+                        }else
+                            startActivity(new Intent(Info.this,MapsActivity.class));
+
+                        fastDialog.dismiss();
+                        finish();
+                        overridePendingTransition(R.anim.slide_in, R.anim.fade_out);
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+        }else {
             createLocationRequest();
-        }else{
-            if(checkLocationInfo.contains("location")){
-                startActivity(new Intent(Info.this,HomeScreen.class));
-                fastDialog.dismiss();
-                finish();
-            }
             fastDialog.dismiss();
         }
-        Log.i("myLocation",sharedPreferences.getString("state",""));
+//        if(!sharedPreferences.contains("state")){
+//            fastDialog.dismiss();
+//            createLocationRequest();
+//        }else{
+//            if(checkLocationInfo.contains("location")){
+//                startActivity(new Intent(Info.this,HomeScreen.class));
+//                fastDialog.dismiss();
+//                finish();
+//            }
+//            fastDialog.dismiss();
+//        }
+//        Log.i("myLocation",sharedPreferences.getString("state",""));
 
 
 
@@ -259,6 +288,30 @@ public class Info extends AppCompatActivity {
             editor.apply();
             Log.i("infoses", cityName + " " );
             Log.i("locationes",longi + " " + lati);
+
+            SharedPreferences location = getSharedPreferences("LocationMaps",MODE_PRIVATE);
+            checkRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state",""));
+            checkRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if(snapshot.hasChild(Objects.requireNonNull(infoAuth.getUid()))){
+                        if(location.contains("location")){
+                            startActivity(new Intent(Info.this,HomeScreen.class));
+                        }else
+                            startActivity(new Intent(Info.this,MapsActivity.class));
+
+                        clientsLocation.removeLocationUpdates(mLocationCallback);
+                        finish();
+
+                        overridePendingTransition(R.anim.slide_in, R.anim.fade_out);
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
         }
     };
 }
