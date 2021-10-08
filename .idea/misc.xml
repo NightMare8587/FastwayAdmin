@@ -5,9 +5,13 @@
       <map>
         <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/drawable-hdpi/inreo_button_back.xml" value="0.21354166666666666" />
         <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/drawable-hdpi/inreo_button_next.xml" value="0.21354166666666666" />
+        <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/drawable/android_shadow_view.xml" value="0.17604166666666668" />
+        <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/drawable/chat_with_customer_button.xml" value="0.17604166666666668" />
         <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/drawable/frag_two_back.xml" value="0.21354166666666666" />
         <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/drawable/gradient2.xml" value="0.2703125" />
+        <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/drawable/ic_customer_support.xml" value="0.17604166666666668" />
         <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/drawable/report_edittext.xml" value="0.2703125" />
+        <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/drawable/toolbar_background_layout.xml" value="0.17604166666666668" />
         <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/layout/account_frag.xml" value="0.1140625" />
         <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/layout/activity_all_menu_dish.xml" value="0.25416666666666665" />
         <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/layout/activity_approve_current_order.xml" value="0.4" />
@@ -40,6 +44,8 @@
         <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/layout/frag_two_layout.xml" value="0.25416666666666665" />
         <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/layout/home_frag.xml" value="0.25416666666666665" />
         <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/layout/home_frag_recycler_adapter.xml" value="0.22509057971014493" />
+        <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/layout/list.xml" value="0.15989583333333332" />
+        <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/layout/menu_frag.xml" value="0.15989583333333332" />
         <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/layout/order_trans_card.xml" value="0.264" />
         <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/layout/random_chat_layout.xml" value="0.2" />
         <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/layout/recent_orders_card.xml" value="0.25416666666666665" />

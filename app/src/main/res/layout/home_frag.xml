@@ -4,11 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginBottom="70dp">
+    android:layout_marginBottom="65dp"
+    android:background="#EBFDFF">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="#EBFDFF">
 
         <ImageView
             android:id="@+id/comboDiscountImageView"
@@ -16,10 +18,11 @@
             android:layout_height="120dp"
             android:layout_marginTop="10dp"
             android:scaleType="fitXY"
+
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/restaurantOnOff"
-            app:srcCompat="@drawable/head" />
+            app:srcCompat="@drawable/discountback" />
 
         <LinearLayout
             android:id="@+id/mainFragLinearLayout"
@@ -47,6 +50,7 @@
                     android:layout_marginTop="4dp"
                     android:layout_marginEnd="4dp"
                     android:layout_weight="0.6"
+                    android:fontFamily="@font/merriweather_sans_bold"
                     android:padding="3dp"
                     android:text="Current Tables"
                     android:textAlignment="textStart"
@@ -66,6 +70,7 @@
                     android:layout_weight="0.3"
                     android:background="@null"
                     android:drawableStart="@drawable/ic_baseline_refresh_24"
+                    android:fontFamily="@font/merriweather_sans_bold"
                     android:text="Refresh"
                     android:textAlignment="center"
                     android:textColor="@color/quantum_cyan"
@@ -117,6 +122,7 @@
                     android:layout_marginTop="4dp"
                     android:layout_marginEnd="4dp"
                     android:layout_weight="0.6"
+                    android:fontFamily="@font/merriweather_sans_bold"
                     android:padding="3dp"
                     android:text="Current Takeaway's"
                     android:textAlignment="textStart"
@@ -136,6 +142,7 @@
                     android:layout_weight="0.3"
                     android:background="@null"
                     android:drawableStart="@drawable/ic_baseline_refresh_24"
+                    android:fontFamily="@font/merriweather_sans_bold"
                     android:text="Refresh"
                     android:textAlignment="center"
                     android:textColor="@color/quantum_cyan"
@@ -164,7 +171,7 @@
             android:id="@+id/homeFragToolBar"
             android:layout_width="match_parent"
             android:layout_height="55dp"
-            android:background="@drawable/toolbar"
+            android:background="@drawable/toolbar_background_layout"
             android:maxHeight="60dp"
             android:minHeight="55dp"
             android:theme="?attr/actionBarTheme"
@@ -178,12 +185,13 @@
             android:id="@+id/restaurantOnOff"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
+            android:layout_marginTop="8dp"
             android:layout_marginEnd="33dp"
             android:layout_marginBottom="8dp"
             android:checked="true"
+            android:fontFamily="@font/merriweather_sans_bold"
             android:text="Online"
-            android:textSize="16sp"
+            android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toTopOf="@+id/comboDiscountImageView"
             app:layout_constraintEnd_toEndOf="parent"

@@ -5,7 +5,7 @@
     android:background="@color/transparent"
     android:layout_margin="10dp"
     app:cardCornerRadius="10dp"
-    android:layout_height="135dp">
+    android:layout_height="145dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -14,34 +14,40 @@
         android:layout_height="match_parent">
 
         <TextView
-            android:layout_width="wrap_content"
             android:id="@+id/homeFragRecyclerViewTables"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="9dp"
+            android:layout_marginTop="5dp"
+            android:fontFamily="@font/amarante"
+            android:textSize="16sp"
             android:text="Table Number: "
             android:textColor="@color/black"
-            android:textStyle="bold"
-            android:layout_marginTop="5dp"
-            android:layout_marginLeft="9dp"
-            android:layout_height="wrap_content"/>
+            android:textStyle="bold" />
 
         <TextView
-            android:layout_width="wrap_content"
-            android:textStyle="bold"
-            android:layout_marginTop="5dp"
-            android:textColor="@color/slate_black"
-            android:layout_marginLeft="9dp"
             android:id="@+id/homeFragRecyclerViewSeats"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="9dp"
+            android:layout_marginTop="5dp"
+            android:fontFamily="@font/amarante"
+            android:textSize="16sp"
             android:text="Seats: "
-            android:layout_height="wrap_content"/>
+            android:textColor="@color/slate_black"
+            android:textStyle="bold" />
 
         <Button
             android:id="@+id/chat"
             android:layout_width="wrap_content"
             android:layout_height="34dp"
             android:layout_gravity="center"
-            android:layout_marginTop="2dp"
+            android:layout_marginTop="5dp"
+            android:textStyle="bold"
             android:background="@drawable/chat_with_customer_button"
             android:padding="5dp"
             android:text="Chat With Customer"
+
             android:textColor="#000000" />
 
         <Button
@@ -49,6 +55,7 @@
             android:layout_width="wrap_content"
             android:layout_height="34dp"
             android:layout_gravity="center"
+            android:textStyle="bold"
             android:layout_marginTop="5dp"
             android:background="@drawable/chat_with_customer_button"
             android:padding="8dp"

@@ -6,7 +6,7 @@
     <item android:id="@+id/randomChatMessages"
         app:showAsAction="always"
         android:title="Messages"
-        android:icon="@drawable/ic_baseline_message_24"/>
+        android:icon="@drawable/ic_message" />
 
     <item android:id="@+id/notification"
         app:showAsAction="always"
