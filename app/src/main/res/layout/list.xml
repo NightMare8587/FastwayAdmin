@@ -5,6 +5,7 @@
     android:layout_height="fill_parent"
     android:fontFamily="@font/merriweather_sans_bold"
     android:padding="10dip"
-    android:textColor="#000000"
     android:textSize="19dp"
-    android:textStyle="bold"></TextView>
+    android:textStyle="bold">
+
+</TextView>
