@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -48,6 +49,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
     List<String> tables = new ArrayList<>();
@@ -78,7 +80,8 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
     @Override
     public void onBindViewHolder(@NonNull TableAdapter holder, @SuppressLint("RecyclerView") int position) {
         auth = FirebaseAuth.getInstance();
-        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(auth.getUid()).child("Tables");
+
+
         holder.tableNum.setText("Table Number : " + tables.get(position));
         holder.status.setText(status.get(position));
         if(status.get(position).equals("unavailable")){
@@ -99,7 +102,9 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
             holder.cancel.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    new KAlertDialog(view.getContext(),KAlertDialog.WARNING_TYPE)
+                    SharedPreferences sharedPreferences = view.getContext().getSharedPreferences("loginInfo",Context.MODE_PRIVATE);
+                    reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid())).child("Tables");
+                            new KAlertDialog(view.getContext(),KAlertDialog.WARNING_TYPE)
                             .setTitleText("Warning!!!")
                             .setContentText("Do you sure wanna remove this reserved table??")
                             .setCancelText("No")
@@ -210,6 +215,8 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
             holder.cancel.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    SharedPreferences sharedPreferences = view.getContext().getSharedPreferences("loginInfo",Context.MODE_PRIVATE);
+                    reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid())).child("Tables");
                     new KAlertDialog(view.getContext(),KAlertDialog.WARNING_TYPE)
                             .setTitleText("Warning!!!")
                             .setContentText("Do you sure wanna remove this reserved table??")
@@ -372,6 +379,10 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
                 alertDialog.setNegativeButton("Delete Table", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+
+                        SharedPreferences sharedPreferences = v.getContext().getSharedPreferences("loginInfo",Context.MODE_PRIVATE);
+                        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid())).child("Tables");
+                        reference.child(tables.get(position)).removeValue();
                         dialog.dismiss();
                     }
                 });
