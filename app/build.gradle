@@ -7,14 +7,16 @@ plugins {
 android {
     compileSdkVersion 31
     buildToolsVersion "30.0.3"
-
+    lintOptions {
+        checkReleaseBuilds false
+    }
     defaultConfig {
         applicationId "com.consumers.fastwayadmin"
         minSdkVersion 21
         targetSdkVersion 31
-        versionCode 14
+        versionCode 15
         multiDexEnabled true
-        versionName "1.0.0.2"
+        versionName "1.0.0.3"
         android.defaultConfig.vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -68,10 +70,10 @@ dependencies {
     implementation 'com.google.android.gms:play-services-safetynet:17.0.1'
     implementation 'com.journeyapps:zxing-android-embedded:4.1.0'
     // firebase messaging
-    implementation 'com.google.firebase:firebase-analytics:19.0.1'
+    implementation 'com.google.firebase:firebase-analytics:19.0.2'
     implementation 'com.google.firebase:firebase-messaging'
 
-    implementation 'com.google.firebase:firebase-core:19.0.1'
+    implementation 'com.google.firebase:firebase-core:19.0.2'
 
 
     implementation 'com.google.firebase:firebase-firestore'
