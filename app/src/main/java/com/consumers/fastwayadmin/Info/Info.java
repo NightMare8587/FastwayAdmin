@@ -89,6 +89,7 @@ public class Info extends AppCompatActivity {
         fastDialog.show();
 
         if(sharedPreferences.contains("state")){
+
             SharedPreferences location = getSharedPreferences("LocationMaps",MODE_PRIVATE);
             checkRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state",""));
             checkRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -103,7 +104,8 @@ public class Info extends AppCompatActivity {
                         fastDialog.dismiss();
                         finish();
                         overridePendingTransition(R.anim.slide_in, R.anim.fade_out);
-                    }
+                    }else
+                        fastDialog.dismiss();
                 }
 
                 @Override
@@ -304,7 +306,8 @@ public class Info extends AppCompatActivity {
                         finish();
 
                         overridePendingTransition(R.anim.slide_in, R.anim.fade_out);
-                    }
+                    }else
+                        fastDialog.dismiss();
                 }
 
                 @Override

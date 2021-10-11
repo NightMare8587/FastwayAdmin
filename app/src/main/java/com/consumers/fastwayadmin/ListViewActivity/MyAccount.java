@@ -5,7 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
@@ -23,12 +23,9 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.consumers.fastwayadmin.Info.MapsActivity;
 import com.consumers.fastwayadmin.Info.MapsActivity2;
 import com.consumers.fastwayadmin.Login.MainActivity;
-import com.consumers.fastwayadmin.NavFrags.EditCredClass;
 import com.consumers.fastwayadmin.NavFrags.EditVendorDetails;
-import com.consumers.fastwayadmin.NavFrags.VendorDetailsActivity;
 import com.consumers.fastwayadmin.R;
 import com.developer.kalert.KAlertDialog;
 import com.example.flatdialoglibrary.dialog.FlatDialog;
@@ -38,13 +35,9 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.FirebaseException;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
-import com.google.firebase.auth.PhoneAuthOptions;
-import com.google.firebase.auth.PhoneAuthProvider;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -54,13 +47,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 
-import karpuzoglu.enes.com.fastdialog.Animations;
-import karpuzoglu.enes.com.fastdialog.FastDialog;
-import karpuzoglu.enes.com.fastdialog.FastDialogBuilder;
-import karpuzoglu.enes.com.fastdialog.PositiveClick;
-import karpuzoglu.enes.com.fastdialog.Type;
 import nl.invissvenska.modalbottomsheetdialog.Item;
 import nl.invissvenska.modalbottomsheetdialog.ModalBottomSheetDialog;
 
@@ -75,6 +62,7 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
     TextView resNameText;
     PhoneAuthCredential credential;
     ModalBottomSheetDialog modalBottomSheetDialog;
+    SharedPreferences.Editor editor;
     TextView textView;
     String[] names = {"Change Credentials (Admin)","Change Credentials (Restaurants)","Delete Account","Change Bank Credentials"};
     @SuppressLint("SetTextI18n")
@@ -84,6 +72,7 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
         setContentView(R.layout.activity_my_account);
         initialise();
         SharedPreferences resInfoSharedPref = getSharedPreferences("RestaurantInfo",MODE_PRIVATE);
+        editor = resInfoSharedPref.edit();
         ArrayAdapter arrayAdapter = new ArrayAdapter<String>(this, R.layout.list,names);
         listView.setAdapter(arrayAdapter);
         SharedPreferences sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
@@ -149,51 +138,15 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
                                     @Override
                                     public void onClick(KAlertDialog kAlertDialog) {
 
-                                        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin");
-                                        reference.child(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser().getUid())).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
-                                            @Override
-                                            public void onComplete(@NonNull Task<Void> task) {
+                                        try {
+                                            startActivity(new Intent(MyAccount.this, MainActivity.class));
+                                            new removeAll().execute();
+                                            finish();
 
-                                            }
-                                        });
-                                        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants");
-                                        reference.child(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser().getUid())).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                            @Override
-                                            public void onSuccess(Void aVoid) {
-
-                                            }
-                                        });
-                                        auth = FirebaseAuth.getInstance();
-                                        FirebaseUser firebaseUser = auth.getCurrentUser();
-                                        auth.signOut();
-                                       firebaseUser.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                           @Override
-                                           public void onSuccess(Void aVoid) {
-
-                                           }
-                                       });
-                                        gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                                                .requestIdToken("765176451275-u5qelumumncbf54dh2fgs1do08luae91.apps.googleusercontent.com")
-                                                .requestEmail()
-                                                .build();
-
-                                        client = GoogleSignIn.getClient(MyAccount.this,gso);
-                                        try{
-
-                                            client.revokeAccess().addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                @Override
-                                                public void onComplete(@NonNull Task<Void> task) {
-
-                                                }
-                                            });
-                                            client.signOut();
                                         }
                                         catch (Exception e){
-                                            Log.i("exception",e.getLocalizedMessage());
+                                            Log.i("logs",e.getLocalizedMessage());
                                         }
-                                        kAlertDialog.dismissWithAnimation();
-                                        startActivity(new Intent(MyAccount.this, MainActivity.class));
-                                        finish();
                                     }
                                 }).setCancelText("No, Wait")
                                 .setCancelClickListener(new KAlertDialog.KAlertClickListener() {
@@ -337,7 +290,10 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
                                         return;
                                     }else {
                                         reference.child("name").setValue(flatDialog.getFirstTextField().toString());
+                                        resNameText.setText(flatDialog.getFirstTextField());
                                         Toast.makeText(MyAccount.this, "Name Changed Successfully", Toast.LENGTH_SHORT).show();
+                                        editor.putString("hotelName",flatDialog.getFirstTextField());
+                                        editor.apply();
                                         flatDialog.dismiss();
                                     }
                                 }
@@ -547,6 +503,49 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
                             kAlertDialog.dismissWithAnimation();
                         }
                     }).show();
+        }
+    }
+
+    public class removeAll extends AsyncTask<Void,Void,Void>{
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            auth = FirebaseAuth.getInstance();
+            reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin");
+            reference.child(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser().getUid())).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+
+                }
+            });
+            reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state", ""));
+            reference.child(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser().getUid())).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+
+                }
+            });
+
+            gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                    .requestIdToken("765176451275-u1ati379eiinc9b21472ml968chmlsqh.apps.googleusercontent.com")
+                    .requestEmail()
+                    .build();
+
+            client = GoogleSignIn.getClient(MyAccount.this, gso);
+            try {
+
+                client.revokeAccess().addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        auth.signOut();
+                    }
+                });
+                client.signOut();
+            } catch (Exception e) {
+                Log.i("exception", e.getLocalizedMessage());
+            }
+
+            return null;
         }
     }
 }
