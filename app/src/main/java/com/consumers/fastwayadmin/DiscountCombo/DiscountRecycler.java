@@ -3,6 +3,7 @@ package com.consumers.fastwayadmin.DiscountCombo;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Handler;
 import android.util.Log;
@@ -38,6 +39,7 @@ import java.util.Objects;
 public class DiscountRecycler extends RecyclerView.Adapter<DiscountRecycler.Holder> {
     List<String> dishName = new ArrayList<>();
     Context context;
+    SharedPreferences sharedPreferences;
     FirebaseAuth auth = FirebaseAuth.getInstance();
     DatabaseReference addToDB = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid()));;
     DatabaseReference dis = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));;
@@ -62,6 +64,7 @@ public class DiscountRecycler extends RecyclerView.Adapter<DiscountRecycler.Hold
         holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                sharedPreferences = v.getContext().getSharedPreferences("loginInfo",Context.MODE_PRIVATE);
                 new KAlertDialog(v.getContext(),KAlertDialog.NORMAL_TYPE)
                         .setTitleText("Confirmation")
                         .setContentText("Do you sure wanna apply offer's to this dish??")
@@ -92,9 +95,11 @@ public class DiscountRecycler extends RecyclerView.Adapter<DiscountRecycler.Hold
                                         .setThirdButtonText("ADD YOUR OWN")
                                         .setThirdButtonColor(Color.parseColor("#fbd1b7"))
                                         .setThirdButtonTextColor(Color.parseColor("#000000"))
+
                                         .setFirstTextFieldHint("Enter How much discount!!")
                                         .setFirstTextFieldBorderColor(Color.BLACK)
                                         .setFirstTextFieldHintColor(Color.BLACK)
+                                        .setFirstTextFieldTextColor(Color.BLACK)
                                         .withFirstButtonListner(new View.OnClickListener() {
                                             @Override
                                             public void onClick(View view) {
@@ -152,7 +157,7 @@ public class DiscountRecycler extends RecyclerView.Adapter<DiscountRecycler.Hold
 
     private void customDiscount(String firstTextField) {
         auth = FirebaseAuth.getInstance();
-        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid()));
+        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
         reference.child("List of Dish").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -188,7 +193,7 @@ public class DiscountRecycler extends RecyclerView.Adapter<DiscountRecycler.Hold
 
     private void fourtyDiscount() {
         auth = FirebaseAuth.getInstance();
-        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid()));
+        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
         reference.child("List of Dish").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -206,7 +211,7 @@ public class DiscountRecycler extends RecyclerView.Adapter<DiscountRecycler.Hold
                                 auth = FirebaseAuth.getInstance();
                                 Log.i("type",type);
                                 Log.i("name",dishName);
-                                reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid()));
+                                reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
                                 reference.child("List of Dish").child(type).child(dishName).child("full").setValue(afterDis);
                             }
                         }
@@ -227,7 +232,7 @@ public class DiscountRecycler extends RecyclerView.Adapter<DiscountRecycler.Hold
                     public void run() {
                         builder.dismiss();
                     }
-                },3000);
+                },1500);
             }
 
             @Override
@@ -239,20 +244,21 @@ public class DiscountRecycler extends RecyclerView.Adapter<DiscountRecycler.Hold
 
     private void addToDiscountDatabase(String discount) {
         auth = FirebaseAuth.getInstance();
-        addToDB = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid()));
+        addToDB = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
         addToDB.child("Discount").child("available").setValue("yes");
     }
 
     private void beforeDiscount(int price,int after, int discount,String type,String name) {
         DisInfo disInfo = new DisInfo(String.valueOf(price),String.valueOf(after),String.valueOf(discount));
-        dis = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid()));
+        dis = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
         dis.child("List of Dish").child(type).child(name).child("Discount").child(name).setValue(disInfo);
     }
 
 
     private void fiftyDiscount() {
         auth = FirebaseAuth.getInstance();
-        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid()));
+
+        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
         reference.child("List of Dish").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {

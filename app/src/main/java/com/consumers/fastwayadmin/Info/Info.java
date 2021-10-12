@@ -101,6 +101,7 @@ public class Info extends AppCompatActivity {
                         }else
                             startActivity(new Intent(Info.this,MapsActivity.class));
 
+                        clientsLocation.removeLocationUpdates(mLocationCallback);
                         fastDialog.dismiss();
                         finish();
                         overridePendingTransition(R.anim.slide_in, R.anim.fade_out);

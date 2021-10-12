@@ -3,10 +3,12 @@ package com.consumers.fastwayadmin.MenuActivities;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.consumers.fastwayadmin.R;
 import com.google.firebase.auth.FirebaseAuth;
@@ -25,6 +27,7 @@ public class EditMenu extends AppCompatActivity {
     EditText fullPlate,halfPlate,name;
     Button saveChanges;
     FirebaseAuth editAuth;
+    SharedPreferences sharedPreferences;
     DatabaseReference editRef;
     String type;
     String change;
@@ -33,6 +36,7 @@ public class EditMenu extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_menu);
+        sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
         initialise();
 
         saveChanges.setOnClickListener(new View.OnClickListener() {
@@ -58,9 +62,9 @@ public class EditMenu extends AppCompatActivity {
                 }
 
                 if(halfPlate.length() != 0){
-                    editRef.child("half").setValue(fullPlate.getText().toString());
+                    editRef.child("half").setValue(halfPlate.getText().toString());
                 }
-
+                Toast.makeText(EditMenu.this, "Changes saved successfully", Toast.LENGTH_SHORT).show();
                 finish();
             }
         });
@@ -82,7 +86,7 @@ public class EditMenu extends AppCompatActivity {
 //        }else{
 //            name.setVisibility(View.VISIBLE);
 //        }
-        editRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(editAuth.getUid())).child("List of Dish")
+        editRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(editAuth.getUid())).child("List of Dish")
                                 .child(type).child(dish);
     }
 }

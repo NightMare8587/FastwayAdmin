@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -25,11 +26,19 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.thecode.aestheticdialogs.AestheticDialog;
+import com.thecode.aestheticdialogs.DialogAnimation;
+import com.thecode.aestheticdialogs.DialogStyle;
+import com.thecode.aestheticdialogs.DialogType;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import karpuzoglu.enes.com.fastdialog.Animations;
+import karpuzoglu.enes.com.fastdialog.FastDialog;
+import karpuzoglu.enes.com.fastdialog.FastDialogBuilder;
+import karpuzoglu.enes.com.fastdialog.Type;
 import mehdi.sakout.fancybuttons.FancyButton;
 
 public class CustomOffer extends AppCompatActivity {
@@ -43,6 +52,8 @@ public class CustomOffer extends AppCompatActivity {
     LinearLayoutManager horizonatl;
     DatabaseReference reference;
     DatabaseReference databaseReference;
+    DatabaseReference dis;
+    DatabaseReference addToDB;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,6 +83,7 @@ public class CustomOffer extends AppCompatActivity {
                         }).show();
             }
         });
+
         proceed.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -87,6 +99,71 @@ public class CustomOffer extends AppCompatActivity {
                         .setSecondButtonTextColor(Color.parseColor("#000000"))
                         .setSecondButtonText("ADD FREE DISH")
                         .withFirstButtonListner(view11 -> {
+                            FastDialog fastDialog = new FastDialogBuilder(view.getContext(), Type.DIALOG)
+                                    .setTitleText("Enter Quantity")
+                                    .setText("Enter quantity of dish")
+                                    .setHint("Enter here")
+                                    .positiveText("Proceed")
+                                    .negativeText("Cancel")
+                                    .setAnimation(Animations.SLIDE_TOP)
+                                    .create();
+
+                            fastDialog.show();
+
+                            fastDialog.positiveClickListener(click -> {
+                                for(int i=0;i< dishName.size(); i++) {
+                                    auth = FirebaseAuth.getInstance();
+                                    reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state", "")).child(Objects.requireNonNull(auth.getUid()));
+                                    reference.child("List of Dish").addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                            for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                                                for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
+                                                    if (String.valueOf(dataSnapshot1.child("mrp").getValue()).equals("no")) {
+                                                        String type = String.valueOf(dataSnapshot.getKey());
+                                                        String dishName = String.valueOf(dataSnapshot1.child("name").getValue());
+                                                        if (Integer.parseInt(Objects.requireNonNull(String.valueOf(dataSnapshot1.child("full").getValue()))) >= 149) {
+                                                            int price = Integer.parseInt(Objects.requireNonNull(String.valueOf(dataSnapshot1.child("full").getValue())));
+                                                            int discount = 50;
+                                                            int afterDis = price - (price * discount / 100);
+                                                            beforeDiscount(price, afterDis, discount, type, dishName);
+                                                            addToDiscountDatabase("yes");
+                                                            auth = FirebaseAuth.getInstance();
+                                                            Log.i("type", type);
+                                                            Log.i("name", dishName);
+//                                reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(auth.getUid()).child("List of Dish");
+                                                            reference.child("List of Dish").child(type).child(dishName).child("full").setValue(afterDis);
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            AestheticDialog.Builder builder = new AestheticDialog.Builder(CustomOffer.this, DialogStyle.FLAT, DialogType.SUCCESS);
+                                            builder.setTitle("Applying Discount")
+                                                    .setMessage("Wait while we are applying discount :)")
+                                                    .setCancelable(false)
+                                                    .setDuration(3000)
+                                                    .setAnimation(DialogAnimation.SHRINK)
+                                                    .setDarkMode(true);
+
+                                            builder.show();
+
+                                            new Handler().postDelayed(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    builder.dismiss();
+                                                    finish();
+                                                }
+                                            }, 3000);
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError error) {
+
+                                        }
+                                    });
+                                }
+                            });
+
                             flatDialog.dismiss();
                         })
                         .withSecondButtonListner(view112 -> {
@@ -95,6 +172,7 @@ public class CustomOffer extends AppCompatActivity {
                         .show();
             }
         });
+
         reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
         reference.child("Current combo").addChildEventListener(new ChildEventListener() {
             @Override
@@ -260,6 +338,16 @@ public class CustomOffer extends AppCompatActivity {
 
             }
         });
+    }
+    private void beforeDiscount(int price,int after, int discount,String type,String name) {
+        DisInfo disInfo = new DisInfo(String.valueOf(price),String.valueOf(after),String.valueOf(discount));
+        dis = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
+        dis.child("List of Dish").child(type).child(name).child("Discount").child(name).setValue(disInfo);
+    }
+    private void addToDiscountDatabase(String discount) {
+        auth = FirebaseAuth.getInstance();
+        addToDB = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
+        addToDB.child("Discount").child("available").setValue("yes");
     }
 
     private void initialise() {

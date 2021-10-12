@@ -43,6 +43,7 @@ public class DishView extends RecyclerView.Adapter<DishView.DishAdapter> {
     List<String> image = new ArrayList<>();
     List<String> before = new ArrayList<>();
     List<String> after = new ArrayList<>();
+    SharedPreferences sharedPreferences;
     List<String> discount = new ArrayList<>();
     FirebaseAuth auth;
     DatabaseReference ref;
@@ -135,8 +136,9 @@ public class DishView extends RecyclerView.Adapter<DishView.DishAdapter> {
         holder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                sharedPreferences = buttonView.getContext().getSharedPreferences("loginInfo",Context.MODE_PRIVATE);
                 FirebaseAuth auth = FirebaseAuth.getInstance();
-                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("Restaurants").child(Objects.requireNonNull(auth.getUid())).child("List of Dish").child(type);
+                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid())).child("List of Dish").child(type);
                 if(isChecked){
                     databaseReference.child(names.get(position)).child("enable").setValue("yes");
                     holder.checkBox.setText("Enabled");
@@ -154,10 +156,34 @@ public class DishView extends RecyclerView.Adapter<DishView.DishAdapter> {
 //                intent.putExtra("type",type);
 //                intent.putExtra("dish",names.get(position));
 //                view.getContext().startActivity(intent);
-
+                sharedPreferences = view.getContext().getSharedPreferences("loginInfo",Context.MODE_PRIVATE);
                 AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
                 builder.setTitle("Important");
                 builder.setMessage("Choose one option");
+                if(!half.get(position).isEmpty()){
+                    builder.setNeutralButton("Remove Half Plate", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            FirebaseAuth auth = FirebaseAuth.getInstance();
+                            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid())).child("List of Dish").child(type).child(names.get(position));
+                            databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @SuppressLint("SetTextI18n")
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                    if(snapshot.hasChild("half")){
+                                        databaseReference.child("half").setValue("");
+                                        holder.available.setText("Half plate not available");
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError error) {
+
+                                }
+                            });
+                        }
+                    });
+                }
                 builder.setPositiveButton("Cancel", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
