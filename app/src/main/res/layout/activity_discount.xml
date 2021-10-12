@@ -6,12 +6,36 @@
     android:layout_height="match_parent"
     tools:context=".DiscountCombo.DiscountActivity">
 
+    <LinearLayout
+        android:id="@+id/linearLayout6"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:orientation="horizontal">
+        <EditText
+            android:id="@+id/searchDishNameForSingleDiscount"
+            android:hint="Enter Dish Name"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.8"/>
+
+        <Button
+            android:layout_width="0dp"
+            android:text="Search"
+            android:id="@+id/searchEnteredDishNameInDatabase"
+            android:layout_height="match_parent"
+            android:layout_weight="0.2"/>
+    </LinearLayout>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/discountActivityRecyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="6dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout6" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -5,8 +5,12 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -36,6 +40,8 @@ public class DiscountActivity extends AppCompatActivity {
     DatabaseReference dis;
     DatabaseReference addToDB;
     FirebaseAuth auth;
+    EditText dishName;
+    Button search;
     SharedPreferences sharedPreferences;
     List<String> name = new ArrayList<>();
     RecyclerView recyclerView;
@@ -49,13 +55,79 @@ public class DiscountActivity extends AppCompatActivity {
 
 
         name.clear();
+
+        dishName.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if(charSequence.length() == 0){
+                    reference.child("List of Dish").addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            if (snapshot.exists()) {
+                                name.clear();
+                                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                                    for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
+                                        if (dataSnapshot1.exists() && String.valueOf(dataSnapshot1.child("mrp").getValue()).equals("no"))
+                                            name.add(dataSnapshot1.child("name").getValue(String.class));
+                                    }
+                                }
+                                recyclerView.setLayoutManager(new LinearLayoutManager(DiscountActivity.this));
+                                recyclerView.setAdapter(new DiscountRecycler(name,DiscountActivity.this));
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
+                        }
+                    });
+                }
+
+                String searchText = charSequence.toString();
+
+                reference.child("List of Dish").addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (snapshot.exists()) {
+                            name.clear();
+                            for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                                for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
+                                    if (dataSnapshot1.exists() && String.valueOf(dataSnapshot1.child("mrp").getValue()).equals("no") && dataSnapshot1.child("name").getValue(String.class).contains(searchText))
+                                        name.add(dataSnapshot1.child("name").getValue(String.class));
+                                }
+                            }
+                            recyclerView.setLayoutManager(new LinearLayoutManager(DiscountActivity.this));
+                            recyclerView.setAdapter(new DiscountRecycler(name,DiscountActivity.this));
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
         reference.child("List of Dish").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
-                        if (dataSnapshot1.exists() && String.valueOf(dataSnapshot1.child("mrp").getValue()).equals("no"))
-                            name.add(dataSnapshot1.child("name").getValue(String.class));
+                if (snapshot.exists()) {
+                    name.clear();
+                    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                        for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
+                            if (dataSnapshot1.exists() && String.valueOf(dataSnapshot1.child("mrp").getValue()).equals("no"))
+                                name.add(dataSnapshot1.child("name").getValue(String.class));
+                        }
                     }
                 }
             }
@@ -332,6 +404,7 @@ public class DiscountActivity extends AppCompatActivity {
         auth = FirebaseAuth.getInstance();
         reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
         dis = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
-
+        dishName = findViewById(R.id.searchDishNameForSingleDiscount);
+        search = findViewById(R.id.searchEnteredDishNameInDatabase);
     }
 }
