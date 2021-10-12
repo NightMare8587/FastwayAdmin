@@ -27,6 +27,7 @@ import com.consumers.fastwayadmin.Info.MapsActivity2;
 import com.consumers.fastwayadmin.Login.MainActivity;
 import com.consumers.fastwayadmin.NavFrags.EditVendorDetails;
 import com.consumers.fastwayadmin.R;
+import com.consumers.fastwayadmin.SplashAndIntro.SplashScreen;
 import com.developer.kalert.KAlertDialog;
 import com.example.flatdialoglibrary.dialog.FlatDialog;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -44,6 +45,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -139,10 +141,7 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
                                     public void onClick(KAlertDialog kAlertDialog) {
 
                                         try {
-                                            startActivity(new Intent(MyAccount.this, MainActivity.class));
                                             new removeAll().execute();
-                                            finish();
-
                                         }
                                         catch (Exception e){
                                             Log.i("logs",e.getLocalizedMessage());
@@ -511,21 +510,29 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
         @Override
         protected Void doInBackground(Void... voids) {
             auth = FirebaseAuth.getInstance();
-            reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin");
-            reference.child(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser().getUid())).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
-                @Override
-                public void onComplete(@NonNull Task<Void> task) {
+            SharedPreferences settings = getSharedPreferences("loginInfo", MODE_PRIVATE);
+            settings.edit().clear().commit();
 
-                }
-            });
-            reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state", ""));
-            reference.child(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser().getUid())).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-                @Override
-                public void onSuccess(Void aVoid) {
+            SharedPreferences res = getSharedPreferences("RestaurantInfo", MODE_PRIVATE);
+            res.edit().clear().commit();
 
-                }
-            });
-
+            SharedPreferences intro = getSharedPreferences("IntroAct", MODE_PRIVATE);
+            intro.edit().clear().commit();
+//            reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin");
+//            reference.child(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser().getUid())).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+//                @Override
+//                public void onComplete(@NonNull Task<Void> task) {
+//
+//                }
+//            });
+//            reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state", ""));
+//            reference.child(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser().getUid())).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+//                @Override
+//                public void onSuccess(Void aVoid) {
+//
+//                }
+//            });
+            auth.signOut();
             gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                     .requestIdToken("765176451275-u1ati379eiinc9b21472ml968chmlsqh.apps.googleusercontent.com")
                     .requestEmail()
@@ -537,13 +544,16 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
                 client.revokeAccess().addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
-                        auth.signOut();
+
                     }
                 });
                 client.signOut();
             } catch (Exception e) {
                 Log.i("exception", e.getLocalizedMessage());
             }
+
+            startActivity(new Intent(MyAccount.this, SplashScreen.class));
+            finish();
 
             return null;
         }

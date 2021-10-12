@@ -1,5 +1,7 @@
 package com.consumers.fastwayadmin.NavFrags;
 
+import static android.content.Context.MODE_PRIVATE;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -28,6 +30,7 @@ import com.consumers.fastwayadmin.Login.MainActivity;
 import com.consumers.fastwayadmin.MyService;
 import com.consumers.fastwayadmin.NavFrags.Reviews.RestaurantsReviews;
 import com.consumers.fastwayadmin.R;
+import com.consumers.fastwayadmin.SplashAndIntro.SplashScreen;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -107,7 +110,7 @@ public class AccountFrag extends Fragment {
                                     @Override
                                     public void onClick(DialogInterface dialogInterface, int i) {
                                         requireContext().stopService(new Intent(requireContext(), MyService.class));
-                                        SharedPreferences stopServices = requireActivity().getSharedPreferences("Stop Services",Context.MODE_PRIVATE);
+                                        SharedPreferences stopServices = requireActivity().getSharedPreferences("Stop Services", MODE_PRIVATE);
                                         SharedPreferences.Editor editor = stopServices.edit();
                                         editor.putString("online","false");
                                         editor.apply();
@@ -117,8 +120,16 @@ public class AccountFrag extends Fragment {
                                             public void onComplete(@NonNull Task<Void> task) {
                                             }
                                         });
+                                        SharedPreferences settings = view.getContext().getSharedPreferences("loginInfo", MODE_PRIVATE);
+                                        settings.edit().clear().commit();
 
-                                        startActivity(new Intent(getActivity(), MainActivity.class));
+                                        SharedPreferences res = view.getContext().getSharedPreferences("RestaurantInfo", MODE_PRIVATE);
+                                        res.edit().clear().commit();
+
+                                        SharedPreferences intro = view.getContext().getSharedPreferences("IntroAct", MODE_PRIVATE);
+                                        intro.edit().clear().commit();
+
+                                        startActivity(new Intent(getActivity(), SplashScreen.class));
                                         getActivity().finish();
                                     }
                                 })

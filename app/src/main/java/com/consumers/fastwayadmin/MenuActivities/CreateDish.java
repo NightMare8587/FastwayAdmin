@@ -19,6 +19,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -155,7 +156,14 @@ public class CreateDish extends AppCompatActivity {
         DishInfo info = new DishInfo(name,half,full,image,mrp,"0","0","0","yes");
         try {
             dish.child("Restaurants").child(state).child(Objects.requireNonNull(dishAuth.getUid())).child("List of Dish").child(menuType).child(name).setValue(info);
-            new Upload().execute();
+            StorageReference reference = storageReference.child(dishAuth.getUid() + "/" + "image" + "/"  + nameOfDish.getText().toString());
+            reference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                @Override
+                public void onSuccess(@NonNull Uri uri) {
+                    DatabaseReference dish = FirebaseDatabase.getInstance().getReference().getRoot();
+                    dish.child("Restaurants").child(state).child(Objects.requireNonNull(dishAuth.getUid())).child("List of Dish").child(menuType).child(name).child("image").setValue(uri + "");
+                }
+            });
             Toast.makeText(this, "Dish Added Successfully", Toast.LENGTH_SHORT).show();
         }catch (Exception e){
             Toast.makeText(this, "Something went Wrong!!!!!", Toast.LENGTH_SHORT).show();
@@ -187,6 +195,7 @@ public class CreateDish extends AppCompatActivity {
             dir.mkdir();
             File file = new File(dir, nameOfDish.getText().toString() + ".jpg");
             try {
+                Log.i("file stored","yes");
                 outputStream = new FileOutputStream(file);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
@@ -242,15 +251,11 @@ public class CreateDish extends AppCompatActivity {
 //            FirebaseAuth auth = FirebaseAuth.getInstance();
 //            StorageReference storageReference = firebaseStorage.getReference();
 //            StorageReference reference = storageReference.child(auth.getUid() + "/" + "image" + "/"  + name);
-            StorageReference reference = storageReference.child(dishAuth.getUid() + "/" + "image" + "/"  + nameOfDish.getText().toString());
-            reference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                @Override
-                public void onSuccess(@NonNull Uri uri) {
-                    dish.child("Restaurants").child(state).child(Objects.requireNonNull(dishAuth.getUid())).child("List of Dish").child(menuType).child(name).child("image").setValue(uri + "");
-                }
-            });
+
             return null;
         }
     }
+
+
 
 }

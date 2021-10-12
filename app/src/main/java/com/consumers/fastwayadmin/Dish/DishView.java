@@ -231,7 +231,8 @@ public class DishView extends RecyclerView.Adapter<DishView.DishAdapter> {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                auth = FirebaseAuth.getInstance();
-                               ref = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid()));
+                                sharedPreferences = view.getContext().getSharedPreferences("loginInfo",Context.MODE_PRIVATE);
+                               ref = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
                                ref.child("List of Dish").child(type).child(names.get(position)).removeValue();
                                 fullPrice.remove(position);
                                 names.remove(position);
