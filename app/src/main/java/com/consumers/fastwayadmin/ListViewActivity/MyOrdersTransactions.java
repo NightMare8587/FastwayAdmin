@@ -112,7 +112,11 @@ public class MyOrdersTransactions extends AppCompatActivity {
                             .setTitleText("Error")
                             .setContentText("No transaction found")
                             .setConfirmText("Exit")
-                            .setConfirmClickListener(KAlertDialog::dismissWithAnimation).show();
+                            .setConfirmClickListener(click -> {
+                                fastDialog.dismiss();
+                                click.dismissWithAnimation();
+                                finish();
+                            }).show();
                 }
             }
 
