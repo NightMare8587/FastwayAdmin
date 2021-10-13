@@ -96,7 +96,7 @@ public class DishView extends RecyclerView.Adapter<DishView.DishAdapter> {
                     }).create();
 
                     builder.show();
-                
+
             }
         });
 

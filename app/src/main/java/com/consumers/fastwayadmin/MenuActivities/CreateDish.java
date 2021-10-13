@@ -52,6 +52,8 @@ public class CreateDish extends AppCompatActivity {
     EditText nameOfDish,halfPlate,fullPlate;
     FirebaseAuth dishAuth;
     CheckBox checkBox;
+    Bitmap bitmap;
+    File file;
     DatabaseReference dish;
     OutputStream outputStream;
     String nameOfDishes;
@@ -117,7 +119,10 @@ public class CreateDish extends AppCompatActivity {
                             else
                                 mrp = "no";
 
-                addToDatabase(name,half,full,image,mrp);
+                new Upload().execute();
+
+                Toast.makeText(CreateDish.this, "Uploading image in background don't close application", Toast.LENGTH_SHORT).show();
+                finish();
             }
         });
     }
@@ -189,11 +194,11 @@ public class CreateDish extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == 20 && resultCode == RESULT_OK && data != null){
-            Bitmap bitmap = (Bitmap) data.getExtras().get("data");
+             bitmap = (Bitmap) data.getExtras().get("data");
             File filepath = Environment.getExternalStorageDirectory();
             File dir = new File(filepath.getAbsolutePath());
             dir.mkdir();
-            File file = new File(dir, nameOfDish.getText().toString() + ".jpg");
+            file = new File(dir, nameOfDish.getText().toString() + ".jpg");
             try {
                 Log.i("file stored","yes");
                 outputStream = new FileOutputStream(file);
@@ -201,29 +206,6 @@ public class CreateDish extends AppCompatActivity {
                 e.printStackTrace();
             }
 
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
-            try {
-                outputStream.flush();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            try {
-                StorageReference reference = storageReference.child(dishAuth.getUid() + "/" + "image" + "/"  + nameOfDish.getText().toString());
-                reference.putFile(Uri.fromFile(file)).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-                        Toast.makeText(CreateDish.this, "Upload Complete and image saved in phone successfully", Toast.LENGTH_SHORT).show();
-
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-
-                    }
-                });
-            }catch (Exception e){
-                Toast.makeText(this, ""+e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
-            }
         }
     }
 
@@ -247,10 +229,29 @@ public class CreateDish extends AppCompatActivity {
 
         @Override
         protected Void doInBackground(Void... voids) {
-//            FirebaseStorage firebaseStorage = FirebaseStorage.getInstance();
-//            FirebaseAuth auth = FirebaseAuth.getInstance();
-//            StorageReference storageReference = firebaseStorage.getReference();
-//            StorageReference reference = storageReference.child(auth.getUid() + "/" + "image" + "/"  + name);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+            try {
+                outputStream.flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                StorageReference reference = storageReference.child(dishAuth.getUid() + "/" + "image" + "/"  + nameOfDish.getText().toString());
+                reference.putFile(Uri.fromFile(file)).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                        Toast.makeText(CreateDish.this, "Upload Complete and image saved in phone successfully", Toast.LENGTH_SHORT).show();
+                        addToDatabase(name,half,full,image,mrp);
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+
+                    }
+                });
+            }catch (Exception e){
+                Toast.makeText(CreateDish.this, ""+e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+            }
 
             return null;
         }
