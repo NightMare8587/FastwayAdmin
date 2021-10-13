@@ -88,6 +88,7 @@ public class AllMenuDish extends AppCompatActivity {
                 }
                 DishView dishView = new DishView(names,fullPrice,halfPrice,dish,image,before,after,discount);
                 loading.setVisibility(View.INVISIBLE);
+                Toast.makeText(AllMenuDish.this, "Click on image icon for adding new image", Toast.LENGTH_SHORT).show();
                 recyclerView.setAdapter(dishView);
                 dishView.notifyDataSetChanged();
 

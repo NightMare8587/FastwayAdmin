@@ -71,10 +71,32 @@ public class DishView extends RecyclerView.Adapter<DishView.DishAdapter> {
     public void onBindViewHolder(@NonNull DishAdapter holder, @SuppressLint("RecyclerView") int position) {
         holder.name.setText(names.get(position));
 //        notifyDataSetChanged();
-        holder.cardView.setOnClickListener(new View.OnClickListener() {
+        holder.imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
+                    AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+                    builder.setTitle("Image")
+                            .setMessage("Add/Upload new image for existing dish")
+                            .setPositiveButton("Add New Image", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    dialogInterface.dismiss();
+                                    Intent intent = new Intent(v.getContext(),AddImageToDish.class);
+                                    intent.putExtra("type",type);
+                                    intent.putExtra("dishName",names.get(position));
+                                    v.getContext().startActivity(intent);
+
+                                }
+                            }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.dismiss();
+                        }
+                    }).create();
+
+                    builder.show();
+                
             }
         });
 
