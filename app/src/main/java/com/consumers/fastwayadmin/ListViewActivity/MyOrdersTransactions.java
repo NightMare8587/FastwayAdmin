@@ -108,7 +108,7 @@ public class MyOrdersTransactions extends AppCompatActivity {
                     new MakePayout().execute();
 
                 }else{
-                    new KAlertDialog(MyOrdersTransactions.this,KAlertDialog.ERROR_TYPE)
+                   KAlertDialog kAlertDialog =  new KAlertDialog(MyOrdersTransactions.this,KAlertDialog.ERROR_TYPE)
                             .setTitleText("Error")
                             .setContentText("No transaction found")
                             .setConfirmText("Exit")
@@ -116,7 +116,10 @@ public class MyOrdersTransactions extends AppCompatActivity {
                                 fastDialog.dismiss();
                                 click.dismissWithAnimation();
                                 finish();
-                            }).show();
+                            });
+
+                   kAlertDialog.setCancelable(false);
+                   kAlertDialog.show();
                 }
             }
 
