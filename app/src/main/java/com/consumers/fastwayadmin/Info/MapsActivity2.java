@@ -13,6 +13,7 @@ import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -146,15 +147,19 @@ public class MapsActivity2 extends FragmentActivity implements OnMapReadyCallbac
 
                 } catch (IOException e) {
                     e.printStackTrace();
+                    Log.i("info",e.getLocalizedMessage());
                 }
-
-                Address address = addressList.get(0);
-                LatLng current = new LatLng(address.getLatitude(),address.getLongitude());
-                mMap.clear();
-                latitude = address.getLatitude();
-                longitude = address.getLongitude();
-                mMap.addMarker(new MarkerOptions().position(current).title("Current Location"));
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(current,15));
+                if(addressList.size() == 0){
+                    Toast.makeText(MapsActivity2.this, "No Result Founded\nTry some recognized places", Toast.LENGTH_SHORT).show();
+                }else {
+                    Address address = addressList.get(0);
+                    LatLng current = new LatLng(address.getLatitude(), address.getLongitude());
+                    mMap.clear();
+                    latitude = address.getLatitude();
+                    longitude = address.getLongitude();
+                    mMap.addMarker(new MarkerOptions().position(current).title("Current Location"));
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(current, 15));
+                }
             }
         });
     }
