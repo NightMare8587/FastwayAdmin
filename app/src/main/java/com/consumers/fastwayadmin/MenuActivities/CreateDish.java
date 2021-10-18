@@ -1,14 +1,6 @@
 package com.consumers.fastwayadmin.MenuActivities;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
-
 import android.Manifest;
-import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -20,11 +12,17 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import com.consumers.fastwayadmin.Dish.DishInfo;
 import com.consumers.fastwayadmin.Dish.SearchDishFastway.SearchFastwayDatabase;
@@ -56,7 +54,6 @@ public class CreateDish extends AppCompatActivity {
     File file;
     DatabaseReference dish;
     OutputStream outputStream;
-    String nameOfDishes;
     String mrp;
     FirebaseStorage storage;
     String state;
@@ -66,6 +63,7 @@ public class CreateDish extends AppCompatActivity {
     String menuType;
     String name,half,full,image;
     String imageUri = "";
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,54 +74,44 @@ public class CreateDish extends AppCompatActivity {
             floatingActionButton.setTooltipText("Search our database");
         }
 
-        floatingActionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(), SearchFastwayDatabase.class);
-                intent.putExtra("dish",menuType);
-                startActivity(intent);
-            }
+        floatingActionButton.setOnClickListener(view -> {
+            Intent intent = new Intent(getApplicationContext(), SearchFastwayDatabase.class);
+            intent.putExtra("dish",menuType);
+            startActivity(intent);
         });
 
-        chooseImage.setOnClickListener(new View.OnClickListener() {
-            @RequiresApi(api = Build.VERSION_CODES.M)
-            @Override
-            public void onClick(View view) {
-                if(nameOfDish.getText().toString().equals(""))
-                    Toast.makeText(CreateDish.this, "Please enter name of dish", Toast.LENGTH_SHORT).show();
-                else
-                CheckPermission();
+        chooseImage.setOnClickListener(view -> {
+            if(nameOfDish.getText().toString().equals(""))
+                Toast.makeText(CreateDish.this, "Please enter name of dish", Toast.LENGTH_SHORT).show();
+            else
+            CheckPermission();
 //               showDialogBox();
-            }
         });
 
-        createDish.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(nameOfDish.length() == 0){
-                    nameOfDish.setError("Invalid Name");
-                    nameOfDish.requestFocus();
-                    return;
-                }else if(fullPlate.length() == 0){
-                    fullPlate.setError("Invalid input");
-                    fullPlate.requestFocus();
-                    return;
-                }
-
-                name = nameOfDish.getText().toString();
-                half = halfPlate.getText().toString();
-                full = fullPlate.getText().toString();
-                image = "";
-                if(checkBox.isChecked())
-                    mrp = "yes";
-                            else
-                                mrp = "no";
-
-                new Upload().execute();
-
-                Toast.makeText(CreateDish.this, "Uploading image in background don't close application", Toast.LENGTH_SHORT).show();
-                finish();
+        createDish.setOnClickListener(view -> {
+            if(nameOfDish.length() == 0){
+                nameOfDish.setError("Invalid Name");
+                nameOfDish.requestFocus();
+                return;
+            }else if(fullPlate.length() == 0){
+                fullPlate.setError("Invalid input");
+                fullPlate.requestFocus();
+                return;
             }
+
+            name = nameOfDish.getText().toString();
+            half = halfPlate.getText().toString();
+            full = fullPlate.getText().toString();
+            image = "";
+            if(checkBox.isChecked())
+                mrp = "yes";
+                        else
+                            mrp = "no";
+
+            new Upload().execute();
+
+            Toast.makeText(CreateDish.this, "Uploading image in background don't close application", Toast.LENGTH_SHORT).show();
+            finish();
         });
     }
 
@@ -147,13 +135,10 @@ public class CreateDish extends AppCompatActivity {
                         intent.putExtra("name",nameDish);
                         startActivity(intent);
                     }
-                }).setNegativeButton("Take Photo", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE); //IMAGE CAPTURE CODE
-                startActivityForResult(intent, 20);
-            }
-        }).create();
+                }).setNegativeButton("Take Photo", (dialogInterface, i) -> {
+                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE); //IMAGE CAPTURE CODE
+                    startActivityForResult(intent, 20);
+                }).create();
         builder.show();
     }
 
