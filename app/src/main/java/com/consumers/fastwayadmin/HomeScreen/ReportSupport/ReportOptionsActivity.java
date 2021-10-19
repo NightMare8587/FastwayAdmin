@@ -33,16 +33,20 @@ public class ReportOptionsActivity extends AppCompatActivity {
     String userID;
     String channel_id = "notification_channel";
     EditText editText;
+    String state;
     String issueName,issueDetail,userName,userEmail;
     Button submitReport;
     DatabaseReference addToBlockList;
     DatabaseReference getUserDetails;
+    SharedPreferences resLocation;
     DatabaseReference reportRef;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_report_options);
         initialise();
+        resLocation = getSharedPreferences("loginInfo",MODE_PRIVATE);
+        state = resLocation.getString("state","");
         editText = findViewById(R.id.specifyinDetailEditText);
         getUserDetails = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(userID);
         getUserDetails.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -101,7 +105,7 @@ public class ReportOptionsActivity extends AppCompatActivity {
                                             SharedPreferences sharedPreferences = getSharedPreferences("RestaurantInfo",MODE_PRIVATE);
                                             addToBlockList.child("authId").setValue(userID);
                                             updateReportValue(userID);
-                                            OtherReportClass otherReportClass = new OtherReportClass(issueName,issueDetail,userName,userEmail,userID,sharedPreferences.getString("hotelName",""));
+                                            OtherReportClass otherReportClass = new OtherReportClass(issueName,issueDetail,userName,userEmail,userID,sharedPreferences.getString("hotelName",""),state);
                                             reportRef.child(Objects.requireNonNull(auth.getUid())).setValue(otherReportClass);
                                             generateNotification();
                                             kAlertDialog.dismissWithAnimation();
@@ -123,7 +127,7 @@ public class ReportOptionsActivity extends AppCompatActivity {
                                                     break;
                                             }
                                             SharedPreferences sharedPreferences = getSharedPreferences("RestaurantInfo",MODE_PRIVATE);
-                                            OtherReportClass otherReportClass = new OtherReportClass(issueName,issueDetail,userName,userEmail,userID,sharedPreferences.getString("hotelName",""));
+                                            OtherReportClass otherReportClass = new OtherReportClass(issueName,issueDetail,userName,userEmail,userID,sharedPreferences.getString("hotelName",""),state);
                                             reportRef.child(Objects.requireNonNull(auth.getUid())).setValue(otherReportClass);
                                             updateReportValue(userID);
                                             generateNotification();
