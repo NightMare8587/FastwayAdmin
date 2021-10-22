@@ -42,6 +42,7 @@ public class RandomChatNoww extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_random_chat_noww);
         auth = FirebaseAuth.getInstance();
+        linearLayoutManager = new LinearLayoutManager(RandomChatNoww.this);
         databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Admin").child(Objects.requireNonNull(auth.getUid())).child("messages").child(auth.getUid());
         recyclerView = findViewById(R.id.randomMessageRecyclerView);
         sendME = findViewById(R.id.sendMessageButtonRandom);
@@ -114,7 +115,7 @@ public class RandomChatNoww extends AppCompatActivity {
 //                    }
                     SharedPreferences preferences = getSharedPreferences("AccountInfo",MODE_PRIVATE);
                     chat chat = new chat(editText.getText().toString().trim(),auth.getUid()+"",System.currentTimeMillis()+"","1",preferences.getString("name",""));
-                    databaseReference.child("messages").child(auth.getUid()).child(System.currentTimeMillis()+"").setValue(chat);
+                    databaseReference.child(System.currentTimeMillis()+"").setValue(chat);
                     editText.setText("");
 
                     updateChat();
@@ -123,7 +124,7 @@ public class RandomChatNoww extends AppCompatActivity {
 
             }
         });
-        databaseReference.child("messages").child(auth.getUid()).addChildEventListener(new ChildEventListener() {
+        databaseReference.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
                 updateChat();
@@ -151,7 +152,7 @@ public class RandomChatNoww extends AppCompatActivity {
     }
 
     private void updateChat() {
-        databaseReference.child("messages").child(Objects.requireNonNull(auth.getUid())).addListenerForSingleValueEvent(new ValueEventListener() {
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.exists()) {
