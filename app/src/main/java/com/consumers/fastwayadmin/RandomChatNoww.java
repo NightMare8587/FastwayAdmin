@@ -1,15 +1,22 @@
 package com.consumers.fastwayadmin;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.consumers.fastwayadmin.Chat.RandomChat.RandomChatView;
+import com.consumers.fastwayadmin.Chat.chat;
+import com.consumers.fastwayadmin.Chat.chatAdapter;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -24,54 +31,142 @@ public class RandomChatNoww extends AppCompatActivity {
     FirebaseAuth auth;
     DatabaseReference databaseReference;
     RecyclerView recyclerView;
-    List<String> senderId = new ArrayList<>();
-    List<List<String>> allMessages = new ArrayList<>();
+    LinearLayoutManager linearLayoutManager;
     List<String> messages = new ArrayList<>();
     List<String> time = new ArrayList<>();
-    List<String> leftRight = new ArrayList<>();
+    List<String> leftOr = new ArrayList<>();
+    Button sendME;
+    EditText editText;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_random_chat_noww);
         auth = FirebaseAuth.getInstance();
-        databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid())).child("messages");
-        recyclerView = findViewById(R.id.randomChatNowRecyclerView);
+        databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Admin").child(Objects.requireNonNull(auth.getUid())).child("messages").child(auth.getUid());
+        recyclerView = findViewById(R.id.randomMessageRecyclerView);
+        sendME = findViewById(R.id.sendMessageButtonRandom);
+        editText = findViewById(R.id.sendMessageEditTextRandom);
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.exists()){
-                    senderId.clear();
                     messages.clear();
                     time.clear();
-                    leftRight.clear();
-                    for(DataSnapshot dataSnapshot : snapshot.getChildren()){
-                        Log.i("info",dataSnapshot.toString() + "");
-                        String currentId = dataSnapshot.getKey().toString();
-                        senderId.add(String.valueOf(dataSnapshot.getKey()));
-                        DatabaseReference getLastChat = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid()).child("messages").child(currentId);
-                        getLastChat.limitToLast(1).addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                if(snapshot.exists()){
-                                    for(DataSnapshot dataSnapshot1 : snapshot.getChildren()){
-                                        Log.i("offo",dataSnapshot1.toString());
-                                        messages.add(String.valueOf(dataSnapshot1.child("message").getValue()));
-                                        time.add(String.valueOf(dataSnapshot1.child("time").getValue()));
-                                    }
-                                    Log.i("offo",messages.toString());
-                                    recyclerView.setLayoutManager(new LinearLayoutManager(RandomChatNoww.this));
-                                    recyclerView.setAdapter(new RandomChatView(messages,time,senderId));
-                                }
+                    leftOr.clear();
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                            messages.add(String.valueOf(dataSnapshot.child("message").getValue()));
+                            time.add(String.valueOf(dataSnapshot.child("time").getValue()));
+                            leftOr.add(String.valueOf(dataSnapshot.child("id").getValue()));
+                        }
+                        linearLayoutManager.setStackFromEnd(true);
+                        recyclerView.setLayoutManager(linearLayoutManager);
+//                    recyclerView.smoothScrollToPosition(message.size()-1);
+                        recyclerView.setAdapter(new chatAdapter(messages,time,leftOr));
+                }
+            }
 
-                            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
 
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        });
 
-                            }
-                        });
+        sendME.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(editText.getText().toString().length() == 0){
+                    Toast.makeText(RandomChatNoww.this, "Enter Some Text", Toast.LENGTH_SHORT).show();
+                    return;
+                }else{
+//                    RequestQueue requestQueue = Volley.newRequestQueue(RandomChatNoww.this);
+//                    JSONObject main = new JSONObject();
+//                    try{
+//                        main.put("to","/topics/"++"");
+//                        JSONObject notification = new JSONObject();
+//                        notification.put("title","Restaurant Owner");
+//                        notification.put("body",""+editText.getText().toString().trim());
+//                        main.put("notification",notification);
+//
+//                        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, main, new Response.Listener<JSONObject>() {
+//                            @Override
+//                            public void onResponse(JSONObject response) {
+//
+//                            }
+//                        }, new Response.ErrorListener() {
+//                            @Override
+//                            public void onErrorResponse(VolleyError error) {
+//                                Toast.makeText(getApplicationContext(), error.getLocalizedMessage()+"null", Toast.LENGTH_SHORT).show();
+//                            }
+//                        }){
+//                            @Override
+//                            public Map<String, String> getHeaders() throws AuthFailureError {
+//                                Map<String,String> header = new HashMap<>();
+//                                header.put("content-type","application/json");
+//                                header.put("authorization","key=AAAAsigSEMs:APA91bEUF9ZFwIu84Jctci56DQd0TQOepztGOIKIBhoqf7N3ueQrkClw0xBTlWZEWyvwprXZmZgW2MNywF1pNBFpq1jFBr0CmlrJ0wygbZIBOnoZ0jP1zZC6nPxqF2MAP6iF3wuBHD2R");
+//                                return header;
+//                            }
+//                        };
+//
+//                        requestQueue.add(jsonObjectRequest);
+//                    }
+//                    catch (Exception e){
+//                        Toast.makeText(getApplicationContext(), e.getLocalizedMessage()+"null", Toast.LENGTH_SHORT).show();
+//                    }
+                    SharedPreferences preferences = getSharedPreferences("AccountInfo",MODE_PRIVATE);
+                    chat chat = new chat(editText.getText().toString().trim(),auth.getUid()+"",System.currentTimeMillis()+"","1",preferences.getString("name",""));
+                    databaseReference.child("messages").child(auth.getUid()).child(System.currentTimeMillis()+"").setValue(chat);
+                    editText.setText("");
 
+                    updateChat();
+                }
+
+
+            }
+        });
+        databaseReference.child("messages").child(auth.getUid()).addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                updateChat();
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                updateChat();
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+                updateChat();
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void updateChat() {
+        databaseReference.child("messages").child(Objects.requireNonNull(auth.getUid())).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists()) {
+                    messages.clear();
+                    time.clear();
+                    leftOr.clear();
+                    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                        messages.add(String.valueOf(dataSnapshot.child("message").getValue()));
+                        time.add(String.valueOf(dataSnapshot.child("time").getValue()));
+                        leftOr.add(String.valueOf(dataSnapshot.child("id").getValue()));
                     }
+                    linearLayoutManager.setStackFromEnd(true);
+                    recyclerView.setLayoutManager(linearLayoutManager);
+//                    recyclerView.smoothScrollToPosition(message.size()-1);
+                    recyclerView.setAdapter(new chatAdapter(messages,time,leftOr));
                 }
             }
 

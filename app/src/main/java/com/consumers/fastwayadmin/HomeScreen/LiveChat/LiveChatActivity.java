@@ -159,7 +159,7 @@ public class LiveChatActivity extends AppCompatActivity {
 
             @Override
             public void onChildMoved(@NonNull @NotNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                updateChild();
+
             }
 
             @Override
