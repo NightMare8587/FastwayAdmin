@@ -37,8 +37,9 @@ public class SearchFastwayDatabase extends AppCompatActivity {
         recyclerView = findViewById(R.id.searchFastwayRecyclerView);
         editText = findViewById(R.id.searchFastwayEditText);
         button = findViewById(R.id.searchFastwayButton);
-        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Global Dish");
         dish = getIntent().getStringExtra("dish");
+        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Global Dish").child(dish);
+
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
