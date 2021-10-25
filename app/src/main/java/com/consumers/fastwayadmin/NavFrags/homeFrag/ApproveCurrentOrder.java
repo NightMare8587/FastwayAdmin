@@ -1,5 +1,6 @@
 package com.consumers.fastwayadmin.NavFrags.homeFrag;
 
+import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -12,6 +13,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -61,6 +63,7 @@ public class ApproveCurrentOrder extends AppCompatActivity {
     MakePaymentToVendor makePaymentToVendor = new MakePaymentToVendor();
     String orderID,orderAmount;
     String table;
+    TextView textView;
     String time;
     String state;
     String id;
@@ -69,6 +72,7 @@ public class ApproveCurrentOrder extends AppCompatActivity {
     List<String> dishQuantity = new ArrayList<>();
     List<String> dishHalfOr = new ArrayList<>();
     Button approve,decline;
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,7 +81,7 @@ public class ApproveCurrentOrder extends AppCompatActivity {
         id = getIntent().getStringExtra("id");
         state = getIntent().getStringExtra("state");
         initialise();
-
+        textView.setText("Table Number: " + table);
         saveRefundInfo = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(id);
         halfOrList = findViewById(R.id.halfOrFullCurrentORder);
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -253,6 +257,7 @@ public class ApproveCurrentOrder extends AppCompatActivity {
         dishQ = findViewById(R.id.quantityCurrentOrder);
         decline = findViewById(R.id.declineCurrentOrderButton);
         progressBar = findViewById(R.id.currentOrderProgressBar);
+        textView = findViewById(R.id.tabeNumApproveCurrentOrder);
     }
     public class InitiateRefund extends AsyncTask<Void,Void,Void> {
 
