@@ -43,7 +43,7 @@ public class RandomChatNoww extends AppCompatActivity {
         setContentView(R.layout.activity_random_chat_noww);
         auth = FirebaseAuth.getInstance();
         linearLayoutManager = new LinearLayoutManager(RandomChatNoww.this);
-        databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Admin").child(Objects.requireNonNull(auth.getUid())).child("messages").child("Admin").child(auth.getUid());
+        databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Admin").child(Objects.requireNonNull(auth.getUid())).child("messages").child(auth.getUid());
         recyclerView = findViewById(R.id.randomMessageRecyclerView);
         sendME = findViewById(R.id.sendMessageButtonRandom);
         editText = findViewById(R.id.sendMessageEditTextRandom);
@@ -62,7 +62,7 @@ public class RandomChatNoww extends AppCompatActivity {
                         linearLayoutManager.setStackFromEnd(true);
                         recyclerView.setLayoutManager(linearLayoutManager);
 //                    recyclerView.smoothScrollToPosition(message.size()-1);
-                        recyclerView.setAdapter(new chatAdapter(messages,time,leftOr));
+                        recyclerView.setAdapter(new RandomChatAdapter(messages,time,leftOr));
                 }
             }
 
@@ -114,7 +114,7 @@ public class RandomChatNoww extends AppCompatActivity {
 //                        Toast.makeText(getApplicationContext(), e.getLocalizedMessage()+"null", Toast.LENGTH_SHORT).show();
 //                    }
                     SharedPreferences preferences = getSharedPreferences("AccountInfo",MODE_PRIVATE);
-                    chat chat = new chat(editText.getText().toString().trim(),auth.getUid()+"",System.currentTimeMillis()+"","1",preferences.getString("name",""));
+                    chat chat = new chat(editText.getText().toString().trim(),auth.getUid()+"",System.currentTimeMillis()+"","0",preferences.getString("name",""));
                     databaseReference.child(System.currentTimeMillis()+"").setValue(chat);
                     editText.setText("");
 
@@ -167,7 +167,7 @@ public class RandomChatNoww extends AppCompatActivity {
                     linearLayoutManager.setStackFromEnd(true);
                     recyclerView.setLayoutManager(linearLayoutManager);
 //                    recyclerView.smoothScrollToPosition(message.size()-1);
-                    recyclerView.setAdapter(new chatAdapter(messages,time,leftOr));
+                    recyclerView.setAdapter(new RandomChatAdapter(messages,time,leftOr));
                 }
             }
 

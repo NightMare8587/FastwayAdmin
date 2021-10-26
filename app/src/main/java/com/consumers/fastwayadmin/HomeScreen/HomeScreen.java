@@ -28,6 +28,7 @@ import com.consumers.fastwayadmin.NavFrags.HomeFrag;
 import com.consumers.fastwayadmin.NavFrags.MenuFrag;
 import com.consumers.fastwayadmin.NavFrags.TablesFrag;
 import com.consumers.fastwayadmin.R;
+import com.consumers.fastwayadmin.RandomChatNoww;
 import com.gauravk.bubblenavigation.BubbleNavigationConstraintView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -214,8 +215,8 @@ public class HomeScreen extends AppCompatActivity {
 
         if(id == R.id.notification)
             startActivity(new Intent(HomeScreen.this, SupportActivity.class));
-//        else
-//          startActivity(new Intent(HomeScreen.this, RandomChatNoww.class));
+        else
+          startActivity(new Intent(HomeScreen.this, RandomChatNoww.class));
         return super.onOptionsItemSelected(item);
     }
 
