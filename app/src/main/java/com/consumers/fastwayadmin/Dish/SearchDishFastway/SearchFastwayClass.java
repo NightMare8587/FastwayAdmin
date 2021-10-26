@@ -1,8 +1,14 @@
 package com.consumers.fastwayadmin.Dish.SearchDishFastway;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,10 +19,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.cardview.widget.CardView;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.consumers.fastwayadmin.Dish.AddImageToDish;
 import com.consumers.fastwayadmin.Dish.DishInfo;
+import com.consumers.fastwayadmin.MenuActivities.CreateDish;
 import com.consumers.fastwayadmin.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
@@ -52,8 +62,10 @@ public class SearchFastwayClass extends RecyclerView.Adapter<SearchFastwayClass.
         holder.name.setText(dishName.get(position));
         Picasso.get().load(dishImage.get(position)).centerCrop().resize(100,100).into(holder.imageView);
         holder.cardView.setOnClickListener(v -> {
+
             FirebaseAuth auth = FirebaseAuth.getInstance();
-            DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid())).child("List of Dish").child(dish);
+            SharedPreferences sharedPreferences = v.getContext().getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
+            DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid())).child("List of Dish").child(dish);
             AlertDialog.Builder alertDialog = new AlertDialog.Builder(v.getContext());
             alertDialog.setTitle("Important");
             alertDialog.setMessage("Enter Amount of half and full\nIf half not available leave empty");
@@ -61,21 +73,52 @@ public class SearchFastwayClass extends RecyclerView.Adapter<SearchFastwayClass.
             linearLayout.setOrientation(LinearLayout.VERTICAL);
             EditText halfPrice = new EditText(v.getContext());
             EditText fullPrice = new EditText(v.getContext());
+            EditText ownDishName = new EditText(v.getContext());
             halfPrice.setHint("Enter Half price if available");
             fullPrice.setHint("Enter Full price (Mandatory)");
+            ownDishName.setHint("Enter if you want your own dish name");
             alertDialog.setPositiveButton("Create", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
+                    String dishNameToAdd = null;
                     if(fullPrice.getText().toString().equals(""))
                         Toast.makeText(v.getContext(), "Full price can't be empty", Toast.LENGTH_SHORT).show();
                     else{
                         String half = halfPrice.getText().toString();
                         String full = fullPrice.getText().toString();
-                        DishInfo info = new DishInfo(dishName.get(position),half,full,dishImage.get(position),"false","0","0","0","yes");
-                        reference.child(dishName.get(position)).setValue(info);
+                        if(ownDishName.getText().toString().equals("")) {
+                            DishInfo info = new DishInfo(dishName.get(position), half, full, dishImage.get(position), "false", "0", "0", "0", "yes");
+                            reference.child(dishName.get(position)).setValue(info);
+                            dishNameToAdd = dishName.get(position);
+                        }else{
+                            DishInfo info = new DishInfo(ownDishName.getText().toString(), half, full, dishImage.get(position), "false", "0", "0", "0", "yes");
+                            reference.child(ownDishName.getText().toString()).setValue(info);
+                            dishNameToAdd = ownDishName.getText().toString();
+                        }
                         Toast.makeText(v.getContext(), "Dish Added successfully", Toast.LENGTH_SHORT).show();
                     }
                     dialogInterface.dismiss();
+                    AlertDialog.Builder alert = new AlertDialog.Builder(v.getContext());
+                    alert.setTitle("Image");
+                    alert.setMessage("Choose one option from below");
+                    String finalDishNameToAdd = dishNameToAdd;
+                    alert.setPositiveButton("Add dish image", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.dismiss();
+                            Intent intent = new Intent(v.getContext(), AddImageToDish.class);
+                            intent.putExtra("type",dish);
+                            intent.putExtra("dishName", finalDishNameToAdd);
+                            v.getContext().startActivity(intent);
+                        }
+                    }).setNegativeButton("Use Fastway Image", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.dismiss();
+                        }
+                    }).create();
+
+                    alert.show();
                 }
             });
 
@@ -88,7 +131,7 @@ public class SearchFastwayClass extends RecyclerView.Adapter<SearchFastwayClass.
 
             linearLayout.addView(halfPrice);
             linearLayout.addView(fullPrice);
-
+            linearLayout.addView(ownDishName);
             alertDialog.setView(linearLayout);
 
             alertDialog.create().show();
