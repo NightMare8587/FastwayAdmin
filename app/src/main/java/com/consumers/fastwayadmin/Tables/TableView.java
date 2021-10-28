@@ -2,6 +2,8 @@ package com.consumers.fastwayadmin.Tables;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -34,8 +36,11 @@ import com.developer.kalert.KAlertDialog;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
@@ -386,6 +391,92 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
                         dialog.dismiss();
                     }
                 });
+                if(status.get(position).equals("unavailable") || status.get(position).equals("Reserved")){
+                    alertDialog.setNeutralButton("Get User Details", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            List<String> myList = map.get(""+tables.get(position));
+                            reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(myList.get(0));
+                            reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                    AlertDialog.Builder alert = new AlertDialog.Builder(v.getContext());
+                                    alert.setTitle("Customer Details");
+                                    Toast.makeText(v.getContext(), "Long press to copy text", Toast.LENGTH_SHORT).show();
+                                    TextView contact = new TextView(v.getContext());
+                                    TextView email = new TextView(v.getContext());
+                                    TextView name = new TextView(v.getContext());
+                                    LinearLayout linearLayout = new LinearLayout(v.getContext());
+                                    linearLayout.setOrientation(LinearLayout.VERTICAL);
+                                    contact.setTextSize(18);
+                                    email.setTextSize(18);
+                                    name.setTextSize(18);
+                                    name.setPadding(6,6,6,6);
+                                    email.setPadding(6,6,6,6);
+                                    contact.setPadding(6,6,6,6);
+                                    name.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+                                    email.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+                                    contact.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+
+                                    if(snapshot.hasChild("name")){
+                                        name.setText(String.valueOf(snapshot.child("name").getValue()));
+                                        linearLayout.addView(name);
+
+                                    }
+
+                                    if(snapshot.hasChild("email")){
+                                        email.setText(String.valueOf(snapshot.child("email").getValue()));
+                                        linearLayout.addView(email);
+
+                                    }
+
+                                    if(snapshot.hasChild("number")){
+                                        contact.setText(String.valueOf(snapshot.child("number").getValue()));
+                                        linearLayout.addView(contact);
+                                    }
+
+                                    name.setOnLongClickListener(click -> {
+                                        Toast.makeText(click.getContext(), "Text Copied", Toast.LENGTH_SHORT).show();
+                                        ClipboardManager clipboard = (ClipboardManager) click.getContext().getSystemService(Context.CLIPBOARD_SERVICE);
+                                        ClipData clip = ClipData.newPlainText("Text Copied", name.getText().toString());
+                                        clipboard.setPrimaryClip(clip);
+                                        return true;
+                                    });
+                                    email.setOnLongClickListener(click -> {
+                                        Toast.makeText(click.getContext(), "Text Copied", Toast.LENGTH_SHORT).show();
+                                        ClipboardManager clipboard = (ClipboardManager) click.getContext().getSystemService(Context.CLIPBOARD_SERVICE);
+                                        ClipData clip = ClipData.newPlainText("Text Copied", email.getText().toString());
+                                        clipboard.setPrimaryClip(clip);
+                                        return true;
+                                    });
+                                    contact.setOnLongClickListener(click -> {
+                                        Toast.makeText(click.getContext(), "Text Copied", Toast.LENGTH_SHORT).show();
+                                        ClipboardManager clipboard = (ClipboardManager) click.getContext().getSystemService(Context.CLIPBOARD_SERVICE);
+                                        ClipData clip = ClipData.newPlainText("Text Copied", contact.getText().toString());
+                                        clipboard.setPrimaryClip(clip);
+                                        return true;
+                                    });
+
+                                    alert.setView(linearLayout);
+                                    alert.setPositiveButton("ok", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                            dialogInterface.dismiss();
+                                        }
+                                    });
+
+                                    alert.create().show();
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError error) {
+
+                                }
+                            });
+                        }
+                    });
+
+                }
 
                 alertDialog.create().show();
             }
