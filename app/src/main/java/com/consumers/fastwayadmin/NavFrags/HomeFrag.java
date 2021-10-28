@@ -75,8 +75,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-//import com.consumers.fastwayadmin.NavFrags.homeFrag.homeAdapter;
-//import com.consumers.fastwayadmin.NavFrags.homeFrag.homeModel;
+import karpuzoglu.enes.com.fastdialog.Animations;
+import karpuzoglu.enes.com.fastdialog.FastDialog;
+import karpuzoglu.enes.com.fastdialog.FastDialogBuilder;
+import karpuzoglu.enes.com.fastdialog.Type;
 
 public class HomeFrag extends Fragment {
     String currentTime;
@@ -196,6 +198,8 @@ public class HomeFrag extends Fragment {
                 secondLinearLayout.setVisibility(View.INVISIBLE);
                 onlineOrOffline.setChecked(false);
                 onlineOrOffline.setText("offline");
+
+
             }else{
                 comboImage.setVisibility(View.VISIBLE);
                 linearLayout.setVisibility(View.VISIBLE);
@@ -290,6 +294,40 @@ public class HomeFrag extends Fragment {
                 secondLinearLayout.setVisibility(View.INVISIBLE);
                 onlineOrOfflineRestaurant.child("status").setValue("offline");
                 editor.putString("online","false");
+                FastDialog fastDialog = new FastDialogBuilder(requireContext(), Type.PROGRESS)
+                        .progressText("Closing restaurant... please wait")
+                        .setAnimation(Animations.SLIDE_BOTTOM)
+                        .cancelable(false)
+                        .create();
+
+                fastDialog.show();
+
+                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(resInfoShared.getString("state","")).child(auth.getUid()).child("Tables");
+                databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if(snapshot.exists()){
+                            for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                                if(String.valueOf(dataSnapshot.child("status").getValue()).equals("unavailable")){
+                                    databaseReference.child(String.valueOf(dataSnapshot.getKey())).child("status").setValue("available");
+                                    databaseReference.child(String.valueOf(dataSnapshot.getKey())).child("customerId").removeValue();
+                                    databaseReference.child(String.valueOf(dataSnapshot.getKey())).child("Current Order").removeValue();
+                                }else if(String.valueOf(dataSnapshot.child("status").getValue()).equals("Reserved")){
+                                    databaseReference.child(String.valueOf(dataSnapshot.getKey())).child("status").setValue("available");
+                                    databaseReference.child(String.valueOf(dataSnapshot.getKey())).child("customerId").removeValue();
+                                    databaseReference.child(String.valueOf(dataSnapshot.getKey())).child("time").removeValue();
+                                    databaseReference.child(String.valueOf(dataSnapshot.getKey())).child("timeInMillis").removeValue();
+                                }
+                            }
+                            fastDialog.dismiss();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
             }
             editor.apply();
 
