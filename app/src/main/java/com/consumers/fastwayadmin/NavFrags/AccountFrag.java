@@ -47,7 +47,7 @@ public class AccountFrag extends Fragment {
     FirebaseAuth auth;
     int count = 0;
     boolean pressed = false;
-    int total = 0;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
