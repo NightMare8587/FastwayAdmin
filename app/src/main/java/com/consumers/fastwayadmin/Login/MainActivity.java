@@ -419,6 +419,7 @@ public class MainActivity extends AppCompatActivity {
                 .setTitleText("Verify")
                 .setHint("Enter 6 digit Code")
                 .positiveText("Verify")
+                .cancelable(false)
                 .negativeText("Cancel")
                 .create();
 
@@ -477,6 +478,8 @@ public class MainActivity extends AppCompatActivity {
                 verifyCodeDialog.dismiss();
             }
         });
+
+
 
     }
     @Override
