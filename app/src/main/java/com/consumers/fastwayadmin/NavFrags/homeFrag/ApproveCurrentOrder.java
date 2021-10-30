@@ -64,6 +64,7 @@ public class ApproveCurrentOrder extends AppCompatActivity {
     String orderID,orderAmount;
     String table;
     TextView textView;
+    int totalPrice = 0;
     String time;
     String state;
     String id;
@@ -94,6 +95,7 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                     orderID = String.valueOf(dataSnapshot.child("orderID").getValue());
                     orderAmount = String.valueOf(dataSnapshot.child("orderAmount").getValue());
                     time = String.valueOf(dataSnapshot.child("time").getValue());
+                    totalPrice = totalPrice + Integer.parseInt(String.valueOf(dataSnapshot.child("price").getValue()));
                 }
                 progressBar.setVisibility(View.INVISIBLE);
                 uploadToArrayAdapter(dishNames,dishQuantity,dishHalfOr);
@@ -375,7 +377,7 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                     DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid())).child("Transactions");
                     PaymentClass paymentClass = new PaymentClass(genratedID,id);
                     databaseReference.child(time).setValue(paymentClass);
-                    params.put("amount",String.valueOf(orderAmount));
+                    params.put("amount",String.valueOf(totalPrice));
                     return params;
                 }
             };
