@@ -35,6 +35,9 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.messaging.FirebaseMessaging;
+
+import java.util.Objects;
 
 public class AccountFrag extends Fragment {
     ListView listView;
@@ -105,6 +108,7 @@ public class AccountFrag extends Fragment {
                                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialogInterface, int i) {
+                                        FirebaseMessaging.getInstance().unsubscribeFromTopic(Objects.requireNonNull(auth.getUid()));
                                         requireContext().stopService(new Intent(requireContext(), MyService.class));
                                         SharedPreferences stopServices = requireActivity().getSharedPreferences("Stop Services", MODE_PRIVATE);
                                         SharedPreferences.Editor editor = stopServices.edit();
