@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_margin="6dp"
+    android:id="@+id/blockedUserCardView"
+    android:layout_height="120dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/nameOfUserBlocked"
+            android:layout_width="wrap_content"
+            android:text="Name"
+            android:layout_weight="1"
+            android:layout_margin="5dp"
+            android:fontFamily="@font/merriweather_sans_bold"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_height="0dp"/>
+
+        <TextView
+            android:id="@+id/dateOnUserBlocked"
+            android:layout_width="wrap_content"
+            android:text="Blocked On: "
+            android:textSize="20sp"
+            android:layout_weight="1"
+            android:layout_margin="5dp"
+            android:textStyle="bold"
+            android:fontFamily="@font/merriweather_sans_bold"
+            android:layout_height="0dp"/>
+
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

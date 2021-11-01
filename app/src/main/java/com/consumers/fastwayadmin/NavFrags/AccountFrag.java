@@ -12,7 +12,6 @@ import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -23,6 +22,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
+import com.consumers.fastwayadmin.ListViewActivity.BlockedUsersList.BlockedUsers;
 import com.consumers.fastwayadmin.ListViewActivity.MyAccount;
 import com.consumers.fastwayadmin.ListViewActivity.MyOrdersTransactions;
 import com.consumers.fastwayadmin.MyService;
@@ -41,7 +41,7 @@ import java.util.Objects;
 
 public class AccountFrag extends Fragment {
     ListView listView;
-    String[] names = {"My Account","My Transactions","Logout","Terms And Conditions","Privacy policy","Restaurant Reviews"};
+    String[] names = {"My Account","Blocked Users","My Transactions","Logout","Terms And Conditions","Privacy policy","Restaurant Reviews"};
     GoogleSignInClient googleSignInClient;
 
     FirebaseAuth auth;
@@ -83,78 +83,75 @@ public class AccountFrag extends Fragment {
         listView = view.findViewById(R.id.listView);
         auth = FirebaseAuth.getInstance();
 
-        ArrayAdapter arrayAdapter = new ArrayAdapter<String>(view.getContext(),R.layout.list,names);
+        ArrayAdapter arrayAdapter = new ArrayAdapter<>(view.getContext(), R.layout.list, names);
         listView.setAdapter(arrayAdapter);
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .build();
 
         googleSignInClient = GoogleSignIn.getClient(requireContext(),gso);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                int id = (int) adapterView.getItemIdAtPosition(i);
-                switch (id){
-                    case 0:
-                        startActivity(new Intent(getActivity(), MyAccount.class));
-                        break;
-                    case 1:
-                        startActivity(new Intent(getActivity(), MyOrdersTransactions.class));
-                        break;
-                    case 2:
-                        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                        builder.setTitle("Logout")
-                                .setMessage("Do you wanna logout?")
-                                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialogInterface, int i) {
-                                        FirebaseMessaging.getInstance().unsubscribeFromTopic(Objects.requireNonNull(auth.getUid()));
-                                        requireContext().stopService(new Intent(requireContext(), MyService.class));
-                                        SharedPreferences stopServices = requireActivity().getSharedPreferences("Stop Services", MODE_PRIVATE);
-                                        SharedPreferences.Editor editor = stopServices.edit();
-                                        editor.putString("online","false");
-                                        editor.apply();
-                                        auth.signOut();
-                                        googleSignInClient.signOut().addOnCompleteListener((Activity) getContext(), new OnCompleteListener<Void>() {
-                                            @Override
-                                            public void onComplete(@NonNull Task<Void> task) {
-                                            }
-                                        });
-                                        SharedPreferences settings = view.getContext().getSharedPreferences("loginInfo", MODE_PRIVATE);
-                                        settings.edit().clear().commit();
-
-                                        SharedPreferences res = view.getContext().getSharedPreferences("RestaurantInfo", MODE_PRIVATE);
-                                        res.edit().clear().commit();
-
-                                        SharedPreferences intro = view.getContext().getSharedPreferences("IntroAct", MODE_PRIVATE);
-                                        intro.edit().clear().commit();
-
-                                        startActivity(new Intent(getActivity(), SplashScreen.class));
-                                        getActivity().finish();
-                                    }
-                                })
-                                .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialogInterface, int i) {
-                                        dialogInterface.dismiss();
-                                    }
-                                }).create();
-
-                        builder.show();
-                        break;
-
-                    case 3:
-                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.websitepolicies.com/policies/view/CpwDZziF"));
-                        startActivity(browserIntent);
-                        break;
-                    case 4:
-                        Intent privacyIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://fastway.flycricket.io/privacy.html"));
-                        startActivity(privacyIntent);
-                        break;
-                    case 5:
-                    startActivity(new Intent(requireContext(), RestaurantsReviews.class));
+        listView.setOnItemClickListener((adapterView, view1, i, l) -> {
+            int id = (int) adapterView.getItemIdAtPosition(i);
+            switch (id){
+                case 0:
+                    startActivity(new Intent(getActivity(), MyAccount.class));
                     break;
-                }
+                case 1:
+                    startActivity(new Intent(getActivity(), BlockedUsers.class));
+                    break;
+                case 2:
+                    startActivity(new Intent(getActivity(), MyOrdersTransactions.class));
+                    break;
+                case 3:
+                    AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+                    builder.setTitle("Logout")
+                            .setMessage("Do you wanna logout?")
+                            .setPositiveButton("Yes", (dialogInterface, i1) -> {
+                                FirebaseMessaging.getInstance().unsubscribeFromTopic(Objects.requireNonNull(auth.getUid()));
+                                requireContext().stopService(new Intent(requireContext(), MyService.class));
+                                SharedPreferences stopServices = requireActivity().getSharedPreferences("Stop Services", MODE_PRIVATE);
+                                SharedPreferences.Editor editor = stopServices.edit();
+                                editor.putString("online","false");
+                                editor.apply();
+                                auth.signOut();
+                                googleSignInClient.signOut().addOnCompleteListener((Activity) getContext(), new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                    }
+                                });
+                                SharedPreferences settings = view1.getContext().getSharedPreferences("loginInfo", MODE_PRIVATE);
+                                settings.edit().clear().commit();
+
+                                SharedPreferences res = view1.getContext().getSharedPreferences("RestaurantInfo", MODE_PRIVATE);
+                                res.edit().clear().commit();
+
+                                SharedPreferences intro = view1.getContext().getSharedPreferences("IntroAct", MODE_PRIVATE);
+                                intro.edit().clear().commit();
+
+                                startActivity(new Intent(getActivity(), SplashScreen.class));
+                                getActivity().finish();
+                            })
+                            .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    dialogInterface.dismiss();
+                                }
+                            }).create();
+
+                    builder.show();
+                    break;
+
+                case 4:
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.websitepolicies.com/policies/view/CpwDZziF"));
+                    startActivity(browserIntent);
+                    break;
+                case 5:
+                    Intent privacyIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://fastway.flycricket.io/privacy.html"));
+                    startActivity(privacyIntent);
+                    break;
+                case 6:
+                startActivity(new Intent(requireContext(), RestaurantsReviews.class));
+                break;
             }
         });
     }

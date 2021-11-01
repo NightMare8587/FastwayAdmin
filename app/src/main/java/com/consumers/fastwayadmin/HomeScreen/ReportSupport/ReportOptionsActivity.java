@@ -34,12 +34,14 @@ public class ReportOptionsActivity extends AppCompatActivity {
     String channel_id = "notification_channel";
     EditText editText;
     String state;
+    DatabaseReference checkIfReportedAlready;
     String issueName,issueDetail,userName,userEmail;
     Button submitReport;
     DatabaseReference addToBlockList;
     DatabaseReference getUserDetails;
     SharedPreferences resLocation;
     DatabaseReference reportRef;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,6 +49,29 @@ public class ReportOptionsActivity extends AppCompatActivity {
         initialise();
         resLocation = getSharedPreferences("loginInfo",MODE_PRIVATE);
         state = resLocation.getString("state","");
+        checkIfReportedAlready = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(Objects.requireNonNull(auth.getUid())).child("Reported Users");
+        checkIfReportedAlready.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.hasChild(userID)){
+                    KAlertDialog kAlertDialog = new KAlertDialog(ReportOptionsActivity.this,KAlertDialog.ERROR_TYPE);
+                    kAlertDialog.setTitleText("Already Reported")
+                            .setContentText("Looks like you have already reported this user")
+                            .setConfirmText("Exit")
+                            .setConfirmClickListener(k -> {
+                                k.dismissWithAnimation();
+                                finish();
+                            });
+                    kAlertDialog.setCancelable(false);
+                    kAlertDialog.show();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
         editText = findViewById(R.id.specifyinDetailEditText);
         getUserDetails = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(userID);
         getUserDetails.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -102,8 +127,11 @@ public class ReportOptionsActivity extends AppCompatActivity {
                                                     issueDetail = editText.getText().toString();
                                                     break;
                                             }
+                                            DatabaseReference reportUsers = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(auth.getUid());
+                                            reportUsers.child("Reported Users").child(userID).child("authId").setValue(userID);
                                             SharedPreferences sharedPreferences = getSharedPreferences("RestaurantInfo",MODE_PRIVATE);
                                             addToBlockList.child("authId").setValue(userID);
+                                            addToBlockList.child("time").setValue(String.valueOf(System.currentTimeMillis()));
                                             updateReportValue(userID);
                                             OtherReportClass otherReportClass = new OtherReportClass(issueName,issueDetail,userName,userEmail,userID,sharedPreferences.getString("hotelName",""),state);
                                             reportRef.child(Objects.requireNonNull(auth.getUid())).setValue(otherReportClass);
@@ -130,6 +158,8 @@ public class ReportOptionsActivity extends AppCompatActivity {
                                             OtherReportClass otherReportClass = new OtherReportClass(issueName,issueDetail,userName,userEmail,userID,sharedPreferences.getString("hotelName",""),state);
                                             reportRef.child(Objects.requireNonNull(auth.getUid())).setValue(otherReportClass);
                                             updateReportValue(userID);
+                                            DatabaseReference reportUsers = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(auth.getUid());
+                                            reportUsers.child("Reported Users").child(userID).child("authId").setValue(userID);
                                             generateNotification();
                                             Toast.makeText(ReportOptionsActivity.this, "Report Submitted Successfully", Toast.LENGTH_SHORT).show();
                                             kAlertDialog.dismissWithAnimation();
