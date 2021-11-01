@@ -96,6 +96,7 @@ public class MainActivity extends AppCompatActivity {
     double longi,lati;
     LocationRequest locationRequest;
     GoogleSignInOptions gso;
+    SharedPreferences getBanInfo;
     FusedLocationProviderClient clientsLocation;
     FastDialog verifyCodeDialog,fastDialog;
     GoogleSignInAccount account;
@@ -167,6 +168,19 @@ public class MainActivity extends AppCompatActivity {
             @SuppressLint("SetTextI18n")
             @Override
             public void onClick(View view) {
+                getBanInfo = getSharedPreferences("loginInfo",MODE_PRIVATE);
+                if(getBanInfo.contains("banTime")){
+                    long value = Long.parseLong(getBanInfo.getString("banTime",""));
+                    long currentTime = Long.parseLong(String.valueOf(System.currentTimeMillis()));
+
+                    if(currentTime > value){
+                        getBanInfo.edit().remove("banTime").apply();
+                    }else{
+                        Toast.makeText(MainActivity.this, "Wait till ban is removed " + TimeUnit.MILLISECONDS.toMinutes(value - currentTime) + " minutes Remaining", Toast.LENGTH_SHORT).show();
+
+                        return;
+                    }
+                }
                 if(fullName.length() == 0){
                     fullName.requestFocus();
                     fullName.setError("Field can't be Empty");
@@ -475,7 +489,15 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Toast.makeText(MainActivity.this, "Cancelled", Toast.LENGTH_SHORT).show();
+                startVerification.setVisibility(View.VISIBLE);
                 verifyCodeDialog.dismiss();
+
+                SharedPreferences sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+
+                long nowPlus5Minutes = System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(5);
+                editor.putString("banTime",String.valueOf(nowPlus5Minutes));
+                editor.apply();
             }
         });
 
