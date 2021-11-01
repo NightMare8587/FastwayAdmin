@@ -101,7 +101,7 @@ public class CustomOffer extends AppCompatActivity {
                         .withFirstButtonListner(view11 -> {
                             FastDialog fastDialog = new FastDialogBuilder(view.getContext(), Type.DIALOG)
                                     .setTitleText("Enter Quantity")
-                                    .setText("Enter quantity of dish")
+                                    .setText("Enter how much discount on dish")
                                     .setHint("Enter here")
                                     .positiveText("Proceed")
                                     .negativeText("Cancel")
@@ -111,58 +111,62 @@ public class CustomOffer extends AppCompatActivity {
                             fastDialog.show();
 
                             fastDialog.positiveClickListener(click -> {
-                                for(int i=0;i< dishName.size(); i++) {
-                                    auth = FirebaseAuth.getInstance();
-                                    reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state", "")).child(Objects.requireNonNull(auth.getUid()));
-                                    reference.child("List of Dish").addListenerForSingleValueEvent(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                            for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                                                for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
-                                                    if (String.valueOf(dataSnapshot1.child("mrp").getValue()).equals("no")) {
-                                                        String type = String.valueOf(dataSnapshot.getKey());
-                                                        String dishName = String.valueOf(dataSnapshot1.child("name").getValue());
-                                                        if (Integer.parseInt(Objects.requireNonNull(String.valueOf(dataSnapshot1.child("full").getValue()))) >= 149) {
-                                                            int price = Integer.parseInt(Objects.requireNonNull(String.valueOf(dataSnapshot1.child("full").getValue())));
-                                                            int discount = 50;
-                                                            int afterDis = price - (price * discount / 100);
-                                                            beforeDiscount(price, afterDis, discount, type, dishName);
-                                                            addToDiscountDatabase("yes");
-                                                            auth = FirebaseAuth.getInstance();
-                                                            Log.i("type", type);
-                                                            Log.i("name", dishName);
+                                if(!fastDialog.getInputText().equals("") && !fastDialog.getInputText().equals("0")) {
+                                    for (int i = 0; i < dishName.size(); i++) {
+                                        auth = FirebaseAuth.getInstance();
+                                        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state", "")).child(Objects.requireNonNull(auth.getUid()));
+                                        reference.child("List of Dish").addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                                                    for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
+                                                        if (String.valueOf(dataSnapshot1.child("mrp").getValue()).equals("no")) {
+                                                            String type = String.valueOf(dataSnapshot.getKey());
+                                                            String dishName = String.valueOf(dataSnapshot1.child("name").getValue());
+                                                            if (Integer.parseInt(Objects.requireNonNull(String.valueOf(dataSnapshot1.child("full").getValue()))) >= 149) {
+                                                                int price = Integer.parseInt(Objects.requireNonNull(String.valueOf(dataSnapshot1.child("full").getValue())));
+                                                                int discount = (int) Integer.parseInt(fastDialog.getInputText());
+                                                                int afterDis = price - (price * discount / 100);
+                                                                beforeDiscount(price, afterDis, discount, type, dishName);
+                                                                addToDiscountDatabase("yes");
+                                                                auth = FirebaseAuth.getInstance();
+                                                                Log.i("type", type);
+                                                                Log.i("name", dishName);
 //                                reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(auth.getUid()).child("List of Dish");
-                                                            reference.child("List of Dish").child(type).child(dishName).child("full").setValue(afterDis);
+                                                                reference.child("List of Dish").child(type).child(dishName).child("full").setValue(afterDis);
+                                                                reference.child("Current combo").removeValue();
+                                                            }
                                                         }
                                                     }
                                                 }
+                                                AestheticDialog.Builder builder = new AestheticDialog.Builder(CustomOffer.this, DialogStyle.FLAT, DialogType.SUCCESS);
+                                                builder.setTitle("Applying Discount")
+                                                        .setMessage("Wait while we are applying discount :)")
+                                                        .setCancelable(false)
+                                                        .setDuration(3000)
+                                                        .setAnimation(DialogAnimation.SHRINK)
+                                                        .setDarkMode(true);
+
+                                                builder.show();
+
+                                                new Handler().postDelayed(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        builder.dismiss();
+                                                        finish();
+                                                    }
+                                                }, 3000);
                                             }
-                                            AestheticDialog.Builder builder = new AestheticDialog.Builder(CustomOffer.this, DialogStyle.FLAT, DialogType.SUCCESS);
-                                            builder.setTitle("Applying Discount")
-                                                    .setMessage("Wait while we are applying discount :)")
-                                                    .setCancelable(false)
-                                                    .setDuration(3000)
-                                                    .setAnimation(DialogAnimation.SHRINK)
-                                                    .setDarkMode(true);
 
-                                            builder.show();
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError error) {
 
-                                            new Handler().postDelayed(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    builder.dismiss();
-                                                    finish();
-                                                }
-                                            }, 3000);
-                                        }
-
-                                        @Override
-                                        public void onCancelled(@NonNull DatabaseError error) {
-
-                                        }
-                                    });
-                                }
+                                            }
+                                        });
+                                    }
+                                }else Toast.makeText(CustomOffer.this, "Field can't be empty", Toast.LENGTH_SHORT).show();
                             });
+
 
                             flatDialog.dismiss();
                         })
@@ -325,12 +329,13 @@ public class CustomOffer extends AppCompatActivity {
                     }
                     proceed.setVisibility(View.VISIBLE);
                     Log.i("log",dishName.toString());
-                    recyclerView.setLayoutManager(horizonatl);
-                    recyclerView.setAdapter(new comboAdapter(dishName));
                 }else {
-                    Toast.makeText(CustomOffer.this, "Something Went Wrong", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(CustomOffer.this, "Something Went Wrong", Toast.LENGTH_SHORT).show();
                     proceed.setVisibility(View.INVISIBLE);
+                    dishName.clear();
                 }
+                recyclerView.setLayoutManager(horizonatl);
+                recyclerView.setAdapter(new comboAdapter(dishName));
             }
 
             @Override
