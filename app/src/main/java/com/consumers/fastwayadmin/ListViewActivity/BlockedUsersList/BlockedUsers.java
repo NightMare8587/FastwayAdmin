@@ -114,7 +114,6 @@ public class BlockedUsers extends AppCompatActivity {
                         userID.add(String.valueOf(dataSnapshot.getKey()));
                         timeReported.add(String.valueOf(dataSnapshot.child("time").getValue()));
                     }
-
                     recyclerView.setLayoutManager(new LinearLayoutManager(BlockedUsers.this));
                     recyclerView.setAdapter(new BlockedRecyclerView(userID,timeReported,sharedPreferences.getString("state",""),BlockedUsers.this));
 
