@@ -1,6 +1,7 @@
 package com.consumers.fastwayadmin.ListViewActivity.BlockedUsersList;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -11,6 +12,7 @@ import android.os.Bundle;
 import com.consumers.fastwayadmin.R;
 import com.developer.kalert.KAlertDialog;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -62,6 +64,65 @@ public class BlockedUsers extends AppCompatActivity {
 
                     kAlertDialog.setCancelable(false);
                     kAlertDialog.show();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+
+        databaseReference.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                updateChild();
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                updateChild();
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+                updateChild();
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void updateChild() {
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists()){
+                    userID.clear();
+                    timeReported.clear();
+
+                    for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                        userID.add(String.valueOf(dataSnapshot.getKey()));
+                        timeReported.add(String.valueOf(dataSnapshot.child("time").getValue()));
+                    }
+
+                    recyclerView.setLayoutManager(new LinearLayoutManager(BlockedUsers.this));
+                    recyclerView.setAdapter(new BlockedRecyclerView(userID,timeReported,sharedPreferences.getString("state",""),BlockedUsers.this));
+
+                }else{
+                    userID.clear();
+                    timeReported.clear();
+                    recyclerView.setLayoutManager(new LinearLayoutManager(BlockedUsers.this));
+                    recyclerView.setAdapter(new BlockedRecyclerView(userID,timeReported,sharedPreferences.getString("state",""),BlockedUsers.this));
                 }
             }
 
