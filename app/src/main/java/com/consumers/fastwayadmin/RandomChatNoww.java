@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.consumers.fastwayadmin.Chat.chat;
 import com.consumers.fastwayadmin.Chat.chatAdapter;
+import com.developer.kalert.KAlertDialog;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -33,6 +34,7 @@ public class RandomChatNoww extends AppCompatActivity {
     RecyclerView recyclerView;
     LinearLayoutManager linearLayoutManager;
     List<String> messages = new ArrayList<>();
+    int count = 1;
     List<String> time = new ArrayList<>();
     List<String> leftOr = new ArrayList<>();
     Button sendME;
@@ -63,6 +65,19 @@ public class RandomChatNoww extends AppCompatActivity {
                         recyclerView.setLayoutManager(linearLayoutManager);
 //                    recyclerView.smoothScrollToPosition(message.size()-1);
                         recyclerView.setAdapter(new RandomChatAdapter(messages,time,leftOr));
+                }else{
+                    count++;
+                    KAlertDialog kAlertDialog = new KAlertDialog(RandomChatNoww.this,KAlertDialog.ERROR_TYPE);
+                    kAlertDialog.setTitleText("No Message From Fastway")
+                            .setContentText("We will notify you as soon as you got reply from fastway")
+                            .setConfirmText("Exit")
+                            .setConfirmClickListener(click -> {
+                                click.dismissWithAnimation();
+                                finish();
+                            });
+
+                    kAlertDialog.setCancelable(false);
+                    kAlertDialog.show();
                 }
             }
 
@@ -168,6 +183,19 @@ public class RandomChatNoww extends AppCompatActivity {
                     recyclerView.setLayoutManager(linearLayoutManager);
 //                    recyclerView.smoothScrollToPosition(message.size()-1);
                     recyclerView.setAdapter(new RandomChatAdapter(messages,time,leftOr));
+                }else if(count == 1){
+                    count++;
+                    KAlertDialog kAlertDialog = new KAlertDialog(RandomChatNoww.this,KAlertDialog.ERROR_TYPE);
+                    kAlertDialog.setTitleText("No Message From Fastway")
+                            .setContentText("We will notify you as soon as you got reply from fastway")
+                            .setConfirmText("Exit")
+                            .setConfirmClickListener(click -> {
+                                click.dismissWithAnimation();
+                                finish();
+                            });
+
+                    kAlertDialog.setCancelable(false);
+                    kAlertDialog.show();
                 }
             }
 
