@@ -9,6 +9,7 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -30,6 +31,7 @@ import com.consumers.fastwayadmin.NavFrags.TablesFrag;
 import com.consumers.fastwayadmin.R;
 import com.consumers.fastwayadmin.RandomChatNoww;
 import com.gauravk.bubblenavigation.BubbleNavigationConstraintView;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -52,7 +54,8 @@ public class HomeScreen extends AppCompatActivity {
     String URL = "https://fcm.googleapis.com/fcm/send";
     FragmentManager manager;
     SharedPreferences sharedPreferences;
-    FirebaseAuth auth;
+    FirebaseAuth auth = FirebaseAuth.getInstance();
+    DatabaseReference resRef;
     DatabaseReference reference;
 
     @Override
@@ -65,23 +68,52 @@ public class HomeScreen extends AppCompatActivity {
         ConnectivityManager cm =
                 (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
 
+
+        resRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
+        resRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.hasChild("fastwayReply")){
+                    AlertDialog.Builder alert = new AlertDialog.Builder(HomeScreen.this);
+                    alert.setTitle("Reply")
+                            .setMessage("You have a new reply from fastway")
+                            .setCancelable(false)
+                            .setPositiveButton("Exit", (dialog, which) -> {
+                                resRef.child("fastwayReply").removeValue();
+                                dialog.dismiss();
+                            }).setNegativeButton("See Message", (dialog, which) -> {
+                        resRef.child("fastwayReply").removeValue();
+                        startActivity(new Intent(HomeScreen.this, RandomChatNoww.class));
+                        dialog.dismiss();
+                    }).create();
+                    alert.setOnCancelListener(dialog -> {
+                        dialog.dismiss();
+                        resRef.child("fastwayReply").removeValue();
+                    });
+                    alert.show();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         boolean isConnected = activeNetwork != null &&
                 activeNetwork.isConnectedOrConnecting();
 
         if(!isConnected){
-            AlertDialog.Builder alert = new AlertDialog.Builder(HomeScreen.this);
-            alert.setTitle("Not Connected")
-                    .setMessage("Looks like you are not connected to internet")
-                    .setPositiveButton("Exit", new DialogInterface.OnClickListener() {
+            View parentLayout = findViewById(android.R.id.content);
+            Snackbar.make(parentLayout, "Please connect to internet :)", Snackbar.LENGTH_LONG)
+                    .setAction("CLOSE", new View.OnClickListener() {
                         @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    });
+                        public void onClick(View view) {
 
-            alert.setCancelable(false);
-            alert.create().show();
+                        }
+                    })
+                    .setActionTextColor(getResources().getColor(android.R.color.holo_red_light ))
+                    .show();
         }
         bubble.setNavigationChangeListener((view, position) -> {
             switch (position){
