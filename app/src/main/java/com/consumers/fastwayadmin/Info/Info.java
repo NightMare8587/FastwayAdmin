@@ -2,29 +2,39 @@ package com.consumers.fastwayadmin.Info;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Looper;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import com.consumers.fastwayadmin.HomeScreen.HomeScreen;
+import com.consumers.fastwayadmin.MenuActivities.CreateDish;
+import com.consumers.fastwayadmin.MenuActivities.CustomDishImageSearch;
 import com.consumers.fastwayadmin.R;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.ResolvableApiException;
@@ -38,6 +48,8 @@ import com.google.android.gms.location.LocationSettingsResponse;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
@@ -46,9 +58,16 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.hbb20.CountryCodePicker;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -62,11 +81,18 @@ public class Info extends AppCompatActivity {
 
     EditText nameOfRestaurant,AddressOfRestaurant,nearbyPlace,pinCode,contactNumber;
     Button proceed;
+    FastDialog loading;
     LocationRequest locationRequest;
+    Bitmap bitmap;
+    StorageReference storageReference;
+    Uri filePath;
+    FirebaseStorage storage;
+    OutputStream outputStream;
+    File file;
     FusedLocationProviderClient clientsLocation;
     double longi,lati;
     CountryCodePicker codePicker;
-    FirebaseAuth infoAuth;
+    FirebaseAuth infoAuth = FirebaseAuth.getInstance();
     DatabaseReference infoRef;
     FastDialog fastDialog;
     SharedPreferences sharedPreferences;
@@ -98,6 +124,8 @@ public class Info extends AppCompatActivity {
                     .show();
         }
         initialise();
+        storage = FirebaseStorage.getInstance();
+        storageReference = storage.getReference();
         checkLocationInfo = getSharedPreferences("LocationMaps",MODE_PRIVATE);
         checkPermissions();
         sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
@@ -176,6 +204,9 @@ public class Info extends AppCompatActivity {
                     contactNumber.requestFocus();
                     contactNumber.setError("Invalid Number");
                     return;
+                }else if(!codePicker.getSelectedCountryCodeWithPlus().equals("+91")){
+                    Toast.makeText(Info.this, "This app currently operates only in India", Toast.LENGTH_SHORT).show();
+                    return;
                 }
                 name = nameOfRestaurant.getText().toString();
                 address = AddressOfRestaurant.getText().toString();
@@ -218,8 +249,29 @@ public class Info extends AppCompatActivity {
         infoRef.child("count").setValue("0");
         infoRef.child("status").setValue("online");
         clientsLocation.removeLocationUpdates(mLocationCallback);
-        startActivity(new Intent(Info.this, MapsActivity.class));
-        finish();
+        AlertDialog.Builder alert = new AlertDialog.Builder(Info.this);
+        alert.setTitle("Images");
+        alert.setMessage("Do you wanna add display image for your restaurant\n(This image will be visible to user)!!\nYou can skip this step and add image later");
+        alert.setPositiveButton("Add Image", new DialogInterface.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.M)
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+                CheckPermission();
+            }
+        }).setNegativeButton("Skip", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+                infoRef.child("DisplayImage").setValue("");
+                startActivity(new Intent(Info.this, MapsActivity.class));
+                finish();
+            }
+        }).create();
+
+        alert.setCancelable(false);
+        alert.show();
+
     }
 
     private void initialise() {
@@ -338,4 +390,176 @@ public class Info extends AppCompatActivity {
             });
         }
     };
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    private void CheckPermission() {
+        if(ContextCompat.checkSelfPermission(Info.this, Manifest.permission.CAMERA) + ContextCompat.checkSelfPermission(Info.this
+                ,Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+            requestPermissions(new String[]{Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE},1);
+        }else
+        {
+            AlertDialog.Builder newDialog = new AlertDialog.Builder(Info.this);
+            newDialog.setTitle("Choose One Option");
+            newDialog.setMessage("Choose one option from below")
+                    .setPositiveButton("Choose From Gallery", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.dismiss();
+                            Intent intent = new Intent();
+                            intent.setType("image/*");
+                            intent.setAction(Intent.ACTION_GET_CONTENT);
+                            startActivityForResult(Intent.createChooser(intent, "Select Picture"), 1);
+                        }
+                    }).setNegativeButton("Take Photo", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    dialogInterface.dismiss();
+                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE); //IMAGE CAPTURE CODE
+                    startActivityForResult(intent, 20);
+                }
+            }).create();
+
+            newDialog.setCancelable(false);
+            newDialog.show();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(requestCode == 1){
+            if(grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                Toast.makeText(this, "Permission Granted", Toast.LENGTH_SHORT).show();
+                AlertDialog.Builder newDialog = new AlertDialog.Builder(Info.this);
+                newDialog.setTitle("Choose One Option");
+                newDialog.setMessage("Choose one option from below")
+                        .setPositiveButton("Choose From Gallery", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+
+                            }
+                        }).setNegativeButton("Take Photo", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE); //IMAGE CAPTURE CODE
+                        startActivityForResult(intent, 20);
+                    }
+                }).create();
+
+                newDialog.setCancelable(false);
+                newDialog.show();
+            }else{
+                Toast.makeText(this, "Permission Denied", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == 20 && resultCode == RESULT_OK && data != null){
+             loading = new FastDialogBuilder(Info.this,Type.PROGRESS)
+                    .setAnimation(Animations.SLIDE_BOTTOM)
+                    .progressText("Uploading Image.....")
+                    .create();
+
+            loading.show();
+
+            bitmap = (Bitmap) data.getExtras().get("data");
+            File filepath = Environment.getExternalStorageDirectory();
+            File dir = new File(filepath.getAbsolutePath());
+            dir.mkdir();
+            file = new File(dir, "DisplayImage" + ".jpg");
+            try {
+                Log.i("file stored","yes");
+                outputStream = new FileOutputStream(file);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+            try {
+                outputStream.flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+                loading.dismiss();
+            }
+            try {
+                StorageReference reference = storageReference.child(infoAuth.getUid() + "/" + "image" + "/"  + "DisplayImage");
+                reference.putFile(Uri.fromFile(file)).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                        StorageReference reference = storageReference.child(infoAuth.getUid() + "/" + "image" + "/"  + "DisplayImage");
+                        reference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                            @Override
+                            public void onSuccess(@NonNull Uri uri) {
+                                Toast.makeText(Info.this, "Upload Complete and image saved in phone successfully", Toast.LENGTH_SHORT).show();
+                                loading.dismiss();
+                                DatabaseReference dish = FirebaseDatabase.getInstance().getReference().getRoot();
+                                dish.child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(infoAuth.getUid())).child("DisplayImage").setValue(uri + "");
+                                startActivity(new Intent(Info.this, MapsActivity.class));
+                                finish();
+                            }
+                        });
+
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(Info.this,
+                                "Something went wrong", Toast.LENGTH_SHORT).show();
+                        loading.dismiss();
+                    }
+                });
+            }catch (Exception e){
+                Toast.makeText(Info.this, ""+e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                loading.dismiss();
+            }
+
+        }else if(requestCode == 1 && resultCode == RESULT_OK && data != null){
+            loading = new FastDialogBuilder(Info.this,Type.PROGRESS)
+                    .setAnimation(Animations.SLIDE_BOTTOM)
+                    .progressText("Uploading Image.....")
+                    .create();
+
+            loading.show();
+            filePath = data.getData();
+            try {
+                bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(),filePath);
+                uploadImage();
+            } catch (IOException e) {
+                e.printStackTrace();
+                loading.dismiss();
+            }
+
+
+        }
+    }
+
+    private void uploadImage() {
+        if(filePath != null){
+            StorageReference reference = storageReference.child(infoAuth.getUid() + "/" + "image" + "/"  + "DisplayImage");
+            reference.putFile(filePath).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(@NonNull UploadTask.TaskSnapshot taskSnapshot) {
+                    StorageReference reference = storageReference.child(infoAuth.getUid() + "/" + "image" + "/"  + "DisplayImage");
+                    reference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(@NonNull Uri uri) {
+                            Toast.makeText(Info.this, "Upload Complete and image saved in phone successfully", Toast.LENGTH_SHORT).show();
+                            loading.dismiss();
+                            DatabaseReference dish = FirebaseDatabase.getInstance().getReference().getRoot();
+                            dish.child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(infoAuth.getUid())).child("DisplayImage").setValue(uri + "");
+                            startActivity(new Intent(Info.this, MapsActivity.class));
+                            finish();
+                        }
+                    });
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    loading.dismiss();
+                }
+            });
+        }else
+            loading.dismiss();
+    }
 }

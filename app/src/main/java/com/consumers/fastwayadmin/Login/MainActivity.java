@@ -193,6 +193,9 @@ public class MainActivity extends AppCompatActivity {
                     phoneNumber.requestFocus();
                     phoneNumber.setError("Enter valid number");
                     return;
+                }else if(!ccp.getSelectedCountryCodeWithPlus().equals("+91")){
+                    Toast.makeText(MainActivity.this, "This app currently operates only in India", Toast.LENGTH_SHORT).show();
+                    return;
                 }
 
                 new KAlertDialog(MainActivity.this,KAlertDialog.WARNING_TYPE)
