@@ -33,8 +33,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import com.consumers.fastwayadmin.HomeScreen.HomeScreen;
-import com.consumers.fastwayadmin.MenuActivities.CreateDish;
-import com.consumers.fastwayadmin.MenuActivities.CustomDishImageSearch;
 import com.consumers.fastwayadmin.R;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.ResolvableApiException;
