@@ -32,6 +32,7 @@ import com.thecode.aestheticdialogs.DialogStyle;
 import com.thecode.aestheticdialogs.DialogType;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -44,6 +45,7 @@ public class DiscountActivity extends AppCompatActivity {
     Button search;
     SharedPreferences sharedPreferences;
     List<String> name = new ArrayList<>();
+    HashMap<String,String> map = new HashMap<>();
     RecyclerView recyclerView;
 
     @Override
@@ -71,13 +73,16 @@ public class DiscountActivity extends AppCompatActivity {
                             if (snapshot.exists()) {
                                 name.clear();
                                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+
                                     for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
-                                        if (dataSnapshot1.exists() && String.valueOf(dataSnapshot1.child("mrp").getValue()).equals("no"))
+                                        if (dataSnapshot1.exists() && String.valueOf(dataSnapshot1.child("mrp").getValue()).equals("no")) {
+                                            map.put(dataSnapshot1.child("name").getValue(String.class), dataSnapshot.getKey());
                                             name.add(dataSnapshot1.child("name").getValue(String.class));
+                                        }
                                     }
                                 }
                                 recyclerView.setLayoutManager(new LinearLayoutManager(DiscountActivity.this));
-                                recyclerView.setAdapter(new DiscountRecycler(name,DiscountActivity.this));
+                                recyclerView.setAdapter(new DiscountRecycler(map,DiscountActivity.this,name));
                             }
                         }
 
@@ -97,12 +102,14 @@ public class DiscountActivity extends AppCompatActivity {
                             name.clear();
                             for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                                 for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
-                                    if (dataSnapshot1.exists() && String.valueOf(dataSnapshot1.child("mrp").getValue()).equals("no") && dataSnapshot1.child("name").getValue(String.class).contains(searchText))
+                                    if (dataSnapshot1.exists() && String.valueOf(dataSnapshot1.child("mrp").getValue()).equals("no") && dataSnapshot1.child("name").getValue(String.class).contains(searchText)) {
+                                        map.put(dataSnapshot1.child("name").getValue(String.class), dataSnapshot.getKey());
                                         name.add(dataSnapshot1.child("name").getValue(String.class));
+                                    }
                                 }
                             }
                             recyclerView.setLayoutManager(new LinearLayoutManager(DiscountActivity.this));
-                            recyclerView.setAdapter(new DiscountRecycler(name,DiscountActivity.this));
+                            recyclerView.setAdapter(new DiscountRecycler(map,DiscountActivity.this,name));
                         }
                     }
 
@@ -125,8 +132,10 @@ public class DiscountActivity extends AppCompatActivity {
                     name.clear();
                     for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                         for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
-                            if (dataSnapshot1.exists() && String.valueOf(dataSnapshot1.child("mrp").getValue()).equals("no"))
+                            if (dataSnapshot1.exists() && String.valueOf(dataSnapshot1.child("mrp").getValue()).equals("no")) {
+                                map.put(dataSnapshot1.child("name").getValue(String.class), dataSnapshot.getKey());
                                 name.add(dataSnapshot1.child("name").getValue(String.class));
+                            }
                         }
                     }
                 }
@@ -222,7 +231,7 @@ public class DiscountActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View view) {
                         recyclerView.setLayoutManager(new LinearLayoutManager(DiscountActivity.this));
-                        recyclerView.setAdapter(new DiscountRecycler(name,DiscountActivity.this));
+                        recyclerView.setAdapter(new DiscountRecycler(map,DiscountActivity.this,name));
                         flatDialog.dismiss();
                     }
                 }).show();
