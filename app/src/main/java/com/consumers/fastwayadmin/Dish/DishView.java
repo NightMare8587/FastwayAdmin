@@ -110,9 +110,11 @@ public class DishView extends RecyclerView.Adapter<DishView.DishAdapter> {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                             String before = String.valueOf(snapshot.child(names.get(position)).child("before").getValue());
+                            String beforeHalf = String.valueOf(snapshot.child(names.get(position)).child("beforeHalf").getValue());
                             Log.d("before",before);
                             databaseReference.child("Discount").removeValue();
                             databaseReference.child("full").setValue(before);
+                            databaseReference.child("half").setValue(beforeHalf);
                     }
 
                     @Override

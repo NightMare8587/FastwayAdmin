@@ -166,11 +166,25 @@ public class DiscountRecycler extends RecyclerView.Adapter<DiscountRecycler.Hold
                         if (String.valueOf(dataSnapshot1.child("mrp").getValue()).equals("no")) {
                             String type = String.valueOf(dataSnapshot.getKey());
                             String dishName = String.valueOf(dataSnapshot1.child("name").getValue());
-                            if (Integer.parseInt(Objects.requireNonNull(String.valueOf(dataSnapshot1.child("full").getValue()))) >= 149) {
+                            if (Integer.parseInt(Objects.requireNonNull(String.valueOf(dataSnapshot1.child("full").getValue()))) >= 149 && !String.valueOf(dataSnapshot1.child("half").getValue()).equals("")) {
+                                int price = Integer.parseInt(Objects.requireNonNull(String.valueOf(dataSnapshot1.child("full").getValue())));
+                                int halfPrice = Integer.parseInt(Objects.requireNonNull(String.valueOf(dataSnapshot1.child("half").getValue())));
+                                int discount = Integer.parseInt(firstTextField);
+                                int afterDis = price - (price * discount / 100);
+                                int afterDisHalf = halfPrice - (halfPrice * discount / 100);
+                                beforeDiscount(price,afterDis,discount,type,dishName,halfPrice);
+                                addToDiscountDatabase("yes");
+                                auth = FirebaseAuth.getInstance();
+                                Log.i("type",type);
+                                Log.i("name",dishName);
+//                                reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(auth.getUid()).child("List of Dish");
+                                reference.child("List of Dish").child(type).child(dishName).child("full").setValue(afterDis);
+                                reference.child("List of Dish").child(type).child(dishName).child("half").setValue(afterDisHalf);
+                            }else{
                                 int price = Integer.parseInt(Objects.requireNonNull(String.valueOf(dataSnapshot1.child("full").getValue())));
                                 int discount = Integer.parseInt(firstTextField);
                                 int afterDis = price - (price * discount / 100);
-                                beforeDiscount(price,afterDis,discount,type,dishName);
+                                beforeDiscount(price,afterDis,discount,type,dishName,0);
                                 addToDiscountDatabase("yes");
                                 auth = FirebaseAuth.getInstance();
                                 Log.i("type",type);
@@ -202,16 +216,30 @@ public class DiscountRecycler extends RecyclerView.Adapter<DiscountRecycler.Hold
                         if (String.valueOf(dataSnapshot1.child("mrp").getValue()).equals("no")) {
                             String type = String.valueOf(dataSnapshot.getKey());
                             String dishName = String.valueOf(dataSnapshot1.child("name").getValue());
-                            if (Integer.parseInt(Objects.requireNonNull(String.valueOf(dataSnapshot1.child("full").getValue()))) >= 149) {
+                            if (Integer.parseInt(Objects.requireNonNull(String.valueOf(dataSnapshot1.child("full").getValue()))) >= 149 && !String.valueOf(dataSnapshot1.child("half").getValue()).equals("")) {
                                 int price = Integer.parseInt(Objects.requireNonNull(String.valueOf(dataSnapshot1.child("full").getValue())));
+                                int halfPrice = Integer.parseInt(Objects.requireNonNull(String.valueOf(dataSnapshot1.child("half").getValue())));
                                 int discount = 40;
                                 int afterDis = price - (price * discount / 100);
-                                beforeDiscount(price,afterDis,discount,type,dishName);
+                                int afterDisHalf = halfPrice - (halfPrice * discount / 100);
+                                beforeDiscount(price,afterDis,discount,type,dishName,halfPrice);
                                 addToDiscountDatabase("yes");
                                 auth = FirebaseAuth.getInstance();
                                 Log.i("type",type);
                                 Log.i("name",dishName);
-                                reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
+                                reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid()));
+                                reference.child("List of Dish").child(type).child(dishName).child("full").setValue(afterDis);
+                                reference.child("List of Dish").child(type).child(dishName).child("half").setValue(afterDisHalf);
+                            }else{
+                                int price = Integer.parseInt(Objects.requireNonNull(String.valueOf(dataSnapshot1.child("full").getValue())));
+                                int discount = 40;
+                                int afterDis = price - (price * discount / 100);
+                                beforeDiscount(price,afterDis,discount,type,dishName,0);
+                                addToDiscountDatabase("yes");
+                                auth = FirebaseAuth.getInstance();
+                                Log.i("type",type);
+                                Log.i("name",dishName);
+                                reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid()));
                                 reference.child("List of Dish").child(type).child(dishName).child("full").setValue(afterDis);
                             }
                         }
@@ -248,8 +276,13 @@ public class DiscountRecycler extends RecyclerView.Adapter<DiscountRecycler.Hold
         addToDB.child("Discount").child("available").setValue("yes");
     }
 
-    private void beforeDiscount(int price,int after, int discount,String type,String name) {
-        DisInfo disInfo = new DisInfo(String.valueOf(price),String.valueOf(after),String.valueOf(discount));
+    private void beforeDiscount(int price,int after, int discount,String type,String name,int halfPrice) {
+        DisInfo disInfo;
+        if(halfPrice == 0)
+            disInfo = new DisInfo(String.valueOf(price),String.valueOf(after),String.valueOf(discount),"");
+        else
+            disInfo = new DisInfo(String.valueOf(price),String.valueOf(after),String.valueOf(discount),""+ halfPrice);
+
         dis = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
         dis.child("List of Dish").child(type).child(name).child("Discount").child(name).setValue(disInfo);
     }
@@ -267,11 +300,26 @@ public class DiscountRecycler extends RecyclerView.Adapter<DiscountRecycler.Hold
                         if (String.valueOf(dataSnapshot1.child("mrp").getValue()).equals("no")) {
                             String type = String.valueOf(dataSnapshot.getKey());
                             String dishName = String.valueOf(dataSnapshot1.child("name").getValue());
-                            if (Integer.parseInt(Objects.requireNonNull(String.valueOf(dataSnapshot1.child("full").getValue()))) >= 149) {
+                            if (Integer.parseInt(Objects.requireNonNull(String.valueOf(dataSnapshot1.child("full").getValue()))) >= 149 && !String.valueOf(dataSnapshot1.child("half").getValue()).equals("")) {
+                                int price = Integer.parseInt(Objects.requireNonNull(String.valueOf(dataSnapshot1.child("full").getValue())));
+                                int halfPrice = Integer.parseInt(Objects.requireNonNull(String.valueOf(dataSnapshot1.child("half").getValue())));
+
+                                int discount = 50;
+                                int afterDis = price - (price * discount / 100);
+                                int afterDisHalf = halfPrice - (halfPrice * discount / 100);
+                                beforeDiscount(price,afterDis,discount,type,dishName,halfPrice);
+                                addToDiscountDatabase("yes");
+                                auth = FirebaseAuth.getInstance();
+                                Log.i("type",type);
+                                Log.i("name",dishName);
+//                                reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(auth.getUid()).child("List of Dish");
+                                reference.child("List of Dish").child(type).child(dishName).child("full").setValue(afterDis);
+                                reference.child("List of Dish").child(type).child(dishName).child("half").setValue(afterDisHalf);
+                            }else{
                                 int price = Integer.parseInt(Objects.requireNonNull(String.valueOf(dataSnapshot1.child("full").getValue())));
                                 int discount = 50;
                                 int afterDis = price - (price * discount / 100);
-                                beforeDiscount(price,afterDis,discount,type,dishName);
+                                beforeDiscount(price,afterDis,discount,type,dishName,0);
                                 addToDiscountDatabase("yes");
                                 auth = FirebaseAuth.getInstance();
                                 Log.i("type",type);
