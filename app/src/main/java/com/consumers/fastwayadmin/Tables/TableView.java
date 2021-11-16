@@ -238,6 +238,8 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
                                     }
                                     reference.child(tables.get(position)).child("customerId").removeValue();
                                     reference.child(tables.get(position)).child("status").setValue("available");
+                                    reference.child(tables.get(position)).child("time").removeValue();
+                                    reference.child(tables.get(position)).child("timeInMillis").removeValue();
 //                                    reference.child(tables.get(position)).child("time").removeValue();
                                     holder.chatWith.setVisibility(View.INVISIBLE);
                                     holder.cancel.setVisibility(View.INVISIBLE);
