@@ -147,6 +147,7 @@ public class ComboAndOffers extends AppCompatActivity {
                                                                     reference.child("Combo").child(comboName).child("enable").setValue("yes");
                                                                     reference.child("Combo").child(comboName).child("rating").setValue("0");
                                                                     reference.child("Combo").child(comboName).child("totalRate").setValue("0");
+                                                                    Toast.makeText(ComboAndOffers.this, "You can add image to combo later", Toast.LENGTH_SHORT).show();
 
                                                                     name.clear();
                                                                     dishQuantity.clear();

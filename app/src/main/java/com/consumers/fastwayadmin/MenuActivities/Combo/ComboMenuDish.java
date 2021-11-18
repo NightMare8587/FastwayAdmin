@@ -31,6 +31,7 @@ public class ComboMenuDish extends AppCompatActivity {
     RecyclerView recyclerView;
     FloatingActionButton add;
     String state;
+    List<String> comboImage = new ArrayList<>();
     List<String> dish = new ArrayList<>();
     List<String> price = new ArrayList<>();
     DatabaseReference reference;
@@ -51,6 +52,10 @@ public class ComboMenuDish extends AppCompatActivity {
                     for(DataSnapshot dataSnapshot : snapshot.getChildren()){
                         comboNames.add(dataSnapshot.getKey().toString());
                         price.add(String.valueOf(dataSnapshot.child("price").getValue()));
+                        if(dataSnapshot.hasChild("image"))
+                            comboImage.add(String.valueOf(dataSnapshot.child("image").getValue()));
+                        else
+                            comboImage.add("");
                         for(DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()){
                             dish.add(String.valueOf(dataSnapshot1.child("name").child("name").getValue()));
                         }
@@ -59,7 +64,7 @@ public class ComboMenuDish extends AppCompatActivity {
                         dish.clear();
                     }
                     recyclerView.setLayoutManager(new LinearLayoutManager(ComboMenuDish.this));
-                    recyclerView.setAdapter(new ComboRecyclerView(comboNames,dishNames,price,ComboMenuDish.this));
+                    recyclerView.setAdapter(new ComboRecyclerView(comboNames,dishNames,price,ComboMenuDish.this,comboImage));
 
                     Log.i("tag",comboNames.toString());
                 }

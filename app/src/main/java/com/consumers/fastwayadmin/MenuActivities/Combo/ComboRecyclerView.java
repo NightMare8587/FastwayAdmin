@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -19,10 +20,12 @@ import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.consumers.fastwayadmin.Dish.AddImageToDish;
 import com.consumers.fastwayadmin.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,10 +35,12 @@ public class ComboRecyclerView extends RecyclerView.Adapter<ComboRecyclerView.Ho
     List<String> comboName = new ArrayList<>();
     List<List<String>> dishName = new ArrayList<>();
     List<String> price = new ArrayList<>();
+    List<String> comboImage;
     Context context;
 
-    public ComboRecyclerView(List<String> comboName, List<List<String>> dishName, List<String> price, Context context) {
+    public ComboRecyclerView(List<String> comboName, List<List<String>> dishName, List<String> price, Context context,List<String> comboImage) {
         this.comboName = comboName;
+        this.comboImage = comboImage;
         this.dishName = dishName;
         this.price = price;
         this.context = context;
@@ -59,6 +64,32 @@ public class ComboRecyclerView extends RecyclerView.Adapter<ComboRecyclerView.Ho
         ViewGroup.LayoutParams param = holder.listView.getLayoutParams();
         param.height = 150*current.size();
         holder.listView.setLayoutParams(param);
+        holder.imageView.setOnClickListener(click -> {
+            AlertDialog.Builder alert = new AlertDialog.Builder(click.getContext());
+            alert.setTitle("Image");
+            alert.setMessage("Choose one option from below");
+            alert.setPositiveButton("Add/Upload New Image", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    dialogInterface.dismiss();
+                    Intent intent = new Intent(click.getContext(), AddImageToDish.class);
+                    intent.putExtra("type","Combo");
+                    intent.putExtra("dishName",comboName.get(position));
+                    click.getContext().startActivity(intent);
+
+                }
+            }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+dialogInterface.dismiss();
+                }
+            });
+            alert.create().show();
+        });
+        if(!comboImage.get(position).equals(""))
+        Picasso.get().load(comboImage.get(position)).resize(200,200).centerCrop().into(holder.imageView);
+        else
+            Picasso.get().load("https://image.shutterstock.com/image-vector/no-image-vector-isolated-on-600w-1481369594.jpg").centerCrop().resize(100, 100).into(holder.imageView);
         holder.listView.requestLayout();
         holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -108,6 +139,7 @@ public class ComboRecyclerView extends RecyclerView.Adapter<ComboRecyclerView.Ho
         TextView comboName,price;
         ListView listView;
         CheckBox checkBox;
+        ImageView imageView;
         CardView cardView;
         public Holder(@NonNull View itemView) {
             super(itemView);
@@ -115,6 +147,7 @@ public class ComboRecyclerView extends RecyclerView.Adapter<ComboRecyclerView.Ho
             price = itemView.findViewById(R.id.comboMenuPriceView);
             listView = itemView.findViewById(R.id.comboDishListViewMenu);
             checkBox = itemView.findViewById(R.id.checkBox);
+            imageView = itemView.findViewById(R.id.ComboImageView);
             cardView = itemView.findViewById(R.id.comboAdCard);
         }
     }

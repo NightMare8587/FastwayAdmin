@@ -20,13 +20,13 @@
             android:id="@+id/comboMenuDishName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="33dp"
+            android:layout_marginStart="15dp"
             android:layout_marginTop="36dp"
             android:text="TextView"
             android:textColor="#000000"
             android:textSize="18sp"
             android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/ComboImageView"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
@@ -46,10 +46,10 @@
             android:id="@+id/comboDishListViewMenu"
             android:layout_width="150dp"
             android:layout_height="match_parent"
-            android:layout_marginStart="25dp"
+            android:layout_marginStart="15dp"
             android:layout_marginTop="1dp"
             android:divider="#00000000"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/ComboImageView"
             app:layout_constraintTop_toBottomOf="@+id/comboMenuDishName" />
 
         <CheckBox
@@ -61,6 +61,16 @@
             android:text="Enabled"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
+
+        <ImageView
+            android:id="@+id/ComboImageView"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/comboMenuDishName"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:srcCompat="@tools:sample/avatars" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>
