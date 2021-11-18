@@ -236,6 +236,21 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
                                     } catch (Exception e) {
                                         Toast.makeText(view.getContext(), e.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
                                     }
+                                    FirebaseAuth auth = FirebaseAuth.getInstance();
+                                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(myList.get(0)).child("Reserve Tables").child(auth.getUid());
+                                    databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                            if(snapshot.exists()){
+                                                databaseReference.child(tables.get(position)).removeValue();
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError error) {
+
+                                        }
+                                    });
                                     reference.child(tables.get(position)).child("customerId").removeValue();
                                     reference.child(tables.get(position)).child("status").setValue("available");
                                     reference.child(tables.get(position)).child("time").removeValue();
