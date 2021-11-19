@@ -1,6 +1,7 @@
 package com.consumers.fastwayadmin.Chat.RandomChatFolder;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -9,6 +10,7 @@ import android.os.Bundle;
 
 import com.consumers.fastwayadmin.R;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -70,6 +72,88 @@ public class RandomChatWithUsers extends AppCompatActivity {
                         messages.clear();
                     }
                     recyclerView.setAdapter(new ClassRandom(messages,userID,time,map,leftOr,RandomChatWithUsers.this,finaLListMeesage,finaLListLeftOr,finaLListTime));
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        databaseReference.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                updateChild();
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                updateChild();
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+                updateChild();
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void updateChild() {
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists()){
+                    messages.clear();
+                    userID.clear();
+                    leftOr.clear();
+                    finaLListTime.clear();
+                    finaLListMeesage.clear();
+                    finaLListLeftOr.clear();
+                    time.clear();
+                    map.clear();
+                    count = 1;
+                    for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                        count = 1;
+                        userID.add(String.valueOf(dataSnapshot.getKey()));
+                        for(DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()){
+                            time.add(String.valueOf(dataSnapshot1.getKey()));
+                            leftOr.add(String.valueOf(dataSnapshot1.child("id").getValue()));
+                            messages.add(String.valueOf(dataSnapshot1.child("message").getValue()));
+                            if(count == 1 && Integer.parseInt(String.valueOf(dataSnapshot1.child("id").getValue())) == 0) {
+                                map.put(dataSnapshot.getKey(), String.valueOf(dataSnapshot1.child("name").getValue()));
+                                count++;
+                            }
+                        }
+                        finaLListMeesage.add(new ArrayList<>(messages));
+                        finaLListLeftOr.add(new ArrayList<>(leftOr));
+                        finaLListTime.add(new ArrayList<>(time));
+                        time.clear();
+                        leftOr.clear();
+                        messages.clear();
+                    }
+                    recyclerView.setAdapter(new ClassRandom(messages,userID,time,map,leftOr,RandomChatWithUsers.this,finaLListMeesage,finaLListLeftOr,finaLListTime));
+                }else {
+                    messages.clear();
+                    userID.clear();
+                    leftOr.clear();
+                    finaLListTime.clear();
+                    finaLListMeesage.clear();
+                    finaLListLeftOr.clear();
+                    time.clear();
+                    map.clear();
+                    recyclerView.setAdapter(new ClassRandom(messages,userID,time,map,leftOr,RandomChatWithUsers.this,finaLListMeesage,finaLListLeftOr,finaLListTime));
+
                 }
             }
 

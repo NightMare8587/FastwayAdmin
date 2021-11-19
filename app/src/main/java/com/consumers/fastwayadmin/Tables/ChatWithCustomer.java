@@ -55,7 +55,7 @@ public class ChatWithCustomer extends AppCompatActivity {
     DatabaseReference resName;
     List<String> leftOrRight = new ArrayList<>();
     EditText editText;
-    Button sendME;
+    Button sendME,endConversation;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,6 +64,7 @@ public class ChatWithCustomer extends AppCompatActivity {
         sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
         editText = findViewById(R.id.sendMessageEditText);
         sendME = findViewById(R.id.sendMessageButton);
+        endConversation = findViewById(R.id.endConversationWithUSer);
         linearLayoutManager = new LinearLayoutManager(getApplicationContext());
         reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
         recyclerView = findViewById(R.id.messageRecyclerView);
@@ -82,7 +83,10 @@ public class ChatWithCustomer extends AppCompatActivity {
             }
         });
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-
+        endConversation.setOnClickListener(click -> {
+            reference.child("messages").child(id).removeValue();
+            finish();
+        });
         reference.child("messages").child(id).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -95,6 +99,10 @@ public class ChatWithCustomer extends AppCompatActivity {
                         time.add(String.valueOf(dataSnapshot.child("time").getValue()));
                         leftOrRight.add(String.valueOf(dataSnapshot.child("id").getValue()));
                     }
+                    if(message.size() != 0)
+                        endConversation.setVisibility(View.VISIBLE);
+                    else
+                        endConversation.setVisibility(View.INVISIBLE);
                     linearLayoutManager.setStackFromEnd(true);
                     recyclerView.setLayoutManager(linearLayoutManager);
 //                    recyclerView.smoothScrollToPosition(message.size()-1);
@@ -198,6 +206,10 @@ public class ChatWithCustomer extends AppCompatActivity {
                         time.add(String.valueOf(dataSnapshot.child("time").getValue()));
                         leftOrRight.add(String.valueOf(dataSnapshot.child("id").getValue()));
                     }
+                    if(message.size() != 0)
+                        endConversation.setVisibility(View.VISIBLE);
+                    else
+                        endConversation.setVisibility(View.INVISIBLE);
                     linearLayoutManager.setStackFromEnd(true);
                     recyclerView.setLayoutManager(linearLayoutManager);
 //                    recyclerView.smoothScrollToPosition(message.size()-1);
