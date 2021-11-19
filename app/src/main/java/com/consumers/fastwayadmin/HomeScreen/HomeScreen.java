@@ -24,6 +24,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.consumers.fastwayadmin.Chat.RandomChatFolder.RandomChatWithUsers;
 import com.consumers.fastwayadmin.NavFrags.AccountFrag;
 import com.consumers.fastwayadmin.NavFrags.HomeFrag;
 import com.consumers.fastwayadmin.NavFrags.MenuFrag;
@@ -248,7 +249,7 @@ public class HomeScreen extends AppCompatActivity {
         if(id == R.id.notification)
             startActivity(new Intent(HomeScreen.this, SupportActivity.class));
         else if(id == R.id.randomChatMessagesUsers){
-            startActivity(new Intent(HomeScreen.this, RandomChatNoww.class));
+            startActivity(new Intent(HomeScreen.this, RandomChatWithUsers.class));
         }
         else
           startActivity(new Intent(HomeScreen.this, RandomChatNoww.class));

@@ -148,7 +148,7 @@ public class TempActivity extends AppCompatActivity {
 
             @Override
             public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                updateChild();
+
             }
 
             @Override
