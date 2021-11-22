@@ -76,6 +76,7 @@ public class MyOrderAdapter extends RecyclerView.Adapter<MyOrderAdapter.Holder> 
     @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull Holder holder, @SuppressLint("RecyclerView") int position) {
+        holder.setIsRecyclable(false);
         if(status.get(position).equals("SUCCESS")) {
             holder.statusTransaction.setTextColor(Color.GREEN);
         }else{

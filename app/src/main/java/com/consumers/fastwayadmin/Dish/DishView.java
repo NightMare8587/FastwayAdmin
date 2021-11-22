@@ -32,22 +32,20 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 public class DishView extends RecyclerView.Adapter<DishView.DishAdapter> {
-    List<String> names = new ArrayList<String>();
-    List<String> fullPrice = new ArrayList<String>();
-    List<String> half = new ArrayList<String>();
-    List<String> image = new ArrayList<>();
-    List<String> before = new ArrayList<>();
-    List<String> after = new ArrayList<>();
+    List<String> names;
+    List<String> fullPrice;
+    List<String> half;
+    List<String> image;
+    List<String> before;
+    List<String> after;
     SharedPreferences sharedPreferences;
-    List<String> discount = new ArrayList<>();
+    List<String> discount;
     FirebaseAuth auth;
     DatabaseReference ref;
-    String main = "https://pixabay.com/api/?";
     String type;
     public DishView(List<String> names,List<String> full,List<String> half,String type,List<String> image,List<String> before,List<String> after,List<String> discount){
         this.fullPrice = full;

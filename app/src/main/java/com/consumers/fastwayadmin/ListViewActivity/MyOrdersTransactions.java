@@ -42,7 +42,6 @@ import karpuzoglu.enes.com.fastdialog.FastDialogBuilder;
 import karpuzoglu.enes.com.fastdialog.Type;
 
 public class MyOrdersTransactions extends AppCompatActivity {
-    String getBenStatus = "https://intercellular-stabi.000webhostapp.com/benStatusFolder/benStatus.php";
     String neftUrl = "https://intercellular-stabi.000webhostapp.com/CheckoutPayouts/payoutNeft.php";
     String singleBenStatus = "https://intercellular-stabi.000webhostapp.com/benStatusFolder/singleStatus.php";
     String genratedToken = "";
