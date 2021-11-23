@@ -661,8 +661,6 @@ public class HomeFrag extends Fragment {
         @Override
         public void onLocationResult(LocationResult locationResult) {
             Location mLastLocation = locationResult.getLastLocation();
-//            RestLocation restLocation = new RestLocation(sharedPreferences.getString("lati",""),sharedPreferences.getString("longi",""));
-//            reference.child("location").setValue(restLocation);
         }
     };
     
