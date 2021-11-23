@@ -82,6 +82,7 @@ import karpuzoglu.enes.com.fastdialog.Type;
 
 public class HomeFrag extends Fragment {
     String currentTime;
+    boolean check = false;
     List<String> time = new ArrayList<>();
     List<List<String>> finalDishNames = new ArrayList<>();
     List<List<String>> finalDishQuantity = new ArrayList<>();
@@ -109,6 +110,7 @@ public class HomeFrag extends Fragment {
     private final int UPDATE_REQUEST_CODE = 69;
     SharedPreferences vendorIdCreated;
     SharedPreferences.Editor vendorIdEditor;
+    SharedPreferences.Editor editor;
     LocationRequest locationRequest;
     LinearLayoutManager horizonatl,anotherHori;
     ImageView comboImage;
@@ -165,7 +167,7 @@ public class HomeFrag extends Fragment {
         ((AppCompatActivity) requireActivity()).setSupportActionBar(toolbar);
         inAppUpdateInfo();
         SharedPreferences stopServices = requireActivity().getSharedPreferences("Stop Services",Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = stopServices.edit();
+         editor = stopServices.edit();
         resInfoShared = view.getContext().getSharedPreferences("loginInfo",Context.MODE_PRIVATE);
         restaurantStatus = view.getContext().getSharedPreferences("RestaurantStatus",Context.MODE_PRIVATE);
         statusEditor = restaurantStatus.edit();
@@ -247,33 +249,6 @@ public class HomeFrag extends Fragment {
 
         new MyTask().execute();
 
-//        reference.child("Tables").addListenerForSingleValueEvent(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                if(snapshot.exists()){
-//                    tableNum.clear();
-//                    seats.clear();
-//                    resId.clear();
-////                    Toast.makeText(view.getContext(), "I am invoked", Toast.LENGTH_SHORT).show();
-////                    Toast.makeText(view.getContext(), ""+snapshot.getChildrenCount(), Toast.LENGTH_SHORT).show();
-//                    for(DataSnapshot dataSnapshot : snapshot.getChildren()){
-//                        if(dataSnapshot.child("status").getValue(String.class).equals("unavailable")){
-//                            resId.add(dataSnapshot.child("customerId").getValue(String.class));
-//                            tableNum.add(dataSnapshot.child("tableNum").getValue(String.class));
-//                            seats.add(dataSnapshot.child("numSeats").getValue(String.class));
-//                        }
-//                    }
-//                    recyclerView.setLayoutManager(horizonatl);
-////                    Toast.makeText(view.getContext(), ""+seats.toString(), Toast.LENGTH_SHORT).show();
-//                    recyclerView.setAdapter(new homeFragClass(tableNum,seats,resId));
-//                }
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//
-//            }
-//        });
 
         onlineOrOffline.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if(isChecked){
@@ -286,41 +261,24 @@ public class HomeFrag extends Fragment {
                 onlineOrOfflineRestaurant.child("status").setValue("online");
                 editor.putString("online","true");
             }else{
-                statusEditor.putString("status","offline");
-                onlineOrOffline.setText("offline");
-                statusEditor.apply();
-                comboImage.setVisibility(View.INVISIBLE);
-                linearLayout.setVisibility(View.INVISIBLE);
-                secondLinearLayout.setVisibility(View.INVISIBLE);
-                onlineOrOfflineRestaurant.child("status").setValue("offline");
-                editor.putString("online","false");
-                FastDialog fastDialog = new FastDialogBuilder(requireContext(), Type.PROGRESS)
-                        .progressText("Closing restaurant... please wait")
-                        .setAnimation(Animations.SLIDE_BOTTOM)
-                        .cancelable(false)
-                        .create();
 
-                fastDialog.show();
-
-                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(resInfoShared.getString("state","")).child(auth.getUid()).child("Tables");
-                databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                onlineOrOfflineRestaurant.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if(snapshot.exists()){
-                            for(DataSnapshot dataSnapshot : snapshot.getChildren()){
-                                if(String.valueOf(dataSnapshot.child("status").getValue()).equals("unavailable")){
-                                    databaseReference.child(String.valueOf(dataSnapshot.getKey())).child("status").setValue("available");
-                                    databaseReference.child(String.valueOf(dataSnapshot.getKey())).child("customerId").removeValue();
-                                    databaseReference.child(String.valueOf(dataSnapshot.getKey())).child("Current Order").removeValue();
-                                }else if(String.valueOf(dataSnapshot.child("status").getValue()).equals("Reserved")){
-                                    databaseReference.child(String.valueOf(dataSnapshot.getKey())).child("status").setValue("available");
-                                    databaseReference.child(String.valueOf(dataSnapshot.getKey())).child("customerId").removeValue();
-                                    databaseReference.child(String.valueOf(dataSnapshot.getKey())).child("time").removeValue();
-                                    databaseReference.child(String.valueOf(dataSnapshot.getKey())).child("timeInMillis").removeValue();
+                        if(snapshot.hasChild("Current TakeAway")){
+                            AlertDialog.Builder alert = new AlertDialog.Builder(requireContext());
+                            alert.setTitle("Error").setMessage("You still have an current takeaway order in queue. Contact  user before closing restaurant");
+                            alert.setPositiveButton("Exit", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    onlineOrOffline.setChecked(true);
+                                    dialogInterface.dismiss();
                                 }
-                            }
-                            fastDialog.dismiss();
-                        }
+                            }).create();
+
+                            alert.show();
+                        }else
+                            checkInfo();
                     }
 
                     @Override
@@ -328,6 +286,9 @@ public class HomeFrag extends Fragment {
 
                     }
                 });
+
+
+
             }
             editor.apply();
 
@@ -506,6 +467,86 @@ public class HomeFrag extends Fragment {
             });
         });
 
+    }
+
+    private void checkInfo() {
+
+        onlineOrOfflineRestaurant.child("Tables").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists()){
+                    for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                        if(dataSnapshot.child("status").getValue(String.class).equals("unavailable")){
+                            check = true;
+                            AlertDialog.Builder alert = new AlertDialog.Builder(requireContext());
+                            alert.setTitle("Error").setMessage("You still have an active table. Contact user before closing restaurant");
+                            alert.setPositiveButton("Exit", (dialogInterface, i) -> dialogInterface.dismiss()).create();
+                            onlineOrOffline.setChecked(true);
+                            alert.show();
+                            break;
+                        }else if(dataSnapshot.child("status").getValue(String.class).equals("Reserved")){
+                            check = true;
+                            AlertDialog.Builder alert = new AlertDialog.Builder(requireContext());
+                            alert.setTitle("Error").setMessage("You still have an active Reserved Table. Contact user before closing restaurant");
+                            alert.setPositiveButton("Exit", (dialogInterface, i) -> dialogInterface.dismiss()).create();
+                            onlineOrOffline.setChecked(true);
+                            alert.show();
+                            break;
+                        }
+                    }
+
+                    if(!check){
+                        statusEditor.putString("status","offline");
+                        onlineOrOffline.setText("offline");
+                        statusEditor.apply();
+                        comboImage.setVisibility(View.INVISIBLE);
+                        linearLayout.setVisibility(View.INVISIBLE);
+                        secondLinearLayout.setVisibility(View.INVISIBLE);
+                        onlineOrOfflineRestaurant.child("status").setValue("offline");
+                        editor.putString("online","false");
+                        FastDialog fastDialog = new FastDialogBuilder(requireContext(), Type.PROGRESS)
+                                .progressText("Closing restaurant... please wait")
+                                .setAnimation(Animations.SLIDE_BOTTOM)
+                                .cancelable(false)
+                                .create();
+
+                        fastDialog.show();
+
+                        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(resInfoShared.getString("state","")).child(auth.getUid()).child("Tables");
+                        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                if(snapshot.exists()){
+                                    for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                                        if(String.valueOf(dataSnapshot.child("status").getValue()).equals("unavailable")){
+                                            databaseReference.child(String.valueOf(dataSnapshot.getKey())).child("status").setValue("available");
+                                            databaseReference.child(String.valueOf(dataSnapshot.getKey())).child("customerId").removeValue();
+                                            databaseReference.child(String.valueOf(dataSnapshot.getKey())).child("Current Order").removeValue();
+                                        }else if(String.valueOf(dataSnapshot.child("status").getValue()).equals("Reserved")){
+                                            databaseReference.child(String.valueOf(dataSnapshot.getKey())).child("status").setValue("available");
+                                            databaseReference.child(String.valueOf(dataSnapshot.getKey())).child("customerId").removeValue();
+                                            databaseReference.child(String.valueOf(dataSnapshot.getKey())).child("time").removeValue();
+                                            databaseReference.child(String.valueOf(dataSnapshot.getKey())).child("timeInMillis").removeValue();
+                                        }
+                                    }
+                                    fastDialog.dismiss();
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+
+                            }
+                        });
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
     private void inAppUpdateInfo() {
