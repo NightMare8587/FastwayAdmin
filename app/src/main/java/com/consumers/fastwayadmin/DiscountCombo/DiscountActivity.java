@@ -18,6 +18,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.consumers.fastwayadmin.R;
 import com.example.flatdialoglibrary.dialog.FlatDialog;
 import com.google.firebase.auth.FirebaseAuth;
@@ -31,19 +38,25 @@ import com.thecode.aestheticdialogs.DialogAnimation;
 import com.thecode.aestheticdialogs.DialogStyle;
 import com.thecode.aestheticdialogs.DialogType;
 
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 public class DiscountActivity extends AppCompatActivity {
     DatabaseReference reference;
     DatabaseReference dis;
     DatabaseReference addToDB;
-    FirebaseAuth auth;
+    FirebaseAuth auth = FirebaseAuth.getInstance();
     EditText dishName;
     Button search;
     SharedPreferences sharedPreferences;
+    SharedPreferences resInfoPred;
+    String resName;
+    String URL = "https://fcm.googleapis.com/fcm/send";
     List<String> name = new ArrayList<>();
     HashMap<String,String> map = new HashMap<>();
     RecyclerView recyclerView;
@@ -54,8 +67,8 @@ public class DiscountActivity extends AppCompatActivity {
         setContentView(R.layout.activity_discount);
         sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
         initialise();
-
-
+        resInfoPred = getSharedPreferences("RestaurantInfo",MODE_PRIVATE);
+        resName = resInfoPred.getString("hotelName","");
         name.clear();
 
         dishName.addTextChangedListener(new TextWatcher() {
@@ -238,6 +251,38 @@ public class DiscountActivity extends AppCompatActivity {
     }
 
     private void customDiscount(String firstTextField) {
+        RequestQueue requestQueue = Volley.newRequestQueue(DiscountActivity.this);
+        JSONObject main = new JSONObject();
+        try{
+            main.put("to","/topics/"+"Restaurant"+ auth.getUid());
+            JSONObject notification = new JSONObject();
+            notification.put("title",resName + "");
+            notification.put("body","Get upto " + firstTextField + "% off on all dish above \u20B9" + "149");
+            main.put("notification",notification);
+
+            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, main, response -> {
+
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Toast.makeText(DiscountActivity.this, error.getLocalizedMessage()+"null", Toast.LENGTH_SHORT).show();
+                }
+            }){
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String,String> header = new HashMap<>();
+                    header.put("content-type","application/json");
+                    header.put("authorization","key=AAAAsigSEMs:APA91bEUF9ZFwIu84Jctci56DQd0TQOepztGOIKIBhoqf7N3ueQrkClw0xBTlWZEWyvwprXZmZgW2MNywF1pNBFpq1jFBr0CmlrJ0wygbZIBOnoZ0jP1zZC6nPxqF2MAP6iF3wuBHD2R");
+                    return header;
+                }
+            };
+
+            requestQueue.add(jsonObjectRequest);
+
+        }
+        catch (Exception e){
+            Toast.makeText(DiscountActivity.this, e.getLocalizedMessage()+"null", Toast.LENGTH_SHORT).show();
+        }
         auth = FirebaseAuth.getInstance();
         reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
         reference.child("List of Dish").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -307,6 +352,39 @@ public class DiscountActivity extends AppCompatActivity {
 
 
     private void fourtyDiscount() {
+
+        RequestQueue requestQueue = Volley.newRequestQueue(DiscountActivity.this);
+        JSONObject main = new JSONObject();
+        try{
+            main.put("to","/topics/"+"Restaurant"+ auth.getUid());
+            JSONObject notification = new JSONObject();
+            notification.put("title",resName + "");
+            notification.put("body","Get upto 40% off on all dish above \u20B9" + "149");
+            main.put("notification",notification);
+
+            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, main, response -> {
+
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Toast.makeText(DiscountActivity.this, error.getLocalizedMessage()+"null", Toast.LENGTH_SHORT).show();
+                }
+            }){
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String,String> header = new HashMap<>();
+                    header.put("content-type","application/json");
+                    header.put("authorization","key=AAAAsigSEMs:APA91bEUF9ZFwIu84Jctci56DQd0TQOepztGOIKIBhoqf7N3ueQrkClw0xBTlWZEWyvwprXZmZgW2MNywF1pNBFpq1jFBr0CmlrJ0wygbZIBOnoZ0jP1zZC6nPxqF2MAP6iF3wuBHD2R");
+                    return header;
+                }
+            };
+
+            requestQueue.add(jsonObjectRequest);
+
+        }
+        catch (Exception e){
+            Toast.makeText(DiscountActivity.this, e.getLocalizedMessage()+"null", Toast.LENGTH_SHORT).show();
+        }
         auth = FirebaseAuth.getInstance();
         reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
 
@@ -394,6 +472,38 @@ public class DiscountActivity extends AppCompatActivity {
 
 
     private void fiftyDiscount() {
+        RequestQueue requestQueue = Volley.newRequestQueue(DiscountActivity.this);
+        JSONObject main = new JSONObject();
+        try{
+            main.put("to","/topics/"+"Restaurant"+ auth.getUid());
+            JSONObject notification = new JSONObject();
+            notification.put("title",resName + "");
+            notification.put("body","Get upto 50% off on all dish above \u20B9" + "149");
+            main.put("notification",notification);
+
+            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, main, response -> {
+
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Toast.makeText(DiscountActivity.this, error.getLocalizedMessage()+"null", Toast.LENGTH_SHORT).show();
+                }
+            }){
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String,String> header = new HashMap<>();
+                    header.put("content-type","application/json");
+                    header.put("authorization","key=AAAAsigSEMs:APA91bEUF9ZFwIu84Jctci56DQd0TQOepztGOIKIBhoqf7N3ueQrkClw0xBTlWZEWyvwprXZmZgW2MNywF1pNBFpq1jFBr0CmlrJ0wygbZIBOnoZ0jP1zZC6nPxqF2MAP6iF3wuBHD2R");
+                    return header;
+                }
+            };
+
+            requestQueue.add(jsonObjectRequest);
+
+        }
+        catch (Exception e){
+            Toast.makeText(DiscountActivity.this, e.getLocalizedMessage()+"null", Toast.LENGTH_SHORT).show();
+        }
         auth = FirebaseAuth.getInstance();
         reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
         reference.child("List of Dish").addListenerForSingleValueEvent(new ValueEventListener() {

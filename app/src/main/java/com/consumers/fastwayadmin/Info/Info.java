@@ -142,6 +142,12 @@ public class Info extends AppCompatActivity {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     if(snapshot.hasChild(Objects.requireNonNull(infoAuth.getUid()))){
+                        SharedPreferences resInfoShared = getSharedPreferences("RestaurantInfo",MODE_PRIVATE);
+                        SharedPreferences.Editor editor = resInfoShared.edit();
+                        editor.putString("hotelName",snapshot.child(infoAuth.getUid()).child("name").getValue(String.class));
+                        editor.putString("hotelAddress",snapshot.child(infoAuth.getUid()).child("address").getValue(String.class));
+                        editor.putString("hotelNumber",snapshot.child(infoAuth.getUid()).child("number").getValue(String.class));
+                        editor.apply();
                         if(location.contains("location")){
                             startActivity(new Intent(Info.this,HomeScreen.class));
                         }else

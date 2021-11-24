@@ -84,7 +84,7 @@ public class MyOrdersTransactions extends AppCompatActivity {
         earningAmount = findViewById(R.id.totalEarningOnOrders);
         recyclerView = findViewById(R.id.orderTransRecyclerView);
         reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
-        reference.child("Transactions").limitToLast(20).addListenerForSingleValueEvent(new ValueEventListener() {
+        reference.child("Transactions").limitToLast(25).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.exists()){
@@ -186,8 +186,12 @@ public class MyOrdersTransactions extends AppCompatActivity {
 
                                     status.add(resp[0]);
                                     days++;
-                                    Double d = Double.parseDouble(resp[1]);
-                                    totalAmount = totalAmount + d.intValue();
+                                    if(resp[0].equals("PENDING")) {
+
+                                    }else{
+                                        Double d = Double.parseDouble(resp[1]);
+                                        totalAmount = totalAmount + d.intValue();
+                                    }
                                     amount.add(resp[1]);
                                     transactionID.add(resp[2]);
 

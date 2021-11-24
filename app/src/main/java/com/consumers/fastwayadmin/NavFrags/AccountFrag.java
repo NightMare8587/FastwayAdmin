@@ -128,6 +128,9 @@ public class AccountFrag extends Fragment {
                                 SharedPreferences intro = view1.getContext().getSharedPreferences("IntroAct", MODE_PRIVATE);
                                 intro.edit().clear().commit();
 
+                                SharedPreferences location = view1.getContext().getSharedPreferences("LocationMaps", MODE_PRIVATE);
+                                location.edit().clear().commit();
+
                                 startActivity(new Intent(getActivity(), SplashScreen.class));
                                 getActivity().finish();
                             })
