@@ -49,14 +49,18 @@ public class MyOrderAdapter extends RecyclerView.Adapter<MyOrderAdapter.Holder> 
     List<String> time;
     List<String> transID;
     HashMap<String,String> map;
+    HashMap<String,String> amountMap;
+    HashMap<String,String> timeMap;
     String channel_id = "notification_channel";
     List<String> status;
     int amounts,days;
     Context context;
 
-    public MyOrderAdapter(List<String> amount, List<String> time, List<String> transID, List<String> status,Context context,int amounts,int days,HashMap<String,String> map) {
+    public MyOrderAdapter(List<String> amount, List<String> time, List<String> transID, List<String> status,Context context,int amounts,int days,HashMap<String,String> map,HashMap<String,String> amountMap,HashMap<String,String> timeMap) {
         this.amount = amount;
         this.time = time;
+        this.amountMap = amountMap;
+        this.timeMap = timeMap;
         this.amounts = amounts;
         this.days = days;
         this.transID = transID;
@@ -85,6 +89,7 @@ public class MyOrderAdapter extends RecyclerView.Adapter<MyOrderAdapter.Holder> 
         holder.statusTransaction.setText(status.get(position));
 
         holder.cardView.setOnClickListener(click -> {
+            Log.i("info",transID.get(position));
             if(status.get(position).equals("FAILED")){
                 AlertDialog.Builder alert = new AlertDialog.Builder(context);
                 alert.setTitle("Failed");
@@ -139,7 +144,7 @@ public class MyOrderAdapter extends RecyclerView.Adapter<MyOrderAdapter.Holder> 
                 alert.create().show();
             }
         });
-        holder.date.setText(DateFormat.getInstance().format(Long.parseLong(time.get(position))));
+        holder.date.setText(DateFormat.getInstance().format(Long.parseLong(Objects.requireNonNull(timeMap.get(transID.get(position))))));
         holder.orderAmount.setText("\u20B9" + amount.get(position));
         holder.customerDetails.setOnClickListener(click -> {
 //            Toast.makeText(click.getContext(), ""+ map.get(transID.get(position)), Toast.LENGTH_SHORT).show();

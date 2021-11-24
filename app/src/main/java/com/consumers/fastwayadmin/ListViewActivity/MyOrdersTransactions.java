@@ -47,8 +47,9 @@ public class MyOrdersTransactions extends AppCompatActivity {
     String genratedToken = "";
     List<String> status = new ArrayList<>();
     List<String> allTransID = new ArrayList<>();
+    HashMap<String,String> timeMap = new HashMap<>();
     List<String> allTimeID = new ArrayList<>();
-    int count = 1;
+    int count = 0;
     List<Integer> amountList = new ArrayList<>();
     List<Integer> daysList = new ArrayList<>();
     List<String> amount = new ArrayList<>();
@@ -83,7 +84,7 @@ public class MyOrdersTransactions extends AppCompatActivity {
         earningAmount = findViewById(R.id.totalEarningOnOrders);
         recyclerView = findViewById(R.id.orderTransRecyclerView);
         reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
-        reference.child("Transactions").limitToLast(25).addListenerForSingleValueEvent(new ValueEventListener() {
+        reference.child("Transactions").limitToLast(20).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.exists()){
@@ -102,6 +103,7 @@ public class MyOrdersTransactions extends AppCompatActivity {
                         time.add(String.valueOf(dataSnapshot.getKey()));
                         transID.add(String.valueOf(dataSnapshot.child("transID").getValue()));
                         map.put(String.valueOf(dataSnapshot.child("transID").getValue()),String.valueOf(dataSnapshot.child("customerID").getValue()));
+                        timeMap.put(String.valueOf(dataSnapshot.child("transID").getValue()),String.valueOf(dataSnapshot.getKey()));
                     }
 
                     new MakePayout().execute();
@@ -159,6 +161,8 @@ public class MyOrdersTransactions extends AppCompatActivity {
 
         @Override
         protected Void doInBackground(Void... voids) {
+            List<String> transactionID = new ArrayList<>();
+            HashMap<String,String> amountMap = new HashMap<>();
             RequestQueue requestQueue = Volley.newRequestQueue(MyOrdersTransactions.this);
             StringRequest stringRequest = new StringRequest(Request.Method.POST, testBearerToken, new Response.Listener<String>() {
                 @Override
@@ -185,6 +189,7 @@ public class MyOrdersTransactions extends AppCompatActivity {
                                     Double d = Double.parseDouble(resp[1]);
                                     totalAmount = totalAmount + d.intValue();
                                     amount.add(resp[1]);
+                                    transactionID.add(resp[2]);
 
 
                                     amountList.add(totalAmount);
@@ -193,11 +198,12 @@ public class MyOrdersTransactions extends AppCompatActivity {
                                     count++;
                                     if(amountList.size() == time.size()){
                                         fastDialog.dismiss();
-                                        Log.i("infoMap",map.toString());
+                                        Log.i("infoMap",transactionID.toString());
+                                        Log.i("infoMap",amountMap.toString());
+                                        Log.i("infoMap",timeMap.toString());
                                         Log.i("infoMap",allTransID.toString());
-                                        Log.i("infoMap",allTimeID.toString());
                                         recyclerView.setLayoutManager(new LinearLayoutManager(MyOrdersTransactions.this));
-                                        recyclerView.setAdapter(new MyOrderAdapter(amount,allTimeID,allTransID,status,MyOrdersTransactions.this,totalAmount,days,map));
+                                        recyclerView.setAdapter(new MyOrderAdapter(amount,allTimeID,transactionID,status,MyOrdersTransactions.this,totalAmount,days,map,amountMap,timeMap));
                                     }
 
                                     if(amountList.size() == time.size()){
@@ -220,7 +226,7 @@ public class MyOrdersTransactions extends AppCompatActivity {
                                     params.put("benID",transID.get(finalI1));
                                     allTransID.add(transID.get(finalI1));
                                     allTimeID.add(time.get(finalI1));
-                                    Log.i("customTrans",transID.get(finalI1) + "");
+//                                    Log.i("customTrans",transID.get(finalI1) + "");
                                     return params;
 
                                 }
@@ -231,7 +237,7 @@ public class MyOrdersTransactions extends AppCompatActivity {
                                     DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                                     DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
                         }
-                        Log.i("value",transID.toString());
+//                        Log.i("value",transID.toString());
                     }
                 }
             }, new Response.ErrorListener() {
