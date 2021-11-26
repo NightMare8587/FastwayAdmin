@@ -23,6 +23,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
 import com.consumers.fastwayadmin.ListViewActivity.BlockedUsersList.BlockedUsers;
+import com.consumers.fastwayadmin.ListViewActivity.CashTrans.CashTransactions;
 import com.consumers.fastwayadmin.ListViewActivity.MyAccount;
 import com.consumers.fastwayadmin.ListViewActivity.MyOrdersTransactions;
 import com.consumers.fastwayadmin.MyService;
@@ -100,7 +101,30 @@ public class AccountFrag extends Fragment {
                     startActivity(new Intent(getActivity(), BlockedUsers.class));
                     break;
                 case 2:
-                    startActivity(new Intent(getActivity(), MyOrdersTransactions.class));
+
+                    AlertDialog.Builder alert = new AlertDialog.Builder(requireContext());
+                    alert.setTitle("Choose");
+                    alert.setMessage("Choose one option from below");
+                    alert.setPositiveButton("Show Online Transactions", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.dismiss();
+                            startActivity(new Intent(getActivity(), MyOrdersTransactions.class));
+                        }
+                    }).setNegativeButton("Show Cash Transactions", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.dismiss();
+                            startActivity(new Intent(getActivity(), CashTransactions.class));
+                        }
+                    }).setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.dismiss();
+                        }
+                    }).create();
+
+                    alert.show();
                     break;
                 case 3:
                     AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());

@@ -110,9 +110,11 @@ public class ApproveCurrentOrder extends AppCompatActivity {
         approve.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 RequestQueue requestQueue = Volley.newRequestQueue(ApproveCurrentOrder.this);
                 JSONObject main = new JSONObject();
                 FirebaseAuth auth = FirebaseAuth.getInstance();
+
                 DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(Objects.requireNonNull(auth.getUid())).child("Tables").child(table);
                 new MakePayout().execute();
                 try{
@@ -180,6 +182,7 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                             RequestQueue requestQueue = Volley.newRequestQueue(ApproveCurrentOrder.this);
                             JSONObject main = new JSONObject();
                             FirebaseAuth auth = FirebaseAuth.getInstance();
+
                             DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(Objects.requireNonNull(auth.getUid())).child("Tables").child(table);
                             new InitiateRefund().execute();
                             try {
