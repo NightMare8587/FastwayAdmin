@@ -135,6 +135,9 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                                     RequestQueue requestQueue = Volley.newRequestQueue(ApproveCurrentTakeAway.this);
                                     JSONObject main = new JSONObject();
                                     FirebaseAuth auth = FirebaseAuth.getInstance();
+                                    CashTransactionClass cashTransactionClass = new CashTransactionClass(orderId,orderAmount,time,id);
+                                    DatabaseReference saveOrderInfo = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
+                                    saveOrderInfo.child("Cash Transactions").child(time).setValue(cashTransactionClass);
                                     DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(Objects.requireNonNull(auth.getUid())).child("Current TakeAway").child(id);
 
                                     try {

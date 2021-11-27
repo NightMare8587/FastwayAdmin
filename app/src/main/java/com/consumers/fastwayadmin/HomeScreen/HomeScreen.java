@@ -1,12 +1,12 @@
 package com.consumers.fastwayadmin.HomeScreen;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -56,6 +56,7 @@ public class HomeScreen extends AppCompatActivity {
     FragmentManager manager;
     SharedPreferences sharedPreferences;
     FirebaseAuth auth = FirebaseAuth.getInstance();
+    Timer timer = new Timer();
     DatabaseReference resRef;
     DatabaseReference reference;
 
@@ -100,22 +101,7 @@ public class HomeScreen extends AppCompatActivity {
 
             }
         });
-        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-        boolean isConnected = activeNetwork != null &&
-                activeNetwork.isConnectedOrConnecting();
 
-        if(!isConnected){
-            View parentLayout = findViewById(android.R.id.content);
-            Snackbar.make(parentLayout, "Please connect to internet :)", Snackbar.LENGTH_LONG)
-                    .setAction("CLOSE", new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-
-                        }
-                    })
-                    .setActionTextColor(getResources().getColor(android.R.color.holo_red_light ))
-                    .show();
-        }
         bubble.setNavigationChangeListener((view, position) -> {
             switch (position){
                 case 0:
@@ -137,72 +123,90 @@ public class HomeScreen extends AppCompatActivity {
         });
         FirebaseAuth auth = FirebaseAuth.getInstance();
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid())).child("Tables");
-        new Timer().scheduleAtFixedRate(new TimerTask() {
+        timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if(snapshot.exists()){
-                            for(DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                                if (dataSnapshot.hasChild("timeInMillis")) {
-                                    String tableNum = dataSnapshot.child("tableNum").getValue(String.class);
-                                    String time = String.valueOf(dataSnapshot.child("timeInMillis").getValue());
-                                    final String id = String.valueOf(dataSnapshot.child("customerId").getValue());
-                                    int result = time.compareTo(String.valueOf(System.currentTimeMillis()));
-                                    if (result < 0) {
-                                        assert tableNum != null;
-                                        databaseReference.child(tableNum).child("customerId").removeValue();
-                                        databaseReference.child(tableNum).child("time").removeValue();
-                                        databaseReference.child(tableNum).child("timeInMillis").removeValue();
-                                        databaseReference.child(tableNum).child("status").setValue("available");
-                                        DatabaseReference removeFromUser = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(id).child("Reserve Tables").child(auth.getUid());
-                                        removeFromUser.child(Objects.requireNonNull(dataSnapshot.getKey())).removeValue();
-                                        RequestQueue requestQueue = Volley.newRequestQueue(HomeScreen.this);
-                                        JSONObject main = new JSONObject();
-                                        try {
-                                            main.put("to", "/topics/" + id + "");
-                                            JSONObject notification = new JSONObject();
-                                            notification.put("title", "Cancelled");
-                                            notification.put("click_action", "Table Frag");
-                                            notification.put("body", "Your Reserved Tables is cancelled because you didn't make it on time");
-                                            main.put("notification", notification);
+                NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+                boolean isConnected = activeNetwork != null &&
+                        activeNetwork.isConnectedOrConnecting();
 
-                                            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, main, new Response.Listener<JSONObject>() {
-                                                @Override
-                                                public void onResponse(JSONObject response) {
+                if (!isConnected) {
+                    View parentLayout = findViewById(android.R.id.content);
+                    Snackbar.make(parentLayout, "Please connect to internet :)", Snackbar.LENGTH_SHORT)
+                            .setAction("CLOSE", new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
 
-                                                }
-                                            }, new Response.ErrorListener() {
-                                                @Override
-                                                public void onErrorResponse(VolleyError error) {
+                                }
+                            })
+                            .setActionTextColor(getResources().getColor(android.R.color.holo_red_light))
+                            .show();
+                } else {
+                    
+                    databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            if (snapshot.exists()) {
+                                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                                    if (dataSnapshot.hasChild("timeInMillis")) {
+                                        String tableNum = dataSnapshot.child("tableNum").getValue(String.class);
+                                        String time = String.valueOf(dataSnapshot.child("timeInMillis").getValue());
+                                        final String id = String.valueOf(dataSnapshot.child("customerId").getValue());
+                                        int result = time.compareTo(String.valueOf(System.currentTimeMillis()));
+                                        if (result < 0) {
+                                            assert tableNum != null;
+                                            databaseReference.child(tableNum).child("customerId").removeValue();
+                                            databaseReference.child(tableNum).child("time").removeValue();
+                                            databaseReference.child(tableNum).child("timeInMillis").removeValue();
+                                            databaseReference.child(tableNum).child("status").setValue("available");
+                                            DatabaseReference removeFromUser = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(id).child("Reserve Tables").child(auth.getUid());
+                                            removeFromUser.child(Objects.requireNonNull(dataSnapshot.getKey())).removeValue();
+                                            RequestQueue requestQueue = Volley.newRequestQueue(HomeScreen.this);
+                                            JSONObject main = new JSONObject();
+                                            try {
+                                                main.put("to", "/topics/" + id + "");
+                                                JSONObject notification = new JSONObject();
+                                                notification.put("title", "Cancelled");
+                                                notification.put("click_action", "Table Frag");
+                                                notification.put("body", "Your Reserved Tables is cancelled because you didn't make it on time");
+                                                main.put("notification", notification);
+
+                                                JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, main, new Response.Listener<JSONObject>() {
+                                                    @Override
+                                                    public void onResponse(JSONObject response) {
+
+                                                    }
+                                                }, new Response.ErrorListener() {
+                                                    @Override
+                                                    public void onErrorResponse(VolleyError error) {
 //                                               Toast.makeText(, error.getLocalizedMessage()+"null", Toast.LENGTH_SHORT).show();
-                                                }
-                                            }) {
-                                                @Override
-                                                public Map<String, String> getHeaders() throws AuthFailureError {
-                                                    Map<String, String> header = new HashMap<>();
-                                                    header.put("content-type", "application/json");
-                                                    header.put("authorization", "key=AAAAsigSEMs:APA91bEUF9ZFwIu84Jctci56DQd0TQOepztGOIKIBhoqf7N3ueQrkClw0xBTlWZEWyvwprXZmZgW2MNywF1pNBFpq1jFBr0CmlrJ0wygbZIBOnoZ0jP1zZC6nPxqF2MAP6iF3wuBHD2R");
-                                                    return header;
-                                                }
-                                            };
+                                                    }
+                                                }) {
+                                                    @Override
+                                                    public Map<String, String> getHeaders() throws AuthFailureError {
+                                                        Map<String, String> header = new HashMap<>();
+                                                        header.put("content-type", "application/json");
+                                                        header.put("authorization", "key=AAAAsigSEMs:APA91bEUF9ZFwIu84Jctci56DQd0TQOepztGOIKIBhoqf7N3ueQrkClw0xBTlWZEWyvwprXZmZgW2MNywF1pNBFpq1jFBr0CmlrJ0wygbZIBOnoZ0jP1zZC6nPxqF2MAP6iF3wuBHD2R");
+                                                        return header;
+                                                    }
+                                                };
 
-                                            requestQueue.add(jsonObjectRequest);
-                                        } catch (Exception e) {
-                                            Toast.makeText(HomeScreen.this, e.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
+                                                requestQueue.add(jsonObjectRequest);
+                                            } catch (Exception e) {
+                                                Toast.makeText(HomeScreen.this, e.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
-                    }
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
 
-                    }
-                });
+                        }
+                    });
+                }
             }
         },0,5000);
 

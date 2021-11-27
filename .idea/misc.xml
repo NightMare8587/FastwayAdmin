@@ -17,6 +17,7 @@
         <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/layout/activity_approve_current_order.xml" value="0.264" />
         <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/layout/activity_approve_current_take_away.xml" value="0.264" />
         <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/layout/activity_blocked_users.xml" value="0.23143115942028986" />
+        <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/layout/activity_cash_transactions.xml" value="0.1046875" />
         <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/layout/activity_chat_with_customer.xml" value="0.2" />
         <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/layout/activity_combo_and_offers.xml" value="0.25416666666666665" />
         <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/layout/activity_custom_offer.xml" value="0.19746376811594202" />
@@ -39,6 +40,7 @@
         <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/layout/band_vendor_layout.xml" value="0.2427536231884058" />
         <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/layout/blocked_users_cardview.xml" value="0.23143115942028986" />
         <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/layout/card.xml" value="0.23278985507246377" />
+        <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/layout/cash_transactions_layout_card.xml" value="0.4" />
         <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/layout/combo_adapter_card.xml" value="0.2128623188405797" />
         <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/layout/combo_menu_layout.xml" value="0.4" />
         <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/layout/display_chat_layout.xml" value="0.2504528985507246" />
