@@ -2,8 +2,18 @@ package com.consumers.fastwayadmin.NavFrags.homeFrag;
 
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Typeface;
+import android.graphics.pdf.PdfDocument;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
@@ -32,16 +42,27 @@ import com.android.volley.toolbox.Volley;
 import com.consumers.fastwayadmin.CancelClass;
 import com.consumers.fastwayadmin.PaymentClass;
 import com.consumers.fastwayadmin.R;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +74,10 @@ public class ApproveCurrentOrder extends AppCompatActivity {
     FirebaseAuth auth;
     ListView listView,halfOrList;
     String genratedToken;
+    FirebaseStorage storage;
+    StorageReference storageReference;
+    String userName,userEmail;
+    Bitmap bmp,scaled,bmp1,scaled1;
     String URL = "https://fcm.googleapis.com/fcm/send";
     String url = "https://intercellular-stabi.000webhostapp.com/refunds/initiateRefund.php";
     String testPayoutToken = "https://intercellular-stabi.000webhostapp.com/CheckoutPayouts/testToken.php";
@@ -81,9 +106,25 @@ public class ApproveCurrentOrder extends AppCompatActivity {
         table = getIntent().getStringExtra("table");
         id = getIntent().getStringExtra("id");
         state = getIntent().getStringExtra("state");
+        bmp = BitmapFactory.decodeResource(getResources(), R.drawable.logo);
+        scaled = Bitmap.createScaledBitmap(bmp,500,500,false);
+        bmp1 = BitmapFactory.decodeResource(getResources(), R.drawable.orderdeclined);
+        scaled1 = Bitmap.createScaledBitmap(bmp1,500,500,false);
         initialise();
         textView.setText("Table Number: " + table);
         saveRefundInfo = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(id);
+        saveRefundInfo.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                userName = String.valueOf(snapshot.child("name").getValue());
+                userEmail = String.valueOf(snapshot.child("email").getValue());
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
         halfOrList = findViewById(R.id.halfOrFullCurrentORder);
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -96,6 +137,8 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                     orderAmount = String.valueOf(dataSnapshot.child("orderAmount").getValue());
                     time = String.valueOf(dataSnapshot.child("time").getValue());
                     totalPrice = totalPrice + Integer.parseInt(String.valueOf(dataSnapshot.child("price").getValue()));
+
+
                 }
                 progressBar.setVisibility(View.INVISIBLE);
                 uploadToArrayAdapter(dishNames,dishQuantity,dishHalfOr);
@@ -181,6 +224,7 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                             dialogInterface.dismiss();
                             RequestQueue requestQueue = Volley.newRequestQueue(ApproveCurrentOrder.this);
                             JSONObject main = new JSONObject();
+                            new GenratePDF().execute();
                             FirebaseAuth auth = FirebaseAuth.getInstance();
 
                             DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(Objects.requireNonNull(auth.getUid())).child("Tables").child(table);
@@ -198,12 +242,7 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                                     public void onResponse(JSONObject response) {
 
                                     }
-                                }, new Response.ErrorListener() {
-                                    @Override
-                                    public void onErrorResponse(VolleyError error) {
-                                        Toast.makeText(ApproveCurrentOrder.this, error.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
-                                    }
-                                }) {
+                                }, error -> Toast.makeText(ApproveCurrentOrder.this, error.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show()) {
                                     @Override
                                     public Map<String, String> getHeaders() throws AuthFailureError {
                                         Map<String, String> header = new HashMap<>();
@@ -415,6 +454,125 @@ public class ApproveCurrentOrder extends AppCompatActivity {
             }
 
             return sb.toString();
+        }
+    }
+    private class GenratePDF extends AsyncTask<Void,Void,Void>{
+
+        @Override
+        protected void onPostExecute(Void unused) {
+            super.onPostExecute(unused);
+            PdfDocument pdfDocument = new PdfDocument();
+            Paint myPaint = new Paint();
+            PdfDocument.PageInfo myPage = new  PdfDocument.PageInfo.Builder(2080,2040,1).create();
+            PdfDocument.Page page = pdfDocument.startPage(myPage);
+
+            Paint text = new Paint();
+            SharedPreferences sharedPreferences = getSharedPreferences("RestaurantInfo",MODE_PRIVATE);
+            Canvas canvas = page.getCanvas();
+
+            canvas.drawBitmap(scaled,735,0,myPaint);
+
+            text.setTextAlign(Paint.Align.LEFT);
+            text.setTypeface(Typeface.create(Typeface.DEFAULT,Typeface.BOLD));
+            text.setTextSize(70);
+            canvas.drawText("Restaurant Details",45,470,text);
+            text.setTextSize(50);
+            canvas.drawText(sharedPreferences.getString("hotelName",""),45,550,text);
+            canvas.drawText(sharedPreferences.getString("hotelAddress",""),45,620,text);
+            canvas.drawText(sharedPreferences.getString("hotelNumber",""),45,700,text);
+
+            text.setTextSize(70);
+//            SharedPreferences sharedPreferences = getSharedPreferences("AccountInfo",MODE_PRIVATE);
+            canvas.drawText("Customer Details",1440,470,text);
+            text.setTextSize(50);
+            canvas.drawText("" + userName,1440,550,text);
+            canvas.drawText("" + userEmail,1440,620,text);
+
+            text.setTextAlign(Paint.Align.LEFT);
+            text.setTypeface(Typeface.create(Typeface.DEFAULT,Typeface.BOLD));
+            text.setColor(Color.BLUE);
+            text.setTextSize(50);
+
+            canvas.drawText("Date: " + new SimpleDateFormat("yyyy/MM/dd").format(new Date()),45,780,text);
+            canvas.drawText("Invoice Number: " + orderID,45,860,text);
+
+            text.setStyle(Paint.Style.STROKE);
+            text.setStrokeWidth(3);
+            text.setColor(Color.BLACK);
+            canvas.drawRect(35,940,1080-20,1020,text);
+            text.setStyle(Paint.Style.FILL);
+            text.setTextSize(40);
+            canvas.drawText("Description",50,990,text);
+            canvas.drawText("Amount",905,990,text);
+
+            canvas.drawLine(855,940,855,1020,text);
+
+            canvas.drawText("Ordered Food",50,1080,text);
+            text.setTypeface(Typeface.create(Typeface.DEFAULT,Typeface.NORMAL));
+            canvas.drawText("(Incl. GST)",50,1120,text);
+            canvas.drawText("\u20B9"+orderAmount,902,1080,text);
+
+//            if(isCouponApplied){
+//                canvas.drawText("Discount Applied (-)",35,1150,text);
+//                text.setTypeface(Typeface.create(Typeface.DEFAULT,Typeface.NORMAL));
+//                canvas.drawText("\u20B9"+discount,899,1150,text);
+//            }
+            text.setTextAlign(Paint.Align.LEFT);
+            text.setTypeface(Typeface.create(Typeface.DEFAULT,Typeface.BOLD));
+            text.setTextSize(55);
+            canvas.drawText("Contact Fastway",50,1470,text);
+            text.setTypeface(Typeface.create(Typeface.DEFAULT,Typeface.NORMAL));
+            text.setTextSize(45);
+            canvas.drawText("Contact Number:  +918076531395",50,1580,text);
+            text.setTypeface(Typeface.create(Typeface.DEFAULT,Typeface.NORMAL));
+
+            canvas.drawText("Email ID:  fastway8587@gmail.com",50,1640,text);
+            canvas.drawBitmap(scaled1,900,1470,myPaint);
+
+            pdfDocument.finishPage(page);
+
+            String fileName = "/invoice" + time + ".pdf";
+            File file = new File(Environment.getExternalStorageDirectory() + fileName);
+
+            try{
+                pdfDocument.writeTo(new FileOutputStream(file));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+//            FastDialog fastDialog = new FastDialogBuilder(ApproveCurrentTakeAway.this, Type.PROGRESS)
+//                    .progressText("Uploading invoice....")
+//                    .cancelable(false)
+//                    .setAnimation(Animations.FADE_IN)
+//                    .create();
+            storage = FirebaseStorage.getInstance();
+            storageReference = storage.getReference();
+            FirebaseAuth auth = FirebaseAuth.getInstance();
+//            fastDialog.show();
+            try {
+                StorageReference reference = storageReference.child(id + "/" + "invoice" + "/"  + fileName);
+                reference.putFile(Uri.fromFile(file)).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                        Toast.makeText(ApproveCurrentOrder.this, "Order cancelled successfully", Toast.LENGTH_SHORT).show();
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+
+                    }
+                });
+            }catch (Exception e){
+                Toast.makeText(ApproveCurrentOrder.this, ""+e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+
+            }
+
+            pdfDocument.close();
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+
+            return null;
         }
     }
 }
