@@ -53,6 +53,7 @@ public class CreateDish extends AppCompatActivity {
     Bitmap bitmap;
     File file;
     DatabaseReference dish;
+    boolean imageAddedOr = false;
     OutputStream outputStream;
     String mrp;
     FirebaseStorage storage;
@@ -108,9 +109,17 @@ public class CreateDish extends AppCompatActivity {
                         else
                             mrp = "no";
 
-            new Upload().execute();
 
-            Toast.makeText(CreateDish.this, "Uploading image in background don't close application", Toast.LENGTH_SHORT).show();
+                        if(imageAddedOr)
+                        new Upload().execute();
+                        else{
+                            DishInfo info = new DishInfo(name,half,full,image,mrp,"0","0","0","yes");
+                            dish.child("Restaurants").child(state).child(Objects.requireNonNull(dishAuth.getUid())).child("List of Dish").child(menuType).child(name).setValue(info);
+                            Toast.makeText(CreateDish.this, "Dish Added Successfully", Toast.LENGTH_SHORT).show();
+                            imageAddedOr = false;
+                        }
+
+
             finish();
         });
     }
@@ -179,6 +188,7 @@ public class CreateDish extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == 20 && resultCode == RESULT_OK && data != null){
+            imageAddedOr = true;
              bitmap = (Bitmap) data.getExtras().get("data");
             File filepath = Environment.getExternalStorageDirectory();
             File dir = new File(filepath.getAbsolutePath());
