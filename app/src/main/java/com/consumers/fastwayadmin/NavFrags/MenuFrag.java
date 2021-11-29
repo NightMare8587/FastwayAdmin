@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
@@ -19,9 +20,20 @@ import androidx.fragment.app.Fragment;
 import com.consumers.fastwayadmin.MenuActivities.AllMenuDish;
 import com.consumers.fastwayadmin.MenuActivities.Combo.ComboMenuDish;
 import com.consumers.fastwayadmin.R;
+import com.developer.kalert.KAlertDialog;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.Objects;
 
+import karpuzoglu.enes.com.fastdialog.Animations;
+import karpuzoglu.enes.com.fastdialog.FastDialog;
+import karpuzoglu.enes.com.fastdialog.FastDialogBuilder;
+import karpuzoglu.enes.com.fastdialog.Type;
 import mehdi.sakout.fancybuttons.FancyButton;
 
 public class MenuFrag extends Fragment {
@@ -29,6 +41,7 @@ public class MenuFrag extends Fragment {
     Toolbar menuBar;
     SharedPreferences sharedPreferences;
     int count = 0;
+    Button appliedOffers;
     boolean pressed = false;
     int total = 0;
     @Nullable
@@ -66,12 +79,77 @@ public class MenuFrag extends Fragment {
         menuBar = view.findViewById(R.id.menuFragBar);
         mainCourse = view.findViewById(R.id.MainCourse);
         breads = view.findViewById(R.id.Breads);
+        appliedOffers = view.findViewById(R.id.removeAppliedOffers);
         sharedPreferences = view.getContext().getSharedPreferences("loginInfo",Context.MODE_PRIVATE);
         snacks = view.findViewById(R.id.Snacks);
         deserts = view.findViewById(R.id.Deserts);
         combo = view.findViewById(R.id.Combo);
         drinks = view.findViewById(R.id.Drinks);
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.hasChild("Discount")){
+                    appliedOffers.setVisibility(View.VISIBLE);
+                }
+            }
 
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        appliedOffers.setOnClickListener(click -> {
+            KAlertDialog kAlertDialog = new KAlertDialog(requireContext(),KAlertDialog.ERROR_TYPE)
+                    .setTitleText("Warning")
+                    .setContentText("Do you sure wanna remove all offers?")
+                    .setConfirmText("Yes").setConfirmClickListener(remove -> {
+                        remove.dismissWithAnimation();
+                        FastDialog fastDialog = new FastDialogBuilder(requireContext(), Type.PROGRESS)
+                                .progressText("Removing..... please wait")
+                                .setAnimation(Animations.FADE_IN)
+                                .create();
+
+                        fastDialog.show();
+                        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(auth.getUid()).child("List of Dish");
+                        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                                    for(DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()){
+                                        if(dataSnapshot1.hasChild("Discount")){
+                                            String beforeFull = String.valueOf(dataSnapshot1.child("Discount").child(Objects.requireNonNull(dataSnapshot1.getKey())).child("before").getValue());
+                                            reference.child(Objects.requireNonNull(dataSnapshot.getKey())).child(dataSnapshot1.getKey()).child("full").setValue(beforeFull);
+
+                                            if(dataSnapshot1.child("Discount").child(Objects.requireNonNull(dataSnapshot1.getKey())).hasChild("beforeHalf")){
+                                                String beforeHalf = String.valueOf(dataSnapshot1.child("Discount").child(Objects.requireNonNull(dataSnapshot1.getKey())).child("beforeHalf").getValue());
+                                                reference.child(dataSnapshot.getKey()).child(dataSnapshot1.getKey()).child("half").setValue(beforeHalf);
+                                            }
+
+                                            reference.child(dataSnapshot.getKey()).child(dataSnapshot1.getKey()).child("Discount").removeValue();
+                                        }
+                                    }
+                                }
+                                databaseReference.child("Discount").removeValue();
+                                fastDialog.dismiss();
+                                appliedOffers.setVisibility(View.INVISIBLE);
+                                Toast.makeText(requireContext(), "Offers removed successfully", Toast.LENGTH_SHORT).show();
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+
+                            }
+                        });
+                    }).setCancelText("No, Wait").setCancelClickListener(cancel -> {
+                        cancel.dismissWithAnimation();
+                    });
+
+            kAlertDialog.setCancelable(false);
+            kAlertDialog.show();
+        });
         mainCourse.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

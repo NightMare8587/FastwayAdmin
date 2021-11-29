@@ -20,11 +20,12 @@
         app:title="Menu" />
 
     <androidx.gridlayout.widget.GridLayout
+        android:id="@+id/gridLayout2"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:padding="15dp"
         app:columnCount="2"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/removeAppliedOffers"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/menuFragBar"
@@ -115,6 +116,18 @@
             fancy:fb_text="Drinks"
             fancy:fb_textSize="20dp" />
     </androidx.gridlayout.widget.GridLayout>
+
+    <Button
+        android:id="@+id/removeAppliedOffers"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="70dp"
+        android:text="Remove Applied Offers"
+        android:textSize="17sp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
