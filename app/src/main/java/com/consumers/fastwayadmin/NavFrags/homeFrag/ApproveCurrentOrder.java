@@ -71,11 +71,12 @@ import java.util.Random;
 
 public class ApproveCurrentOrder extends AppCompatActivity {
     DatabaseReference databaseReference;
-    FirebaseAuth auth;
+    FirebaseAuth auth = FirebaseAuth.getInstance();
     ListView listView,halfOrList;
     String genratedToken;
     FirebaseStorage storage;
     StorageReference storageReference;
+    DatabaseReference totalOrders;
     String userName,userEmail;
     Bitmap bmp,scaled,bmp1,scaled1;
     String URL = "https://fcm.googleapis.com/fcm/send";
@@ -106,6 +107,7 @@ public class ApproveCurrentOrder extends AppCompatActivity {
         table = getIntent().getStringExtra("table");
         id = getIntent().getStringExtra("id");
         state = getIntent().getStringExtra("state");
+        SharedPreferences sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
         bmp = BitmapFactory.decodeResource(getResources(), R.drawable.logo);
         scaled = Bitmap.createScaledBitmap(bmp,500,500,false);
         bmp1 = BitmapFactory.decodeResource(getResources(), R.drawable.orderdeclined);
@@ -113,6 +115,8 @@ public class ApproveCurrentOrder extends AppCompatActivity {
         initialise();
         textView.setText("Table Number: " + table);
         saveRefundInfo = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(id);
+        totalOrders = FirebaseDatabase.getInstance().getReference().child("Restaurants").child(sharedPreferences.getString("state","")).child(auth.getUid());
+
         saveRefundInfo.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -157,7 +161,23 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                 RequestQueue requestQueue = Volley.newRequestQueue(ApproveCurrentOrder.this);
                 JSONObject main = new JSONObject();
                 FirebaseAuth auth = FirebaseAuth.getInstance();
+                totalOrders.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if(snapshot.hasChild("totalOrdersMade")){
+                            int totalOrder = Integer.parseInt(String.valueOf(snapshot.child("totalOrdersMade").getValue()));
+                            totalOrder = totalOrder + 1;
+                            totalOrders.child("totalOrdersMade").setValue(totalOrder);
+                        }else{
+                            totalOrders.child("totalOrdersMade").setValue("1");
+                        }
+                    }
 
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
                 DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(Objects.requireNonNull(auth.getUid())).child("Tables").child(table);
                 new MakePayout().execute();
                 try{

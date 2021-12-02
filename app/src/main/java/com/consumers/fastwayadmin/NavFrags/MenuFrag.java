@@ -143,25 +143,20 @@ public class MenuFrag extends Fragment {
 
                             }
                         });
-                    }).setCancelText("No, Wait").setCancelClickListener(cancel -> {
-                        cancel.dismissWithAnimation();
-                    });
+                    }).setCancelText("No, Wait").setCancelClickListener(KAlertDialog::dismissWithAnimation);
 
             kAlertDialog.setCancelable(false);
             kAlertDialog.show();
         });
-        mainCourse.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                SharedPreferences preferences = view.getContext().getSharedPreferences("DishType", Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = preferences.edit();
-                editor.putString("Type","Main Course");
-                editor.putString("state",sharedPreferences.getString("state",""));
-                editor.apply();
-                Intent intent = new Intent(getActivity(), AllMenuDish.class);
-                intent.putExtra("Dish","Main Course");
-                startActivity(intent);
-            }
+        mainCourse.setOnClickListener(view1 -> {
+            SharedPreferences preferences = view1.getContext().getSharedPreferences("DishType", Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putString("Type","Main Course");
+            editor.putString("state",sharedPreferences.getString("state",""));
+            editor.apply();
+            Intent intent = new Intent(getActivity(), AllMenuDish.class);
+            intent.putExtra("Dish","Main Course");
+            startActivity(intent);
         });
 
         breads.setOnClickListener(new View.OnClickListener() {

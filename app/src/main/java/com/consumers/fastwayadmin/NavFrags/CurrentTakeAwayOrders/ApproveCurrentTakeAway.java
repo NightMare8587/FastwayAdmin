@@ -124,6 +124,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
         halfOrList = findViewById(R.id.halfOrTakeAwayListView);
         dishNames = findViewById(R.id.DishNamesTakeAwayListView);
         approve = findViewById(R.id.approveTakeAwayButton);
+        DatabaseReference totalOrders = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
 
         DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(id);
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -152,6 +153,23 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if(paymentMode.equals("cash")){
+                    totalOrders.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            if(snapshot.hasChild("totalOrdersMade")){
+                                int totalOrder = Integer.parseInt(String.valueOf(snapshot.child("totalOrdersMade").getValue()));
+                                totalOrder = totalOrder + 1;
+                                totalOrders.child("totalOrdersMade").setValue(totalOrder);
+                            }else{
+                                totalOrders.child("totalOrdersMade").setValue("1");
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
+                        }
+                    });
                     new KAlertDialog(ApproveCurrentTakeAway.this,KAlertDialog.WARNING_TYPE)
                             .setTitleText("Warning")
                             .setContentText("Approve order only after you received cash payment")
@@ -234,6 +252,23 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                                 Toast.makeText(ApproveCurrentTakeAway.this, "Field can't be empty", Toast.LENGTH_SHORT).show();
                                 fastDialog.dismiss();
                             } else if (fastDialog.getInputText().equals(digitCode.trim())) {
+                                totalOrders.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                        if(snapshot.hasChild("totalOrdersMade")){
+                                            int totalOrder = Integer.parseInt(String.valueOf(snapshot.child("totalOrdersMade").getValue()));
+                                            totalOrder = totalOrder + 1;
+                                            totalOrders.child("totalOrdersMade").setValue(totalOrder);
+                                        }else{
+                                            totalOrders.child("totalOrdersMade").setValue("1");
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError error) {
+
+                                    }
+                                });
                                 Toast.makeText(ApproveCurrentTakeAway.this, "Order Confirmed", Toast.LENGTH_SHORT).show();
                                 new MakePayout().execute();
                                 RequestQueue requestQueue = Volley.newRequestQueue(ApproveCurrentTakeAway.this);
@@ -294,6 +329,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                         }
                     });
                 }
+
             }
         });
 
