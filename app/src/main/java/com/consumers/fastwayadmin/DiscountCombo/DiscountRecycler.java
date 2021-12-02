@@ -3,7 +3,6 @@ package com.consumers.fastwayadmin.DiscountCombo;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Handler;
@@ -11,7 +10,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,7 +31,6 @@ import com.thecode.aestheticdialogs.DialogAnimation;
 import com.thecode.aestheticdialogs.DialogStyle;
 import com.thecode.aestheticdialogs.DialogType;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
@@ -44,9 +41,9 @@ public class DiscountRecycler extends RecyclerView.Adapter<DiscountRecycler.Hold
     SharedPreferences sharedPreferences;
     HashMap<String,String> dishName;
     FirebaseAuth auth = FirebaseAuth.getInstance();
-    DatabaseReference addToDB = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid()));;
-    DatabaseReference dis = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));;
-    DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid()));;
+    DatabaseReference addToDB = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid()));
+    DatabaseReference dis = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
+    DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid()));
 
     public DiscountRecycler(HashMap<String,String> dishName,Context context,List<String> name){
         this.dishName = dishName;
@@ -65,83 +62,58 @@ public class DiscountRecycler extends RecyclerView.Adapter<DiscountRecycler.Hold
     @Override
     public void onBindViewHolder(@NonNull Holder holder, @SuppressLint("RecyclerView") int position) {
         holder.textView.setText(name.get(position));
-        holder.cardView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.i("info",dishName.get(name.get(position)) + " " + name.get(position));
-                sharedPreferences = v.getContext().getSharedPreferences("loginInfo",Context.MODE_PRIVATE);
-                new KAlertDialog(v.getContext(),KAlertDialog.NORMAL_TYPE)
-                        .setTitleText("Confirmation")
-                        .setContentText("Do you sure wanna apply offer's to this dish??")
-                        .setConfirmText("Yes")
-                        .setConfirmClickListener(new KAlertDialog.KAlertClickListener() {
-                            @Override
-                            public void onClick(KAlertDialog kAlertDialog) {
-                                FlatDialog flatDialog1 = new FlatDialog(v.getContext());
-                                flatDialog1.setCanceledOnTouchOutside(true);
-                                flatDialog1.setOnCancelListener(new DialogInterface.OnCancelListener() {
-                                    @Override
-                                    public void onCancel(DialogInterface dialogInterface) {
-                                        Toast.makeText(v.getContext(), "Cancelled", Toast.LENGTH_SHORT).show();
-                                        dialogInterface.dismiss();
+        holder.cardView.setOnClickListener(v -> {
+            Log.i("info",dishName.get(name.get(position)) + " " + name.get(position));
+            sharedPreferences = v.getContext().getSharedPreferences("loginInfo",Context.MODE_PRIVATE);
+            new KAlertDialog(v.getContext(),KAlertDialog.NORMAL_TYPE)
+                    .setTitleText("Confirmation")
+                    .setContentText("Do you sure wanna apply offer's to this dish??")
+                    .setConfirmText("Yes")
+                    .setConfirmClickListener(kAlertDialog -> {
+                        FlatDialog flatDialog1 = new FlatDialog(v.getContext());
+                        flatDialog1.setCanceledOnTouchOutside(true);
+                        flatDialog1.setOnCancelListener(dialogInterface -> {
+                            Toast.makeText(v.getContext(), "Cancelled", Toast.LENGTH_SHORT).show();
+                            dialogInterface.dismiss();
+                        });
+                        flatDialog1.setTitle("Choose One Option")
+                                .setSubtitle("Only Applicable for items above 149")
+                                .setSubtitleColor(Color.BLACK)
+                                .setTitleColor(Color.BLACK)
+                                .setBackgroundColor(Color.parseColor("#f9fce1"))
+                                .setFirstButtonColor(Color.parseColor("#d3f6f3"))
+                                .setFirstButtonTextColor(Color.parseColor("#000000"))
+                                .setFirstButtonText("50% OFF")
+                                .setSecondButtonColor(Color.parseColor("#fee9b2"))
+                                .setSecondButtonTextColor(Color.parseColor("#000000"))
+                                .setSecondButtonText("40% OFF")
+                                .setThirdButtonText("ADD YOUR OWN")
+                                .setThirdButtonColor(Color.parseColor("#fbd1b7"))
+                                .setThirdButtonTextColor(Color.parseColor("#000000"))
+                                .setFirstTextFieldHint("Enter How much discount!!")
+                                .setFirstTextFieldBorderColor(Color.BLACK)
+                                .setFirstTextFieldHintColor(Color.BLACK)
+                                .setFirstTextFieldTextColor(Color.BLACK)
+                                .withFirstButtonListner(view -> {
+                                    fiftyDiscount(dishName.get(name.get(position)),name.get(position));
+                                    flatDialog1.dismiss();
+                                })
+                                .withSecondButtonListner(view -> {
+                                    fourtyDiscount(dishName.get(name.get(position)),name.get(position));
+                                    flatDialog1.dismiss();
+                                })
+                                .withThirdButtonListner(view -> {
+                                    if (flatDialog1.getFirstTextField().equals("")) {
+
+                                        Toast.makeText(v.getContext(), "Field Can't be Empty", Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        customDiscount(dishName.get(name.get(position)),name.get(position),flatDialog1.getFirstTextField());
+                                        flatDialog1.dismiss();
                                     }
-                                });
-                                flatDialog1.setTitle("Choose One Option")
-                                        .setSubtitle("Only Applicable for items above 149")
-                                        .setSubtitleColor(Color.BLACK)
-                                        .setTitleColor(Color.BLACK)
-                                        .setBackgroundColor(Color.parseColor("#f9fce1"))
-                                        .setFirstButtonColor(Color.parseColor("#d3f6f3"))
-                                        .setFirstButtonTextColor(Color.parseColor("#000000"))
-                                        .setFirstButtonText("50% OFF")
-                                        .setSecondButtonColor(Color.parseColor("#fee9b2"))
-                                        .setSecondButtonTextColor(Color.parseColor("#000000"))
-                                        .setSecondButtonText("40% OFF")
-                                        .setThirdButtonText("ADD YOUR OWN")
-                                        .setThirdButtonColor(Color.parseColor("#fbd1b7"))
-                                        .setThirdButtonTextColor(Color.parseColor("#000000"))
-
-                                        .setFirstTextFieldHint("Enter How much discount!!")
-                                        .setFirstTextFieldBorderColor(Color.BLACK)
-                                        .setFirstTextFieldHintColor(Color.BLACK)
-                                        .setFirstTextFieldTextColor(Color.BLACK)
-                                        .withFirstButtonListner(new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View view) {
-                                                fiftyDiscount(dishName.get(name.get(position)),name.get(position));
-                                                flatDialog1.dismiss();
-                                            }
-                                        })
-                                        .withSecondButtonListner(new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View view) {
-                                                fourtyDiscount(dishName.get(name.get(position)),name.get(position));
-                                                flatDialog1.dismiss();
-                                            }
-                                        })
-                                        .withThirdButtonListner(new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View view) {
-                                                if (flatDialog1.getFirstTextField().equals("")) {
-
-                                                    Toast.makeText(v.getContext(), "Field Can't be Empty", Toast.LENGTH_SHORT).show();
-                                                    return;
-                                                } else {
-                                                    customDiscount(dishName.get(name.get(position)),name.get(position),flatDialog1.getFirstTextField());
-                                                    flatDialog1.dismiss();
-                                                }
-                                            }
-                                        }).show();
-                                kAlertDialog.dismissWithAnimation();
-                            }
-                        }).setCancelText("No")
-                        .setCancelClickListener(new KAlertDialog.KAlertClickListener() {
-                            @Override
-                            public void onClick(KAlertDialog kAlertDialog) {
-                                kAlertDialog.dismissWithAnimation();
-                            }
-                        }).show();
-            }
+                                }).show();
+                        kAlertDialog.dismissWithAnimation();
+                    }).setCancelText("No")
+                    .setCancelClickListener(KAlertDialog::dismissWithAnimation).show();
         });
     }
 
@@ -178,7 +150,7 @@ public class DiscountRecycler extends RecyclerView.Adapter<DiscountRecycler.Hold
                                     int afterDis = price - (price * discount / 100);
                                     int afterDisHalf = halfPrice - (halfPrice * discount / 100);
                                     beforeDiscount(price, afterDis, discount, field, textField, halfPrice);
-                                    addToDiscountDatabase("yes");
+                                    addToDiscountDatabase("" + discount);
                                     auth = FirebaseAuth.getInstance();
                                     Log.i("type", type);
                                     Log.i("name", dishName);
@@ -190,7 +162,7 @@ public class DiscountRecycler extends RecyclerView.Adapter<DiscountRecycler.Hold
                                     int discount = Integer.parseInt(firstTextField);
                                     int afterDis = price - (price * discount / 100);
                                     beforeDiscount(price,afterDis,discount,type,dishName,0);
-                                    addToDiscountDatabase("yes");
+                                    addToDiscountDatabase("" + discount);
                                     auth = FirebaseAuth.getInstance();
                                     Log.i("type",type);
                                     Log.i("name",dishName);
@@ -227,7 +199,7 @@ public class DiscountRecycler extends RecyclerView.Adapter<DiscountRecycler.Hold
                                     int afterDis = price - (price * discount / 100);
                                     int afterDisHalf = halfPrice - (halfPrice * discount / 100);
                                     beforeDiscount(price, afterDis, discount, s1, s, halfPrice);
-                                    addToDiscountDatabase("yes");
+                                    addToDiscountDatabase("" + discount);
                                     auth = FirebaseAuth.getInstance();
                                     Log.i("type", type);
                                     Log.i("name", dishName);
@@ -257,12 +229,7 @@ public class DiscountRecycler extends RecyclerView.Adapter<DiscountRecycler.Hold
 
                 builder.show();
 
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        builder.dismiss();
-                    }
-                },1500);
+                new Handler().postDelayed(builder::dismiss,1500);
             }
 
             @Override
@@ -276,6 +243,7 @@ public class DiscountRecycler extends RecyclerView.Adapter<DiscountRecycler.Hold
         auth = FirebaseAuth.getInstance();
         addToDB = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
         addToDB.child("Discount").child("available").setValue("yes");
+        addToDB.child("Discount").child("dis").setValue(discount);
     }
 
     private void beforeDiscount(int price,int after, int discount,String type,String name,int halfPrice) {
@@ -310,7 +278,7 @@ public class DiscountRecycler extends RecyclerView.Adapter<DiscountRecycler.Hold
                                     int afterDis = price - (price * discount / 100);
                                     int afterDisHalf = halfPrice - (halfPrice * discount / 100);
                                     beforeDiscount(price, afterDis, discount, s1, s, halfPrice);
-                                    addToDiscountDatabase("yes");
+                                    addToDiscountDatabase("" + discount);
                                     auth = FirebaseAuth.getInstance();
                                     Log.i("type", type);
                                     Log.i("name", dishName);

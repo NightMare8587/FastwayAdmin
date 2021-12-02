@@ -301,7 +301,7 @@ public class DiscountActivity extends AppCompatActivity {
                                     int afterDis = price - (price * discount / 100);
                                     int afterDisHalf = halfPrice - (halfPrice * discount / 100);
                                     beforeDiscount(price, afterDis, discount, type, dishName, halfPrice);
-                                    addToDiscountDatabase("yes");
+                                    addToDiscountDatabase(discount + "");
                                     auth = FirebaseAuth.getInstance();
                                     Log.i("type", type);
                                     Log.i("name", dishName);
@@ -313,7 +313,7 @@ public class DiscountActivity extends AppCompatActivity {
                                     int discount = Integer.parseInt(firstTextField);
                                     int afterDis = price - (price * discount / 100);
                                     beforeDiscount(price,afterDis,discount,type,dishName,0);
-                                    addToDiscountDatabase("yes");
+                                    addToDiscountDatabase(discount + "");
                                     auth = FirebaseAuth.getInstance();
                                     Log.i("type",type);
                                     Log.i("name",dishName);
@@ -416,7 +416,7 @@ public class DiscountActivity extends AppCompatActivity {
                                     int discount = 40;
                                     int afterDis = price - (price * discount / 100);
                                     beforeDiscount(price,afterDis,discount,type,dishName,0);
-                                    addToDiscountDatabase("yes");
+                                    addToDiscountDatabase(discount + "");
                                     auth = FirebaseAuth.getInstance();
                                     Log.i("type",type);
                                     Log.i("name",dishName);
@@ -457,6 +457,7 @@ public class DiscountActivity extends AppCompatActivity {
         auth = FirebaseAuth.getInstance();
         addToDB = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
         addToDB.child("Discount").child("available").setValue("yes");
+        addToDB.child("Discount").child("dis").setValue(discount);
     }
 
     private void beforeDiscount(int price,int after, int discount,String type,String name,int halfPrice) {
@@ -523,7 +524,7 @@ public class DiscountActivity extends AppCompatActivity {
                                     int afterDis = price - (price * discount / 100);
                                     int afterDisHalf = halfPrice - (halfPrice * discount / 100);
                                     beforeDiscount(price, afterDis, discount, type, dishName, halfPrice);
-                                    addToDiscountDatabase("yes");
+                                    addToDiscountDatabase(discount + "");
                                     auth = FirebaseAuth.getInstance();
                                     Log.i("type", type);
                                     Log.i("name", dishName);
