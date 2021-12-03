@@ -44,13 +44,11 @@ public class DiscountRecycler extends RecyclerView.Adapter<DiscountRecycler.Hold
     DatabaseReference addToDB = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid()));
     DatabaseReference dis = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
     DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid()));
-
     public DiscountRecycler(HashMap<String,String> dishName,Context context,List<String> name){
         this.dishName = dishName;
         this.context = context;
         this.name = name;
     }
-
     @NonNull
     @Override
     public Holder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
