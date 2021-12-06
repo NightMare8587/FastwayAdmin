@@ -38,6 +38,7 @@ import java.util.Objects;
 public class DiscountRecycler extends RecyclerView.Adapter<DiscountRecycler.Holder> {
     List<String> name;
     Context context;
+
     SharedPreferences sharedPreferences;
     HashMap<String,String> dishName;
     FirebaseAuth auth = FirebaseAuth.getInstance();
