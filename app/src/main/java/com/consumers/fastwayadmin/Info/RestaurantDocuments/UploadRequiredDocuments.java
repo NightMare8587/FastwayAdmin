@@ -96,15 +96,15 @@ public class UploadRequiredDocuments extends AppCompatActivity {
                     }
                     if(snapshot.child("Restaurant Documents").hasChild("fssai")){
                         fssai = true;
-                        panCard.setClickable(false);
+                        fssaiCard.setClickable(false);
                     }
                     if(snapshot.child("Restaurant Documents").hasChild("gst")){
                         gst = true;
-                        panCard.setClickable(false);
+                        gstCard.setClickable(false);
                     }
                     if(snapshot.child("Restaurant Documents").hasChild("adhaar")){
                         adhaar = true;
-                        panCard.setClickable(false);
+                        adhaarCard.setClickable(false);
                     }
 
                     checkIfAllUploaded();
