@@ -1,5 +1,4 @@
 package com.consumers.fastwayadmin.DiscountCombo;
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;

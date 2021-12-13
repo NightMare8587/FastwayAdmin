@@ -151,7 +151,7 @@ public class Info extends AppCompatActivity {
                         if(location.contains("location")){
                             startActivity(new Intent(Info.this,HomeScreen.class));
                         }else
-                            startActivity(new Intent(Info.this,MapsActivity.class));
+                            startActivity(new Intent(Info.this,UploadRequiredDocuments.class));
 
                         clientsLocation.removeLocationUpdates(mLocationCallback);
                         fastDialog.dismiss();
@@ -377,7 +377,7 @@ public class Info extends AppCompatActivity {
                         if(location.contains("location")){
                             startActivity(new Intent(Info.this,HomeScreen.class));
                         }else
-                            startActivity(new Intent(Info.this,MapsActivity.class));
+                            startActivity(new Intent(Info.this,UploadRequiredDocuments.class));
 
                         clientsLocation.removeLocationUpdates(mLocationCallback);
                         finish();
@@ -499,7 +499,7 @@ public class Info extends AppCompatActivity {
                                 loading.dismiss();
                                 DatabaseReference dish = FirebaseDatabase.getInstance().getReference().getRoot();
                                 dish.child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(infoAuth.getUid())).child("DisplayImage").setValue(uri + "");
-                                startActivity(new Intent(Info.this, MapsActivity.class));
+                                startActivity(new Intent(Info.this, UploadRequiredDocuments.class));
                                 finish();
                             }
                         });
@@ -552,7 +552,7 @@ public class Info extends AppCompatActivity {
                             loading.dismiss();
                             DatabaseReference dish = FirebaseDatabase.getInstance().getReference().getRoot();
                             dish.child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(infoAuth.getUid())).child("DisplayImage").setValue(uri + "");
-                            startActivity(new Intent(Info.this, MapsActivity.class));
+                            startActivity(new Intent(Info.this, UploadRequiredDocuments.class));
                             finish();
                         }
                     });
