@@ -33,6 +33,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import com.consumers.fastwayadmin.HomeScreen.HomeScreen;
+import com.consumers.fastwayadmin.Info.RestaurantDocuments.UploadRequiredDocuments;
 import com.consumers.fastwayadmin.R;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.ResolvableApiException;
@@ -151,7 +152,7 @@ public class Info extends AppCompatActivity {
                         if(location.contains("location")){
                             startActivity(new Intent(Info.this,HomeScreen.class));
                         }else
-                            startActivity(new Intent(Info.this,UploadRequiredDocuments.class));
+                            startActivity(new Intent(Info.this, UploadRequiredDocuments.class));
 
                         clientsLocation.removeLocationUpdates(mLocationCallback);
                         fastDialog.dismiss();

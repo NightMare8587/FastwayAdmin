@@ -31,7 +31,7 @@
         android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         tools:replace="android:icon,android:allowBackup">
         <activity
-            android:name=".Info.UploadRequiredDocuments"
+            android:name=".Info.RestaurantDocuments.UploadRequiredDocuments"
             android:exported="false" />
         <activity
             android:name=".ListViewActivity.CashTrans.CashTransactions"

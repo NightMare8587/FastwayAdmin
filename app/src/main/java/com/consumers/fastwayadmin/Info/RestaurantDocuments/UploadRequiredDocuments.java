@@ -1,4 +1,4 @@
-package com.consumers.fastwayadmin.Info;
+package com.consumers.fastwayadmin.Info.RestaurantDocuments;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -22,6 +22,7 @@ import android.util.Log;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.consumers.fastwayadmin.Info.MapsActivity;
 import com.consumers.fastwayadmin.R;
 import com.developer.kalert.KAlertDialog;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -52,6 +53,7 @@ import karpuzoglu.enes.com.fastdialog.Type;
 
 public class UploadRequiredDocuments extends AppCompatActivity {
     DatabaseReference databaseReference;
+    String panUrl,adhaarUrl,gstUrl,fssaiUrl;
     FirebaseAuth auth = FirebaseAuth.getInstance();
     SharedPreferences sharedPreferences;
     Button panCard,adhaarCard,fssaiCard,gstCard;
@@ -82,7 +84,7 @@ public class UploadRequiredDocuments extends AppCompatActivity {
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
         sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
-        databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
+        databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -274,10 +276,12 @@ public class UploadRequiredDocuments extends AppCompatActivity {
                     .setContentText("Documents uploaded and will be verified by our fastway staff with an on-site verification")
                     .setConfirmText("Exit")
                     .setConfirmClickListener(click -> {
-                        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("")
+                        ResDocuments resDocuments = new ResDocuments(panUrl,adhaarUrl,fssaiUrl,gstUrl);
+                        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Restaurant Registration");
+                        databaseReference.child(Objects.requireNonNull(auth.getUid())).setValue(resDocuments);
                         click.dismissWithAnimation();
-                        startActivity(new Intent(getApplicationContext(),MapsActivity.class));
-                    });
+                        startActivity(new Intent(getApplicationContext(), MapsActivity.class));
+                    }).show();
         }
     }
 
@@ -345,7 +349,8 @@ public class UploadRequiredDocuments extends AppCompatActivity {
                                 Toast.makeText(UploadRequiredDocuments.this, "Upload Complete and image saved in phone successfully", Toast.LENGTH_SHORT).show();
                                 loading.dismiss();
                                 DatabaseReference dish = FirebaseDatabase.getInstance().getReference().getRoot();
-                                dish.child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid())).child("Restaurant Documents").child("pan").setValue(uri + "");
+                                panUrl = uri + "";
+                                dish.child("Admin").child(Objects.requireNonNull(auth.getUid())).child("Restaurant Documents").child("pan").setValue(uri + "");
                                 checkIfAllUploaded();
                             }
                         });
@@ -403,8 +408,9 @@ public class UploadRequiredDocuments extends AppCompatActivity {
                                 Toast.makeText(UploadRequiredDocuments.this, "Upload Complete and image saved in phone successfully", Toast.LENGTH_SHORT).show();
                                 loading.dismiss();
                                 fssai = true;
+                                fssaiUrl = uri + "";
                                 DatabaseReference dish = FirebaseDatabase.getInstance().getReference().getRoot();
-                                dish.child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid())).child("Restaurant Documents").child("fssai").setValue(uri + "");
+                                dish.child("Admin").child(Objects.requireNonNull(auth.getUid())).child("Restaurant Documents").child("fssai").setValue(uri + "");
                                 checkIfAllUploaded();
                             }
                         });
@@ -462,8 +468,9 @@ public class UploadRequiredDocuments extends AppCompatActivity {
                                 Toast.makeText(UploadRequiredDocuments.this, "Upload Complete and image saved in phone successfully", Toast.LENGTH_SHORT).show();
                                 loading.dismiss();
                                 adhaar = true;
+                                adhaarUrl = uri + "";
                                 DatabaseReference dish = FirebaseDatabase.getInstance().getReference().getRoot();
-                                dish.child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid())).child("Restaurant Documents").child("adhaar").setValue(uri + "");
+                                dish.child("Admin").child(Objects.requireNonNull(auth.getUid())).child("Restaurant Documents").child("adhaar").setValue(uri + "");
                                 checkIfAllUploaded();
                             }
                         });
@@ -521,8 +528,9 @@ public class UploadRequiredDocuments extends AppCompatActivity {
                                 Toast.makeText(UploadRequiredDocuments.this, "Upload Complete and image saved in phone successfully", Toast.LENGTH_SHORT).show();
                                 loading.dismiss();
                                 gst = true;
+                                gstUrl = uri + "";
                                 DatabaseReference dish = FirebaseDatabase.getInstance().getReference().getRoot();
-                                dish.child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid())).child("Restaurant Documents").child("gst").setValue(uri + "");
+                                dish.child("Admin").child(Objects.requireNonNull(auth.getUid())).child("Restaurant Documents").child("gst").setValue(uri + "");
                                 checkIfAllUploaded();
                             }
                         });
@@ -613,10 +621,26 @@ public class UploadRequiredDocuments extends AppCompatActivity {
                     reference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                         @Override
                         public void onSuccess(@NonNull Uri uri) {
+                            if(value.equals("pan")) {
+                                panUrl = uri + "";
+                                pan = true;
+                            }
+                            if(value.equals("fssai")) {
+                                fssai = true;
+                                fssaiUrl = uri + "";
+                            }
+                            if(value.equals("adhaar")) {
+                                adhaar = true;
+                                adhaarUrl = uri + "";
+                            }
+                            if(value.equals("gst")) {
+                                gst = true;
+                                gstUrl = uri + "";
+                            }
                             Toast.makeText(UploadRequiredDocuments.this, "Upload Complete and image saved in phone successfully", Toast.LENGTH_SHORT).show();
                             loading.dismiss();
                             DatabaseReference dish = FirebaseDatabase.getInstance().getReference().getRoot();
-                            dish.child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid())).child("Required Documents").child(value).setValue(uri + "");
+                            dish.child("Admin").child(Objects.requireNonNull(auth.getUid())).child("Restaurant Documents").child(value).setValue(uri + "");
                            checkIfAllUploaded();
                         }
                     });
