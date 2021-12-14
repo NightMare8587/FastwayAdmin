@@ -551,13 +551,13 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                 @Override
                 protected Map<String, String> getParams() {
                     Map<String,String> params = new HashMap<>();
-                    params.put("benID",id);
+                    params.put("benID",auth.getUid());
                     String genratedID = ApproveCurrentTakeAway.RandomString
-                            .getAlphaNumericString(8);
+                            .getAlphaNumericString(11);
                     genratedID = genratedID + String.valueOf(System.currentTimeMillis());
                     params.put("transID",genratedID);
                     params.put("token",genratedToken);
-                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(id).child("Transactions");
+                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid())).child("Transactions");
                     PaymentClass paymentClass = new PaymentClass(genratedID,auth.getUid() + "");
                     databaseReference.child(time).setValue(paymentClass);
                     params.put("amount",String.valueOf(orderAmount));
