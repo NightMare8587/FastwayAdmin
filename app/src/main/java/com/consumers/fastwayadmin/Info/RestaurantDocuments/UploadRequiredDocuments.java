@@ -19,7 +19,9 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.consumers.fastwayadmin.Info.MapsActivity;
@@ -62,6 +64,7 @@ public class UploadRequiredDocuments extends AppCompatActivity {
     FirebaseStorage storage;
     File file;
     Bitmap bitmap;
+    TextView panText,gstText,adhaarText,FssaiText;
     OutputStream outputStream;
     FastDialog loading;
     boolean pan = false;
@@ -80,6 +83,11 @@ public class UploadRequiredDocuments extends AppCompatActivity {
                 .setAnimation(Animations.FADE_IN)
                 .create();
 
+        gstText = findViewById(R.id.uploadGstText);
+        panText = findViewById(R.id.panTextUploaded);
+        adhaarText = findViewById(R.id.uploadAdhaarCardText);
+        FssaiText = findViewById(R.id.uploadFssaiText);
+
         checkPermissions();
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
@@ -92,18 +100,22 @@ public class UploadRequiredDocuments extends AppCompatActivity {
                     fastDialog.show();
                     if(snapshot.child("Restaurant Documents").hasChild("pan")){
                         pan = true;
+                        panText.setVisibility(View.VISIBLE);
                         panCard.setClickable(false);
                     }
                     if(snapshot.child("Restaurant Documents").hasChild("fssai")){
                         fssai = true;
+                        FssaiText.setVisibility(View.VISIBLE);
                         fssaiCard.setClickable(false);
                     }
                     if(snapshot.child("Restaurant Documents").hasChild("gst")){
                         gst = true;
+                        gstText.setVisibility(View.VISIBLE);
                         gstCard.setClickable(false);
                     }
                     if(snapshot.child("Restaurant Documents").hasChild("adhaar")){
                         adhaar = true;
+                        adhaarText.setVisibility(View.VISIBLE);
                         adhaarCard.setClickable(false);
                     }
 
@@ -279,6 +291,8 @@ public class UploadRequiredDocuments extends AppCompatActivity {
                         ResDocuments resDocuments = new ResDocuments(panUrl,adhaarUrl,fssaiUrl,gstUrl);
                         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Restaurant Registration");
                         databaseReference.child(Objects.requireNonNull(auth.getUid())).setValue(resDocuments);
+                        databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid()).child("Restaurant Documents");
+                        databaseReference.child("verified").setValue("no");
                         click.dismissWithAnimation();
                         startActivity(new Intent(getApplicationContext(), MapsActivity.class));
                     }).show();
@@ -348,6 +362,7 @@ public class UploadRequiredDocuments extends AppCompatActivity {
                                 pan = true;
                                 Toast.makeText(UploadRequiredDocuments.this, "Upload Complete and image saved in phone successfully", Toast.LENGTH_SHORT).show();
                                 loading.dismiss();
+                                panText.setVisibility(View.VISIBLE);
                                 DatabaseReference dish = FirebaseDatabase.getInstance().getReference().getRoot();
                                 panUrl = uri + "";
                                 dish.child("Admin").child(Objects.requireNonNull(auth.getUid())).child("Restaurant Documents").child("pan").setValue(uri + "");
@@ -408,6 +423,7 @@ public class UploadRequiredDocuments extends AppCompatActivity {
                                 Toast.makeText(UploadRequiredDocuments.this, "Upload Complete and image saved in phone successfully", Toast.LENGTH_SHORT).show();
                                 loading.dismiss();
                                 fssai = true;
+                                FssaiText.setVisibility(View.VISIBLE);
                                 fssaiUrl = uri + "";
                                 DatabaseReference dish = FirebaseDatabase.getInstance().getReference().getRoot();
                                 dish.child("Admin").child(Objects.requireNonNull(auth.getUid())).child("Restaurant Documents").child("fssai").setValue(uri + "");
@@ -469,6 +485,7 @@ public class UploadRequiredDocuments extends AppCompatActivity {
                                 loading.dismiss();
                                 adhaar = true;
                                 adhaarUrl = uri + "";
+                                adhaarText.setVisibility(View.VISIBLE);
                                 DatabaseReference dish = FirebaseDatabase.getInstance().getReference().getRoot();
                                 dish.child("Admin").child(Objects.requireNonNull(auth.getUid())).child("Restaurant Documents").child("adhaar").setValue(uri + "");
                                 checkIfAllUploaded();
@@ -528,6 +545,7 @@ public class UploadRequiredDocuments extends AppCompatActivity {
                                 Toast.makeText(UploadRequiredDocuments.this, "Upload Complete and image saved in phone successfully", Toast.LENGTH_SHORT).show();
                                 loading.dismiss();
                                 gst = true;
+                                gstText.setVisibility(View.VISIBLE);
                                 gstUrl = uri + "";
                                 DatabaseReference dish = FirebaseDatabase.getInstance().getReference().getRoot();
                                 dish.child("Admin").child(Objects.requireNonNull(auth.getUid())).child("Restaurant Documents").child("gst").setValue(uri + "");
@@ -624,18 +642,22 @@ public class UploadRequiredDocuments extends AppCompatActivity {
                             if(value.equals("pan")) {
                                 panUrl = uri + "";
                                 pan = true;
+                                panText.setVisibility(View.VISIBLE);
                             }
                             if(value.equals("fssai")) {
                                 fssai = true;
                                 fssaiUrl = uri + "";
+                                FssaiText.setVisibility(View.VISIBLE);
                             }
                             if(value.equals("adhaar")) {
                                 adhaar = true;
                                 adhaarUrl = uri + "";
+                                adhaarText.setVisibility(View.VISIBLE);
                             }
                             if(value.equals("gst")) {
                                 gst = true;
                                 gstUrl = uri + "";
+                                gstText.setVisibility(View.VISIBLE);
                             }
                             Toast.makeText(UploadRequiredDocuments.this, "Upload Complete and image saved in phone successfully", Toast.LENGTH_SHORT).show();
                             loading.dismiss();

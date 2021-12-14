@@ -31,7 +31,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="22dp"
-        android:text="Upload GST Number"
+        android:text="Upload GST"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/uploadFSSAIcard" />
@@ -41,8 +41,56 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="21dp"
-        android:text="Upload Adhaar Card"
+        android:text="Upload Adhaar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/uploadGSTcard" />
+
+    <TextView
+        android:id="@+id/panTextUploaded"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="54dp"
+        android:text="uploaded"
+        android:textColor="@color/cfdialog_positive_button_color"
+        android:visibility="invisible"
+        app:layout_constraintStart_toEndOf="@+id/uploadPANcard"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/uploadFssaiText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="53dp"
+        android:text="uploaded"
+        android:textColor="@color/cfdialog_positive_button_color"
+        android:visibility="invisible"
+        app:layout_constraintStart_toEndOf="@+id/uploadFSSAIcard"
+        app:layout_constraintTop_toBottomOf="@+id/panTextUploaded" />
+
+    <TextView
+        android:id="@+id/uploadGstText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="51dp"
+        android:text="uploaded"
+        android:textColor="@color/cfdialog_positive_button_color"
+        android:visibility="invisible"
+        app:layout_constraintStart_toEndOf="@+id/uploadGSTcard"
+        app:layout_constraintTop_toBottomOf="@+id/uploadFssaiText" />
+
+    <TextView
+        android:id="@+id/uploadAdhaarCardText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="48dp"
+        android:text="uploaded"
+        android:textColor="@color/cfdialog_positive_button_color"
+        android:visibility="invisible"
+        app:layout_constraintStart_toEndOf="@+id/uploadAdhaarCard"
+        app:layout_constraintTop_toBottomOf="@+id/uploadGstText" />
 </androidx.constraintlayout.widget.ConstraintLayout>
