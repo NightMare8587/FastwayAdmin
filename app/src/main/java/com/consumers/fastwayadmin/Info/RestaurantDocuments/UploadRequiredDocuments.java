@@ -100,22 +100,27 @@ public class UploadRequiredDocuments extends AppCompatActivity {
                     fastDialog.show();
                     if(snapshot.child("Restaurant Documents").hasChild("pan")){
                         pan = true;
+                        panUrl = snapshot.child("Restaurant Documents").child("pan").getValue(String.class);
                         panText.setVisibility(View.VISIBLE);
                         panCard.setClickable(false);
                     }
                     if(snapshot.child("Restaurant Documents").hasChild("fssai")){
                         fssai = true;
+                        fssaiUrl = snapshot.child("Restaurant Documents").child("fssai").getValue(String.class);
                         FssaiText.setVisibility(View.VISIBLE);
                         fssaiCard.setClickable(false);
                     }
                     if(snapshot.child("Restaurant Documents").hasChild("gst")){
                         gst = true;
+                        gstUrl = snapshot.child("Restaurant Documents").child("gst").getValue(String.class);
                         gstText.setVisibility(View.VISIBLE);
+
                         gstCard.setClickable(false);
                     }
                     if(snapshot.child("Restaurant Documents").hasChild("adhaar")){
                         adhaar = true;
                         adhaarText.setVisibility(View.VISIBLE);
+                        adhaarUrl = snapshot.child("Restaurant Documents").child("adhaar").getValue(String.class);
                         adhaarCard.setClickable(false);
                     }
 
@@ -291,6 +296,11 @@ public class UploadRequiredDocuments extends AppCompatActivity {
                         ResDocuments resDocuments = new ResDocuments(panUrl,adhaarUrl,fssaiUrl,gstUrl);
                         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Restaurant Registration");
                         databaseReference.child(Objects.requireNonNull(auth.getUid())).setValue(resDocuments);
+                        SharedPreferences sharedPreferences = getSharedPreferences("RestaurantInfo",MODE_PRIVATE);
+                        databaseReference.child(auth.getUid()).child("ResName").setValue(sharedPreferences.getString("hotelName",""));
+                        databaseReference.child(auth.getUid()).child("ResAddress").setValue(sharedPreferences.getString("hotelAddress",""));
+                        databaseReference.child(auth.getUid()).child("ResNumber").setValue(sharedPreferences.getString("hotelNumber",""));
+
                         databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid()).child("Restaurant Documents");
                         databaseReference.child("verified").setValue("no");
                         click.dismissWithAnimation();
