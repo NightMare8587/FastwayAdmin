@@ -303,6 +303,7 @@ public class UploadRequiredDocuments extends AppCompatActivity {
 
                         databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid()).child("Restaurant Documents");
                         databaseReference.child("verified").setValue("no");
+                        databaseReference.child("bankVerified").setValue("no");
                         click.dismissWithAnimation();
                         startActivity(new Intent(getApplicationContext(), MapsActivity.class));
                     }).show();
