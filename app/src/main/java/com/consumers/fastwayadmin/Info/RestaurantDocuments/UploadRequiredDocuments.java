@@ -87,7 +87,6 @@ public class UploadRequiredDocuments extends AppCompatActivity {
         panText = findViewById(R.id.panTextUploaded);
         adhaarText = findViewById(R.id.uploadAdhaarCardText);
         FssaiText = findViewById(R.id.uploadFssaiText);
-
         checkPermissions();
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
@@ -300,6 +299,7 @@ public class UploadRequiredDocuments extends AppCompatActivity {
                         databaseReference.child(auth.getUid()).child("ResName").setValue(sharedPreferences.getString("hotelName",""));
                         databaseReference.child(auth.getUid()).child("ResAddress").setValue(sharedPreferences.getString("hotelAddress",""));
                         databaseReference.child(auth.getUid()).child("ResNumber").setValue(sharedPreferences.getString("hotelNumber",""));
+                        databaseReference.child(auth.getUid()).child("state").setValue(this.sharedPreferences.getString("state",""));
 
                         databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid()).child("Restaurant Documents");
                         databaseReference.child("verified").setValue("no");
