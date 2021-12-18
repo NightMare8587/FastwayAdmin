@@ -31,6 +31,9 @@
         android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         tools:replace="android:icon,android:allowBackup">
         <activity
+            android:name=".Info.RestaurantDocuments.ReUploadDocumentsAgain"
+            android:exported="false" />
+        <activity
             android:name=".Info.RestaurantDocuments.UploadRequiredDocuments"
             android:exported="false" />
         <activity

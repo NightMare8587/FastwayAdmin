@@ -1,6 +1,7 @@
 package com.consumers.fastwayadmin.HomeScreen;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
@@ -25,6 +26,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.consumers.fastwayadmin.Chat.RandomChatFolder.RandomChatWithUsers;
+import com.consumers.fastwayadmin.Info.RestaurantDocuments.ReUploadDocumentsAgain;
 import com.consumers.fastwayadmin.NavFrags.AccountFrag;
 import com.consumers.fastwayadmin.NavFrags.HomeFrag;
 import com.consumers.fastwayadmin.NavFrags.MenuFrag;
@@ -101,6 +103,38 @@ public class HomeScreen extends AppCompatActivity {
 
             }
         });
+
+        resRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid())).child("Restaurant Documents");
+        resRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists() && snapshot.hasChild("reasonForCancel")){
+                    AlertDialog.Builder alert = new AlertDialog.Builder(HomeScreen.this);
+                    String reason = snapshot.child("reasonForCancel").getValue(String.class);
+                    alert.setTitle("Error").setMessage("Your restaurant registration is denied by fastway for following reason's:\n\n" + reason + "\n\nYou can submit another response for restaurant registration")
+                            .setPositiveButton("Re-Submit", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    startActivity(new Intent(HomeScreen.this, ReUploadDocumentsAgain.class));
+                                    dialogInterface.dismiss();
+                                }
+                            }).setNegativeButton("Skip", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.dismiss();
+                        }
+                    }).create();
+
+                    alert.show();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
 
         bubble.setNavigationChangeListener((view, position) -> {
             switch (position){
