@@ -1,5 +1,6 @@
 package com.consumers.fastwayadmin.NavFrags;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -47,6 +48,7 @@ public class TablesFrag extends Fragment {
     DatabaseReference tableRef;
     List<String> tableNumber = new ArrayList<>();
     List<String> status  = new ArrayList<>();
+    List<String> timeInMillis  = new ArrayList<>();
     RecyclerView table;
     int count = 0;
     boolean pressed = false;
@@ -98,6 +100,7 @@ public class TablesFrag extends Fragment {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.exists()){
                     HashMap<String,List<String>> map = new HashMap<>();
+                    timeInMillis.clear();
                     for(DataSnapshot dataSnapshot : snapshot.getChildren()){
                         tableNumber.add(Objects.requireNonNull(dataSnapshot.child("tableNum").getValue()).toString());
                         status.add(dataSnapshot.child("status").getValue().toString());
@@ -107,9 +110,12 @@ public class TablesFrag extends Fragment {
                             list.add(String.valueOf(dataSnapshot.child("customerId").getValue()));
                             list.add(String.valueOf(dataSnapshot.child("time").getValue()));
                             map.put(String.valueOf(dataSnapshot.child("tableNum").getValue(String.class)), list);
+                            if(dataSnapshot.hasChild("timeInMillis"))
+                                timeInMillis.add(String.valueOf(dataSnapshot.child("timeInMillis").getValue()));
+                            else timeInMillis.add("");
                         }
                     }
-                    tableView = new TableView(tableNumber,status,map,getContext());
+                    tableView = new TableView(tableNumber,status,map,getContext(),timeInMillis);
                     table.setAdapter(tableView);
                     tableView.notifyDataSetChanged();
 
@@ -164,6 +170,7 @@ public class TablesFrag extends Fragment {
                     if(snapshot.exists()){
                         tableNumber.clear();
                         status.clear();
+                        timeInMillis.clear();
                         HashMap<String,List<String>> map = new HashMap<>();
                         for(DataSnapshot dataSnapshot : snapshot.getChildren()) {
                             tableNumber.add(Objects.requireNonNull(dataSnapshot.child("tableNum").getValue()).toString());
@@ -173,9 +180,12 @@ public class TablesFrag extends Fragment {
                                 list.add(String.valueOf(dataSnapshot.child("customerId").getValue()));
                                 list.add(String.valueOf(dataSnapshot.child("time").getValue()));
                                 map.put(String.valueOf(dataSnapshot.child("tableNum").getValue(String.class)), list);
+                                if(dataSnapshot.hasChild("timeInMillis"))
+                                    timeInMillis.add(String.valueOf(dataSnapshot.child("timeInMillis").getValue()));
+                                else timeInMillis.add("");
                             }
                         }
-                        tableView = new TableView(tableNumber,status,map,getContext());
+                        tableView = new TableView(tableNumber,status,map,getContext(),timeInMillis);
                         table.setAdapter(tableView);
                         tableView.notifyDataSetChanged();
 
@@ -198,11 +208,13 @@ public class TablesFrag extends Fragment {
 
     private void updateChild() {
         tableRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.exists()){
                     tableNumber.clear();
                     status.clear();
+                    timeInMillis.clear();
                     HashMap<String,List<String>> map = new HashMap<>();
                     for(DataSnapshot dataSnapshot : snapshot.getChildren()) {
                         tableNumber.add(Objects.requireNonNull(dataSnapshot.child("tableNum").getValue()).toString());
@@ -212,9 +224,13 @@ public class TablesFrag extends Fragment {
                             list.add(String.valueOf(dataSnapshot.child("customerId").getValue()));
                             list.add(String.valueOf(dataSnapshot.child("time").getValue()));
                             map.put(String.valueOf(dataSnapshot.child("tableNum").getValue(String.class)), list);
-                        }
+                            if(dataSnapshot.hasChild("timeInMillis"))
+                                timeInMillis.add(String.valueOf(dataSnapshot.child("timeInMillis").getValue()));
+                            else timeInMillis.add("");
+                        }else
+                            timeInMillis.add("");
                     }
-                    tableView = new TableView(tableNumber,status,map,getContext());
+                    tableView = new TableView(tableNumber,status,map,getContext(),timeInMillis);
                     table.setAdapter(tableView);
                     tableView.notifyDataSetChanged();
 
@@ -237,6 +253,7 @@ public class TablesFrag extends Fragment {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     if(snapshot.exists()){
+                        timeInMillis.clear();
                         HashMap<String,List<String>> map = new HashMap<>();
                         for(DataSnapshot dataSnapshot : snapshot.getChildren()){
                             tableNumber.add(Objects.requireNonNull(dataSnapshot.child("tableNum").getValue()).toString());
@@ -247,9 +264,12 @@ public class TablesFrag extends Fragment {
                                 list.add(String.valueOf(dataSnapshot.child("customerId").getValue()));
                                 list.add(String.valueOf(dataSnapshot.child("time").getValue()));
                                 map.put(String.valueOf(dataSnapshot.child("tableNum").getValue(String.class)), list);
+                                if(dataSnapshot.hasChild("timeInMillis"))
+                                    timeInMillis.add(String.valueOf(dataSnapshot.child("timeInMillis").getValue()));
+                                else timeInMillis.add("");
                             }
                         }
-                        tableView = new TableView(tableNumber,status,map,getContext());
+                        tableView = new TableView(tableNumber,status,map,getContext(),timeInMillis);
                         table.setAdapter(tableView);
                         tableView.notifyDataSetChanged();
 

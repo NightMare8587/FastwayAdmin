@@ -51,18 +51,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
     List<String> tables;
     List<String> status;
     HashMap<String,List<String>> map;
+    List<String> timeInMillis;
     String URL = "https://fcm.googleapis.com/fcm/send";
     DatabaseReference reference;
     Context context;
     FirebaseAuth auth;
-    public TableView(List<String> tables,List<String> status,HashMap<String,List<String>> map,Context context){
+    public TableView(List<String> tables,List<String> status,HashMap<String,List<String>> map,Context context,List<String> timeInMillis){
         this.status = status;
         this.map = map;
+        this.timeInMillis = timeInMillis;
         this.tables = tables;
         this.context = context;
     }
@@ -174,6 +177,36 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
         }
         if(status.get(position).equals("Reserved")){
             List<String> myList = map.get(""+tables.get(position));
+            holder.cardView.setOnLongClickListener(click -> {
+                AlertDialog.Builder alert = new AlertDialog.Builder(click.getContext());
+                alert.setTitle("Add Time").setMessage("Add 10 min to reserved table").setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                        FirebaseAuth auth = FirebaseAuth.getInstance();
+                        long time = Long.parseLong(timeInMillis.get(position));
+                        time = time + 600000;
+                        SharedPreferences sharedPreferences = click.getContext().getSharedPreferences("loginInfo",Context.MODE_PRIVATE);
+                        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid())).child("Tables").child(tables.get(position));
+                        databaseReference.child("timeInMillis").setValue(time + "");
+
+                        databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(myList.get(0)).child("Reserve Tables").child(auth.getUid()).child(tables.get(position));
+                        databaseReference.child("timeInMillis").setValue(time + "");
+
+                        Toast.makeText(click.getContext(), "10min added successfully", Toast.LENGTH_SHORT).show();
+
+                    }
+                }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                }).create();
+                alert.show();
+                return true;
+            });
+
+
             holder.chatWith.setVisibility(View.VISIBLE);
             holder.cancel.setVisibility(View.VISIBLE);
             holder.timeOfReserved.setVisibility(View.VISIBLE);
@@ -277,6 +310,8 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
 
             });
         }
+
+
         holder.cardView.setOnClickListener(v -> {
             SharedPreferences sharedPreferences = v.getContext().getSharedPreferences("loginInfo",Context.MODE_PRIVATE);
             FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
