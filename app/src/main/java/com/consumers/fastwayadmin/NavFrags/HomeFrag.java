@@ -22,6 +22,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Switch;
@@ -82,6 +83,8 @@ import karpuzoglu.enes.com.fastdialog.Type;
 
 public class HomeFrag extends Fragment {
     String currentTime;
+    @SuppressLint("UseSwitchCompatOrMaterialCode")
+    Switch acceptOrders;
     boolean check = false;
     List<String> time = new ArrayList<>();
     List<List<String>> finalDishNames = new ArrayList<>();
@@ -168,6 +171,7 @@ public class HomeFrag extends Fragment {
         inAppUpdateInfo();
         SharedPreferences stopServices = requireActivity().getSharedPreferences("Stop Services",Context.MODE_PRIVATE);
          editor = stopServices.edit();
+         acceptOrders = view.findViewById(R.id.acceptingOrdersSwitchHomeFrag);
         resInfoShared = view.getContext().getSharedPreferences("loginInfo",Context.MODE_PRIVATE);
         restaurantStatus = view.getContext().getSharedPreferences("RestaurantStatus",Context.MODE_PRIVATE);
         statusEditor = restaurantStatus.edit();
@@ -200,15 +204,22 @@ public class HomeFrag extends Fragment {
                 secondLinearLayout.setVisibility(View.INVISIBLE);
                 onlineOrOffline.setChecked(false);
                 onlineOrOffline.setText("offline");
-
-
+                acceptOrders.setChecked(false);
             }else{
                 comboImage.setVisibility(View.VISIBLE);
                 linearLayout.setVisibility(View.VISIBLE);
                 secondLinearLayout.setVisibility(View.VISIBLE);
                 onlineOrOffline.setChecked(true);
                 onlineOrOffline.setText("online");
+                acceptOrders.setChecked(true);
             }
+        }
+
+        if(restaurantStatus.contains("resOrdersAccepting")){
+            if(restaurantStatus.getString("resOrdersAccepting","").equals("no")){
+                acceptOrders.setChecked(false);
+            }else
+                acceptOrders.setChecked(true);
         }
         if(ContextCompat.checkSelfPermission(requireActivity(),Manifest.permission.CAMERA) + ContextCompat.checkSelfPermission(requireActivity(),Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
             requestPermissions(new String[]{Manifest.permission.CAMERA,Manifest.permission.ACCESS_COARSE_LOCATION},1);
@@ -249,16 +260,55 @@ public class HomeFrag extends Fragment {
 
         new MyTask().execute();
 
+        acceptOrders.setOnCheckedChangeListener((compoundButton, b) -> {
+            if(b){
+                acceptOrders.setChecked(true);
+                statusEditor.putString("resOrdersAccepting","yes");
+                statusEditor.apply();
+                onlineOrOfflineRestaurant.child("acceptingOrders").setValue("yes");
+                Toast.makeText(getContext(), "Restaurant is now accepting orders", Toast.LENGTH_SHORT).show();
+            }else{
+                onlineOrOfflineRestaurant.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if(snapshot.hasChild("Current TakeAway")){
+                            AlertDialog.Builder alert = new AlertDialog.Builder(requireContext());
+                            alert.setTitle("Error").setMessage("You still have an current takeaway order in queue. Contact  user before closing restaurant");
+                            alert.setPositiveButton("Exit", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    onlineOrOffline.setChecked(true);
+                                    acceptOrders.setChecked(true);
+                                    dialogInterface.dismiss();
+                                }
+                            }).create();
+
+                            alert.show();
+                        }else
+                            checkCurrentInfo();
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+            }
+        });
+
 
         onlineOrOffline.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if(isChecked){
                 statusEditor.putString("status","online");
+                statusEditor.putString("resOrdersAccepting","yes");
                 onlineOrOffline.setText("online");
+                acceptOrders.setChecked(true);
                 secondLinearLayout.setVisibility(View.VISIBLE);
                 statusEditor.apply();
                 comboImage.setVisibility(View.VISIBLE);
                 linearLayout.setVisibility(View.VISIBLE);
                 onlineOrOfflineRestaurant.child("status").setValue("online");
+                onlineOrOfflineRestaurant.child("acceptingOrders").setValue("yes");
                 editor.putString("online","true");
             }else{
 
@@ -272,6 +322,7 @@ public class HomeFrag extends Fragment {
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i) {
                                     onlineOrOffline.setChecked(true);
+                                    acceptOrders.setChecked(true);
                                     dialogInterface.dismiss();
                                 }
                             }).create();
@@ -469,6 +520,51 @@ public class HomeFrag extends Fragment {
 
     }
 
+    private void checkCurrentInfo() {
+
+        onlineOrOfflineRestaurant.child("Tables").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists()){
+                    for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                        if(dataSnapshot.child("status").getValue(String.class).equals("unavailable")){
+                            check = true;
+                            AlertDialog.Builder alert = new AlertDialog.Builder(requireContext());
+                            alert.setTitle("Error").setMessage("You still have an active table. Contact user before not accepting orders");
+                            alert.setPositiveButton("Exit", (dialogInterface, i) -> dialogInterface.dismiss()).create();
+                            onlineOrOffline.setChecked(true);
+                            acceptOrders.setChecked(true);
+                            alert.show();
+                            break;
+                        }else if(dataSnapshot.child("status").getValue(String.class).equals("Reserved")){
+                            check = true;
+                            AlertDialog.Builder alert = new AlertDialog.Builder(requireContext());
+                            alert.setTitle("Error").setMessage("You still have an active Reserved Table. Contact user before not accepting orders");
+                            alert.setPositiveButton("Exit", (dialogInterface, i) -> dialogInterface.dismiss()).create();
+                            onlineOrOffline.setChecked(true);
+                            acceptOrders.setChecked(true);
+                            alert.show();
+                            break;
+                        }
+                    }
+
+                    if(!check){
+                        acceptOrders.setChecked(false);
+                        onlineOrOfflineRestaurant.child("acceptingOrders").setValue("no");
+                        statusEditor.putString("resOrdersAccepting","no");
+                        statusEditor.apply();
+                        Toast.makeText(requireContext(), "Restaurant will not receive orders", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
     private void checkInfo() {
 
         onlineOrOfflineRestaurant.child("Tables").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -482,6 +578,7 @@ public class HomeFrag extends Fragment {
                             alert.setTitle("Error").setMessage("You still have an active table. Contact user before closing restaurant");
                             alert.setPositiveButton("Exit", (dialogInterface, i) -> dialogInterface.dismiss()).create();
                             onlineOrOffline.setChecked(true);
+                            acceptOrders.setChecked(true);
                             alert.show();
                             break;
                         }else if(dataSnapshot.child("status").getValue(String.class).equals("Reserved")){
@@ -490,6 +587,7 @@ public class HomeFrag extends Fragment {
                             alert.setTitle("Error").setMessage("You still have an active Reserved Table. Contact user before closing restaurant");
                             alert.setPositiveButton("Exit", (dialogInterface, i) -> dialogInterface.dismiss()).create();
                             onlineOrOffline.setChecked(true);
+                            acceptOrders.setChecked(true);
                             alert.show();
                             break;
                         }
@@ -497,12 +595,15 @@ public class HomeFrag extends Fragment {
 
                     if(!check){
                         statusEditor.putString("status","offline");
+                        statusEditor.putString("resOrdersAccepting","no");
                         onlineOrOffline.setText("offline");
+                        acceptOrders.setChecked(false);
                         statusEditor.apply();
                         comboImage.setVisibility(View.INVISIBLE);
                         linearLayout.setVisibility(View.INVISIBLE);
                         secondLinearLayout.setVisibility(View.INVISIBLE);
                         onlineOrOfflineRestaurant.child("status").setValue("offline");
+                        onlineOrOfflineRestaurant.child("acceptingOrders").setValue("no");
                         editor.putString("online","false");
                         FastDialog fastDialog = new FastDialogBuilder(requireContext(), Type.PROGRESS)
                                 .progressText("Closing restaurant... please wait")
@@ -512,7 +613,7 @@ public class HomeFrag extends Fragment {
 
                         fastDialog.show();
 
-                        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(resInfoShared.getString("state","")).child(auth.getUid()).child("Tables");
+                        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(resInfoShared.getString("state","")).child(Objects.requireNonNull(auth.getUid())).child("Tables");
                         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot snapshot) {

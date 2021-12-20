@@ -187,7 +187,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:layout_marginEnd="33dp"
+            android:layout_marginEnd="25dp"
             android:layout_marginBottom="8dp"
             android:checked="true"
             android:fontFamily="@font/merriweather_sans_bold"
@@ -196,7 +196,25 @@
             android:textStyle="bold"
             app:layout_constraintBottom_toTopOf="@+id/comboDiscountImageView"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/homeFragToolBar" />
+            app:layout_constraintTop_toBottomOf="@+id/homeFragToolBar"
+            tools:ignore="UseSwitchCompatOrMaterialXml" />
+
+        <Switch
+            android:id="@+id/acceptingOrdersSwitchHomeFrag"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="25dp"
+            android:layout_marginTop="8dp"
+            android:checked="true"
+            android:fontFamily="@font/merriweather_sans_bold"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp"
+            android:text="Accept Orders"
+            app:layout_constraintBottom_toTopOf="@+id/comboDiscountImageView"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/homeFragToolBar"
+            tools:ignore="UseSwitchCompatOrMaterialXml" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
