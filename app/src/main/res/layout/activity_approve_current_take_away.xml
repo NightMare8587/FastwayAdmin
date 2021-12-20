@@ -52,6 +52,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="70dp"
+        android:layout_marginBottom="50dp"
         android:orientation="horizontal"
         app:layout_constraintBottom_toTopOf="@+id/linearLayout4"
         app:layout_constraintEnd_toEndOf="parent"
@@ -116,5 +117,16 @@
         app:layout_constraintBottom_toTopOf="@+id/trashLinearLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/showCustomisationCurrentTakeaway"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Show Customisation"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout4"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/trashLinearLayout" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

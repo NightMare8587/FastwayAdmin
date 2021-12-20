@@ -77,6 +77,7 @@ public class ApproveCurrentOrder extends AppCompatActivity {
     FirebaseStorage storage;
     StorageReference storageReference;
     DatabaseReference totalOrders;
+    String customisation = "";
     String userName,userEmail;
     Bitmap bmp,scaled,bmp1,scaled1;
     String URL = "https://fcm.googleapis.com/fcm/send";
@@ -98,7 +99,7 @@ public class ApproveCurrentOrder extends AppCompatActivity {
     List<String> dishNames = new ArrayList<>();
     List<String> dishQuantity = new ArrayList<>();
     List<String> dishHalfOr = new ArrayList<>();
-    Button approve,decline;
+    Button approve,decline,showCustomisation;
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,6 +108,7 @@ public class ApproveCurrentOrder extends AppCompatActivity {
         table = getIntent().getStringExtra("table");
         id = getIntent().getStringExtra("id");
         state = getIntent().getStringExtra("state");
+        showCustomisation = findViewById(R.id.showCustomisationButton);
         SharedPreferences sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
         bmp = BitmapFactory.decodeResource(getResources(), R.drawable.logo);
         scaled = Bitmap.createScaledBitmap(bmp,500,500,false);
@@ -141,17 +143,42 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                     orderAmount = String.valueOf(dataSnapshot.child("orderAmount").getValue());
                     time = String.valueOf(dataSnapshot.child("time").getValue());
                     totalPrice = totalPrice + Integer.parseInt(String.valueOf(dataSnapshot.child("price").getValue()));
-
+                    customisation = String.valueOf(dataSnapshot.child("customisation").getValue());
 
                 }
                 progressBar.setVisibility(View.INVISIBLE);
                 uploadToArrayAdapter(dishNames,dishQuantity,dishHalfOr);
+
+                if(!customisation.equals("")){
+                    AlertDialog.Builder alert = new AlertDialog.Builder(ApproveCurrentOrder.this);
+                    alert.setTitle("Customisation").setMessage("User has added following customisation to his/her order made\n\n\n" + customisation).setPositiveButton("Exit", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.dismiss();
+                            showCustomisation.setVisibility(View.VISIBLE);
+                        }
+                    }).create();
+
+                    alert.show();
+                }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
 
             }
+        });
+
+        showCustomisation.setOnClickListener(click -> {
+            AlertDialog.Builder alert = new AlertDialog.Builder(ApproveCurrentOrder.this);
+            alert.setTitle("Customisation").setMessage("User has added following customisation to his/her order made\n\n\n" + customisation).setPositiveButton("Exit", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    dialogInterface.dismiss();
+                }
+            }).create();
+
+            alert.show();
         });
 
         approve.setOnClickListener(new View.OnClickListener() {

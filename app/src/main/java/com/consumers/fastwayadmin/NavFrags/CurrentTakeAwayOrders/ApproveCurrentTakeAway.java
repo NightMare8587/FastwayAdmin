@@ -81,6 +81,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
     String userName,userEmail;
     String paymentMode;
     String genratedToken;
+    String customisation;
     String testPayoutToken = "https://intercellular-stabi.000webhostapp.com/CheckoutPayouts/testToken.php";
     String testBearerToken = "https://intercellular-stabi.000webhostapp.com/CheckoutPayouts/test/testBearerToken.php";
     String testPaymentToVendor = "https://intercellular-stabi.000webhostapp.com/CheckoutPayouts/test/testPayment.php";
@@ -96,6 +97,8 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
     String digitCode;
     String time;
     ListView listView,dishNames,halfOrList;
+    Button showCustom;
+    DatabaseReference checkForCustomisation;
     String id,orderId,orderAmount;
     String URL = "https://fcm.googleapis.com/fcm/send";
     String state;
@@ -104,6 +107,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_approve_current_take_away);
         id = getIntent().getStringExtra("id");
+        showCustom = findViewById(R.id.showCustomisationCurrentTakeaway);
         bmp = BitmapFactory.decodeResource(getResources(), R.drawable.logo);
         scaled = Bitmap.createScaledBitmap(bmp,500,500,false);
         bmp1 = BitmapFactory.decodeResource(getResources(), R.drawable.orderdeclined);
@@ -112,6 +116,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
         state = sharedPreferences.getString("state","");
         saveRefundInfo = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(id);
         orderAmount = getIntent().getStringExtra("orderAmount");
+        customisation = getIntent().getStringExtra("customisation");
         orderId = getIntent().getStringExtra("orderID");
         time = getIntent().getStringExtra("time");
         paymentMode = getIntent().getStringExtra("payment");
@@ -124,6 +129,43 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
         halfOrList = findViewById(R.id.halfOrTakeAwayListView);
         dishNames = findViewById(R.id.DishNamesTakeAwayListView);
         approve = findViewById(R.id.approveTakeAwayButton);
+//        checkForCustomisation = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid())).child("Current TakeAway");
+//        checkForCustomisation.addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//
+//            }
+//        });
+
+        showCustom.setOnClickListener(click -> {
+            AlertDialog.Builder alert = new AlertDialog.Builder(ApproveCurrentTakeAway.this);
+            alert.setTitle("Customisation").setMessage("User has requested for following customisation to his/her order\n\n\n" + customisation).setPositiveButton("Exit", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    dialogInterface.dismiss();
+                }
+            }).create();
+
+            alert.show();
+        });
+
+        if(!customisation.equals("")){
+            AlertDialog.Builder alert = new AlertDialog.Builder(ApproveCurrentTakeAway.this);
+            alert.setTitle("Customisation").setMessage("User has requested for following customisation to his/her order\n\n\n" + customisation).setPositiveButton("Exit", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    dialogInterface.dismiss();
+                    showCustom.setVisibility(View.VISIBLE);
+                }
+            }).create();
+
+            alert.show();
+        }
         DatabaseReference totalOrders = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
 
         DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(id);

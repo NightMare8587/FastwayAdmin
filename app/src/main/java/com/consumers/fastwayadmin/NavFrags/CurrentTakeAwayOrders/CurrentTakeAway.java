@@ -3,6 +3,7 @@ package com.consumers.fastwayadmin.NavFrags.CurrentTakeAwayOrders;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.text.Layout;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,14 +25,16 @@ public class CurrentTakeAway extends RecyclerView.Adapter<CurrentTakeAway.Holder
     List<List<String>> finalHalfOr = new ArrayList<>();
     List<String> currentTakeAwayAuth = new ArrayList<>();
     List<String> finalUserNames = new ArrayList<>();
+    List<String> customisationList = new ArrayList<>();
     List<String> orderId = new ArrayList<>();
     List<String> orderAmount = new ArrayList<>();
     List<String> time;
 
-    public CurrentTakeAway(List<List<String>> finalDishNames, List<List<String>> finalDishQuantity, List<List<String>> finalHalfOr, List<String> finalUserNames, List<String> finalPayment,List<String> orderId,List<String> orderAmount,List<String> currentTakeAwayAuth,List<String> time) {
+    public CurrentTakeAway(List<List<String>> finalDishNames, List<List<String>> finalDishQuantity, List<List<String>> finalHalfOr, List<String> finalUserNames, List<String> finalPayment,List<String> orderId,List<String> orderAmount,List<String> currentTakeAwayAuth,List<String> time,List<String> customisationList) {
         this.finalDishNames = finalDishNames;
         this.finalDishQuantity = finalDishQuantity;
         this.finalHalfOr = finalHalfOr;
+        this.customisationList = customisationList;
         this.time = time;
         this.finalUserNames = finalUserNames;
         this.orderAmount = orderAmount;
@@ -81,6 +84,8 @@ public class CurrentTakeAway extends RecyclerView.Adapter<CurrentTakeAway.Holder
                 intent.putExtra("payment",finalPayment.get(position));
                 intent.putExtra("time",time.get(position));
                 intent.putExtra("orderAmount",orderAmount.get(position));
+                intent.putExtra("customisation",customisationList.get(position));
+                Log.i("log",customisationList.get(position));
                 view.getContext().startActivity(intent);
             }
         });
