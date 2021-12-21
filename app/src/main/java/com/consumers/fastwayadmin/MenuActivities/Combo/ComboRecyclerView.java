@@ -32,9 +32,9 @@ import java.util.List;
 import java.util.Objects;
 
 public class ComboRecyclerView extends RecyclerView.Adapter<ComboRecyclerView.Holder> {
-    List<String> comboName = new ArrayList<>();
-    List<List<String>> dishName = new ArrayList<>();
-    List<String> price = new ArrayList<>();
+    List<String> comboName;
+    List<List<String>> dishName;
+    List<String> price;
     List<String> comboImage;
     Context context;
 
