@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,6 +50,7 @@ public class TablesFrag extends Fragment {
     List<String> tableNumber = new ArrayList<>();
     List<String> status  = new ArrayList<>();
     List<String> timeInMillis  = new ArrayList<>();
+    List<String> timeOfBooking  = new ArrayList<>();
     RecyclerView table;
     int count = 0;
     boolean pressed = false;
@@ -101,6 +103,7 @@ public class TablesFrag extends Fragment {
                 if(snapshot.exists()){
                     HashMap<String,List<String>> map = new HashMap<>();
                     timeInMillis.clear();
+                    timeOfBooking.clear();
                     for(DataSnapshot dataSnapshot : snapshot.getChildren()){
                         tableNumber.add(Objects.requireNonNull(dataSnapshot.child("tableNum").getValue()).toString());
                         status.add(dataSnapshot.child("status").getValue().toString());
@@ -110,12 +113,17 @@ public class TablesFrag extends Fragment {
                             list.add(String.valueOf(dataSnapshot.child("customerId").getValue()));
                             list.add(String.valueOf(dataSnapshot.child("time").getValue()));
                             map.put(String.valueOf(dataSnapshot.child("tableNum").getValue(String.class)), list);
-                            if(dataSnapshot.hasChild("timeInMillis"))
+                            if(dataSnapshot.hasChild("timeInMillis")) {
                                 timeInMillis.add(String.valueOf(dataSnapshot.child("timeInMillis").getValue()));
-                            else timeInMillis.add("");
+                                timeOfBooking.add(String.valueOf(dataSnapshot.child("timeOfBooking").getValue()));
+                            }
+                            else {
+                                timeInMillis.add("");
+                                timeOfBooking.add("");
+                            }
                         }
                     }
-                    tableView = new TableView(tableNumber,status,map,getContext(),timeInMillis);
+                    tableView = new TableView(tableNumber,status,map,getContext(),timeInMillis,timeOfBooking);
                     table.setAdapter(tableView);
                     tableView.notifyDataSetChanged();
 
@@ -170,6 +178,7 @@ public class TablesFrag extends Fragment {
                     if(snapshot.exists()){
                         tableNumber.clear();
                         status.clear();
+                        timeOfBooking.clear();
                         timeInMillis.clear();
                         HashMap<String,List<String>> map = new HashMap<>();
                         for(DataSnapshot dataSnapshot : snapshot.getChildren()) {
@@ -180,12 +189,19 @@ public class TablesFrag extends Fragment {
                                 list.add(String.valueOf(dataSnapshot.child("customerId").getValue()));
                                 list.add(String.valueOf(dataSnapshot.child("time").getValue()));
                                 map.put(String.valueOf(dataSnapshot.child("tableNum").getValue(String.class)), list);
-                                if(dataSnapshot.hasChild("timeInMillis"))
+                                if (dataSnapshot.hasChild("timeInMillis")) {
                                     timeInMillis.add(String.valueOf(dataSnapshot.child("timeInMillis").getValue()));
-                                else timeInMillis.add("");
+                                    timeOfBooking.add(String.valueOf(dataSnapshot.child("timeOfBooking").getValue()));
+                                } else {
+                                    timeInMillis.add("");
+                                    timeOfBooking.add("");
+                                }
+                            } else {
+                                timeOfBooking.add("");
+                                timeInMillis.add("");
                             }
                         }
-                        tableView = new TableView(tableNumber,status,map,getContext(),timeInMillis);
+                        tableView = new TableView(tableNumber,status,map,getContext(),timeInMillis,timeOfBooking);
                         table.setAdapter(tableView);
                         tableView.notifyDataSetChanged();
 
@@ -214,6 +230,7 @@ public class TablesFrag extends Fragment {
                 if(snapshot.exists()){
                     tableNumber.clear();
                     status.clear();
+                    timeOfBooking.clear();
                     timeInMillis.clear();
                     HashMap<String,List<String>> map = new HashMap<>();
                     for(DataSnapshot dataSnapshot : snapshot.getChildren()) {
@@ -224,14 +241,22 @@ public class TablesFrag extends Fragment {
                             list.add(String.valueOf(dataSnapshot.child("customerId").getValue()));
                             list.add(String.valueOf(dataSnapshot.child("time").getValue()));
                             map.put(String.valueOf(dataSnapshot.child("tableNum").getValue(String.class)), list);
-                            if(dataSnapshot.hasChild("timeInMillis"))
+                            if(dataSnapshot.hasChild("timeInMillis")) {
                                 timeInMillis.add(String.valueOf(dataSnapshot.child("timeInMillis").getValue()));
-                            else timeInMillis.add("");
-                        }else
+                                timeOfBooking.add(String.valueOf(dataSnapshot.child("timeOfBooking").getValue()));
+                            }
+                            else {
+                                timeInMillis.add("");
+                                timeOfBooking.add("");
+                            }
+                        }else {
                             timeInMillis.add("");
+                            timeOfBooking.add("");
+                        }
                     }
-                    tableView = new TableView(tableNumber,status,map,getContext(),timeInMillis);
+                    tableView = new TableView(tableNumber,status,map,getContext(),timeInMillis,timeOfBooking);
                     table.setAdapter(tableView);
+                    Log.i("info",timeOfBooking.toString());
                     tableView.notifyDataSetChanged();
 
                 }
@@ -264,12 +289,17 @@ public class TablesFrag extends Fragment {
                                 list.add(String.valueOf(dataSnapshot.child("customerId").getValue()));
                                 list.add(String.valueOf(dataSnapshot.child("time").getValue()));
                                 map.put(String.valueOf(dataSnapshot.child("tableNum").getValue(String.class)), list);
-                                if(dataSnapshot.hasChild("timeInMillis"))
+                                if(dataSnapshot.hasChild("timeInMillis")) {
                                     timeInMillis.add(String.valueOf(dataSnapshot.child("timeInMillis").getValue()));
-                                else timeInMillis.add("");
+                                    timeOfBooking.add(String.valueOf(dataSnapshot.child("timeOfBooking").getValue()));
+                                }
+                                else {
+                                    timeInMillis.add("");
+                                    timeOfBooking.add("");
+                                }
                             }
                         }
-                        tableView = new TableView(tableNumber,status,map,getContext(),timeInMillis);
+                        tableView = new TableView(tableNumber,status,map,getContext(),timeInMillis,timeOfBooking);
                         table.setAdapter(tableView);
                         tableView.notifyDataSetChanged();
 

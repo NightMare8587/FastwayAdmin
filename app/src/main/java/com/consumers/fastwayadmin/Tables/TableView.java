@@ -55,16 +55,18 @@ import java.util.Objects;
 public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
     List<String> tables;
     List<String> status;
+    List<String> timeOfBooking;
     HashMap<String,List<String>> map;
     List<String> timeInMillis;
     String URL = "https://fcm.googleapis.com/fcm/send";
     DatabaseReference reference;
     Context context;
     FirebaseAuth auth;
-    public TableView(List<String> tables,List<String> status,HashMap<String,List<String>> map,Context context,List<String> timeInMillis){
+    public TableView(List<String> tables,List<String> status,HashMap<String,List<String>> map,Context context,List<String> timeInMillis,List<String> timeOfBooking){
         this.status = status;
         this.map = map;
         this.timeInMillis = timeInMillis;
+        this.timeOfBooking = timeOfBooking;
         this.tables = tables;
         this.context = context;
     }
@@ -151,6 +153,7 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
                                     } catch (Exception e) {
                                         Toast.makeText(view.getContext(), e.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
                                     }
+
                                     reference.child(tables.get(position)).child("customerId").removeValue();
                                     reference.child(tables.get(position)).child("status").setValue("available");
 //                                    reference.child(tables.get(position)).child("time").removeValue();
@@ -241,34 +244,71 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
                                 if(!editText.getText().toString().equals("")) {
                                     RequestQueue requestQueue = Volley.newRequestQueue(view.getContext());
                                     JSONObject main = new JSONObject();
-                                    try {
-                                        main.put("to", "/topics/" + myList.get(0) + "");
-                                        JSONObject notification = new JSONObject();
-                                        notification.put("title", "Reserved Table Cancelled");
-                                        notification.put("click_action", "Table Frag");
-                                        notification.put("body", "Your Reserved Tables is cancelled by the owner\n" + editText.getText().toString() + "");
-                                        main.put("notification", notification);
-                                        dialogInterface.dismiss();
-                                        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, main, new Response.Listener<JSONObject>() {
-                                            @Override
-                                            public void onResponse(JSONObject response) {
+                                    long currentTime = System.currentTimeMillis();
+                                    long bookingTime = Long.parseLong(timeOfBooking.get(position));
+                                    if(currentTime - bookingTime >= 3600000){
 
-                                            }
-                                        }, error -> Toast.makeText(view.getContext(), error.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show()) {
-                                            @Override
-                                            public Map<String, String> getHeaders() {
-                                                Map<String, String> header = new HashMap<>();
-                                                header.put("content-type", "application/json");
-                                                header.put("authorization", "key=AAAAsigSEMs:APA91bEUF9ZFwIu84Jctci56DQd0TQOepztGOIKIBhoqf7N3ueQrkClw0xBTlWZEWyvwprXZmZgW2MNywF1pNBFpq1jFBr0CmlrJ0wygbZIBOnoZ0jP1zZC6nPxqF2MAP6iF3wuBHD2R");
-                                                return header;
-                                            }
-                                        };
+                                        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(myList.get(0));
+                                        databaseReference.child("CompensationCoupon").child("value").setValue("70");
 
-                                        requestQueue.add(jsonObjectRequest);
-                                    } catch (Exception e) {
-                                        Toast.makeText(view.getContext(), e.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
+                                        try {
+                                            main.put("to", "/topics/" + myList.get(0) + "");
+                                            JSONObject notification = new JSONObject();
+                                            notification.put("title", "Reserved Table Cancelled");
+                                            notification.put("click_action", "Table Frag");
+                                            notification.put("body", "Your Reserved Tables is cancelled by the owner\n" + editText.getText().toString() + "\n" + "You have been provided with 70% discount coupon which you can use on your next order :)");
+                                            main.put("notification", notification);
+                                            dialogInterface.dismiss();
+                                            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, main, new Response.Listener<JSONObject>() {
+                                                @Override
+                                                public void onResponse(JSONObject response) {
+
+                                                }
+                                            }, error -> Toast.makeText(view.getContext(), error.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show()) {
+                                                @Override
+                                                public Map<String, String> getHeaders() {
+                                                    Map<String, String> header = new HashMap<>();
+                                                    header.put("content-type", "application/json");
+                                                    header.put("authorization", "key=AAAAsigSEMs:APA91bEUF9ZFwIu84Jctci56DQd0TQOepztGOIKIBhoqf7N3ueQrkClw0xBTlWZEWyvwprXZmZgW2MNywF1pNBFpq1jFBr0CmlrJ0wygbZIBOnoZ0jP1zZC6nPxqF2MAP6iF3wuBHD2R");
+                                                    return header;
+                                                }
+                                            };
+
+                                            requestQueue.add(jsonObjectRequest);
+                                        } catch (Exception e) {
+                                            Toast.makeText(view.getContext(), e.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }else {
+                                        try {
+                                            main.put("to", "/topics/" + myList.get(0) + "");
+                                            JSONObject notification = new JSONObject();
+                                            notification.put("title", "Reserved Table Cancelled");
+                                            notification.put("click_action", "Table Frag");
+                                            notification.put("body", "Your Reserved Tables is cancelled by the owner\n" + editText.getText().toString() + "");
+                                            main.put("notification", notification);
+                                            dialogInterface.dismiss();
+                                            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, main, new Response.Listener<JSONObject>() {
+                                                @Override
+                                                public void onResponse(JSONObject response) {
+
+                                                }
+                                            }, error -> Toast.makeText(view.getContext(), error.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show()) {
+                                                @Override
+                                                public Map<String, String> getHeaders() {
+                                                    Map<String, String> header = new HashMap<>();
+                                                    header.put("content-type", "application/json");
+                                                    header.put("authorization", "key=AAAAsigSEMs:APA91bEUF9ZFwIu84Jctci56DQd0TQOepztGOIKIBhoqf7N3ueQrkClw0xBTlWZEWyvwprXZmZgW2MNywF1pNBFpq1jFBr0CmlrJ0wygbZIBOnoZ0jP1zZC6nPxqF2MAP6iF3wuBHD2R");
+                                                    return header;
+                                                }
+                                            };
+
+                                            requestQueue.add(jsonObjectRequest);
+                                        } catch (Exception e) {
+                                            Toast.makeText(view.getContext(), e.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
+                                        }
                                     }
                                     FirebaseAuth auth = FirebaseAuth.getInstance();
+
                                     DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(myList.get(0)).child("Reserve Tables").child(auth.getUid());
                                     databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                                         @Override
