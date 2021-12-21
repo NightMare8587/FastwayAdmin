@@ -14,6 +14,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -30,6 +31,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -135,7 +137,17 @@ public class DishView extends RecyclerView.Adapter<DishView.DishAdapter> {
             holder.removeOffers.setVisibility(View.INVISIBLE);
         }
         if(!image.get(position).equals(""))
-        Picasso.get().load(image.get(position)).centerCrop().resize(100,100).into(holder.imageView);
+        Picasso.get().load(image.get(position)).centerCrop().resize(100,100).into(holder.imageView, new Callback() {
+            @Override
+            public void onSuccess() {
+                holder.progressBar.setVisibility(View.INVISIBLE);
+            }
+
+            @Override
+            public void onError(Exception e) {
+                holder.progressBar.setVisibility(View.INVISIBLE);
+            }
+        });
         else
             Picasso.get().load("https://image.shutterstock.com/image-vector/no-image-vector-isolated-on-600w-1481369594.jpg").centerCrop().resize(100, 100).into(holder.imageView);
 
@@ -286,12 +298,14 @@ public class DishView extends RecyclerView.Adapter<DishView.DishAdapter> {
         ImageView imageView;
         CardView cardView;
         Button removeOffers;
+        ProgressBar progressBar;
         CheckBox checkBox;
         public DishAdapter(@NonNull View itemView) {
             super(itemView);
             imageView = itemView.findViewById(R.id.displayDishImage);
             name = itemView.findViewById(R.id.DishName);
             price = itemView.findViewById(R.id.pricePfDish);
+            progressBar = itemView.findViewById(R.id.dishCardViewProgressBAr);
             cardView = itemView.findViewById(R.id.myCard);
             available = itemView.findViewById(R.id.availableOr);
             discountPrice = itemView.findViewById(R.id.discountedPrice);
