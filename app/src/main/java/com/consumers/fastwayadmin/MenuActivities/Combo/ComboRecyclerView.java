@@ -37,7 +37,6 @@ public class ComboRecyclerView extends RecyclerView.Adapter<ComboRecyclerView.Ho
     List<String> price;
     List<String> comboImage;
     Context context;
-
     public ComboRecyclerView(List<String> comboName, List<List<String>> dishName, List<String> price, Context context,List<String> comboImage) {
         this.comboName = comboName;
         this.comboImage = comboImage;
