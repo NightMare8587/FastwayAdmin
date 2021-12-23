@@ -15,6 +15,8 @@ import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -90,6 +92,7 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
         holder.tableNum.setText("Table Number : " + tables.get(position));
         holder.status.setText(status.get(position));
         if(status.get(position).equals("unavailable")){
+            holder.checkBox.setVisibility(View.INVISIBLE);
             List<String> myList = map.get(""+tables.get(position));
             holder.chatWith.setVisibility(View.VISIBLE);
             holder.cancel.setVisibility(View.VISIBLE);
@@ -177,7 +180,41 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
 
             });
         }
+
+
+        if(status.get(position).equals("available")){
+            holder.checkBox.setChecked(true);
+            holder.checkBox.setText("Enabled");
+            holder.checkBox.setVisibility(View.VISIBLE);
+
+        }
+
+        if(status.get(position).equals("NotAvailable")){
+            holder.checkBox.setChecked(false);
+            holder.checkBox.setText("Disabled");
+            holder.checkBox.setVisibility(View.VISIBLE);
+
+        }
+
+        holder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                SharedPreferences sharedPreferences = compoundButton.getContext().getSharedPreferences("loginInfo",Context.MODE_PRIVATE);
+                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid())).child("Tables").child(tables.get(position));
+                if(b){
+                    databaseReference.child("status").setValue("available");
+                    holder.checkBox.setText("Enabled");
+                }else{
+                    databaseReference.child("status").setValue("NotAvailable");
+                    holder.checkBox.setText("Disabled");
+                }
+            }
+        });
+
+
+
         if(status.get(position).equals("Reserved")){
+            holder.checkBox.setVisibility(View.INVISIBLE);
             List<String> myList = map.get(""+tables.get(position));
             holder.cardView.setOnLongClickListener(click -> {
                 AlertDialog.Builder alert = new AlertDialog.Builder(click.getContext());
@@ -327,6 +364,7 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
                                     reference.child(tables.get(position)).child("status").setValue("available");
                                     reference.child(tables.get(position)).child("time").removeValue();
                                     reference.child(tables.get(position)).child("timeInMillis").removeValue();
+                                    reference.child(tables.get(position)).child("timeOfBooking").removeValue();
 //                                    reference.child(tables.get(position)).child("time").removeValue();
                                     holder.chatWith.setVisibility(View.INVISIBLE);
                                     holder.cancel.setVisibility(View.INVISIBLE);
@@ -336,7 +374,7 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
                                 }
                             });
                             alertD.setNegativeButton("No, Wait", (dialogInterface, i) -> {
-
+                                dialogInterface.dismiss();
                             });
 
                             alertD.create().show();
@@ -550,6 +588,7 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
     public static class TableAdapter extends RecyclerView.ViewHolder{
         TextView tableNum,status,chatWith,cancel,timeOfReserved;
         CardView cardView;
+        CheckBox checkBox;
         public TableAdapter(@NonNull View itemView) {
             super(itemView);
             tableNum = itemView.findViewById(R.id.numberOfTable);
@@ -558,6 +597,7 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
             cardView = itemView.findViewById(R.id.adminTableCardView);
             cancel = itemView.findViewById(R.id.cancelSeat);
             timeOfReserved = itemView.findViewById(R.id.timeOfReservedTable);
+            checkBox = itemView.findViewById(R.id.enabledTableCheckBox);
         }
     }
 }
