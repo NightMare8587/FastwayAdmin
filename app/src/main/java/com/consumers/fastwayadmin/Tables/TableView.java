@@ -49,6 +49,8 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,15 +60,17 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
     List<String> tables;
     List<String> status;
     List<String> timeOfBooking;
+    List<String> timeOfUnavailability;
     HashMap<String,List<String>> map;
     List<String> timeInMillis;
     String URL = "https://fcm.googleapis.com/fcm/send";
     DatabaseReference reference;
     Context context;
     FirebaseAuth auth;
-    public TableView(List<String> tables,List<String> status,HashMap<String,List<String>> map,Context context,List<String> timeInMillis,List<String> timeOfBooking){
+    public TableView(List<String> tables,List<String> status,HashMap<String,List<String>> map,Context context,List<String> timeInMillis,List<String> timeOfBooking,List<String> timeOfUnavailability){
         this.status = status;
         this.map = map;
+        this.timeOfUnavailability = timeOfUnavailability;
         this.timeInMillis = timeInMillis;
         this.timeOfBooking = timeOfBooking;
         this.tables = tables;
@@ -95,6 +99,10 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
             holder.checkBox.setVisibility(View.INVISIBLE);
             List<String> myList = map.get(""+tables.get(position));
             holder.chatWith.setVisibility(View.VISIBLE);
+            holder.timeOfReserved.setVisibility(View.VISIBLE);
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("hh:mm:ss");
+            Date date = new Date(Long.parseLong(timeOfUnavailability.get(position)));
+            holder.timeOfReserved.setText(simpleDateFormat.format(date) + "");
             holder.cancel.setVisibility(View.VISIBLE);
 //            holder.timeOfReserved.setVisibility(View.VISIBLE);
 //            holder.timeOfReserved.setText(myList.get(1)+"");
@@ -158,6 +166,7 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
                                     }
 
                                     reference.child(tables.get(position)).child("customerId").removeValue();
+                                    reference.child(tables.get(position)).child("timeOfUnavailability").removeValue();
                                     reference.child(tables.get(position)).child("status").setValue("available");
 //                                    reference.child(tables.get(position)).child("time").removeValue();
                                     holder.chatWith.setVisibility(View.INVISIBLE);
@@ -193,7 +202,6 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
             holder.checkBox.setChecked(false);
             holder.checkBox.setText("Disabled");
             holder.checkBox.setVisibility(View.VISIBLE);
-
         }
 
         holder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {

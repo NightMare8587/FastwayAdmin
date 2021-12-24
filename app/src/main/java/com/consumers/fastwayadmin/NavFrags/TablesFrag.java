@@ -51,6 +51,7 @@ public class TablesFrag extends Fragment {
     List<String> status  = new ArrayList<>();
     List<String> timeInMillis  = new ArrayList<>();
     List<String> timeOfBooking  = new ArrayList<>();
+    List<String> timeOfUnavailability  = new ArrayList<>();
     RecyclerView table;
     int count = 0;
     boolean pressed = false;
@@ -104,6 +105,7 @@ public class TablesFrag extends Fragment {
                     HashMap<String,List<String>> map = new HashMap<>();
                     timeInMillis.clear();
                     timeOfBooking.clear();
+                    timeOfUnavailability.clear();
                     for(DataSnapshot dataSnapshot : snapshot.getChildren()){
                         tableNumber.add(Objects.requireNonNull(dataSnapshot.child("tableNum").getValue()).toString());
                         status.add(dataSnapshot.child("status").getValue().toString());
@@ -121,9 +123,14 @@ public class TablesFrag extends Fragment {
                                 timeInMillis.add("");
                                 timeOfBooking.add("");
                             }
+
+                            if(dataSnapshot.hasChild("timeOfUnavailability")){
+                                timeOfUnavailability.add(String.valueOf(dataSnapshot.child("timeOfUnavailability").getValue()));
+                            }else
+                                timeOfUnavailability.add("");
                         }
                     }
-                    tableView = new TableView(tableNumber,status,map,getContext(),timeInMillis,timeOfBooking);
+                    tableView = new TableView(tableNumber,status,map,getContext(),timeInMillis,timeOfBooking,timeOfUnavailability);
                     table.setAdapter(tableView);
                     tableView.notifyDataSetChanged();
 
@@ -180,6 +187,7 @@ public class TablesFrag extends Fragment {
                         status.clear();
                         timeOfBooking.clear();
                         timeInMillis.clear();
+                        timeOfUnavailability.clear();
                         HashMap<String,List<String>> map = new HashMap<>();
                         for(DataSnapshot dataSnapshot : snapshot.getChildren()) {
                             tableNumber.add(Objects.requireNonNull(dataSnapshot.child("tableNum").getValue()).toString());
@@ -196,12 +204,18 @@ public class TablesFrag extends Fragment {
                                     timeInMillis.add("");
                                     timeOfBooking.add("");
                                 }
+
+                                if(dataSnapshot.hasChild("timeOfUnavailability")){
+                                    timeOfUnavailability.add(String.valueOf(dataSnapshot.child("timeOfUnavailability").getValue()));
+                                }else
+                                    timeOfUnavailability.add("");
                             } else {
                                 timeOfBooking.add("");
                                 timeInMillis.add("");
+                                timeOfUnavailability.add("");
                             }
                         }
-                        tableView = new TableView(tableNumber,status,map,getContext(),timeInMillis,timeOfBooking);
+                        tableView = new TableView(tableNumber,status,map,getContext(),timeInMillis,timeOfBooking,timeOfUnavailability);
                         table.setAdapter(tableView);
                         tableView.notifyDataSetChanged();
 
@@ -229,11 +243,13 @@ public class TablesFrag extends Fragment {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.exists()){
                     tableNumber.clear();
+                    timeOfUnavailability.clear();
                     status.clear();
                     timeOfBooking.clear();
                     timeInMillis.clear();
                     HashMap<String,List<String>> map = new HashMap<>();
                     for(DataSnapshot dataSnapshot : snapshot.getChildren()) {
+
                         tableNumber.add(Objects.requireNonNull(dataSnapshot.child("tableNum").getValue()).toString());
                         status.add(dataSnapshot.child("status").getValue().toString());
                         if (dataSnapshot.hasChild("customerId")) {
@@ -249,12 +265,18 @@ public class TablesFrag extends Fragment {
                                 timeInMillis.add("");
                                 timeOfBooking.add("");
                             }
+
+                            if(dataSnapshot.hasChild("timeOfUnavailability")){
+                                timeOfUnavailability.add(dataSnapshot.child("timeOfUnavailability").getValue(String.class));
+                            }else
+                                timeOfUnavailability.add("");
                         }else {
                             timeInMillis.add("");
                             timeOfBooking.add("");
+                            timeOfUnavailability.add("");
                         }
                     }
-                    tableView = new TableView(tableNumber,status,map,getContext(),timeInMillis,timeOfBooking);
+                    tableView = new TableView(tableNumber,status,map,getContext(),timeInMillis,timeOfBooking,timeOfUnavailability);
                     table.setAdapter(tableView);
                     Log.i("info",timeOfBooking.toString());
                     tableView.notifyDataSetChanged();
@@ -299,7 +321,7 @@ public class TablesFrag extends Fragment {
                                 }
                             }
                         }
-                        tableView = new TableView(tableNumber,status,map,getContext(),timeInMillis,timeOfBooking);
+                        tableView = new TableView(tableNumber,status,map,getContext(),timeInMillis,timeOfBooking,timeOfUnavailability);
                         table.setAdapter(tableView);
                         tableView.notifyDataSetChanged();
 
