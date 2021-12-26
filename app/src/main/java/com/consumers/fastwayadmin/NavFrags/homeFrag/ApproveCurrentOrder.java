@@ -70,6 +70,9 @@ import java.util.Objects;
 import java.util.Random;
 
 public class ApproveCurrentOrder extends AppCompatActivity {
+    List<String> dishNamePdf;
+    List<String> dishPricePdf;
+    List<String> timesDishOrderedPdf;
     DatabaseReference databaseReference;
     FirebaseAuth auth = FirebaseAuth.getInstance();
     ListView listView,halfOrList;
@@ -148,6 +151,9 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                 }
                 progressBar.setVisibility(View.INVISIBLE);
                 uploadToArrayAdapter(dishNames,dishQuantity,dishHalfOr);
+
+                dishNamePdf = new ArrayList<>(dishNames);
+
 
                 if(!customisation.equals("")){
                     AlertDialog.Builder alert = new AlertDialog.Builder(ApproveCurrentOrder.this);
