@@ -254,6 +254,7 @@ public class Info extends AppCompatActivity {
         infoRef.child("count").setValue("0");
         infoRef.child("status").setValue("online");
         infoRef.child("acceptingOrders").setValue("yes");
+        infoRef.child("totalReports").setValue("0");
         clientsLocation.removeLocationUpdates(mLocationCallback);
         AlertDialog.Builder alert = new AlertDialog.Builder(Info.this);
         alert.setTitle("Images");
