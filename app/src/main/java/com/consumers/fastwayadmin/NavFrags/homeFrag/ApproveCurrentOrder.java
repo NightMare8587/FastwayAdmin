@@ -71,8 +71,6 @@ import java.util.Random;
 
 public class ApproveCurrentOrder extends AppCompatActivity {
     List<String> dishNamePdf;
-    List<String> dishPricePdf;
-    List<String> timesDishOrderedPdf;
     DatabaseReference databaseReference;
     FirebaseAuth auth = FirebaseAuth.getInstance();
     ListView listView,halfOrList;
