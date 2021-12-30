@@ -200,7 +200,6 @@ public class MyOrdersTransactions extends AppCompatActivity {
                                     daysList.add(days);
                                     Log.i("value",totalAmount + "");
                                     count++;
-
                                     if(amountList.size() == time.size()){
                                         fastDialog.dismiss();
                                         Log.i("infoMap",transactionID.toString());
