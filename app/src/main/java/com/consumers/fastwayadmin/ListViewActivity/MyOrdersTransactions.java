@@ -4,6 +4,8 @@ import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -68,6 +70,7 @@ public class MyOrdersTransactions extends AppCompatActivity {
     SharedPreferences sharedPreferences;
     String currentTransID;
     List<String> transID = new ArrayList<>();
+    final Handler handler = new Handler(Looper.getMainLooper());
     FirebaseAuth auth = FirebaseAuth.getInstance();
     DatabaseReference reference;
     String testPayoutToken = "https://intercellular-stabi.000webhostapp.com/CheckoutPayouts/testToken.php";
@@ -170,6 +173,23 @@ public class MyOrdersTransactions extends AppCompatActivity {
 
         @Override
         protected Void doInBackground(Void... voids) {
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    KAlertDialog kAlertDialog =  new KAlertDialog(MyOrdersTransactions.this,KAlertDialog.ERROR_TYPE)
+                            .setTitleText("Error")
+                            .setContentText("Server Time Out\nTry again later :)")
+                            .setConfirmText("Exit")
+                            .setConfirmClickListener(click -> {
+                                fastDialog.dismiss();
+                                click.dismissWithAnimation();
+                                finish();
+                            });
+
+                    kAlertDialog.setCancelable(false);
+                    kAlertDialog.show();
+                }
+            },15000);
             List<String> transactionID = new ArrayList<>();
             HashMap<String,String> amountMap = new HashMap<>();
             RequestQueue requestQueue = Volley.newRequestQueue(MyOrdersTransactions.this);
@@ -215,6 +235,7 @@ public class MyOrdersTransactions extends AppCompatActivity {
                                         Log.i("infoMap",amountMap.toString());
                                         Log.i("infoMap",timeMap.toString());
                                         showAllTransactions.setVisibility(View.VISIBLE);
+                                        handler.removeCallbacksAndMessages(null);
                                         Log.i("infoMap",allTransID.toString());
                                         recyclerView.setLayoutManager(new LinearLayoutManager(MyOrdersTransactions.this));
                                         recyclerView.setAdapter(new MyOrderAdapter(amount,allTimeID,transactionID,status,MyOrdersTransactions.this,totalAmount,days,map,amountMap,timeMap));
@@ -223,6 +244,7 @@ public class MyOrdersTransactions extends AppCompatActivity {
                                     if(amountList.size() == time.size()){
                                         numberOfTransactions.setText("Transactions: " + days);
                                         earningAmount.setText("\u20B9" + totalAmount);
+
                                     }
                                 }
                             }, new Response.ErrorListener() {
