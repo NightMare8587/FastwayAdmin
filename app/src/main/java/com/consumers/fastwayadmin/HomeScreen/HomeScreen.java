@@ -190,6 +190,7 @@ public class HomeScreen extends AppCompatActivity {
                                             databaseReference.child(tableNum).child("customerId").removeValue();
                                             databaseReference.child(tableNum).child("time").removeValue();
                                             databaseReference.child(tableNum).child("timeInMillis").removeValue();
+                                            databaseReference.child(tableNum).child("timeOfBooking").removeValue();
                                             databaseReference.child(tableNum).child("status").setValue("available");
                                             DatabaseReference removeFromUser = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(id).child("Reserve Tables").child(auth.getUid());
                                             removeFromUser.child(Objects.requireNonNull(dataSnapshot.getKey())).removeValue();

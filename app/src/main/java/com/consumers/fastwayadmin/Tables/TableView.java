@@ -397,6 +397,105 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
         }
 
 
+        if(status.get(position).equals("MultipleReserved")){
+            holder.checkBox.setVisibility(View.INVISIBLE);
+            List<String> myList = map.get(""+tables.get(position));
+            holder.chatWith.setVisibility(View.VISIBLE);
+            holder.cancel.setVisibility(View.VISIBLE);
+            holder.timeOfReserved.setVisibility(View.VISIBLE);
+            assert myList != null;
+            holder.timeOfReserved.setText(myList.get(1)+"");
+            holder.chatWith.setOnClickListener(view -> {
+                Intent intent = new Intent(view.getContext(),ChatWithCustomer.class);
+                intent.putExtra("id",myList.get(0));
+                view.getContext().startActivity(intent);
+            });
+            holder.cancel.setOnClickListener(view -> {
+                SharedPreferences sharedPreferences = view.getContext().getSharedPreferences("loginInfo",Context.MODE_PRIVATE);
+                reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid())).child("Tables");
+                new KAlertDialog(view.getContext(),KAlertDialog.WARNING_TYPE)
+                        .setTitleText("Warning!!!")
+                        .setContentText("Do you sure wanna remove this Multiple reserved table??")
+                        .setCancelText("No")
+                        .setCancelClickListener(KAlertDialog::dismissWithAnimation)
+                        .setConfirmText("Yes")
+                        .setConfirmClickListener(kAlertDialog -> {
+                            kAlertDialog.dismissWithAnimation();
+                            AlertDialog.Builder alertD = new AlertDialog.Builder(view.getContext());
+                            alertD.setTitle("Important");
+                            alertD.setMessage("Enter reason for cancellation of table below");
+                            LinearLayout linearLayout = new LinearLayout(view.getContext());
+                            EditText editText = new EditText(view.getContext());
+                            linearLayout.setOrientation(LinearLayout.VERTICAL);
+                            editText.setHint("Enter reason here");
+                            linearLayout.addView(editText);
+                            alertD.setView(linearLayout);
+                            alertD.setPositiveButton("Proceed", (dialogInterface, i) -> {
+                                if(!editText.getText().toString().equals("")) {
+                                    RequestQueue requestQueue = Volley.newRequestQueue(view.getContext());
+                                    JSONObject main = new JSONObject();
+                                    long currentTime = System.currentTimeMillis();
+                                    long bookingTime = Long.parseLong(timeOfBooking.get(position));
+                                        try {
+                                            main.put("to", "/topics/" + myList.get(0) + "");
+                                            JSONObject notification = new JSONObject();
+                                            notification.put("title", "Multiple Reserved Table Cancelled");
+                                            notification.put("click_action", "Table Frag");
+                                            notification.put("body", "Your Reserved Tables are cancelled by the owner\n" + editText.getText().toString() + "");
+                                            main.put("notification", notification);
+                                            dialogInterface.dismiss();
+                                            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, main, new Response.Listener<JSONObject>() {
+                                                @Override
+                                                public void onResponse(JSONObject response) {
+
+                                                }
+                                            }, error -> Toast.makeText(view.getContext(), error.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show()) {
+                                                @Override
+                                                public Map<String, String> getHeaders() {
+                                                    Map<String, String> header = new HashMap<>();
+                                                    header.put("content-type", "application/json");
+                                                    header.put("authorization", "key=AAAAsigSEMs:APA91bEUF9ZFwIu84Jctci56DQd0TQOepztGOIKIBhoqf7N3ueQrkClw0xBTlWZEWyvwprXZmZgW2MNywF1pNBFpq1jFBr0CmlrJ0wygbZIBOnoZ0jP1zZC6nPxqF2MAP6iF3wuBHD2R");
+                                                    return header;
+                                                }
+                                            };
+
+                                            requestQueue.add(jsonObjectRequest);
+                                        } catch (Exception e) {
+                                            Toast.makeText(view.getContext(), e.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
+                                        }
+
+                                    FirebaseAuth auth = FirebaseAuth.getInstance();
+                                        for(int i2=0;i2<status.size();i2++) {
+                                            if(status.get(position).equals("MultipleReserved")) {
+                                                reference.child(tables.get(i2)).child("customerId").removeValue();
+                                                reference.child(tables.get(i2)).child("status").setValue("available");
+                                                reference.child(tables.get(i2)).child("time").removeValue();
+                                                reference.child(tables.get(i2)).child("timeInMillis").removeValue();
+                                                reference.child(tables.get(i2)).child("timeOfBooking").removeValue();
+//                                    reference.child(tables.get(position)).child("time").removeValue();
+                                                holder.chatWith.setVisibility(View.INVISIBLE);
+                                                holder.cancel.setVisibility(View.INVISIBLE);
+                                                holder.status.setText("available");
+                                            }
+//                                    holder.timeOfReserved.setVisibility(View.INVISIBLE);
+                                        }
+                                }
+                            });
+                            alertD.setNegativeButton("No, Wait", (dialogInterface, i) -> {
+                                dialogInterface.dismiss();
+                            });
+
+                            alertD.create().show();
+
+
+
+                        }).show();
+
+
+
+            });
+
+        }
         holder.cardView.setOnClickListener(v -> {
             SharedPreferences sharedPreferences = v.getContext().getSharedPreferences("loginInfo",Context.MODE_PRIVATE);
             FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
