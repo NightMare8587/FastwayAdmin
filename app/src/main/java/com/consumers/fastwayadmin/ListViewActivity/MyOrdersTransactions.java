@@ -5,6 +5,8 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -47,6 +49,8 @@ public class MyOrdersTransactions extends AppCompatActivity {
     String genratedToken = "";
     List<String> status = new ArrayList<>();
     List<String> allTransID = new ArrayList<>();
+    Button showAllTransactions;
+    TextView textView;
     HashMap<String,String> timeMap = new HashMap<>();
     List<String> allTimeID = new ArrayList<>();
     int count = 0;
@@ -80,11 +84,13 @@ public class MyOrdersTransactions extends AppCompatActivity {
                 .setAnimation(Animations.SLIDE_TOP)
                 .create();
         fastDialog.show();
+        textView = findViewById(R.id.showingTrasacntionTimeDate);
+        showAllTransactions = findViewById(R.id.showAllOnlineTransactions);
         numberOfTransactions = findViewById(R.id.totalTransactionDays);
         earningAmount = findViewById(R.id.totalEarningOnOrders);
         recyclerView = findViewById(R.id.orderTransRecyclerView);
         reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
-        reference.child("Transactions").limitToLast(25).addListenerForSingleValueEvent(new ValueEventListener() {
+        reference.child("Transactions").limitToLast(20).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.exists()){
@@ -130,12 +136,15 @@ public class MyOrdersTransactions extends AppCompatActivity {
             }
         });
 
+
+        showAllTransactions.setOnClickListener(click -> {
+
+        });
+
     }
 
 
     public class MakePayout extends AsyncTask<Void,Void,Void> {
-
-
         @Override
         protected Void doInBackground(Void... voids) {
             RequestQueue requestQueue = Volley.newRequestQueue(MyOrdersTransactions.this);
@@ -205,6 +214,7 @@ public class MyOrdersTransactions extends AppCompatActivity {
                                         Log.i("infoMap",transactionID.toString());
                                         Log.i("infoMap",amountMap.toString());
                                         Log.i("infoMap",timeMap.toString());
+                                        showAllTransactions.setVisibility(View.VISIBLE);
                                         Log.i("infoMap",allTransID.toString());
                                         recyclerView.setLayoutManager(new LinearLayoutManager(MyOrdersTransactions.this));
                                         recyclerView.setAdapter(new MyOrderAdapter(amount,allTimeID,transactionID,status,MyOrdersTransactions.this,totalAmount,days,map,amountMap,timeMap));

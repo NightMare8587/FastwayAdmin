@@ -11,17 +11,18 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="15dp"
+        android:layout_marginBottom="50dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/totalTransactionDays" />
 
     <TextView
-        android:id="@+id/textView25"
+        android:id="@+id/showingTrasacntionTimeDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
-        android:text="Showing Last 25 days Transactions"
+        android:text="Showing Last 20 Transactions"
         android:textSize="17sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
@@ -38,7 +39,7 @@
         android:textSize="15sp"
         app:layout_constraintBottom_toTopOf="@+id/orderTransRecyclerView"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView25" />
+        app:layout_constraintTop_toBottomOf="@+id/showingTrasacntionTimeDate" />
 
     <TextView
         android:id="@+id/totalEarningOnOrders"
@@ -50,6 +51,17 @@
         android:textSize="15sp"
         app:layout_constraintBottom_toTopOf="@+id/orderTransRecyclerView"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView25"
+        app:layout_constraintTop_toBottomOf="@+id/showingTrasacntionTimeDate"
         app:layout_constraintVertical_bias="0.0" />
+
+    <Button
+        android:id="@+id/showAllOnlineTransactions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Request Transaction Report"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/orderTransRecyclerView" />
 </androidx.constraintlayout.widget.ConstraintLayout>
