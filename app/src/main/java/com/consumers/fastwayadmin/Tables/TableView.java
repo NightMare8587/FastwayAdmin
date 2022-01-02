@@ -465,20 +465,45 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
                                         }
 
                                     FirebaseAuth auth = FirebaseAuth.getInstance();
-                                        for(int i2=0;i2<status.size();i2++) {
-                                            if(status.get(position).equals("MultipleReserved")) {
-                                                reference.child(tables.get(i2)).child("customerId").removeValue();
-                                                reference.child(tables.get(i2)).child("status").setValue("available");
-                                                reference.child(tables.get(i2)).child("time").removeValue();
-                                                reference.child(tables.get(i2)).child("timeInMillis").removeValue();
-                                                reference.child(tables.get(i2)).child("timeOfBooking").removeValue();
-//                                    reference.child(tables.get(position)).child("time").removeValue();
-                                                holder.chatWith.setVisibility(View.INVISIBLE);
-                                                holder.cancel.setVisibility(View.INVISIBLE);
-                                                holder.status.setText("available");
+
+                                        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid())).child("Tables");
+                                        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                                for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                                                    List<String> myLists = map.get(""+tables.get(position));
+                                                    if(dataSnapshot.hasChild("customerId") && dataSnapshot.child("customerId").getValue(String.class).equals(myLists.get(0)) && dataSnapshot.child("status").getValue(String.class).equals("MultipleReserved")){
+                                                        databaseReference.child(dataSnapshot.getKey()).child("customerId").removeValue();
+                                                        databaseReference.child(dataSnapshot.getKey()).child("timeOfUnavailability").removeValue();
+                                                        databaseReference.child(dataSnapshot.getKey()).child("time").removeValue();
+                                                        databaseReference.child(dataSnapshot.getKey()).child("timeInMillis").removeValue();
+                                                        databaseReference.child(dataSnapshot.getKey()).child("timeOfBooking").removeValue();
+                                                        databaseReference.child(dataSnapshot.getKey()).child("status").setValue("available");
+                                                    }
+                                                }
                                             }
-//                                    holder.timeOfReserved.setVisibility(View.INVISIBLE);
-                                        }
+
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError error) {
+
+                                            }
+                                        });
+
+
+//                                        for(int i2=0;i2<status.size();i2++) {
+//                                            if(status.get(position).equals("MultipleReserved")) {
+//                                                reference.child(tables.get(i2)).child("customerId").removeValue();
+//                                                reference.child(tables.get(i2)).child("status").setValue("available");
+//                                                reference.child(tables.get(i2)).child("time").removeValue();
+//                                                reference.child(tables.get(i2)).child("timeInMillis").removeValue();
+//                                                reference.child(tables.get(i2)).child("timeOfBooking").removeValue();
+////                                    reference.child(tables.get(position)).child("time").removeValue();
+//                                                holder.chatWith.setVisibility(View.INVISIBLE);
+//                                                holder.cancel.setVisibility(View.INVISIBLE);
+//                                                holder.status.setText("available");
+//                                            }
+////                                    holder.timeOfReserved.setVisibility(View.INVISIBLE);
+//                                        }
                                 }
                             });
                             alertD.setNegativeButton("No, Wait", (dialogInterface, i) -> {
@@ -495,6 +520,123 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
 
             });
 
+        }
+
+        if(status.get(position).equals("MultipleUnavailable")){
+            holder.checkBox.setVisibility(View.INVISIBLE);
+            List<String> myList = map.get(""+tables.get(position));
+            holder.chatWith.setVisibility(View.VISIBLE);
+            holder.timeOfReserved.setVisibility(View.VISIBLE);
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("hh:mm:ss");
+            Date date = new Date(Long.parseLong(timeOfUnavailability.get(position)));
+            holder.timeOfReserved.setText(simpleDateFormat.format(date) + "");
+            holder.cancel.setVisibility(View.VISIBLE);
+//            holder.timeOfReserved.setVisibility(View.VISIBLE);
+//            holder.timeOfReserved.setText(myList.get(1)+"");
+            holder.chatWith.setOnClickListener(view -> {
+                Intent intent = new Intent(view.getContext(),ChatWithCustomer.class);
+                assert myList != null;
+                intent.putExtra("id",myList.get(0));
+                view.getContext().startActivity(intent);
+            });
+
+            holder.cancel.setOnClickListener(view -> {
+                SharedPreferences sharedPreferences = view.getContext().getSharedPreferences("loginInfo",Context.MODE_PRIVATE);
+                reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid())).child("Tables");
+                new KAlertDialog(view.getContext(),KAlertDialog.WARNING_TYPE)
+                        .setTitleText("Warning!!!")
+                        .setContentText("Do you sure wanna remove this reserved table??")
+                        .setCancelText("No")
+                        .setCancelClickListener(KAlertDialog::dismissWithAnimation)
+                        .setConfirmText("Yes")
+                        .setConfirmClickListener(kAlertDialog -> {
+                            AlertDialog.Builder alertD = new AlertDialog.Builder(view.getContext());
+                            alertD.setTitle("Important");
+                            alertD.setMessage("Enter reason for cancellation of table below");
+                            LinearLayout linearLayout = new LinearLayout(view.getContext());
+                            EditText editText = new EditText(view.getContext());
+                            editText.setMaxLines(200);
+                            editText.setHint("Enter reason here");
+                            linearLayout.setOrientation(LinearLayout.VERTICAL);
+                            linearLayout.addView(editText);
+                            alertD.setView(linearLayout);
+                            alertD.setPositiveButton("Proceed", (dialogInterface, i) -> {
+                                if(!editText.getText().toString().equals("")) {
+                                    kAlertDialog.dismissWithAnimation();
+                                    RequestQueue requestQueue = Volley.newRequestQueue(view.getContext());
+                                    JSONObject main = new JSONObject();
+                                    try {
+
+                                        assert myList != null;
+                                        main.put("to", "/topics/" + myList.get(0) + "");
+                                        JSONObject notification = new JSONObject();
+                                        notification.put("title", "Table Cancelled");
+                                        notification.put("click_action", "Table Frag");
+                                        notification.put("body", "Your Tables is cancelled by the owner\n" + editText.getText().toString() + "");
+                                        main.put("notification", notification);
+                                        dialogInterface.dismiss();
+                                        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, main, response -> {
+
+                                        }, error -> Toast.makeText(view.getContext(), error.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show()) {
+                                            @Override
+                                            public Map<String, String> getHeaders() {
+                                                Map<String, String> header = new HashMap<>();
+                                                header.put("content-type", "application/json");
+                                                header.put("authorization", "key=AAAAsigSEMs:APA91bEUF9ZFwIu84Jctci56DQd0TQOepztGOIKIBhoqf7N3ueQrkClw0xBTlWZEWyvwprXZmZgW2MNywF1pNBFpq1jFBr0CmlrJ0wygbZIBOnoZ0jP1zZC6nPxqF2MAP6iF3wuBHD2R");
+                                                return header;
+                                            }
+                                        };
+
+                                        requestQueue.add(jsonObjectRequest);
+                                    } catch (Exception e) {
+                                        Toast.makeText(view.getContext(), e.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
+                                    }
+
+
+                                    FirebaseAuth auth = FirebaseAuth.getInstance();
+
+                                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(auth.getUid()).child("Tables");
+                                    databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                            for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                                                List<String> myLists = map.get(""+dataSnapshot.getKey());
+                                                if(dataSnapshot.hasChild("customerId") && dataSnapshot.child("customerId").getValue(String.class).equals(myLists.get(0)) && dataSnapshot.child("status").getValue(String.class).equals("MultipleUnavailable")){
+                                                    databaseReference.child(dataSnapshot.getKey()).child("customerId").removeValue();
+                                                    databaseReference.child(dataSnapshot.getKey()).child("timeOfUnavailability").removeValue();
+                                                    databaseReference.child(dataSnapshot.getKey()).child("status").setValue("available");
+                                                }
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError error) {
+
+                                        }
+                                    });
+//                                    reference.child(tables.get(position)).child("customerId").removeValue();
+//                                    reference.child(tables.get(position)).child("timeOfUnavailability").removeValue();
+//                                    reference.child(tables.get(position)).child("status").setValue("available");
+////                                    reference.child(tables.get(position)).child("time").removeValue();
+//                                    holder.chatWith.setVisibility(View.INVISIBLE);
+//                                    holder.cancel.setVisibility(View.INVISIBLE);
+//                                    holder.status.setText("available");
+//                                    holder.timeOfReserved.setVisibility(View.INVISIBLE);
+
+                                }
+                            });
+                            alertD.setNegativeButton("No, Wait", (dialogInterface, i) -> {
+
+                            });
+
+                            alertD.create().show();
+
+
+                        }).show();
+
+
+
+            });
         }
         holder.cardView.setOnClickListener(v -> {
             SharedPreferences sharedPreferences = v.getContext().getSharedPreferences("loginInfo",Context.MODE_PRIVATE);
