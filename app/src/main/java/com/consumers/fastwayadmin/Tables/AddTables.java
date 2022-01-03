@@ -6,8 +6,12 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.pdf.PdfDocument;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -220,6 +224,34 @@ public class AddTables extends AppCompatActivity {
                         }
                     });
 
+                    PdfDocument pdfDocument = new PdfDocument();
+                    Paint myPaint = new Paint();
+                    PdfDocument.PageInfo myPage = new  PdfDocument.PageInfo.Builder(1024,720,1).create();
+                    PdfDocument.Page page = pdfDocument.startPage(myPage);
+
+                    Paint text = new Paint();
+
+                    Canvas canvas = page.getCanvas();
+
+                    canvas.drawBitmap(bitmap,275,70,myPaint);
+                    text.setTextAlign(Paint.Align.LEFT);
+                    text.setTypeface(Typeface.create(Typeface.DEFAULT,Typeface.BOLD));
+                    text.setTextSize(70);
+                    canvas.drawText("Table Number: " + tableNumber.getText().toString(),275,85,text);
+                    canvas.drawText("Seats: " + numberOfSeats.getText().toString(),395,595,text);
+
+                    pdfDocument.finishPage(page);
+
+                    String fileNames = "/Table " + tableNumber.getText().toString() + ".pdf";
+                    File file = new File(Environment.getExternalStorageDirectory() + fileNames);
+
+                    try{
+                        pdfDocument.writeTo(new FileOutputStream(file));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    pdfDocument.close();
 
                 } catch (WriterException e) {
                     e.printStackTrace();
