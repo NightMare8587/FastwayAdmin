@@ -360,7 +360,6 @@ public class MyOrdersTransactions extends AppCompatActivity {
                                     if(amountList.size() == time.size()){
                                         numberOfTransactions.setText("Transactions: " + days);
                                         earningAmount.setText("\u20B9" + totalAmount);
-
                                     }
                                 }
                             }, new Response.ErrorListener() {
