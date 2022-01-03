@@ -1,18 +1,25 @@
 package com.consumers.fastwayadmin.ListViewActivity;
 
 import android.annotation.SuppressLint;
+import android.app.DatePickerDialog;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.DatePicker;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -34,9 +41,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
@@ -51,6 +61,10 @@ public class MyOrdersTransactions extends AppCompatActivity {
     String genratedToken = "";
     List<String> status = new ArrayList<>();
     List<String> allTransID = new ArrayList<>();
+    long startMilli = 0;
+    boolean start = false;
+    boolean end = false;
+    long endMilli = 0;
     Button showAllTransactions;
     TextView textView;
     HashMap<String,String> timeMap = new HashMap<>();
@@ -77,6 +91,7 @@ public class MyOrdersTransactions extends AppCompatActivity {
     String testBearerToken = "https://intercellular-stabi.000webhostapp.com/CheckoutPayouts/test/testBearerToken.php";
     FastDialog fastDialog;
     String authToken = "https://intercellular-stabi.000webhostapp.com/CheckoutPayouts/authBEarerToken.php";
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -141,7 +156,108 @@ public class MyOrdersTransactions extends AppCompatActivity {
 
 
         showAllTransactions.setOnClickListener(click -> {
+            final Calendar myCalendar= Calendar.getInstance();
+//            DatePickerDialog.OnDateSetListener date =new DatePickerDialog.OnDateSetListener() {
+//                @Override
+//                public void onDateSet(DatePicker view, int year, int month, int day) {
+//                    myCalendar.set(Calendar.YEAR, year);
+//                    myCalendar.set(Calendar.MONTH,month);
+//                    myCalendar.set(Calendar.DAY_OF_MONTH,day);
+//                }
+//            };
+            AlertDialog.Builder alert = new AlertDialog.Builder(MyOrdersTransactions.this);
+            alert.setTitle("Pick Date Range").setMessage("Pick date range for your transaction details\nMax 1 month");
+            LinearLayout linearLayout = new LinearLayout(MyOrdersTransactions.this);
+            linearLayout.setOrientation(LinearLayout.VERTICAL);
+            TextView startDate = new TextView(MyOrdersTransactions.this);
+            TextView endDate = new TextView(MyOrdersTransactions.this);
+            startDate.setText("Pick Starting Date");
+            endDate.setText("Pick Ending Date");
+            startDate.setTextSize(18f);
+            endDate.setTextSize(18f);
 
+
+
+            startDate.setGravity(Gravity.CENTER);
+            startDate.setPadding(8,8,8,8);
+            endDate.setPadding(8,8,8,8);
+            endDate.setGravity(Gravity.CENTER);
+
+            endDate.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    DatePickerDialog.OnDateSetListener date =new DatePickerDialog.OnDateSetListener() {
+                        @Override
+                        public void onDateSet(DatePicker view, int year, int month, int day) {
+                            myCalendar.set(Calendar.YEAR, year);
+                            myCalendar.set(Calendar.MONTH,month);
+                            myCalendar.set(Calendar.DAY_OF_MONTH,day);
+                            String myFormat="dd/MM/yy";
+                            SimpleDateFormat dateFormat=new SimpleDateFormat(myFormat, Locale.getDefault());
+                            endDate.setText(dateFormat.format(myCalendar.getTime()));
+                            endMilli = Long.parseLong(String.valueOf(myCalendar.getTimeInMillis()));
+                            Log.i("info","" + endMilli);
+                            end = true;
+                        }
+                    };
+                    new DatePickerDialog(MyOrdersTransactions.this,date,myCalendar.get(Calendar.YEAR),myCalendar.get(Calendar.MONTH),myCalendar.get(Calendar.DAY_OF_MONTH)).show();
+
+                }
+            });
+
+            startDate.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    DatePickerDialog.OnDateSetListener date =new DatePickerDialog.OnDateSetListener() {
+                        @Override
+                        public void onDateSet(DatePicker view, int year, int month, int day) {
+                            myCalendar.set(Calendar.YEAR, year);
+                            myCalendar.set(Calendar.MONTH,month);
+                            myCalendar.set(Calendar.DAY_OF_MONTH,day);
+                            String myFormat="dd/MM/yy";
+                            SimpleDateFormat dateFormat=new SimpleDateFormat(myFormat, Locale.getDefault());
+                            startDate.setText(dateFormat.format(myCalendar.getTime()));
+                            startMilli = Long.parseLong(String.valueOf(myCalendar.getTimeInMillis()));
+                            Log.i("info","" + startMilli);
+                            start = true;
+                        }
+                    };
+                    new DatePickerDialog(MyOrdersTransactions.this,date,myCalendar.get(Calendar.YEAR),myCalendar.get(Calendar.MONTH),myCalendar.get(Calendar.DAY_OF_MONTH)).show();
+
+                }
+            });
+
+            alert.setPositiveButton("Request Report", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    dialogInterface.dismiss();
+                    if(Math.abs(endMilli - startMilli) > 2592000000f)
+                        Toast.makeText(MyOrdersTransactions.this, "Date Exceeded 30 days", Toast.LENGTH_SHORT).show();
+                    else{
+                        if(start && end) {
+                            FirebaseAuth auth = FirebaseAuth.getInstance();
+                            SharedPreferences sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
+                            TransactionReportClass transactionReportClass = new TransactionReportClass(startDate.getText().toString(),endDate.getText().toString(),auth.getUid(),sharedPreferences.getString("email",""));
+                            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Transaction Request").child(auth.getUid());
+                            databaseReference.setValue(transactionReportClass);
+                            Toast.makeText(MyOrdersTransactions.this, "Request Submitted Successfully", Toast.LENGTH_SHORT).show();
+                        }else{
+                            Toast.makeText(MyOrdersTransactions.this, "Please Select Dates To Proceed", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }
+            }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    dialogInterface.dismiss();
+                }
+            });
+
+            linearLayout.addView(startDate);
+            linearLayout.addView(endDate);
+
+            alert.setView(linearLayout);
+            alert.create().show();
         });
 
     }
@@ -189,7 +305,7 @@ public class MyOrdersTransactions extends AppCompatActivity {
                     kAlertDialog.setCancelable(false);
                     kAlertDialog.show();
                 }
-            },15000);
+            },12000);
             List<String> transactionID = new ArrayList<>();
             HashMap<String,String> amountMap = new HashMap<>();
             RequestQueue requestQueue = Volley.newRequestQueue(MyOrdersTransactions.this);
