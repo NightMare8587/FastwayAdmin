@@ -233,12 +233,15 @@ public class MyOrdersTransactions extends AppCompatActivity {
                     dialogInterface.dismiss();
                     if(Math.abs(endMilli - startMilli) > 2592000000f)
                         Toast.makeText(MyOrdersTransactions.this, "Date Exceeded 30 days", Toast.LENGTH_SHORT).show();
+                    else if(startMilli > endMilli){
+                        Toast.makeText(MyOrdersTransactions.this, "Check your starting and ending date", Toast.LENGTH_SHORT).show();
+                    }
                     else{
                         if(start && end) {
                             FirebaseAuth auth = FirebaseAuth.getInstance();
                             SharedPreferences sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
-                            TransactionReportClass transactionReportClass = new TransactionReportClass(startDate.getText().toString(),endDate.getText().toString(),auth.getUid(),sharedPreferences.getString("email",""));
-                            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Transaction Request").child(auth.getUid());
+                            TransactionReportClass transactionReportClass = new TransactionReportClass(startDate.getText().toString(),endDate.getText().toString(),auth.getUid(),sharedPreferences.getString("email",""),startMilli + "",endMilli + "");
+                            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Transaction Request").child(Objects.requireNonNull(auth.getUid()));
                             databaseReference.setValue(transactionReportClass);
                             Toast.makeText(MyOrdersTransactions.this, "Request Submitted Successfully", Toast.LENGTH_SHORT).show();
                         }else{
@@ -246,12 +249,7 @@ public class MyOrdersTransactions extends AppCompatActivity {
                         }
                     }
                 }
-            }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    dialogInterface.dismiss();
-                }
-            });
+            }).setNegativeButton("Cancel", (dialogInterface, i) -> dialogInterface.dismiss());
 
             linearLayout.addView(startDate);
             linearLayout.addView(endDate);
