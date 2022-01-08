@@ -330,7 +330,6 @@ public class MyOrdersTransactions extends AppCompatActivity {
                                     status.add(resp[0]);
                                     days++;
                                     if(resp[0].equals("PENDING")) {
-
                                     }else{
                                         Double d = Double.parseDouble(resp[1]);
                                         totalAmount = totalAmount + d.intValue();
