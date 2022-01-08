@@ -240,9 +240,6 @@ public class HomeFrag extends Fragment {
                     .setSecondButtonColor(Color.parseColor("#fee9b2"))
                     .setSecondButtonTextColor(Color.parseColor("#000000"))
                     .setSecondButtonText("COMBO/THALI")
-                    .setThirdButtonColor(Color.parseColor("#fbd1b7"))
-                    .setThirdButtonTextColor(Color.parseColor("#000000"))
-                    .setThirdButtonText("ADD CUSTOM OFFER")
                     .withFirstButtonListner(view11 -> {
                         startActivity(new Intent(getContext(), DiscountActivity.class));
                         flatDialog.dismiss();
@@ -250,10 +247,6 @@ public class HomeFrag extends Fragment {
                     .withSecondButtonListner(view112 -> {
                         startActivity(new Intent(getContext(), ComboAndOffers.class));
                         flatDialog.dismiss();
-                    })
-                    .withThirdButtonListner(view113 -> {
-                        flatDialog.dismiss();
-                        startActivity(new Intent(getContext(), CustomOffer.class));
                     })
                     .show();
 
