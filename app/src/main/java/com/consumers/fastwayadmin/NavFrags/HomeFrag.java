@@ -249,7 +249,6 @@ public class HomeFrag extends Fragment {
                         flatDialog.dismiss();
                     })
                     .show();
-
         });
 
         new MyTask().execute();
