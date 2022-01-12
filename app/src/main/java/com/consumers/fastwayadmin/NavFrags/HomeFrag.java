@@ -121,7 +121,6 @@ public class HomeFrag extends Fragment {
     Toolbar toolbar;
     Button refershRecyclerView,refreshTakeAway;
     List<String> isCurrentOrder = new ArrayList<>();
-//    homeAdapter homeAdapter;
     SharedPreferences sharedPreferences;
     Switch onlineOrOffline;
     DatabaseReference reference;
