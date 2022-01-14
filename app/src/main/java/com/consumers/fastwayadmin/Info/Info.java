@@ -149,12 +149,15 @@ public class Info extends AppCompatActivity {
                         editor.putString("hotelAddress",snapshot.child(infoAuth.getUid()).child("address").getValue(String.class));
                         editor.putString("hotelNumber",snapshot.child(infoAuth.getUid()).child("number").getValue(String.class));
                         editor.apply();
-                        if(location.contains("location")){
-                            startActivity(new Intent(Info.this,HomeScreen.class));
-                        }else
-                            startActivity(new Intent(Info.this, UploadRequiredDocuments.class));
 
-                        clientsLocation.removeLocationUpdates(mLocationCallback);
+                        if(location.contains("location")){
+                            clientsLocation.removeLocationUpdates(mLocationCallback);
+                            startActivity(new Intent(Info.this,HomeScreen.class));
+                        }else {
+                            clientsLocation.removeLocationUpdates(mLocationCallback);
+                            startActivity(new Intent(Info.this, UploadRequiredDocuments.class));
+                        }
+
                         fastDialog.dismiss();
                         finish();
                         overridePendingTransition(R.anim.slide_in, R.anim.fade_out);

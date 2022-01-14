@@ -155,7 +155,48 @@ public class HomeScreen extends AppCompatActivity {
             }
         });
         FirebaseAuth auth = FirebaseAuth.getInstance();
+        DatabaseReference myRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid()).child("Restaurant Documents");
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid())).child("Tables");
+        myRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            if(dataSnapshot.exists() && dataSnapshot.hasChild("verified")){
+                                if(dataSnapshot.child("verified").getValue(String.class).equals("no")){
+                                     AlertDialog.Builder alert = new AlertDialog.Builder(HomeScreen.this);
+                                     alert.setTitle("Error")
+                                             .setMessage("Your restaurant is either not verified or has been disbanded by Fastway")
+                                             .setPositiveButton("Exit", new DialogInterface.OnClickListener() {
+                                                 @Override
+                                                 public void onClick(DialogInterface dialogInterface, int i) {
+                                                     dialogInterface.dismiss();
+                                                     Intent homeIntent = new Intent(Intent.ACTION_MAIN);
+                                                     homeIntent.addCategory( Intent.CATEGORY_HOME );
+                                                     homeIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                                     startActivity(homeIntent);
+                                                     finish();
+                                                 }
+                                             }).setNegativeButton("Contact Fastway", new DialogInterface.OnClickListener() {
+                                         @Override
+                                         public void onClick(DialogInterface dialogInterface, int i) {
+                                             dialogInterface.dismiss();
+                                             Intent homeIntent = new Intent(HomeScreen.this,SupportActivity.class);
+                                             homeIntent.addCategory( Intent.CATEGORY_HOME );
+                                             homeIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                             startActivity(homeIntent);
+                                             finish();
+                                         }
+                                     }).create();
+                                     alert.setCancelable(false);
+                                     alert.show();
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
@@ -175,6 +216,9 @@ public class HomeScreen extends AppCompatActivity {
                             .setActionTextColor(getResources().getColor(android.R.color.holo_red_light))
                             .show();
                 } else {
+
+
+
                     databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
