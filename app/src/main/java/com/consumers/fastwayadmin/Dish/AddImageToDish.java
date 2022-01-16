@@ -107,14 +107,16 @@ public class AddImageToDish extends AppCompatActivity {
                 .setPositiveButton("Search Online", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        String nameDish = dishName;
-                        Intent intent = new Intent(getApplicationContext(),CustomDishImageSearch.class);
-                        intent.putExtra("name",nameDish);
-                        startActivity(intent);
+                        dialogInterface.dismiss();
+                        Intent intent = new Intent();
+                        intent.setType("image/*");
+                        intent.setAction(Intent.ACTION_GET_CONTENT);
+                        startActivityForResult(Intent.createChooser(intent, "Select Picture"), 1);
                     }
                 }).setNegativeButton("Take Photo", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
                 Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE); //IMAGE CAPTURE CODE
                 startActivityForResult(intent, 20);
             }

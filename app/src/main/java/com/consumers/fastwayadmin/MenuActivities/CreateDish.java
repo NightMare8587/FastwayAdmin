@@ -139,12 +139,14 @@ public class CreateDish extends AppCompatActivity {
                 .setPositiveButton("Search Online", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        String nameDish = nameOfDish.getText().toString();
-                        Intent intent = new Intent(getApplicationContext(),CustomDishImageSearch.class);
-                        intent.putExtra("name",nameDish);
-                        startActivity(intent);
+                        dialogInterface.dismiss();
+//                        String nameDish = nameOfDish.getText().toString();
+//                        Intent intent = new Intent(getApplicationContext(),CustomDishImageSearch.class);
+//                        intent.putExtra("name",nameDish);
+//                        startActivity(intent);
                     }
                 }).setNegativeButton("Take Photo", (dialogInterface, i) -> {
+                    dialogInterface.dismiss();
                     Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE); //IMAGE CAPTURE CODE
                     startActivityForResult(intent, 20);
                 }).create();

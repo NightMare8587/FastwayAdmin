@@ -45,7 +45,7 @@ public class RandomChatNoww extends AppCompatActivity {
         setContentView(R.layout.activity_random_chat_noww);
         auth = FirebaseAuth.getInstance();
         linearLayoutManager = new LinearLayoutManager(RandomChatNoww.this);
-        databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Admin").child(Objects.requireNonNull(auth.getUid())).child("messages").child(auth.getUid());
+        databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("messages").child("Admin").child(Objects.requireNonNull(auth.getUid()));
         recyclerView = findViewById(R.id.randomMessageRecyclerView);
         sendME = findViewById(R.id.sendMessageButtonRandom);
         editText = findViewById(R.id.sendMessageEditTextRandom);
