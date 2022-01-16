@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -72,67 +73,7 @@ public class HomeScreen extends AppCompatActivity {
                 (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
 
 
-        resRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
-        resRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(snapshot.hasChild("fastwayReply")){
-                    AlertDialog.Builder alert = new AlertDialog.Builder(HomeScreen.this);
-                    alert.setTitle("Reply")
-                            .setMessage("You have a new reply from fastway")
-                            .setCancelable(false)
-                            .setPositiveButton("Exit", (dialog, which) -> {
-                                resRef.child("fastwayReply").removeValue();
-                                dialog.dismiss();
-                            }).setNegativeButton("See Message", (dialog, which) -> {
-                        resRef.child("fastwayReply").removeValue();
-                        startActivity(new Intent(HomeScreen.this, RandomChatNoww.class));
-                        dialog.dismiss();
-                    }).create();
-                    alert.setOnCancelListener(dialog -> {
-                        dialog.dismiss();
-                        resRef.child("fastwayReply").removeValue();
-                    });
-                    alert.show();
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-
-        resRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid())).child("Restaurant Documents");
-        resRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(snapshot.exists() && snapshot.hasChild("reasonForCancel")){
-                    AlertDialog.Builder alert = new AlertDialog.Builder(HomeScreen.this);
-                    String reason = snapshot.child("reasonForCancel").getValue(String.class);
-                    alert.setTitle("Error").setMessage("Your restaurant registration is denied by fastway for following reason's:\n\n" + reason + "\n\nYou can submit another response for restaurant registration")
-                            .setPositiveButton("Re-Submit", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    startActivity(new Intent(HomeScreen.this, ReUploadDocumentsAgain.class));
-                                    dialogInterface.dismiss();
-                                }
-                            }).setNegativeButton("Skip", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            dialogInterface.dismiss();
-                        }
-                    }).create();
-
-                    alert.show();
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
+      new BackgroundWork().execute();
 
 
         bubble.setNavigationChangeListener((view, position) -> {
@@ -345,5 +286,74 @@ public class HomeScreen extends AppCompatActivity {
         manager = getSupportFragmentManager();
         FirebaseMessaging.getInstance().subscribeToTopic(Objects.requireNonNull(auth.getUid()));
         reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid());
+    }
+
+    public class BackgroundWork extends AsyncTask<Void,Void,Void>{
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            resRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
+            resRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if(snapshot.hasChild("fastwayReply")){
+                        AlertDialog.Builder alert = new AlertDialog.Builder(HomeScreen.this);
+                        alert.setTitle("Reply")
+                                .setMessage("You have a new reply from fastway")
+                                .setCancelable(false)
+                                .setPositiveButton("Exit", (dialog, which) -> {
+                                    resRef.child("fastwayReply").removeValue();
+                                    dialog.dismiss();
+                                }).setNegativeButton("See Message", (dialog, which) -> {
+                            resRef.child("fastwayReply").removeValue();
+                            startActivity(new Intent(HomeScreen.this, RandomChatNoww.class));
+                            dialog.dismiss();
+                        }).create();
+                        alert.setOnCancelListener(dialog -> {
+                            dialog.dismiss();
+                            resRef.child("fastwayReply").removeValue();
+                        });
+                        alert.show();
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+
+            resRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid())).child("Restaurant Documents");
+            resRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if(snapshot.exists() && snapshot.hasChild("reasonForCancel")){
+                        AlertDialog.Builder alert = new AlertDialog.Builder(HomeScreen.this);
+                        String reason = snapshot.child("reasonForCancel").getValue(String.class);
+                        alert.setTitle("Error").setMessage("Your restaurant registration is denied by fastway for following reason's:\n\n" + reason + "\n\nYou can submit another response for restaurant registration")
+                                .setPositiveButton("Re-Submit", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        startActivity(new Intent(HomeScreen.this, ReUploadDocumentsAgain.class));
+                                        dialogInterface.dismiss();
+                                    }
+                                }).setNegativeButton("Skip", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialogInterface.dismiss();
+                            }
+                        }).create();
+
+                        alert.show();
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+            return null;
+        }
     }
 }
