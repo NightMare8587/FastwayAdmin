@@ -137,7 +137,8 @@ public class ReportOptionsActivity extends AppCompatActivity {
                                             reportRef.child(Objects.requireNonNull(auth.getUid())).setValue(otherReportClass);
                                             generateNotification();
                                             kAlertDialog.dismissWithAnimation();
-
+                                            DatabaseReference storeReports = FirebaseDatabase.getInstance().getReference().child("Complaints").child("AllReports").child("Users").child(userID).child(String.valueOf(System.currentTimeMillis()));
+                                            storeReports.setValue(otherReportClass);
                                             finish();
                                         }
                                     }).setCancelClickListener(new KAlertDialog.KAlertClickListener() {
@@ -161,6 +162,8 @@ public class ReportOptionsActivity extends AppCompatActivity {
                                             DatabaseReference reportUsers = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(auth.getUid());
                                             reportUsers.child("Reported Users").child(userID).child("authId").setValue(userID);
                                             generateNotification();
+                                            DatabaseReference storeReports = FirebaseDatabase.getInstance().getReference().child("Complaints").child("AllReports").child("Users").child(userID).child(String.valueOf(System.currentTimeMillis()));
+                                            storeReports.setValue(otherReportClass);
                                             Toast.makeText(ReportOptionsActivity.this, "Report Submitted Successfully", Toast.LENGTH_SHORT).show();
                                             kAlertDialog.dismissWithAnimation();
                                             finish();
