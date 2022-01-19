@@ -97,7 +97,6 @@ public class TablesFrag extends Fragment {
         tableRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(tableAuth.getUid())).child("Tables");
         tableNumber.clear();
         status.clear();
-//        new MyTask().execute();
 //        tableRef.addListenerForSingleValueEvent(new ValueEventListener() {
 //            @Override
 //            public void onDataChange(@NonNull DataSnapshot snapshot) {
