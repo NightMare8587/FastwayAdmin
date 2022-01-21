@@ -215,6 +215,8 @@ public class HomeScreen extends AppCompatActivity {
                                             }
                                         }
                                     }
+
+                                    
                                 }
                             }
                         }
@@ -226,7 +228,7 @@ public class HomeScreen extends AppCompatActivity {
                     });
                 }
             }
-        },0,5000);
+        },0,10000);
 
 
     }
