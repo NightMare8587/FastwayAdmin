@@ -149,7 +149,7 @@ public class Info extends AppCompatActivity {
                         editor.putString("hotelAddress",snapshot.child(infoAuth.getUid()).child("address").getValue(String.class));
                         editor.putString("hotelNumber",snapshot.child(infoAuth.getUid()).child("number").getValue(String.class));
                         editor.apply();
-                        
+
 
                         if(location.contains("location")){
                             clientsLocation.removeLocationUpdates(mLocationCallback);

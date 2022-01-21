@@ -185,15 +185,15 @@ public class MainActivity extends AppCompatActivity {
                     fullName.requestFocus();
                     fullName.setError("Field can't be Empty");
                     return;
-                }else if(emailAddress.length() == 0){
+                }if(emailAddress.length() == 0){
                     emailAddress.requestFocus();
                     emailAddress.setError("Field can't be Empty");
                     return;
-                }else if(phoneNumber.length() <= 9){
+                }if(phoneNumber.length() <= 9){
                     phoneNumber.requestFocus();
                     phoneNumber.setError("Enter valid number");
                     return;
-                }else if(!ccp.getSelectedCountryCodeWithPlus().equals("+91")){
+                }if(!ccp.getSelectedCountryCodeWithPlus().equals("+91")){
                     Toast.makeText(MainActivity.this, "This app currently operates only in India", Toast.LENGTH_SHORT).show();
                     return;
                 }
