@@ -605,6 +605,9 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
                         Toast.makeText(ApproveCurrentOrder.this, "Order cancelled successfully", Toast.LENGTH_SHORT).show();
+                        String newString = fileName.replace("/","");
+                        deleteFile(newString);
+                        file.delete();
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
