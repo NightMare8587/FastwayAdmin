@@ -119,7 +119,6 @@ public class ApproveCurrentOrder extends AppCompatActivity {
         textView.setText("Table Number: " + table);
         saveRefundInfo = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(id);
         totalOrders = FirebaseDatabase.getInstance().getReference().child("Restaurants").child(sharedPreferences.getString("state","")).child(auth.getUid());
-
         saveRefundInfo.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
