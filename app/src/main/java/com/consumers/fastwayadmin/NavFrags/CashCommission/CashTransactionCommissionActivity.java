@@ -18,6 +18,6 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cash_transaction_commission);
         sharedPreferences = getSharedPreferences("CashCommission",MODE_PRIVATE);
-        
+
     }
 }

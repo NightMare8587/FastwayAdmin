@@ -357,51 +357,51 @@ public class HomeScreen extends AppCompatActivity {
                 }
             });
 
-            DatabaseReference checkIfCommissionNeeded = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
-            checkIfCommissionNeeded.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    if(dataSnapshot.hasChild("lastCommissionPaid")){
-                            long lastPaidDate = Long.parseLong(Objects.requireNonNull(dataSnapshot.child("lastCommissionPaid").getValue(String.class)));
-                    }else{
-                        if(dataSnapshot.hasChild("registrationDate")){
-                            long registerTime = Long.parseLong(Objects.requireNonNull(dataSnapshot.child("registrationDate").getValue(String.class)));
-                            long currentTime = System.currentTimeMillis();
-                            if(currentTime - registerTime >= 2419200000L){
-                                SharedPreferences sharedPreferences = getSharedPreferences("CashCommission",MODE_PRIVATE);
-                                SharedPreferences.Editor editor = sharedPreferences.edit();
-                                AlertDialog.Builder alert = new AlertDialog.Builder(HomeScreen.this);
-                                alert.setTitle("Cash Transaction").setMessage("It's time for payment of cash transaction commission\nDo you wanna pay now or you can pay later!")
-                                        .setPositiveButton("Pay Now", new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialogInterface, int i) {
-                                                dialogInterface.dismiss();
-                                                startActivity(new Intent(HomeScreen.this, CashTransactionCommissionActivity.class));
-                                            }
-                                        }).setNegativeButton("Later", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialogInterface, int i) {
-                                        dialogInterface.dismiss();
-                                        if(sharedPreferences.contains("cashCommission")){
-
-                                        }else {
-                                            editor.putString("cashCommission", "1");
-                                            editor.apply();
-                                        }
-                                    }
-                                }).create();
-                                alert.setCancelable(false);
-                                alert.show();
-                            }
-                        }
-                    }
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                }
-            });
+//            DatabaseReference checkIfCommissionNeeded = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
+//            checkIfCommissionNeeded.addListenerForSingleValueEvent(new ValueEventListener() {
+//                @Override
+//                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                    if(dataSnapshot.hasChild("lastCommissionPaid")){
+//                            long lastPaidDate = Long.parseLong(Objects.requireNonNull(dataSnapshot.child("lastCommissionPaid").getValue(String.class)));
+//                    }else{
+//                        if(dataSnapshot.hasChild("registrationDate")){
+//                            long registerTime = Long.parseLong(Objects.requireNonNull(dataSnapshot.child("registrationDate").getValue(String.class)));
+//                            long currentTime = System.currentTimeMillis();
+//                            if(currentTime - registerTime >= 2419200000L){
+//                                SharedPreferences sharedPreferences = getSharedPreferences("CashCommission",MODE_PRIVATE);
+//                                SharedPreferences.Editor editor = sharedPreferences.edit();
+//                                AlertDialog.Builder alert = new AlertDialog.Builder(HomeScreen.this);
+//                                alert.setTitle("Cash Transaction").setMessage("It's time for payment of cash transaction commission\nDo you wanna pay now or you can pay later!")
+//                                        .setPositiveButton("Pay Now", new DialogInterface.OnClickListener() {
+//                                            @Override
+//                                            public void onClick(DialogInterface dialogInterface, int i) {
+//                                                dialogInterface.dismiss();
+//                                                startActivity(new Intent(HomeScreen.this, CashTransactionCommissionActivity.class));
+//                                            }
+//                                        }).setNegativeButton("Later", new DialogInterface.OnClickListener() {
+//                                    @Override
+//                                    public void onClick(DialogInterface dialogInterface, int i) {
+//                                        dialogInterface.dismiss();
+//                                        if(sharedPreferences.contains("cashCommission")){
+//
+//                                        }else {
+//                                            editor.putString("cashCommission", "1");
+//                                            editor.apply();
+//                                        }
+//                                    }
+//                                }).create();
+//                                alert.setCancelable(false);
+//                                alert.show();
+//                            }
+//                        }
+//                    }
+//                }
+//
+//                @Override
+//                public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//                }
+//            });
 
 
 
