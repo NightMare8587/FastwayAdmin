@@ -156,6 +156,9 @@ public class AccountFrag extends Fragment {
                                 SharedPreferences location = view1.getContext().getSharedPreferences("LocationMaps", MODE_PRIVATE);
                                 location.edit().clear().commit();
 
+                                SharedPreferences cashCommission = view1.getContext().getSharedPreferences("CashCommission", MODE_PRIVATE);
+                                cashCommission.edit().clear().commit();
+
                                 startActivity(new Intent(getActivity(), SplashScreen.class));
                                 getActivity().finish();
                             })
