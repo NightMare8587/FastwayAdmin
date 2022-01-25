@@ -189,7 +189,7 @@ public class MainActivity extends AppCompatActivity {
                     emailAddress.requestFocus();
                     emailAddress.setError("Field can't be Empty");
                     return;
-                }if(phoneNumber.length() <= 9){
+                }if(phoneNumber.length() != 10){
                     phoneNumber.requestFocus();
                     phoneNumber.setError("Enter valid number");
                     return;
@@ -468,6 +468,7 @@ public class MainActivity extends AppCompatActivity {
                                             sender = new GMailSender(emailOfSender,passOfSender);
                                             new MyAsyncClass().execute();
                                             reference.child("Admin").child(Objects.requireNonNull(loginAuth.getUid())).setValue(user);
+                                            reference.child("Admin").child(loginAuth.getUid()).child("registrationDate").setValue(System.currentTimeMillis() + "");
                                         }
                                     }
 
