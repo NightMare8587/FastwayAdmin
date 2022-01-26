@@ -156,7 +156,6 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
                                     }
                                 }).show();
                         break;
-
                     case 3:
                         Intent intent = new Intent(MyAccount.this, EditVendorDetails.class);
                         startActivityForResult(intent,2);
