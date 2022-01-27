@@ -37,7 +37,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -58,9 +57,7 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
     GoogleSignInClient client;
     GoogleSignInOptions gso;
     SharedPreferences sharedPreferences;
-    String verId;
     TextView resNameText;
-    PhoneAuthCredential credential;
     ModalBottomSheetDialog modalBottomSheetDialog;
     SharedPreferences.Editor editor;
     TextView textView;
@@ -73,7 +70,7 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
         initialise();
         SharedPreferences resInfoSharedPref = getSharedPreferences("RestaurantInfo",MODE_PRIVATE);
         editor = resInfoSharedPref.edit();
-        ArrayAdapter arrayAdapter = new ArrayAdapter<String>(this, R.layout.list,names);
+        ArrayAdapter arrayAdapter = new ArrayAdapter<>(this, R.layout.list, names);
         listView.setAdapter(arrayAdapter);
         SharedPreferences sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
         if(resInfoSharedPref.contains("hotelName")) {
