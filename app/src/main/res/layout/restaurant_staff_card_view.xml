@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_margin="5dp"
+    android:id="@+id/restaurantStaffCardViewHolder"
     android:layout_height="120dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -12,7 +13,7 @@
 
         <ImageView
             android:id="@+id/restaurantStaffCardImageView"
-            android:layout_width="wrap_content"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -26,7 +27,7 @@
             android:layout_marginStart="9dp"
             android:layout_marginTop="9dp"
             android:text="TextView"
-            android:textSize="17sp"
+            android:textSize="21sp"
             android:textStyle="bold"
             app:layout_constraintStart_toEndOf="@+id/restaurantStaffCardImageView"
             app:layout_constraintTop_toTopOf="parent" />

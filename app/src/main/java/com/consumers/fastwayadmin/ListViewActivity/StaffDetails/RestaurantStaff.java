@@ -62,6 +62,7 @@ public class RestaurantStaff extends AppCompatActivity {
     DatabaseReference databaseReference;
     List<String> name = new ArrayList<>();
     List<String> image = new ArrayList<>();
+    List<String> UUIDs = new ArrayList<>();
     Bitmap bitmap;
     OutputStream outputStream;
     String currentUUID;
@@ -92,10 +93,11 @@ public class RestaurantStaff extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.exists()){
                     for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                        UUIDs.add(String.valueOf(dataSnapshot.getKey()));
                         name.add(String.valueOf(dataSnapshot.child("name").getValue()));
                         image.add(String.valueOf(dataSnapshot.child("image").getValue()));
                     }
-                    recyclerView.setAdapter(new StaffAdapter(name,image));
+                    recyclerView.setAdapter(new StaffAdapter(name,image,RestaurantStaff.this,UUIDs));
                 }else
                 {
                     Toast.makeText(RestaurantStaff.this, "Add Staff Details", Toast.LENGTH_SHORT).show();
@@ -206,12 +208,14 @@ public class RestaurantStaff extends AppCompatActivity {
                 if(snapshot.exists()){
                     image.clear();
                     name.clear();
+                    UUIDs.clear();
                     isBankAvailable.clear();
                     for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                        UUIDs.add(String.valueOf(dataSnapshot.getKey()));
                         name.add(String.valueOf(dataSnapshot.child("name").getValue()));
                         image.add(String.valueOf(dataSnapshot.child("image").getValue()));
                     }
-                    recyclerView.setAdapter(new StaffAdapter(name,image));
+                    recyclerView.setAdapter(new StaffAdapter(name,image,RestaurantStaff.this,UUIDs));
                 }else
                 {
                     Toast.makeText(RestaurantStaff.this, "Add Staff Details", Toast.LENGTH_SHORT).show();
@@ -259,23 +263,27 @@ public class RestaurantStaff extends AppCompatActivity {
                                 if(holderAccountNumber.getText().toString().equals("")){
                                     holderAccountNumber.requestFocus();
                                     holderAccountNumber.setError("Field can't be empty");
+                                    Toast.makeText(RestaurantStaff.this, "Wrong Input", Toast.LENGTH_SHORT).show();
                                     return;
                                 }
 
                                 if(holderAccountIFSC.getText().toString().equals("")){
                                     holderAccountIFSC.requestFocus();
+                                    Toast.makeText(RestaurantStaff.this, "Wrong Input", Toast.LENGTH_SHORT).show();
                                     holderAccountIFSC.setError("Field can't be empty");
                                     return;
                                 }
 
                                 if(holderAccountIFSC.getText().toString().length() != 11){
                                     holderAccountIFSC.requestFocus();
-                                    holderAccountIFSC.setError("Invalid IFSC code");
+                                    Toast.makeText(RestaurantStaff.this, "Wrong Input Add 11 digit IFSC", Toast.LENGTH_SHORT).show();
+                                    holderAccountIFSC.setError("Invalid IFSC code (11 digit)");
                                     return;
                                 }
 
                                 if(holderName.getText().toString().equals("")){
                                     holderName.requestFocus();
+                                    Toast.makeText(RestaurantStaff.this, "Wrong Input", Toast.LENGTH_SHORT).show();
                                     holderName.setError("Field can't be empty");
                                     return;
                                 }
