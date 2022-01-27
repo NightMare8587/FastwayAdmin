@@ -110,7 +110,7 @@ public class SplashScreen extends AppCompatActivity {
     private void createLocationRequest() {
         locationRequest = LocationRequest.create();
         locationRequest.setInterval(1000);
-        locationRequest.setFastestInterval(5000);
+        locationRequest.setFastestInterval(1000);
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
@@ -141,7 +141,7 @@ public class SplashScreen extends AppCompatActivity {
 
                             overridePendingTransition(R.anim.slide_in, R.anim.fade_out);
                         }
-                    },1650);
+                    },500);
                 } catch (ApiException exception) {
                     switch (exception.getStatusCode()) {
                         case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
@@ -222,7 +222,7 @@ public class SplashScreen extends AppCompatActivity {
 
                             overridePendingTransition(R.anim.slide_in, R.anim.fade_out);
                         }
-                    },1650);
+                    },700);
                     break;
                 case Activity.RESULT_CANCELED:
                     // The user was asked to change settings, but chose not to
