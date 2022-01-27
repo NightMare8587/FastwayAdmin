@@ -25,6 +25,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.consumers.fastwayadmin.Info.MapsActivity2;
 import com.consumers.fastwayadmin.Info.RestaurantDocuments.ReUploadDocuments.ViewAndReuploadDocuments;
+import com.consumers.fastwayadmin.ListViewActivity.StaffDetails.RestaurantStaff;
 import com.consumers.fastwayadmin.NavFrags.EditVendorDetails;
 import com.consumers.fastwayadmin.R;
 import com.consumers.fastwayadmin.SplashAndIntro.SplashScreen;
@@ -63,7 +64,7 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
     ModalBottomSheetDialog modalBottomSheetDialog;
     SharedPreferences.Editor editor;
     TextView textView;
-    String[] names = {"Change Credentials (Admin)","Change Credentials (Restaurants)","Delete Account","Change Bank Credentials","Restaurant Documents"};
+    String[] names = {"Change Credentials (Admin)","Change Credentials (Restaurants)","Delete Account","Change Bank Credentials","Restaurant Documents","Restaurant Staff Details"};
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -158,6 +159,9 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
                         break;
                     case 4:
                         startActivity(new Intent(MyAccount.this, ViewAndReuploadDocuments.class));
+                        break;
+                    case 5:
+                        startActivity(new Intent(MyAccount.this, RestaurantStaff.class));
                         break;
 
                 }
