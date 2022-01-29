@@ -13,7 +13,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.CompoundButton;
 import android.widget.ListView;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
@@ -45,7 +47,7 @@ public class AccountFrag extends Fragment {
     ListView listView;
     String[] names = {"My Account","Blocked Users","My Transactions","Logout","Terms And Conditions","Privacy policy","Restaurant Reviews","Cash Transaction Commission"};
     GoogleSignInClient googleSignInClient;
-
+    Switch aSwitch;
     FirebaseAuth auth;
     int count = 0;
     boolean pressed = false;
@@ -90,7 +92,7 @@ public class AccountFrag extends Fragment {
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .build();
-
+        aSwitch = view.findViewById(R.id.storeImagesinPhoneSwitch);
         googleSignInClient = GoogleSignIn.getClient(requireContext(),gso);
         listView.setOnItemClickListener((adapterView, view1, i, l) -> {
             int id = (int) adapterView.getItemIdAtPosition(i);
@@ -186,6 +188,27 @@ public class AccountFrag extends Fragment {
                 case 7:
                 startActivity(new Intent(requireContext(), CashTransactionCommissionActivity.class));
                 break;
+            }
+        });
+        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("loginInfo",MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        if(sharedPreferences.getString("storeInDevice","").equals("yes"))
+            aSwitch.setChecked(true);
+        else
+            aSwitch.setChecked(false);
+
+        aSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if (b) {
+                    Toast.makeText(requireContext(), "Images Will be stored in device storage", Toast.LENGTH_SHORT).show();
+                    editor.putString("storeInDevice","yes");
+                    editor.apply();
+                } else {
+                    Toast.makeText(requireContext(), "Images Will not be stored in device storage", Toast.LENGTH_SHORT).show();
+                    editor.putString("storeInDevice","no");
+                    editor.apply();
+                }
             }
         });
     }

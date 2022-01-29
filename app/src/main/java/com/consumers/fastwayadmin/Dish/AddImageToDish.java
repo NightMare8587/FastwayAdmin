@@ -151,7 +151,11 @@ public class AddImageToDish extends AppCompatActivity {
                 reference.putFile(Uri.fromFile(file)).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-                        Toast.makeText(AddImageToDish.this, "Upload Complete and image saved in phone successfully", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(AddImageToDish.this, "Upload Complete", Toast.LENGTH_SHORT).show();
+                        SharedPreferences sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
+                        if(sharedPreferences.getString("storeInDevice","").equals("no")){
+                            file.delete();
+                        }
                         new UploadInBackground().execute();
                         fastDialog.dismiss();
                         finish();

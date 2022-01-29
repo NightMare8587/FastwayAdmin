@@ -633,6 +633,7 @@ public class MainActivity extends AppCompatActivity {
             Uri personPhoto = acct.getPhotoUrl();
             editor.putString("email",personEmail);
             editor.putString("name",personName);
+            editor.putString("storeInDevice","yes");
             editor.apply();
             Log.i("info",personName+ " " + personEmail + " " + personFamilyName);
         }
