@@ -3,6 +3,7 @@ package com.consumers.fastwayadmin.MenuActivities;
 import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -63,7 +64,7 @@ public class CreateDish extends AppCompatActivity {
     FloatingActionButton floatingActionButton;
     String menuType;
     String name,half,full,image;
-    String imageUri = "";
+
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -237,7 +238,12 @@ public class CreateDish extends AppCompatActivity {
                 reference.putFile(Uri.fromFile(file)).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-                        Toast.makeText(CreateDish.this, "Upload Complete and image saved in phone successfully", Toast.LENGTH_SHORT).show();
+                        SharedPreferences sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
+                        if(sharedPreferences.getString("storeInDevice","").equals("no"))
+                            file.delete();
+
+
+                        Toast.makeText(CreateDish.this, "Upload Complete", Toast.LENGTH_SHORT).show();
                         addToDatabase(name,half,full,image,mrp);
                     }
                 }).addOnFailureListener(new OnFailureListener() {
