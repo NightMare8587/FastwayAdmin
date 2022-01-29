@@ -1,18 +1,16 @@
 package com.consumers.fastwayadmin.NavFrags.CashCommission;
 
+import android.annotation.SuppressLint;
+import android.content.Intent;
+import android.os.Bundle;
+import android.widget.Button;
+import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-
-import android.annotation.SuppressLint;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
+import androidx.appcompat.app.AppCompatDialog;
 
 import com.consumers.fastwayadmin.R;
 import com.developer.kalert.KAlertDialog;
@@ -31,7 +29,7 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
     TextView totalCashTransaction,totalCommission;
     Button payCommissionNow;
     int commissionAmount;
-    SharedPreferences sharedPreferences;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,26 +48,16 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
                      commissionAmount = (totalCash * 7)/100;
                     totalCommission.setText("Commission to be paid " + "\u20B9" + commissionAmount);
                     payCommissionNow.setText("Pay \u20B9" + commissionAmount + " Now");
-                    payCommissionNow.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            AlertDialog.Builder builder = new AlertDialog.Builder(CashTransactionCommissionActivity.this);
-                            builder.setTitle("Pay Commission").setMessage("Do you sure wanna proceed to pay commission")
-                                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialogInterface, int i) {
-                                            dialogInterface.dismiss();
-                                        }
-                                    }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
+                    payCommissionNow.setOnClickListener(view -> {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(CashTransactionCommissionActivity.this);
+                        builder.setTitle("Pay Commission").setMessage("Do you sure wanna proceed to pay commission")
+                                .setNegativeButton("No", (dialogInterface, i) -> dialogInterface.dismiss()).setPositiveButton("Yes", (dialogInterface, i) -> {
                                     dialogInterface.dismiss();
                                     Intent intent = new Intent(CashTransactionCommissionActivity.this, CashFreeGateway.class);
                                     intent.putExtra("amount",commissionAmount + "");
-                                }
-                            }).create();
-                            builder.show();
-                        }
+                                    startActivityForResult(intent,2);
+                                }).create();
+                        builder.show();
                     });
                 }else{
                     KAlertDialog kAlertDialog = new KAlertDialog(CashTransactionCommissionActivity.this,KAlertDialog.ERROR_TYPE)
@@ -101,13 +89,23 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
                     .setTitleText("Success")
                     .setContentText("Payment made successfully")
                     .setConfirmText("Exit")
-                    .setConfirmClickListener(new KAlertDialog.KAlertClickListener() {
-                        @Override
-                        public void onClick(KAlertDialog kAlertDialog) {
-
-                        }
+                    .setConfirmClickListener(kAlertDialog1 -> {
+                        kAlertDialog1.dismiss();
+                        finish();
                     });
 
+            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
+            databaseReference.child("totalCashTakeAway").setValue("0");
+            databaseReference.child("lastCommissionPaid").setValue(String.valueOf(System.currentTimeMillis()));
+
+            kAlertDialog.setCancelable(false);
+            kAlertDialog.show();
+        }else if(resultCode == 3){
+            KAlertDialog kAlertDialog = new KAlertDialog(CashTransactionCommissionActivity.this,KAlertDialog.ERROR_TYPE)
+                    .setTitleText("Error")
+                    .setContentText("Payment Failed\nIf amount deducted if will get refunded in 2-3 business days")
+                    .setConfirmText("Exit")
+                    .setConfirmClickListener(AppCompatDialog::dismiss);
             kAlertDialog.setCancelable(false);
             kAlertDialog.show();
         }

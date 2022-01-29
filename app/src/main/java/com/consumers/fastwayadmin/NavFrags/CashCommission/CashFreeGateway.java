@@ -1,4 +1,5 @@
 package com.consumers.fastwayadmin.NavFrags.CashCommission;
+
 import static com.cashfree.pg.CFPaymentService.PARAM_APP_ID;
 import static com.cashfree.pg.CFPaymentService.PARAM_CUSTOMER_EMAIL;
 import static com.cashfree.pg.CFPaymentService.PARAM_CUSTOMER_NAME;
@@ -11,7 +12,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -26,15 +26,10 @@ import com.android.volley.toolbox.Volley;
 import com.cashfree.pg.CFPaymentService;
 import com.consumers.fastwayadmin.R;
 import com.developer.kalert.KAlertDialog;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Random;
 
 public class CashFreeGateway extends AppCompatActivity {
@@ -154,8 +149,10 @@ public class CashFreeGateway extends AppCompatActivity {
                         if (bundle.getString("txStatus").equals("SUCCESS")) {
 //                            Toast.makeText(this, "Transaction Failed" , Toast.LENGTH_SHORT).show();
                             setResult(2);
+                            finish();
                         }else
                             setResult(3);
+                        finish();
                     }
                 }
         }
