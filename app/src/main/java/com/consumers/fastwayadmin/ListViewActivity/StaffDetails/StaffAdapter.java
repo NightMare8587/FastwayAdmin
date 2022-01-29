@@ -1,5 +1,6 @@
 package com.consumers.fastwayadmin.ListViewActivity.StaffDetails;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -52,7 +53,7 @@ public class StaffAdapter extends RecyclerView.Adapter<StaffAdapter.Holder> {
     }
 
     @Override
-    public void onBindViewHolder(@NonNull Holder holder, int position) {
+    public void onBindViewHolder(@NonNull Holder holder, @SuppressLint("RecyclerView") int position) {
         holder.name.setText(name.get(position));
         holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
