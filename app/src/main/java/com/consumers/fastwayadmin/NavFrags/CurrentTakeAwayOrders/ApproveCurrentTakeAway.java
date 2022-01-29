@@ -129,18 +129,6 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
         halfOrList = findViewById(R.id.halfOrTakeAwayListView);
         dishNames = findViewById(R.id.DishNamesTakeAwayListView);
         approve = findViewById(R.id.approveTakeAwayButton);
-//        checkForCustomisation = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid())).child("Current TakeAway");
-//        checkForCustomisation.addListenerForSingleValueEvent(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//
-//            }
-//        });
 
         showCustom.setOnClickListener(click -> {
             AlertDialog.Builder alert = new AlertDialog.Builder(ApproveCurrentTakeAway.this);
@@ -220,10 +208,29 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                                 @Override
                                 public void onClick(KAlertDialog kAlertDialog) {
                                     kAlertDialog.dismissWithAnimation();
+                                    FirebaseAuth auth = FirebaseAuth.getInstance();
+                                    DatabaseReference trackTotalCash = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
+                                    trackTotalCash.addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                            if(snapshot.hasChild("totalCashTakeAway")){
+                                                int prevAmount = Integer.parseInt(String.valueOf(snapshot.child("totalCashTakeAway").getValue()));
+                                                int currAmount = Integer.parseInt(orderAmount);
+                                                trackTotalCash.child("totalCashTakeAway").setValue(String.valueOf(currAmount + prevAmount));
+                                            }else{
+                                                trackTotalCash.child("totalCashTakeAway").setValue(String.valueOf(orderAmount));
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError error) {
+
+                                        }
+                                    });
                                     Toast.makeText(ApproveCurrentTakeAway.this, "Order Confirmed", Toast.LENGTH_SHORT).show();
                                     RequestQueue requestQueue = Volley.newRequestQueue(ApproveCurrentTakeAway.this);
                                     JSONObject main = new JSONObject();
-                                    FirebaseAuth auth = FirebaseAuth.getInstance();
+
                                     CashTransactionClass cashTransactionClass = new CashTransactionClass(orderId,orderAmount,time,id);
                                     DatabaseReference saveOrderInfo = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
                                     saveOrderInfo.child("Cash Transactions").child(time).setValue(cashTransactionClass);

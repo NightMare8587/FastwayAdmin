@@ -31,8 +31,11 @@
         android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         tools:replace="android:icon,android:allowBackup">
         <activity
+            android:name=".NavFrags.CashCommission.CashFreeGateway"
+            android:exported="true" />
+        <activity
             android:name=".ListViewActivity.StaffDetails.UpdateImageRestaurantStaff"
-            android:exported="false" />
+            android:exported="true" />
         <activity
             android:name=".ListViewActivity.StaffDetails.RestaurantStaff"
             android:exported="false" />
