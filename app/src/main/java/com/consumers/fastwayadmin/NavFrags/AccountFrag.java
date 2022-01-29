@@ -2,6 +2,7 @@ package com.consumers.fastwayadmin.NavFrags;
 
 import static android.content.Context.MODE_PRIVATE;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -47,7 +48,10 @@ public class AccountFrag extends Fragment {
     ListView listView;
     String[] names = {"My Account","Blocked Users","My Transactions","Logout","Terms And Conditions","Privacy policy","Restaurant Reviews","Cash Transaction Commission"};
     GoogleSignInClient googleSignInClient;
+    @SuppressLint("UseSwitchCompatOrMaterialCode")
     Switch aSwitch;
+    SharedPreferences sharedPreferences;
+    SharedPreferences.Editor editor;
     FirebaseAuth auth;
     int count = 0;
     boolean pressed = false;
@@ -86,13 +90,19 @@ public class AccountFrag extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         listView = view.findViewById(R.id.listView);
         auth = FirebaseAuth.getInstance();
-
+        aSwitch = view.findViewById(R.id.storeImagesinPhoneSwitch);
+         sharedPreferences = requireContext().getSharedPreferences("loginInfo",MODE_PRIVATE);
+         editor = sharedPreferences.edit();
+        if(sharedPreferences.getString("storeInDevice","").equals("yes"))
+            aSwitch.setChecked(true);
+        else
+            aSwitch.setChecked(false);
         ArrayAdapter arrayAdapter = new ArrayAdapter<>(view.getContext(), R.layout.list, names);
         listView.setAdapter(arrayAdapter);
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .build();
-        aSwitch = view.findViewById(R.id.storeImagesinPhoneSwitch);
+
         googleSignInClient = GoogleSignIn.getClient(requireContext(),gso);
         listView.setOnItemClickListener((adapterView, view1, i, l) -> {
             int id = (int) adapterView.getItemIdAtPosition(i);
@@ -190,12 +200,7 @@ public class AccountFrag extends Fragment {
                 break;
             }
         });
-        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("loginInfo",MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        if(sharedPreferences.getString("storeInDevice","").equals("yes"))
-            aSwitch.setChecked(true);
-        else
-            aSwitch.setChecked(false);
+
 
         aSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
