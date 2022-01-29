@@ -242,7 +242,6 @@ public class CreateDish extends AppCompatActivity {
                         if(sharedPreferences.getString("storeInDevice","").equals("no"))
                             file.delete();
 
-
                         Toast.makeText(CreateDish.this, "Upload Complete", Toast.LENGTH_SHORT).show();
                         addToDatabase(name,half,full,image,mrp);
                     }
