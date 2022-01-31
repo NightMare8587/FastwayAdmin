@@ -61,7 +61,7 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
     ModalBottomSheetDialog modalBottomSheetDialog;
     SharedPreferences.Editor editor;
     TextView textView;
-    String[] names = {"Change Credentials (Admin)","Change Credentials (Restaurants)","Delete Account","Change Bank Credentials","Restaurant Documents","Restaurant Staff Details"};
+    String[] names = {"Change Credentials (Admin)","Change Credentials (Restaurants)","Delete Account","Change Bank Credentials","Restaurant Documents","Restaurant Staff Details","Leave Fastway"};
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,7 +70,7 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
         initialise();
         SharedPreferences resInfoSharedPref = getSharedPreferences("RestaurantInfo",MODE_PRIVATE);
         editor = resInfoSharedPref.edit();
-        ArrayAdapter arrayAdapter = new ArrayAdapter<>(this, R.layout.list, names);
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this, R.layout.list, names);
         listView.setAdapter(arrayAdapter);
         SharedPreferences sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
         if(resInfoSharedPref.contains("hotelName")) {
@@ -95,11 +95,9 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
             });
         }
         textView.setText("Hi, " + sharedPreferences.getString("name",""));
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                switch (i){
-                    case 0:
+        listView.setOnItemClickListener((adapterView, view, i, l) -> {
+            switch (i){
+                case 0:
 //                        FlatDialog flatDialog = new FlatDialog(MyAccount.this)
 //                                .setTitle("Choose One Option")
 //                                .setTitleColor(Color.BLACK)
@@ -109,59 +107,58 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
 //                                .setSecondButtonColor(Color.LTGRAY)
 //                                .setSecondButtonText("Change Email")
 //                                .setSecondButtonTextColor()
-                        modalBottomSheetDialog = new ModalBottomSheetDialog.Builder()
-                                .setRoundedModal(true)
-                                .setHeader("Choose One Option")
-                                .add(R.menu.bottom_sheet)
-                                .build();
-                        modalBottomSheetDialog.show(getSupportFragmentManager(),"admin");
+                    modalBottomSheetDialog = new ModalBottomSheetDialog.Builder()
+                            .setRoundedModal(true)
+                            .setHeader("Choose One Option")
+                            .add(R.menu.bottom_sheet)
+                            .build();
+                    modalBottomSheetDialog.show(getSupportFragmentManager(),"admin");
 
-                        break;
-                    case 1:
-                        modalBottomSheetDialog = new ModalBottomSheetDialog.Builder()
-                                .setRoundedModal(true)
-                                .setHeader("Choose One Option")
-                                .add(R.menu.bottom_sheet_restaurant)
-                                .build();
-                        modalBottomSheetDialog.show(getSupportFragmentManager(),"restaurant");
-                        break;
+                    break;
+                case 1:
+                    modalBottomSheetDialog = new ModalBottomSheetDialog.Builder()
+                            .setRoundedModal(true)
+                            .setHeader("Choose One Option")
+                            .add(R.menu.bottom_sheet_restaurant)
+                            .build();
+                    modalBottomSheetDialog.show(getSupportFragmentManager(),"restaurant");
+                    break;
 
-                    case 2:
-                        new KAlertDialog(MyAccount.this,KAlertDialog.WARNING_TYPE)
-                                .setTitleText("Delete Account")
-                                .setContentText("Do you sure wanna delete your account!!!\n"+"This action can't be revert")
-                                .setConfirmText("Yes, Delete")
-                                .setConfirmClickListener(new KAlertDialog.KAlertClickListener() {
-                                    @Override
-                                    public void onClick(KAlertDialog kAlertDialog) {
+                case 2:
+                    new KAlertDialog(MyAccount.this,KAlertDialog.WARNING_TYPE)
+                            .setTitleText("Delete Account")
+                            .setContentText("Do you sure wanna delete your account!!!\n"+"This action can't be revert")
+                            .setConfirmText("Yes, Delete")
+                            .setConfirmClickListener(new KAlertDialog.KAlertClickListener() {
+                                @Override
+                                public void onClick(KAlertDialog kAlertDialog) {
 
-                                        try {
-                                            new removeAll().execute();
-                                        }
-                                        catch (Exception e){
-                                            Log.i("logs",e.getLocalizedMessage());
-                                        }
+                                    try {
+                                        new removeAll().execute();
                                     }
-                                }).setCancelText("No, Wait")
-                                .setCancelClickListener(new KAlertDialog.KAlertClickListener() {
-                                    @Override
-                                    public void onClick(KAlertDialog kAlertDialog) {
-                                        kAlertDialog.dismissWithAnimation();
+                                    catch (Exception e){
+                                        Log.i("logs",e.getLocalizedMessage());
                                     }
-                                }).show();
-                        break;
-                    case 3:
-                        Intent intent = new Intent(MyAccount.this, EditVendorDetails.class);
-                        startActivityForResult(intent,2);
-                        break;
-                    case 4:
-                        startActivity(new Intent(MyAccount.this, ViewAndReuploadDocuments.class));
-                        break;
-                    case 5:
-                        startActivity(new Intent(MyAccount.this, RestaurantStaff.class));
-                        break;
+                                }
+                            }).setCancelText("No, Wait")
+                            .setCancelClickListener(new KAlertDialog.KAlertClickListener() {
+                                @Override
+                                public void onClick(KAlertDialog kAlertDialog) {
+                                    kAlertDialog.dismissWithAnimation();
+                                }
+                            }).show();
+                    break;
+                case 3:
+                    Intent intent = new Intent(MyAccount.this, EditVendorDetails.class);
+                    startActivityForResult(intent,2);
+                    break;
+                case 4:
+                    startActivity(new Intent(MyAccount.this, ViewAndReuploadDocuments.class));
+                    break;
+                case 5:
+                    startActivity(new Intent(MyAccount.this, RestaurantStaff.class));
+                    break;
 
-                }
             }
         });
     }
