@@ -49,6 +49,10 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
                     totalCommission.setText("Commission to be paid " + "\u20B9" + commissionAmount);
                     payCommissionNow.setText("Pay \u20B9" + commissionAmount + " Now");
                     payCommissionNow.setOnClickListener(view -> {
+                        if(snapshot.hasChild("lastCommissionPaid")){
+                            long lastCommission = Long.parseLong(String.valueOf(snapshot.child("lastCommissionPaid").getValue()));
+
+                        }
                         AlertDialog.Builder builder = new AlertDialog.Builder(CashTransactionCommissionActivity.this);
                         builder.setTitle("Pay Commission").setMessage("Do you sure wanna proceed to pay commission")
                                 .setNegativeButton("No", (dialogInterface, i) -> dialogInterface.dismiss()).setPositiveButton("Yes", (dialogInterface, i) -> {
