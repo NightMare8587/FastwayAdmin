@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ListViewActivity.LeaveFastwayPackage.LeaveFastway">
+
+    <RadioGroup
+        android:id="@+id/radioGroupReportRestaurant"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:checkedButton="@id/radioButtonHygiene"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <RadioButton
+            android:id="@+id/radioButtonHygiene"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Not Finding Fastway Usefull" />
+
+        <RadioButton
+            android:id="@+id/radioButtonStaff"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Others" />
+
+<!--        <RadioButton-->
+<!--            android:id="@+id/radioButtonTheft"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="Report For Any Theft" />-->
+
+<!--        <RadioButton-->
+<!--            android:id="@+id/radioButtonOthers"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="Others" />-->
+    </RadioGroup>
+
+    <EditText
+        android:id="@+id/editTextReportRestaurant"
+        android:layout_width="0dp"
+        android:layout_height="135dp"
+        android:layout_marginTop="20dp"
+        android:textColorHint="@color/gray_btn_bg_color"
+        android:layout_marginLeft="12dp"
+        android:layout_marginRight="12dp"
+        android:padding="8dp"
+        android:background="@drawable/report_edittext"
+        android:ems="10"
+        android:gravity="start|top"
+        android:hint="Explain what happened (Optional)\n(200 words limit)"
+        android:inputType="textMultiLine"
+        android:maxLength="200"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/radioGroupReportRestaurant" />
+
+    <Button
+        android:id="@+id/submitAndLeaveFastway"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="21dp"
+        android:text="Submit"
+        android:textSize="17sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editTextReportRestaurant" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

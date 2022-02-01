@@ -61,6 +61,7 @@ public class HomeScreen extends AppCompatActivity {
     FirebaseAuth auth = FirebaseAuth.getInstance();
     Timer timer = new Timer();
     DatabaseReference resRef;
+    String UID;
     DatabaseReference reference;
 
     @Override
@@ -97,8 +98,8 @@ public class HomeScreen extends AppCompatActivity {
             }
         });
         FirebaseAuth auth = FirebaseAuth.getInstance();
-        DatabaseReference myRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid()).child("Restaurant Documents");
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid())).child("Tables");
+        DatabaseReference myRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(UID).child("Restaurant Documents");
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(UID)).child("Tables");
         myRef.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -178,7 +179,7 @@ public class HomeScreen extends AppCompatActivity {
                                             databaseReference.child(tableNum).child("timeInMillis").removeValue();
                                             databaseReference.child(tableNum).child("timeOfBooking").removeValue();
                                             databaseReference.child(tableNum).child("status").setValue("available");
-                                            DatabaseReference removeFromUser = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(id).child("Reserve Tables").child(auth.getUid());
+                                            DatabaseReference removeFromUser = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(id).child("Reserve Tables").child(UID);
                                             removeFromUser.child(Objects.requireNonNull(dataSnapshot.getKey())).removeValue();
                                             RequestQueue requestQueue = Volley.newRequestQueue(HomeScreen.this);
                                             JSONObject main = new JSONObject();
@@ -284,18 +285,19 @@ public class HomeScreen extends AppCompatActivity {
     }
 
     private void initialise() {
+        UID = auth.getUid() + "";
         auth = FirebaseAuth.getInstance();
         bubble = findViewById(R.id.top_navigation_constraint);
         manager = getSupportFragmentManager();
-        FirebaseMessaging.getInstance().subscribeToTopic(Objects.requireNonNull(auth.getUid()));
-        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid());
+        FirebaseMessaging.getInstance().subscribeToTopic(Objects.requireNonNull(UID));
+        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(UID);
     }
 
     public class BackgroundWork extends AsyncTask<Void,Void,Void>{
 
         @Override
         protected Void doInBackground(Void... voids) {
-            resRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
+            resRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(UID));
             resRef.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -326,7 +328,7 @@ public class HomeScreen extends AppCompatActivity {
                 }
             });
 
-            resRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid())).child("Restaurant Documents");
+            resRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(UID)).child("Restaurant Documents");
             resRef.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -357,7 +359,7 @@ public class HomeScreen extends AppCompatActivity {
                 }
             });
 
-            DatabaseReference checkIfCommissionNeeded = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
+            DatabaseReference checkIfCommissionNeeded = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(UID));
             checkIfCommissionNeeded.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {

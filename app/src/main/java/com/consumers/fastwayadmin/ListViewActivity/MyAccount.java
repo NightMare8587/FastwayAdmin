@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -25,6 +24,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.consumers.fastwayadmin.Info.MapsActivity2;
 import com.consumers.fastwayadmin.Info.RestaurantDocuments.ReUploadDocuments.ViewAndReuploadDocuments;
+import com.consumers.fastwayadmin.ListViewActivity.LeaveFastwayPackage.LeaveFastway;
 import com.consumers.fastwayadmin.ListViewActivity.StaffDetails.RestaurantStaff;
 import com.consumers.fastwayadmin.NavFrags.EditVendorDetails;
 import com.consumers.fastwayadmin.R;
@@ -57,6 +57,7 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
     GoogleSignInClient client;
     GoogleSignInOptions gso;
     SharedPreferences sharedPreferences;
+    String UID;
     TextView resNameText;
     ModalBottomSheetDialog modalBottomSheetDialog;
     SharedPreferences.Editor editor;
@@ -76,7 +77,7 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
         if(resInfoSharedPref.contains("hotelName")) {
             resNameText.setText(resInfoSharedPref.getString("hotelName", ""));
         }else{
-            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
+            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(UID));
             databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -158,6 +159,9 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
                 case 5:
                     startActivity(new Intent(MyAccount.this, RestaurantStaff.class));
                     break;
+                case 6:
+                    startActivity(new Intent(MyAccount.this, LeaveFastway.class));
+                    break;
 
             }
         });
@@ -168,14 +172,15 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
         resNameText = findViewById(R.id.resNameAccountFrag);
         listView = findViewById(R.id.accountActivityListView);
         auth = FirebaseAuth.getInstance();
-        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
+        UID = auth.getUid() + "";
+        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(UID));
     }
 
     @SuppressLint("NonConstantResourceId")
     @Override
     public void onItemSelected(String tag, Item item) {
         if (tag.equals("admin")) {
-            reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
+            reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(UID));
             int id = item.getId();
             switch (id) {
                 case R.id.changeNameBottomSheet:
@@ -198,7 +203,7 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
                                 @Override
                                 public void onClick(View view) {
                                     Map<String, Object> map = new HashMap<>();
-                                    Log.i("auth", auth.getUid());
+                                    Log.i("auth", UID);
                                     map.put("name", String.valueOf(flatDialog.getFirstTextField().toString()));
                                     reference.child("name").setValue(flatDialog.getFirstTextField().toString());
                                     Toast.makeText(MyAccount.this, "Name Changed Successfully", Toast.LENGTH_SHORT).show();
@@ -235,7 +240,7 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
                                 @Override
                                 public void onClick(View view) {
                                     Map<String, Object> map = new HashMap<>();
-                                    Log.i("auth", auth.getUid());
+                                    Log.i("auth", UID);
                                     map.put("name", String.valueOf(flatDialog1.getFirstTextField().toString()));
                                     reference.child("email").setValue(flatDialog1.getFirstTextField().toString());
                                     Toast.makeText(MyAccount.this, "Email Changed Successfully", Toast.LENGTH_SHORT).show();
@@ -257,11 +262,11 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
                     throw new IllegalStateException("Unexpected value: " + id);
             }
         }else if(tag.equals("restaurant")){
-            reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
+            reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(UID));
             int id = item.getId();
             switch (id){
                 case R.id.changeNameBottomSheetRestaurant:
-//                    reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid()));
+//                    reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(UID));
                     FlatDialog flatDialog = new FlatDialog(MyAccount.this);
                     flatDialog.setTitle("Enter New Name")
                             .setBackgroundColor(Color.WHITE)

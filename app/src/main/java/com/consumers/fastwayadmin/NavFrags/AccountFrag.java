@@ -40,6 +40,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.Objects;
@@ -52,6 +54,7 @@ public class AccountFrag extends Fragment {
     Switch aSwitch;
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
+    String UID;
     FirebaseAuth auth;
     int count = 0;
     boolean pressed = false;
@@ -90,6 +93,7 @@ public class AccountFrag extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         listView = view.findViewById(R.id.listView);
         auth = FirebaseAuth.getInstance();
+        UID = auth.getUid() + "";
         aSwitch = view.findViewById(R.id.storeImagesinPhoneSwitch);
          sharedPreferences = requireContext().getSharedPreferences("loginInfo",MODE_PRIVATE);
          editor = sharedPreferences.edit();
@@ -144,7 +148,11 @@ public class AccountFrag extends Fragment {
                     builder.setTitle("Logout")
                             .setMessage("Do you wanna logout?")
                             .setPositiveButton("Yes", (dialogInterface, i1) -> {
-                                FirebaseMessaging.getInstance().unsubscribeFromTopic(Objects.requireNonNull(auth.getUid()));
+                                SharedPreferences settings = view1.getContext().getSharedPreferences("loginInfo", MODE_PRIVATE);
+                                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(settings.getString("state","")).child(UID);
+                                databaseReference.child("status").setValue("offline");
+                                databaseReference.child("acceptingOrders").setValue("no");
+                                FirebaseMessaging.getInstance().unsubscribeFromTopic(Objects.requireNonNull(UID));
                                 requireContext().stopService(new Intent(requireContext(), MyService.class));
                                 SharedPreferences stopServices = requireActivity().getSharedPreferences("Stop Services", MODE_PRIVATE);
                                 SharedPreferences.Editor editor = stopServices.edit();
@@ -156,7 +164,7 @@ public class AccountFrag extends Fragment {
                                     public void onComplete(@NonNull Task<Void> task) {
                                     }
                                 });
-                                SharedPreferences settings = view1.getContext().getSharedPreferences("loginInfo", MODE_PRIVATE);
+
                                 settings.edit().clear().commit();
 
                                 SharedPreferences res = view1.getContext().getSharedPreferences("RestaurantInfo", MODE_PRIVATE);

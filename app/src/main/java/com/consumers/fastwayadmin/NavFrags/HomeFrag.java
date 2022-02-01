@@ -96,12 +96,13 @@ public class HomeFrag extends Fragment {
     String usernameOfTakeAway;
     String orderId,orderAmount;
     List<String> finalUserNames = new ArrayList<>();
-    FirebaseAuth auth;
+    FirebaseAuth auth = FirebaseAuth.getInstance();
     RecyclerView recyclerView,homeFragTakeAwayRecucler;
     List<String> currentTakeAwayAuth = new ArrayList<>();
     List<String> dishNameCurrentTakeAway = new ArrayList<>();
     List<String> dishQuantityCurrentTakeAway = new ArrayList<>();
     List<String> userNameTakeAway = new ArrayList<>();
+    String UID;
     String paymentMode;
     LinearLayout linearLayout,secondLinearLayout;
     List<String> halfOr = new ArrayList<>();
@@ -167,6 +168,7 @@ public class HomeFrag extends Fragment {
         toolbar = view.findViewById(R.id.homeFragToolBar);
         ((AppCompatActivity) requireActivity()).setSupportActionBar(toolbar);
         inAppUpdateInfo();
+        UID = auth.getUid() + "";
         SharedPreferences stopServices = requireActivity().getSharedPreferences("Stop Services",Context.MODE_PRIVATE);
          editor = stopServices.edit();
          acceptOrders = view.findViewById(R.id.acceptingOrdersSwitchHomeFrag);
@@ -189,12 +191,12 @@ public class HomeFrag extends Fragment {
 //        recyclerView.setLayoutManager(new LinearLayoutManager(view.getContext(),LinearLayoutManager.HORIZONTAL),true);
         comboImage = view.findViewById(R.id.comboDiscountImageView);
         auth = FirebaseAuth.getInstance();
-        onlineOrOfflineRestaurant = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(resInfoShared.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
+        onlineOrOfflineRestaurant = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(resInfoShared.getString("state","")).child(Objects.requireNonNull(UID));
         horizonatl = new LinearLayoutManager(view.getContext(),LinearLayoutManager.HORIZONTAL,false);
         anotherHori = new LinearLayoutManager(view.getContext(),LinearLayoutManager.HORIZONTAL,false);;
         sharedPreferences = requireActivity().getSharedPreferences("locations current", Context.MODE_PRIVATE);
-        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(resInfoShared.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
-        FirebaseMessaging.getInstance().subscribeToTopic(Objects.requireNonNull(auth.getUid()));
+        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(resInfoShared.getString("state","")).child(Objects.requireNonNull(UID));
+        FirebaseMessaging.getInstance().subscribeToTopic(Objects.requireNonNull(UID));
         if(restaurantStatus.contains("status")){
             if(restaurantStatus.getString("status","").equals("offline")){
                 comboImage.setVisibility(View.INVISIBLE);
@@ -203,6 +205,8 @@ public class HomeFrag extends Fragment {
                 onlineOrOffline.setChecked(false);
                 onlineOrOffline.setText("offline");
                 acceptOrders.setChecked(false);
+                onlineOrOfflineRestaurant.child("status").setValue("offline");
+                onlineOrOfflineRestaurant.child("acceptingOrders").setValue("no");
             }else{
                 comboImage.setVisibility(View.VISIBLE);
                 linearLayout.setVisibility(View.VISIBLE);
@@ -210,7 +214,12 @@ public class HomeFrag extends Fragment {
                 onlineOrOffline.setChecked(true);
                 onlineOrOffline.setText("online");
                 acceptOrders.setChecked(true);
+                onlineOrOfflineRestaurant.child("status").setValue("online");
+                onlineOrOfflineRestaurant.child("acceptingOrders").setValue("yes");
             }
+        }else{
+            onlineOrOfflineRestaurant.child("status").setValue("online");
+            onlineOrOfflineRestaurant.child("acceptingOrders").setValue("yes");
         }
 
         if(restaurantStatus.contains("resOrdersAccepting")){
@@ -393,7 +402,7 @@ public class HomeFrag extends Fragment {
 
         refreshTakeAway.setOnClickListener(click -> {
             FirebaseAuth auth = FirebaseAuth.getInstance();
-            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(resInfoShared.getString("state","")).child(Objects.requireNonNull(auth.getUid())).child("Current TakeAway");
+            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(resInfoShared.getString("state","")).child(Objects.requireNonNull(UID)).child("Current TakeAway");
             databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -610,7 +619,7 @@ public class HomeFrag extends Fragment {
 
                         fastDialog.show();
 
-                        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(resInfoShared.getString("state","")).child(Objects.requireNonNull(auth.getUid())).child("Tables");
+                        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(resInfoShared.getString("state","")).child(Objects.requireNonNull(UID)).child("Tables");
                         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -873,7 +882,7 @@ public class HomeFrag extends Fragment {
         protected void onPostExecute(Void unused) {
             super.onPostExecute(unused);
             FirebaseAuth auth = FirebaseAuth.getInstance();
-            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(resInfoShared.getString("state","")).child(auth.getUid()).child("Tables");
+            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(resInfoShared.getString("state","")).child(UID).child("Tables");
             databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -929,7 +938,7 @@ public class HomeFrag extends Fragment {
         @Override
         protected Void doInBackground(Void... voids) {
             FirebaseAuth auth = FirebaseAuth.getInstance();
-            checkForBank = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
+            checkForBank = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(UID));
             checkForBank.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -965,7 +974,7 @@ public class HomeFrag extends Fragment {
         protected Void doInBackground(Void... voids) {
 
             FirebaseAuth auth = FirebaseAuth.getInstance();
-            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(resInfoShared.getString("state","")).child(Objects.requireNonNull(auth.getUid())).child("Current TakeAway");
+            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(resInfoShared.getString("state","")).child(Objects.requireNonNull(UID)).child("Current TakeAway");
             databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
