@@ -45,12 +45,14 @@ public class ChatWithCustomer extends AppCompatActivity {
     DatabaseReference reference;
     FirebaseAuth auth;
     String id;
+    boolean containsBad = false;
     String restaurantName;
     String URL = "https://fcm.googleapis.com/fcm/send";
     RecyclerView recyclerView;
     List<String> message = new ArrayList<>();
     List<String> time = new ArrayList<>();
     SharedPreferences sharedPreferences;
+    List<String> badWords = new ArrayList<>();
     LinearLayoutManager linearLayoutManager;
     DatabaseReference resName;
     List<String> leftOrRight = new ArrayList<>();
@@ -61,6 +63,7 @@ public class ChatWithCustomer extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_with_customer);
         auth = FirebaseAuth.getInstance();
+        addBadWords();
         sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
         editText = findViewById(R.id.sendMessageEditText);
         sendME = findViewById(R.id.sendMessageButton);
@@ -148,49 +151,77 @@ public class ChatWithCustomer extends AppCompatActivity {
                 if(editText.getText().toString().length() == 0){
                     Toast.makeText(ChatWithCustomer.this, "Enter Some Text", Toast.LENGTH_SHORT).show();
                     return;
-                }else{
-                    RequestQueue requestQueue = Volley.newRequestQueue(ChatWithCustomer.this);
-                    JSONObject main = new JSONObject();
-                    try{
-                        main.put("to","/topics/"+id+"");
-                        JSONObject notification = new JSONObject();
-                        notification.put("title","Restaurant Owner" + "(" + restaurantName + ")");
-                        notification.put("body",""+editText.getText().toString().trim());
-                        main.put("notification",notification);
-
-                        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, main, new Response.Listener<JSONObject>() {
-                            @Override
-                            public void onResponse(JSONObject response) {
-
-                            }
-                        }, new Response.ErrorListener() {
-                            @Override
-                            public void onErrorResponse(VolleyError error) {
-                                Toast.makeText(getApplicationContext(), error.getLocalizedMessage()+"null", Toast.LENGTH_SHORT).show();
-                            }
-                        }){
-                            @Override
-                            public Map<String, String> getHeaders() throws AuthFailureError {
-                                Map<String,String> header = new HashMap<>();
-                                header.put("content-type","application/json");
-                                header.put("authorization","key=AAAAsigSEMs:APA91bEUF9ZFwIu84Jctci56DQd0TQOepztGOIKIBhoqf7N3ueQrkClw0xBTlWZEWyvwprXZmZgW2MNywF1pNBFpq1jFBr0CmlrJ0wygbZIBOnoZ0jP1zZC6nPxqF2MAP6iF3wuBHD2R");
-                                return header;
-                            }
-                        };
-
-                        requestQueue.add(jsonObjectRequest);
+                }else {
+                    containsBad = false;
+                    String text = editText.getText().toString().trim().toLowerCase();
+                    for (int i = 0; i < badWords.size(); i++) {
+                        if (text.contains(badWords.get(i).toLowerCase()))
+                            containsBad = true;
                     }
-                    catch (Exception e){
-                        Toast.makeText(getApplicationContext(), e.getLocalizedMessage()+"null", Toast.LENGTH_SHORT).show();
-                    }
-                    SharedPreferences sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
-                    chat chat = new chat(editText.getText().toString(),auth.getUid()+"",System.currentTimeMillis()+"","1",sharedPreferences.getString("name",""));
-                  reference.child("messages").child(id).child(System.currentTimeMillis()+"").setValue(chat);
-                  editText.setText("");
-                  updateChat();
+
+
+                    if (!containsBad) {
+                        RequestQueue requestQueue = Volley.newRequestQueue(ChatWithCustomer.this);
+                        JSONObject main = new JSONObject();
+                        try {
+                            main.put("to", "/topics/" + id + "");
+                            JSONObject notification = new JSONObject();
+                            notification.put("title", "Restaurant Owner" + "(" + restaurantName + ")");
+                            notification.put("body", "" + editText.getText().toString().trim());
+                            main.put("notification", notification);
+
+                            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, main, new Response.Listener<JSONObject>() {
+                                @Override
+                                public void onResponse(JSONObject response) {
+
+                                }
+                            }, new Response.ErrorListener() {
+                                @Override
+                                public void onErrorResponse(VolleyError error) {
+                                    Toast.makeText(getApplicationContext(), error.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
+                                }
+                            }) {
+                                @Override
+                                public Map<String, String> getHeaders() throws AuthFailureError {
+                                    Map<String, String> header = new HashMap<>();
+                                    header.put("content-type", "application/json");
+                                    header.put("authorization", "key=AAAAsigSEMs:APA91bEUF9ZFwIu84Jctci56DQd0TQOepztGOIKIBhoqf7N3ueQrkClw0xBTlWZEWyvwprXZmZgW2MNywF1pNBFpq1jFBr0CmlrJ0wygbZIBOnoZ0jP1zZC6nPxqF2MAP6iF3wuBHD2R");
+                                    return header;
+                                }
+                            };
+
+                            requestQueue.add(jsonObjectRequest);
+                        } catch (Exception e) {
+                            Toast.makeText(getApplicationContext(), e.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
+                        }
+                        SharedPreferences sharedPreferences = getSharedPreferences("loginInfo", MODE_PRIVATE);
+                        chat chat = new chat(editText.getText().toString(), auth.getUid() + "", System.currentTimeMillis() + "", "1", sharedPreferences.getString("name", ""));
+                        reference.child("messages").child(id).child(System.currentTimeMillis() + "").setValue(chat);
+                        editText.setText("");
+                        updateChat();
+                    }else
+                        Toast.makeText(ChatWithCustomer.this, "We don't allow to use bad words in our app", Toast.LENGTH_SHORT).show();
                 }
             }
         });
+    }
+
+    private void addBadWords() {
+        badWords.add("chutiya");
+        badWords.add("gandu");
+        badWords.add("lodu");
+        badWords.add("kutta");
+        badWords.add("kutti");
+        badWords.add("saale");
+        badWords.add("madarchod");
+        badWords.add("bc");
+        badWords.add("mc");
+        badWords.add("bkl");
+        badWords.add("randi");
+        badWords.add("fuck");
+        badWords.add("bitch");
+        badWords.add("asshole");
+        badWords.add("choda");
     }
 
     private void updateChat() {

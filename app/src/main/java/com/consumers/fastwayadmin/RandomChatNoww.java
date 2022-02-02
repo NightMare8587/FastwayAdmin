@@ -34,6 +34,8 @@ public class RandomChatNoww extends AppCompatActivity {
     RecyclerView recyclerView;
     LinearLayoutManager linearLayoutManager;
     List<String> messages = new ArrayList<>();
+    boolean containsBad = false;
+    List<String> badWords = new ArrayList<>();
     int count = 1;
     List<String> time = new ArrayList<>();
     List<String> leftOr = new ArrayList<>();
@@ -94,46 +96,23 @@ public class RandomChatNoww extends AppCompatActivity {
                     Toast.makeText(RandomChatNoww.this, "Enter Some Text", Toast.LENGTH_SHORT).show();
                     return;
                 }else{
-//                    RequestQueue requestQueue = Volley.newRequestQueue(RandomChatNoww.this);
-//                    JSONObject main = new JSONObject();
-//                    try{
-//                        main.put("to","/topics/"++"");
-//                        JSONObject notification = new JSONObject();
-//                        notification.put("title","Restaurant Owner");
-//                        notification.put("body",""+editText.getText().toString().trim());
-//                        main.put("notification",notification);
-//
-//                        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, main, new Response.Listener<JSONObject>() {
-//                            @Override
-//                            public void onResponse(JSONObject response) {
-//
-//                            }
-//                        }, new Response.ErrorListener() {
-//                            @Override
-//                            public void onErrorResponse(VolleyError error) {
-//                                Toast.makeText(getApplicationContext(), error.getLocalizedMessage()+"null", Toast.LENGTH_SHORT).show();
-//                            }
-//                        }){
-//                            @Override
-//                            public Map<String, String> getHeaders() throws AuthFailureError {
-//                                Map<String,String> header = new HashMap<>();
-//                                header.put("content-type","application/json");
-//                                header.put("authorization","key=AAAAsigSEMs:APA91bEUF9ZFwIu84Jctci56DQd0TQOepztGOIKIBhoqf7N3ueQrkClw0xBTlWZEWyvwprXZmZgW2MNywF1pNBFpq1jFBr0CmlrJ0wygbZIBOnoZ0jP1zZC6nPxqF2MAP6iF3wuBHD2R");
-//                                return header;
-//                            }
-//                        };
-//
-//                        requestQueue.add(jsonObjectRequest);
-//                    }
-//                    catch (Exception e){
-//                        Toast.makeText(getApplicationContext(), e.getLocalizedMessage()+"null", Toast.LENGTH_SHORT).show();
-//                    }
-                    SharedPreferences preferences = getSharedPreferences("AccountInfo",MODE_PRIVATE);
-                    chat chat = new chat(editText.getText().toString().trim(),auth.getUid()+"",System.currentTimeMillis()+"","0",preferences.getString("name",""));
-                    databaseReference.child(System.currentTimeMillis()+"").setValue(chat);
-                    editText.setText("");
+                    containsBad = false;
+                    String text = editText.getText().toString().trim().toLowerCase();
+                    for (int i = 0; i < badWords.size(); i++) {
+                        if (text.contains(badWords.get(i).toLowerCase()))
+                            containsBad = true;
+                    }
 
-                    updateChat();
+                    if(!containsBad) {
+                        SharedPreferences preferences = getSharedPreferences("AccountInfo", MODE_PRIVATE);
+                        chat chat = new chat(editText.getText().toString().trim(), auth.getUid() + "", System.currentTimeMillis() + "", "0", preferences.getString("name", ""));
+                        databaseReference.child(System.currentTimeMillis() + "").setValue(chat);
+                        editText.setText("");
+
+                        updateChat();
+                    }
+                    else
+                        Toast.makeText(RandomChatNoww.this, "We don't allow to use bad words in our app", Toast.LENGTH_SHORT).show();
                 }
 
 
@@ -204,5 +183,22 @@ public class RandomChatNoww extends AppCompatActivity {
 
             }
         });
+    }
+    private void addBadWords() {
+        badWords.add("chutiya");
+        badWords.add("gandu");
+        badWords.add("lodu");
+        badWords.add("kutta");
+        badWords.add("kutti");
+        badWords.add("saale");
+        badWords.add("madarchod");
+        badWords.add("bc");
+        badWords.add("mc");
+        badWords.add("bkl");
+        badWords.add("randi");
+        badWords.add("fuck");
+        badWords.add("bitch");
+        badWords.add("asshole");
+        badWords.add("choda");
     }
 }
