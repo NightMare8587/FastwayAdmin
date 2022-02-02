@@ -1,7 +1,7 @@
 package com.consumers.fastwayadmin.HomeScreen;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
@@ -18,11 +18,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.consumers.fastwayadmin.Chat.RandomChatFolder.RandomChatWithUsers;
@@ -59,11 +56,12 @@ public class HomeScreen extends AppCompatActivity {
     FragmentManager manager;
     SharedPreferences sharedPreferences;
     FirebaseAuth auth = FirebaseAuth.getInstance();
+    long currentTime = System.currentTimeMillis();
     Timer timer = new Timer();
     DatabaseReference resRef;
     String UID;
     DatabaseReference reference;
-
+    @SuppressLint("CommitPrefEdits")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,7 +75,6 @@ public class HomeScreen extends AppCompatActivity {
 
       new BackgroundWork().execute();
 
-
         bubble.setNavigationChangeListener((view, position) -> {
             switch (position){
                 case 0:
@@ -85,50 +82,41 @@ public class HomeScreen extends AppCompatActivity {
                     break;
                 case 1:
                     manager.beginTransaction().replace(R.id.homescreen,new MenuFrag()).commit();
-
                     break;
                 case 2:
                     manager.beginTransaction().replace(R.id.homescreen,new TablesFrag()).commit();
-
                     break;
                 case 3:
                     manager.beginTransaction().replace(R.id.homescreen,new AccountFrag()).commit();
-
                     break;
             }
         });
-        FirebaseAuth auth = FirebaseAuth.getInstance();
+
         DatabaseReference myRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(UID).child("Restaurant Documents");
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(UID)).child("Tables");
         myRef.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             if(dataSnapshot.exists() && dataSnapshot.hasChild("verified")){
-                                if(dataSnapshot.child("verified").getValue(String.class).equals("no")){
+                                if(Objects.equals(dataSnapshot.child("verified").getValue(String.class), "no")){
                                      AlertDialog.Builder alert = new AlertDialog.Builder(HomeScreen.this);
                                      alert.setTitle("Error")
                                              .setMessage("Your restaurant is either not verified or has been disbanded by Fastway")
-                                             .setPositiveButton("Exit", new DialogInterface.OnClickListener() {
-                                                 @Override
-                                                 public void onClick(DialogInterface dialogInterface, int i) {
-                                                     dialogInterface.dismiss();
-                                                     Intent homeIntent = new Intent(Intent.ACTION_MAIN);
-                                                     homeIntent.addCategory( Intent.CATEGORY_HOME );
-                                                     homeIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                                     startActivity(homeIntent);
-                                                     finish();
-                                                 }
-                                             }).setNegativeButton("Contact Fastway", new DialogInterface.OnClickListener() {
-                                         @Override
-                                         public void onClick(DialogInterface dialogInterface, int i) {
-                                             dialogInterface.dismiss();
-                                             Intent homeIntent = new Intent(HomeScreen.this,SupportActivity.class);
-                                             homeIntent.addCategory( Intent.CATEGORY_HOME );
-                                             homeIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                             startActivity(homeIntent);
-                                             finish();
-                                         }
-                                     }).create();
+                                             .setPositiveButton("Exit", (dialogInterface, i) -> {
+                                                 dialogInterface.dismiss();
+                                                 Intent homeIntent = new Intent(Intent.ACTION_MAIN);
+                                                 homeIntent.addCategory( Intent.CATEGORY_HOME );
+                                                 homeIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                                 startActivity(homeIntent);
+                                                 finish();
+                                             }).setNegativeButton("Contact Fastway", (dialogInterface, i) -> {
+                                                 dialogInterface.dismiss();
+                                                 Intent homeIntent = new Intent(HomeScreen.this,SupportActivity.class);
+                                                 homeIntent.addCategory( Intent.CATEGORY_HOME );
+                                                 homeIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                                 startActivity(homeIntent);
+                                                 finish();
+                                             }).create();
                                      alert.setCancelable(false);
                                      alert.show();
                                 }
@@ -150,11 +138,8 @@ public class HomeScreen extends AppCompatActivity {
                 if (!isConnected) {
                     View parentLayout = findViewById(android.R.id.content);
                     Snackbar.make(parentLayout, "Please connect to internet :)", Snackbar.LENGTH_SHORT)
-                            .setAction("CLOSE", new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
+                            .setAction("CLOSE", view -> {
 
-                                }
                             })
                             .setActionTextColor(getResources().getColor(android.R.color.holo_red_light))
                             .show();
@@ -191,19 +176,13 @@ public class HomeScreen extends AppCompatActivity {
                                                 notification.put("body", "Your Reserved Tables is cancelled because you didn't make it on time");
                                                 main.put("notification", notification);
 
-                                                JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, main, new Response.Listener<JSONObject>() {
-                                                    @Override
-                                                    public void onResponse(JSONObject response) {
+                                                JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, main, response -> {
 
-                                                    }
-                                                }, new Response.ErrorListener() {
-                                                    @Override
-                                                    public void onErrorResponse(VolleyError error) {
+                                                }, error -> {
 //                                               Toast.makeText(, error.getLocalizedMessage()+"null", Toast.LENGTH_SHORT).show();
-                                                    }
                                                 }) {
                                                     @Override
-                                                    public Map<String, String> getHeaders() throws AuthFailureError {
+                                                    public Map<String, String> getHeaders() {
                                                         Map<String, String> header = new HashMap<>();
                                                         header.put("content-type", "application/json");
                                                         header.put("authorization", "key=AAAAsigSEMs:APA91bEUF9ZFwIu84Jctci56DQd0TQOepztGOIKIBhoqf7N3ueQrkClw0xBTlWZEWyvwprXZmZgW2MNywF1pNBFpq1jFBr0CmlrJ0wygbZIBOnoZ0jP1zZC6nPxqF2MAP6iF3wuBHD2R");
@@ -240,35 +219,6 @@ public class HomeScreen extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.notification,menu);
         return true;
     }
-
-//    @Override
-//    protected void onResume() {
-//        super.onResume();
-//        Log.i("called","after logout");
-//        stopService(new Intent(this,MyService.class));
-//    }
-//
-//    @Override
-//    protected void onStop() {
-//        super.onStop();
-//        SharedPreferences sharedPreferences = getSharedPreferences("Stop Services",MODE_PRIVATE);
-//        if(sharedPreferences.contains("online")){
-//            if(sharedPreferences.getString("online","").equals("false")) {
-//                stopService(new Intent(this,MyService.class));
-//            }else
-//                startService(new Intent(this,MyService.class));
-//        }
-//
-//    }
-//
-//    @Override
-//    protected void onPause() {
-//        super.onPause();
-////        ServiceInitiatorClass serviceInitiatorClass = new ServiceInitiatorClass();
-////        Toast.makeText(serviceInitiatorClass, "Hi", Toast.LENGTH_SHORT).show();
-//        Log.i("hello","I called");
-//        stopService(new Intent(this,MyService.class));
-//    }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
@@ -336,18 +286,10 @@ public class HomeScreen extends AppCompatActivity {
                         AlertDialog.Builder alert = new AlertDialog.Builder(HomeScreen.this);
                         String reason = snapshot.child("reasonForCancel").getValue(String.class);
                         alert.setTitle("Error").setMessage("Your restaurant registration is denied by fastway for following reason's:\n\n" + reason + "\n\nYou can submit another response for restaurant registration")
-                                .setPositiveButton("Re-Submit", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialogInterface, int i) {
-                                        startActivity(new Intent(HomeScreen.this, ReUploadDocumentsAgain.class));
-                                        dialogInterface.dismiss();
-                                    }
-                                }).setNegativeButton("Skip", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                dialogInterface.dismiss();
-                            }
-                        }).create();
+                                .setPositiveButton("Re-Submit", (dialogInterface, i) -> {
+                                    startActivity(new Intent(HomeScreen.this, ReUploadDocumentsAgain.class));
+                                    dialogInterface.dismiss();
+                                }).setNegativeButton("Skip", (dialogInterface, i) -> dialogInterface.dismiss()).create();
 
                         alert.show();
                     }
@@ -365,27 +307,100 @@ public class HomeScreen extends AppCompatActivity {
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     if(dataSnapshot.hasChild("lastCommissionPaid")){
                             long lastPaidDate = Long.parseLong(Objects.requireNonNull(dataSnapshot.child("lastCommissionPaid").getValue(String.class)));
+                        if(currentTime - lastPaidDate >= 2678400000L){
+                            SharedPreferences sharedPreferences = getSharedPreferences("CashCommission",MODE_PRIVATE);
+                             SharedPreferences.Editor editor = sharedPreferences.edit();
+                             editor.putString("fine","10");
+                             editor.apply();
+                            AlertDialog.Builder alert = new AlertDialog.Builder(HomeScreen.this);
+                            alert.setTitle("Cash Transaction").setMessage("It's time for payment of cash transaction commission, since you have exceeded time limit fine of 10% will be applied\nDo you wanna pay now or you can pay later!")
+                                    .setPositiveButton("Pay Now", (dialogInterface, i) -> {
+                                        dialogInterface.dismiss();
+                                        startActivity(new Intent(HomeScreen.this, CashTransactionCommissionActivity.class));
+                                    }).setNegativeButton("Later", (dialogInterface, i) -> dialogInterface.dismiss()).create();
+                            alert.setCancelable(false);
+                            alert.show();
+                        } else if(currentTime - lastPaidDate >= 2592000000L){
+
+                            AlertDialog.Builder alert = new AlertDialog.Builder(HomeScreen.this);
+                            alert.setTitle("Cash Transaction").setMessage("It's time for payment of cash transaction commission, today is last day for else fine of 10% will be applied\nDo you wanna pay now or you can pay later!")
+                                    .setPositiveButton("Pay Now", (dialogInterface, i) -> {
+                                        dialogInterface.dismiss();
+                                        startActivity(new Intent(HomeScreen.this, CashTransactionCommissionActivity.class));
+                                    }).setNegativeButton("Later", (dialogInterface, i) -> dialogInterface.dismiss()).create();
+                            alert.setCancelable(false);
+                            alert.show();
+                        }
+                        else if(currentTime - lastPaidDate >= 2505600000L){
+
+                            AlertDialog.Builder alert = new AlertDialog.Builder(HomeScreen.this);
+                            alert.setTitle("Cash Transaction").setMessage("It's time for payment of cash transaction commission, tomorrow is last day after that fine will be applied\nDo you wanna pay now or you can pay later!")
+                                    .setPositiveButton("Pay Now", (dialogInterface, i) -> {
+                                        dialogInterface.dismiss();
+                                        startActivity(new Intent(HomeScreen.this, CashTransactionCommissionActivity.class));
+                                    }).setNegativeButton("Later", (dialogInterface, i) -> dialogInterface.dismiss()).create();
+                            alert.setCancelable(false);
+                            alert.show();
+                        }
+                        else if(currentTime - lastPaidDate >= 2419200000L){
+
+                            AlertDialog.Builder alert = new AlertDialog.Builder(HomeScreen.this);
+                            alert.setTitle("Cash Transaction").setMessage("It's time for payment of cash transaction commission\nDo you wanna pay now or you can pay later!")
+                                    .setPositiveButton("Pay Now", (dialogInterface, i) -> {
+                                        dialogInterface.dismiss();
+                                        startActivity(new Intent(HomeScreen.this, CashTransactionCommissionActivity.class));
+                                    }).setNegativeButton("Later", (dialogInterface, i) -> dialogInterface.dismiss()).create();
+                            alert.setCancelable(false);
+                            alert.show();
+                        }
                     }else{
                         if(dataSnapshot.hasChild("registrationDate")){
                             long registerTime = Long.parseLong(Objects.requireNonNull(dataSnapshot.child("registrationDate").getValue(String.class)));
-                            long currentTime = System.currentTimeMillis();
-                            if(currentTime - registerTime >= 2419200000L){
+
+                            if(currentTime - registerTime >= 2678400000L){
                                 SharedPreferences sharedPreferences = getSharedPreferences("CashCommission",MODE_PRIVATE);
                                 SharedPreferences.Editor editor = sharedPreferences.edit();
+                                editor.putString("fine","10");
+                                editor.apply();
+                                AlertDialog.Builder alert = new AlertDialog.Builder(HomeScreen.this);
+                                alert.setTitle("Cash Transaction").setMessage("It's time for payment of cash transaction commission, since you have exceeded time limit fine of 10% will be applied\nDo you wanna pay now or you can pay later!")
+                                        .setPositiveButton("Pay Now", (dialogInterface, i) -> {
+                                            dialogInterface.dismiss();
+                                            startActivity(new Intent(HomeScreen.this, CashTransactionCommissionActivity.class));
+                                        }).setNegativeButton("Later", (dialogInterface, i) -> dialogInterface.dismiss()).create();
+                                alert.setCancelable(false);
+                                alert.show();
+                            }
+                           else if(currentTime - registerTime >= 2592000000L){
+
+                                AlertDialog.Builder alert = new AlertDialog.Builder(HomeScreen.this);
+                                alert.setTitle("Cash Transaction").setMessage("It's time for payment of cash transaction commission, today is last day for else fine of 10% will be applied\nDo you wanna pay now or you can pay later!")
+                                        .setPositiveButton("Pay Now", (dialogInterface, i) -> {
+                                            dialogInterface.dismiss();
+                                            startActivity(new Intent(HomeScreen.this, CashTransactionCommissionActivity.class));
+                                        }).setNegativeButton("Later", (dialogInterface, i) -> dialogInterface.dismiss()).create();
+                                alert.setCancelable(false);
+                                alert.show();
+                            }
+                            else if(currentTime - registerTime >= 2505600000L){
+
+                                AlertDialog.Builder alert = new AlertDialog.Builder(HomeScreen.this);
+                                alert.setTitle("Cash Transaction").setMessage("It's time for payment of cash transaction commission, tomorrow is last day after that fine will be applied\nDo you wanna pay now or you can pay later!")
+                                        .setPositiveButton("Pay Now", (dialogInterface, i) -> {
+                                            dialogInterface.dismiss();
+                                            startActivity(new Intent(HomeScreen.this, CashTransactionCommissionActivity.class));
+                                        }).setNegativeButton("Later", (dialogInterface, i) -> dialogInterface.dismiss()).create();
+                                alert.setCancelable(false);
+                                alert.show();
+                            }
+                            else if(currentTime - registerTime >= 2419200000L){
+
                                 AlertDialog.Builder alert = new AlertDialog.Builder(HomeScreen.this);
                                 alert.setTitle("Cash Transaction").setMessage("It's time for payment of cash transaction commission\nDo you wanna pay now or you can pay later!")
-                                        .setPositiveButton("Pay Now", new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialogInterface, int i) {
-                                                dialogInterface.dismiss();
-                                                startActivity(new Intent(HomeScreen.this, CashTransactionCommissionActivity.class));
-                                            }
-                                        }).setNegativeButton("Later", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialogInterface, int i) {
-                                        dialogInterface.dismiss();
-                                    }
-                                }).create();
+                                        .setPositiveButton("Pay Now", (dialogInterface, i) -> {
+                                            dialogInterface.dismiss();
+                                            startActivity(new Intent(HomeScreen.this, CashTransactionCommissionActivity.class));
+                                        }).setNegativeButton("Later", (dialogInterface, i) -> dialogInterface.dismiss()).create();
                                 alert.setCancelable(false);
                                 alert.show();
                             }
@@ -398,9 +413,6 @@ public class HomeScreen extends AppCompatActivity {
 
                 }
             });
-
-
-
             return null;
         }
     }

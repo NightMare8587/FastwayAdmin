@@ -2,9 +2,11 @@ package com.consumers.fastwayadmin.NavFrags.CashCommission;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -49,19 +51,34 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
                     totalCommission.setText("Commission to be paid " + "\u20B9" + commissionAmount);
                     payCommissionNow.setText("Pay \u20B9" + commissionAmount + " Now");
                     payCommissionNow.setOnClickListener(view -> {
-                        if(snapshot.hasChild("lastCommissionPaid")){
-                            long lastCommission = Long.parseLong(String.valueOf(snapshot.child("lastCommissionPaid").getValue()));
-
-                        }
-                        AlertDialog.Builder builder = new AlertDialog.Builder(CashTransactionCommissionActivity.this);
-                        builder.setTitle("Pay Commission").setMessage("Do you sure wanna proceed to pay commission")
-                                .setNegativeButton("No", (dialogInterface, i) -> dialogInterface.dismiss()).setPositiveButton("Yes", (dialogInterface, i) -> {
+                        if(commissionAmount != 0) {
+                            SharedPreferences cash = getSharedPreferences("CashCommission",MODE_PRIVATE);
+                            if(cash.contains("fine")) {
+                                String fine = cash.getString("fine","");
+                                AlertDialog.Builder builder = new AlertDialog.Builder(CashTransactionCommissionActivity.this);
+                                builder.setTitle("Pay Commission").setMessage("Do you sure wanna proceed to pay commission\nFine of " + fine + "% will be applied")
+                                        .setNegativeButton("No", (dialogInterface, i) -> dialogInterface.dismiss()).setPositiveButton("Yes", (dialogInterface, i) -> {
+                                    dialogInterface.dismiss();
+                                    int fineAmount = (commissionAmount * 10)/100;
+                                    commissionAmount = commissionAmount + fineAmount;
+                                    Intent intent = new Intent(CashTransactionCommissionActivity.this, CashFreeGateway.class);
+                                    intent.putExtra("amount", commissionAmount + "");
+                                    startActivityForResult(intent, 2);
+                                }).create();
+                                builder.show();
+                            }else{
+                                AlertDialog.Builder builder = new AlertDialog.Builder(CashTransactionCommissionActivity.this);
+                                builder.setTitle("Pay Commission").setMessage("Do you sure wanna proceed to pay commission")
+                                        .setNegativeButton("No", (dialogInterface, i) -> dialogInterface.dismiss()).setPositiveButton("Yes", (dialogInterface, i) -> {
                                     dialogInterface.dismiss();
                                     Intent intent = new Intent(CashTransactionCommissionActivity.this, CashFreeGateway.class);
-                                    intent.putExtra("amount",commissionAmount + "");
-                                    startActivityForResult(intent,2);
+                                    intent.putExtra("amount", commissionAmount + "");
+                                    startActivityForResult(intent, 2);
                                 }).create();
-                        builder.show();
+                                builder.show();
+                            }
+                        }else
+                            Toast.makeText(CashTransactionCommissionActivity.this, "No commission amount pending", Toast.LENGTH_SHORT).show();
                     });
                 }else{
                     KAlertDialog kAlertDialog = new KAlertDialog(CashTransactionCommissionActivity.this,KAlertDialog.ERROR_TYPE)
@@ -97,7 +114,10 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
                         kAlertDialog1.dismiss();
                         finish();
                     });
-
+            SharedPreferences sharedPreferences = getSharedPreferences("CashCommission",MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.remove("fine");
+            editor.apply();
             DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
             databaseReference.child("totalCashTakeAway").setValue("0");
             databaseReference.child("lastCommissionPaid").setValue(String.valueOf(System.currentTimeMillis()));
