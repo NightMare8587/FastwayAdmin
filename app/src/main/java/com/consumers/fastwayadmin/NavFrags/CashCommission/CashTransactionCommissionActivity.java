@@ -121,7 +121,6 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
             DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
             databaseReference.child("totalCashTakeAway").setValue("0");
             databaseReference.child("lastCommissionPaid").setValue(String.valueOf(System.currentTimeMillis()));
-
             kAlertDialog.setCancelable(false);
             kAlertDialog.show();
         }else if(resultCode == 3){
