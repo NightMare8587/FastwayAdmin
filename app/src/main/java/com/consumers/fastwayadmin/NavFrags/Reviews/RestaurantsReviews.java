@@ -8,7 +8,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.consumers.fastwayadmin.R;
 import com.google.firebase.auth.FirebaseAuth;
@@ -26,9 +28,13 @@ public class RestaurantsReviews extends AppCompatActivity {
     RecyclerView recyclerView;
     FirebaseAuth auth = FirebaseAuth.getInstance();
     DatabaseReference reference;
+    DatabaseReference staffReff;
+    int whichOne = 0;
+    List<String> staffID = new ArrayList<>();
     List<String> customerID = new ArrayList<>();
     ProgressBar progressBar;
     List<String> rating = new ArrayList<>();
+    Button resStaffReview;
     List<String> customerName = new ArrayList<>();
     List<String> customerReview = new ArrayList<>();
 
@@ -63,6 +69,29 @@ public class RestaurantsReviews extends AppCompatActivity {
                 progressBar.setVisibility(View.INVISIBLE);
             }
         });
+
+//        resStaffReview.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                staffReff.addListenerForSingleValueEvent(new ValueEventListener() {
+//                    @Override
+//                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                        if(snapshot.exists()){
+//                            for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+//
+//                            }
+//                        }else{
+//                            Toast.makeText(RestaurantsReviews.this, "No Review yet on your staff", Toast.LENGTH_SHORT).show();
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void onCancelled(@NonNull DatabaseError error) {
+//
+//                    }
+//                });
+//            }
+//        });
     }
 
     private void initialise() {
@@ -71,5 +100,7 @@ public class RestaurantsReviews extends AppCompatActivity {
         reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid())).child("Reviews");
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         progressBar = findViewById(R.id.restaurantReviewProgressBar);
+        resStaffReview = findViewById(R.id.restaurantStaffReciewButton);
+        staffReff = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid()).child("Restaurant Staff Reports");
     }
 }

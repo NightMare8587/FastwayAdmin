@@ -31,7 +31,6 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
     TextView totalCashTransaction,totalCommission;
     Button payCommissionNow;
     int commissionAmount;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
