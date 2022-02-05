@@ -3,6 +3,7 @@ package com.consumers.fastwayadmin.HomeScreen.LiveChat;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -20,6 +21,7 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
@@ -34,6 +36,8 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.database.annotations.NotNull;
 
 
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -47,6 +51,7 @@ public class LiveChatActivity extends AppCompatActivity {
     List<String> message = new ArrayList<>();
     FirebaseAuth auth;
     DatabaseReference reference;
+    String FURL  = "https://fcm.googleapis.com/fcm/send";
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
     LinearLayoutManager linearLayoutManager;
@@ -97,6 +102,98 @@ public class LiveChatActivity extends AppCompatActivity {
                     return;
                 }else{
                     String messa = editText.getText().toString();
+
+                    if(messa.equals("2")){
+                        modiFiedBotReply();
+                        String time = String.valueOf(System.currentTimeMillis());
+
+                        liveChatClass liveChatClass = new liveChatClass(messa,time,"0");
+                        reference.child("Live Chat").child(System.currentTimeMillis() + "").setValue(liveChatClass);
+                        editText.setText("");
+                        return;
+                    }
+                    
+                    if(messa.equals("4")){
+                        String time = String.valueOf(System.currentTimeMillis());
+
+                        liveChatClass liveChatClass = new liveChatClass(messa,time,"0");
+                        reference.child("Live Chat").child(System.currentTimeMillis() + "").setValue(liveChatClass);
+
+                        new Handler().postDelayed(() -> {
+                            String stime = String.valueOf(System.currentTimeMillis());
+                            liveChatClass liveChatClass1 = new liveChatClass("Connecting you with an agent. Avg wait time 2 min",stime,"1");
+                            reference.child("Live Chat").child(System.currentTimeMillis() + "").setValue(liveChatClass1);
+                        },500);
+                        editText.setText("");
+                        return;
+                    }
+
+                    if(messa.equals("5")){
+                        String time = String.valueOf(System.currentTimeMillis());
+
+                        liveChatClass liveChatClass = new liveChatClass(messa,time,"0");
+                        reference.child("Live Chat").child(System.currentTimeMillis() + "").setValue(liveChatClass);
+
+                        new Handler().postDelayed(() -> {
+                            String stime = String.valueOf(System.currentTimeMillis());
+                            liveChatClass liveChatClass1 = new liveChatClass("Please Enter the number for callback\nNo need to add +91",stime,"1");
+                            reference.child("Live Chat").child(System.currentTimeMillis() + "").setValue(liveChatClass1);
+                        },500);
+                        editText.setText("");
+                        return;
+                    }
+
+                    if(messa.length() == 10){
+                        String time = String.valueOf(System.currentTimeMillis());
+
+                        liveChatClass liveChatClass = new liveChatClass(messa,time,"0");
+                        reference.child("Live Chat").child(System.currentTimeMillis() + "").setValue(liveChatClass);
+
+                        new Handler().postDelayed(() -> {
+                            String stime = String.valueOf(System.currentTimeMillis());
+                            liveChatClass liveChatClass1 = new liveChatClass("You will get callback from our fastway team\nAvg waiting time 2 minutes",stime,"1");
+                            reference.child("Live Chat").child(System.currentTimeMillis() + "").setValue(liveChatClass1);
+                        },500);
+
+                        RequestQueue requestQueue = Volley.newRequestQueue(LiveChatActivity.this);
+                        JSONObject main = new JSONObject();
+                        try {
+                            main.put("to", "/topics/" + "FastwayLiveChat");
+                            JSONObject notification = new JSONObject();
+                            notification.put("title", "CallBack Request");
+                            notification.put("body", "Callback request from number " + editText.getText().toString());
+                            main.put("notification", notification);
+
+                            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, FURL, main, new Response.Listener<JSONObject>() {
+                                @Override
+                                public void onResponse(JSONObject response) {
+
+                                }
+                            }, new Response.ErrorListener() {
+                                @Override
+                                public void onErrorResponse(VolleyError error) {
+                                    Log.i("info",error.getLocalizedMessage() + " s");
+                                    Toast.makeText(getApplicationContext(), error.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
+                                }
+                            }) {
+                                @Override
+                                public Map<String, String> getHeaders() {
+                                    Map<String, String> header = new HashMap<>();
+                                    header.put("content-type", "application/json");
+                                    header.put("authorization", "key=AAAAsigSEMs:APA91bEUF9ZFwIu84Jctci56DQd0TQOepztGOIKIBhoqf7N3ueQrkClw0xBTlWZEWyvwprXZmZgW2MNywF1pNBFpq1jFBr0CmlrJ0wygbZIBOnoZ0jP1zZC6nPxqF2MAP6iF3wuBHD2R");
+                                    return header;
+                                }
+                            };
+
+                            requestQueue.add(jsonObjectRequest);
+                        } catch (Exception e) {
+                            Log.i("info",e.getLocalizedMessage() + " s");
+                            Toast.makeText(getApplicationContext(), e.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
+                        }
+                        editText.setText("");
+                        return;
+                    }
+
                     String time = String.valueOf(System.currentTimeMillis());
 
                     liveChatClass liveChatClass = new liveChatClass(messa,time,"0");
@@ -227,5 +324,11 @@ public class LiveChatActivity extends AppCompatActivity {
         editor = sharedPreferences.edit();
 
 
+    }
+    private void modiFiedBotReply() {
+        new Handler().postDelayed(() -> {
+            liveChatClass liveChatClass = new liveChatClass("Choose One Option\n3.Fastway Website\n4.Live Chat With Customer Support\n5.Get A Call Back from Fastway\n\n Enter number as input",System.currentTimeMillis() + "","1");
+            reference.child("Live Chat").child(System.currentTimeMillis() + "").setValue(liveChatClass);
+        },500);
     }
 }
