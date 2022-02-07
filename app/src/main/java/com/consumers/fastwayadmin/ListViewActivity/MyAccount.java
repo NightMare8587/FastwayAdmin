@@ -122,24 +122,16 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
                             .setTitleText("Delete Account")
                             .setContentText("Do you sure wanna delete your account!!!\n"+"This action can't be revert")
                             .setConfirmText("Yes, Delete")
-                            .setConfirmClickListener(new KAlertDialog.KAlertClickListener() {
-                                @Override
-                                public void onClick(KAlertDialog kAlertDialog) {
+                            .setConfirmClickListener(kAlertDialog -> {
 
-                                    try {
-                                        new removeAll().execute();
-                                    }
-                                    catch (Exception e){
-                                        Log.i("logs",e.getLocalizedMessage());
-                                    }
+                                try {
+                                    new removeAll().execute();
+                                }
+                                catch (Exception e){
+                                    Log.i("logs",e.getLocalizedMessage());
                                 }
                             }).setCancelText("No, Wait")
-                            .setCancelClickListener(new KAlertDialog.KAlertClickListener() {
-                                @Override
-                                public void onClick(KAlertDialog kAlertDialog) {
-                                    kAlertDialog.dismissWithAnimation();
-                                }
-                            }).show();
+                            .setCancelClickListener(kAlertDialog -> kAlertDialog.dismissWithAnimation()).show();
                     break;
                 case 3:
                     Intent intent = new Intent(MyAccount.this, EditVendorDetails.class);
@@ -194,23 +186,15 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
                             .setSecondButtonText("Cancel")
                             .setSecondButtonColor(Color.CYAN)
                             .setSecondButtonTextColor(Color.BLACK)
-                            .withFirstButtonListner(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
-                                    Map<String, Object> map = new HashMap<>();
-                                    Log.i("auth", UID);
-                                    map.put("name", String.valueOf(flatDialog.getFirstTextField().toString()));
-                                    reference.child("name").setValue(flatDialog.getFirstTextField().toString());
-                                    Toast.makeText(MyAccount.this, "Name Changed Successfully", Toast.LENGTH_SHORT).show();
-                                    flatDialog.dismiss();
-                                }
+                            .withFirstButtonListner(view -> {
+                                Map<String, Object> map = new HashMap<>();
+                                Log.i("auth", UID);
+                                map.put("name", String.valueOf(flatDialog.getFirstTextField()));
+                                reference.child("name").setValue(flatDialog.getFirstTextField());
+                                Toast.makeText(MyAccount.this, "Name Changed Successfully", Toast.LENGTH_SHORT).show();
+                                flatDialog.dismiss();
                             })
-                            .withSecondButtonListner(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
-                                    flatDialog.dismiss();
-                                }
-                            });
+                            .withSecondButtonListner(view -> flatDialog.dismiss());
 
                     flatDialog.create();
                     flatDialog.show();
@@ -231,23 +215,15 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
                             .setSecondButtonText("Cancel")
                             .setSecondButtonColor(Color.CYAN)
                             .setSecondButtonTextColor(Color.BLACK)
-                            .withFirstButtonListner(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
-                                    Map<String, Object> map = new HashMap<>();
-                                    Log.i("auth", UID);
-                                    map.put("name", String.valueOf(flatDialog1.getFirstTextField().toString()));
-                                    reference.child("email").setValue(flatDialog1.getFirstTextField().toString());
-                                    Toast.makeText(MyAccount.this, "Email Changed Successfully", Toast.LENGTH_SHORT).show();
-                                    flatDialog1.dismiss();
-                                }
+                            .withFirstButtonListner(view -> {
+                                Map<String, Object> map = new HashMap<>();
+                                Log.i("auth", UID);
+                                map.put("name", String.valueOf(flatDialog1.getFirstTextField()));
+                                reference.child("email").setValue(flatDialog1.getFirstTextField());
+                                Toast.makeText(MyAccount.this, "Email Changed Successfully", Toast.LENGTH_SHORT).show();
+                                flatDialog1.dismiss();
                             })
-                            .withSecondButtonListner(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
-                                    flatDialog1.dismiss();
-                                }
-                            });
+                            .withSecondButtonListner(view -> flatDialog1.dismiss());
 
                     flatDialog1.create();
                     flatDialog1.show();
@@ -434,9 +410,6 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
                     EditText resAddress = new EditText(MyAccount.this);
                     EditText resNearby = new EditText(MyAccount.this);
                     EditText resPIN = new EditText(MyAccount.this);
-//                    resAddress.setBackground(null);
-//                    resNearby.setBackground(null);
-//                    resPIN.setBackground(null);
                     resPIN.setInputType(InputType.TYPE_CLASS_NUMBER);
                     resAddress.setHint("Enter new address");
                     resNearby.setHint("Enter new nearby");
@@ -444,27 +417,19 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
                     layout.addView(resAddress);
                     layout.addView(resNearby);
                     layout.addView(resPIN);
-                    alert.setPositiveButton("Make Changes", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            if(!resPIN.getText().toString().equals("") && !resAddress.getText().toString().equals("") && !resNearby.getText().toString().equals("")) {
-                                reference.child("address").setValue(resAddress.getText().toString());
-                                reference.child("nearby").setValue(resNearby.getText().toString());
-                                reference.child("pin").setValue(resPIN.getText().toString());
-                                dialogInterface.dismiss();
-                                Toast.makeText(MyAccount.this, "Address And Nearby Changed Successfully", Toast.LENGTH_SHORT).show();
-                                        startActivityForResult(new Intent(MyAccount.this, MapsActivity2.class),69);
-
-                            }else
-                                Toast.makeText(MyAccount.this, "Field can't be empty", Toast.LENGTH_SHORT).show();
-
-                        }
-                    }).setNegativeButton("No, Wait", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
+                    alert.setPositiveButton("Make Changes", (dialogInterface, i) -> {
+                        if(!resPIN.getText().toString().equals("") && !resAddress.getText().toString().equals("") && !resNearby.getText().toString().equals("")) {
+                            reference.child("address").setValue(resAddress.getText().toString());
+                            reference.child("nearby").setValue(resNearby.getText().toString());
+                            reference.child("pin").setValue(resPIN.getText().toString());
                             dialogInterface.dismiss();
-                        }
-                    });
+                            Toast.makeText(MyAccount.this, "Address And Nearby Changed Successfully", Toast.LENGTH_SHORT).show();
+                                    startActivityForResult(new Intent(MyAccount.this, MapsActivity2.class),69);
+
+                        }else
+                            Toast.makeText(MyAccount.this, "Field can't be empty", Toast.LENGTH_SHORT).show();
+
+                    }).setNegativeButton("No, Wait", (dialogInterface, i) -> dialogInterface.dismiss());
                     alert.setView(layout);
                     alert.create().show();
                     modalBottomSheetDialog.dismiss();
@@ -481,12 +446,7 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
                    .setTitleText("Success")
                    .setContentText("Location Changes Successfully")
                    .setConfirmText("Great")
-                   .setConfirmClickListener(new KAlertDialog.KAlertClickListener() {
-                       @Override
-                       public void onClick(KAlertDialog kAlertDialog) {
-                           kAlertDialog.dismissWithAnimation();
-                       }
-                   }).show();
+                   .setConfirmClickListener(kAlertDialog -> kAlertDialog.dismissWithAnimation()).show();
         }else if(resultCode == 100){
             new KAlertDialog(MyAccount.this,KAlertDialog.SUCCESS_TYPE)
                     .setTitleText("Success")
@@ -510,10 +470,10 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
             settings.edit().clear().commit();
 
             SharedPreferences res = getSharedPreferences("RestaurantInfo", MODE_PRIVATE);
-            res.edit().clear().commit();
+            res.edit().clear().apply();
 
             SharedPreferences intro = getSharedPreferences("IntroAct", MODE_PRIVATE);
-            intro.edit().clear().commit();
+            intro.edit().clear().apply();
 //            reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin");
 //            reference.child(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser().getUid())).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
 //                @Override
@@ -537,11 +497,8 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
             client = GoogleSignIn.getClient(MyAccount.this, gso);
             try {
 
-                client.revokeAccess().addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
+                client.revokeAccess().addOnCompleteListener(task -> {
 
-                    }
                 });
                 client.signOut();
             } catch (Exception e) {

@@ -132,6 +132,7 @@ public class Info extends AppCompatActivity {
         fastDialog = new FastDialogBuilder(Info.this, Type.PROGRESS)
                 .progressText("Checking Database...")
                 .setAnimation(Animations.SLIDE_TOP)
+                .cancelable(false)
                 .create();
         fastDialog.show();
 
