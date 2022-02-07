@@ -239,7 +239,6 @@ public class HomeScreen extends AppCompatActivity {
     }
 
     public class BackgroundWork extends AsyncTask<Void,Void,Void>{
-
         @Override
         protected Void doInBackground(Void... voids) {
             resRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(UID));

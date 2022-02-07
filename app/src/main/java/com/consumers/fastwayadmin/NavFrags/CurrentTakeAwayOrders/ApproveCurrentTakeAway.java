@@ -609,7 +609,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                     DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid())).child("Transactions");
                     PaymentClass paymentClass = new PaymentClass(genratedID,auth.getUid() + "");
                     databaseReference.child(time).setValue(paymentClass);
-                    params.put("amount",String.valueOf(orderAmount));
+                    params.put("amount",String.valueOf("1"));
                     return params;
                 }
             };
