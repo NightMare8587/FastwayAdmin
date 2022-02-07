@@ -112,7 +112,7 @@ public class LiveChatActivity extends AppCompatActivity {
                         editText.setText("");
                         return;
                     }
-                    
+
                     if(messa.equals("4")){
                         String time = String.valueOf(System.currentTimeMillis());
 

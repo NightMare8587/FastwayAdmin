@@ -144,9 +144,6 @@ public class HomeScreen extends AppCompatActivity {
                             .setActionTextColor(getResources().getColor(android.R.color.holo_red_light))
                             .show();
                 } else {
-
-
-
                     databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -196,8 +193,6 @@ public class HomeScreen extends AppCompatActivity {
                                             }
                                         }
                                     }
-
-                                    
                                 }
                             }
                         }
