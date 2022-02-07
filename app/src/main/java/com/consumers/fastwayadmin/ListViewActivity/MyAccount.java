@@ -25,6 +25,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.consumers.fastwayadmin.Info.MapsActivity2;
 import com.consumers.fastwayadmin.Info.RestaurantDocuments.ReUploadDocuments.ViewAndReuploadDocuments;
 import com.consumers.fastwayadmin.ListViewActivity.LeaveFastwayPackage.LeaveFastway;
+import com.consumers.fastwayadmin.ListViewActivity.ResTimingsPackage.AddRestaurantTimings;
 import com.consumers.fastwayadmin.ListViewActivity.StaffDetails.RestaurantStaff;
 import com.consumers.fastwayadmin.NavFrags.EditVendorDetails;
 import com.consumers.fastwayadmin.R;
@@ -62,7 +63,7 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
     ModalBottomSheetDialog modalBottomSheetDialog;
     SharedPreferences.Editor editor;
     TextView textView;
-    String[] names = {"Change Credentials (Admin)","Change Credentials (Restaurants)","Delete Account","Change Bank Credentials","Restaurant Documents","Restaurant Staff Details","Leave Fastway"};
+    String[] names = {"Change Credentials (Admin)","Change Credentials (Restaurants)","Delete Account","Change Bank Credentials","Restaurant Documents","Restaurant Staff Details","Add Restaurant Timings","Leave Fastway"};
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,15 +100,6 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
         listView.setOnItemClickListener((adapterView, view, i, l) -> {
             switch (i){
                 case 0:
-//                        FlatDialog flatDialog = new FlatDialog(MyAccount.this)
-//                                .setTitle("Choose One Option")
-//                                .setTitleColor(Color.BLACK)
-//                                .setFirstButtonText("Change Name")
-//                                .setFirstButtonTextColor(Color.BLACK)
-//                                .setFirstButtonColor(Color.LTGRAY)
-//                                .setSecondButtonColor(Color.LTGRAY)
-//                                .setSecondButtonText("Change Email")
-//                                .setSecondButtonTextColor()
                     modalBottomSheetDialog = new ModalBottomSheetDialog.Builder()
                             .setRoundedModal(true)
                             .setHeader("Choose One Option")
@@ -160,6 +152,9 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
                     startActivity(new Intent(MyAccount.this, RestaurantStaff.class));
                     break;
                 case 6:
+                    startActivity(new Intent(MyAccount.this, AddRestaurantTimings.class));
+                    break;
+                case 7:
                     startActivity(new Intent(MyAccount.this, LeaveFastway.class));
                     break;
 
