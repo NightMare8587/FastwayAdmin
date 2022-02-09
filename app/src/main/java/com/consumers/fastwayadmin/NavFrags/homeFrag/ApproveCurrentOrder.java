@@ -119,7 +119,6 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                 userName = String.valueOf(snapshot.child("name").getValue());
                 userEmail = String.valueOf(snapshot.child("email").getValue());
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
 
