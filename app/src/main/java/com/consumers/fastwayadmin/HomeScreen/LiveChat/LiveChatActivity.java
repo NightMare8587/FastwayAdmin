@@ -40,8 +40,10 @@ import java.util.Objects;
 
 public class LiveChatActivity extends AppCompatActivity {
     RequestQueue requestQueue;
+    String timeOfJoining;
     String URL = "https://intercellular-stabi.000webhostapp.com/fastwayadminbot.php";
     RecyclerView recyclerView;
+    boolean talkWithAgent = false;
     List<String> message = new ArrayList<>();
     FirebaseAuth auth;
     DatabaseReference reference; boolean connectedWithFastway = false;
@@ -64,29 +66,10 @@ public class LiveChatActivity extends AppCompatActivity {
         saveInfo = getSharedPreferences("loginInfo",MODE_PRIVATE);
         saveEdit = saveInfo.edit();
         linearLayoutManager = new LinearLayoutManager(getApplicationContext());
-        liveTalkWithAdmin = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("LiveChat");
-        liveTalkWithAdmin.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(snapshot.exists()){
-                    connectedWithFastway = true;
-                    saveEdit.putString("liveChat","yes");
-                    saveEdit.apply();
-                }else {
-                    saveEdit.remove("liveChat");
-                    saveEdit.apply();
-                    botReply();
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
         linearLayoutManager.setStackFromEnd(true);
         reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
-
+        botReply();
+        liveTalkWithAdmin = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("LiveChat");
         reference.child("Live Chat").limitToLast(15).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -120,7 +103,6 @@ public class LiveChatActivity extends AppCompatActivity {
                 String messa = editText.getText().toString();
                 if(connectedWithFastway){
                     String time = String.valueOf(System.currentTimeMillis());
-
                     liveChatClass liveChatClass = new liveChatClass(messa,time,"0");
                     reference.child("Live Chat").child(time + "").setValue(liveChatClass);
                     editText.setText("");
@@ -144,9 +126,11 @@ public class LiveChatActivity extends AppCompatActivity {
 
                     new Handler().postDelayed(() -> {
                         String stime = String.valueOf(System.currentTimeMillis());
-                        liveTalkWithAdmin.child("id").setValue(auth.getUid());
-                        liveTalkWithAdmin.child("type").setValue("Admin");
-                        liveChatClass liveChatClass1 = new liveChatClass("Connecting you with an agent. Avg wait time 2 min",stime,"1");
+                        timeOfJoining = stime;
+                        talkWithAgent = true;
+                        liveTalkWithAdmin.child(stime).child("id").setValue(auth.getUid());
+                        liveTalkWithAdmin.child(stime).child("type").setValue("Admin");
+                        liveChatClass liveChatClass1 = new liveChatClass("Connecting you with an agent. Avg waiting time 2 min",stime,"1");
                         reference.child("Live Chat").child(System.currentTimeMillis() + "").setValue(liveChatClass1);
                     },500);
                     editText.setText("");
@@ -407,5 +391,12 @@ public class LiveChatActivity extends AppCompatActivity {
             liveChatClass liveChatClass = new liveChatClass("Choose One Option\n3.Fastway Website\n4.Live Chat With Customer Support\n5.Get A Call Back from Fastway\n\n Enter number as input",System.currentTimeMillis() + "","1");
             reference.child("Live Chat").child(System.currentTimeMillis() + "").setValue(liveChatClass);
         },500);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(talkWithAgent)
+        liveTalkWithAdmin.child(timeOfJoining).removeValue();
     }
 }
