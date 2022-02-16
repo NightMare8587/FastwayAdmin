@@ -1,10 +1,8 @@
 package com.consumers.fastwayadmin.Login;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
@@ -12,14 +10,12 @@ import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -51,13 +47,9 @@ import com.google.android.gms.location.LocationSettingsResponse;
 import com.google.android.gms.location.LocationSettingsStates;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.location.SettingsClient;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseException;
 import com.google.firebase.auth.AuthCredential;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
@@ -83,8 +75,6 @@ import java.util.concurrent.TimeUnit;
 import karpuzoglu.enes.com.fastdialog.Animations;
 import karpuzoglu.enes.com.fastdialog.FastDialog;
 import karpuzoglu.enes.com.fastdialog.FastDialogBuilder;
-import karpuzoglu.enes.com.fastdialog.NegativeClick;
-import karpuzoglu.enes.com.fastdialog.PositiveClick;
 import karpuzoglu.enes.com.fastdialog.Type;
 
 
@@ -101,12 +91,10 @@ public class MainActivity extends AppCompatActivity {
     FastDialog verifyCodeDialog,fastDialog;
     GoogleSignInAccount account;
     GoogleSignInClient client;
-    protected boolean isProgressShowing = false;
     String verId;
     FirebaseFirestore db =  FirebaseFirestore.getInstance();
     SharedPreferences loginInfo;
     SharedPreferences.Editor editor;
-    ViewGroup group;
      ImageView signInButton;
 //    ProgressBar wait;
     PhoneAuthProvider.ForceResendingToken myToken;
@@ -129,10 +117,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         initialise();
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
-
-//        Sprite bounce = new Wave();
-//        spinKitView.setColor(R.color.teal_200);
-//        spinKitView.setIndeterminateDrawable(bounce);
         checkPermissions();
         SharedPreferences stopServices = getSharedPreferences("Stop Services", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor5 = stopServices.edit();
@@ -154,102 +138,63 @@ public class MainActivity extends AppCompatActivity {
         editor = loginInfo.edit();
 
         //google sign in button
-        signInButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent signIn = client.getSignInIntent();
-                startActivityForResult(signIn,3);
-            }
+        signInButton.setOnClickListener(view -> {
+            Intent signIn = client.getSignInIntent();
+            startActivityForResult(signIn,3);
         });
 
         // start phone auth verification
-        startVerification.setOnClickListener(new View.OnClickListener() {
+        startVerification.setOnClickListener(view -> {
+            getBanInfo = getSharedPreferences("loginInfo",MODE_PRIVATE);
+            if(getBanInfo.contains("banTime")){
+                long value = Long.parseLong(getBanInfo.getString("banTime",""));
+                long currentTime = Long.parseLong(String.valueOf(System.currentTimeMillis()));
 
-            @SuppressLint("SetTextI18n")
-            @Override
-            public void onClick(View view) {
-                getBanInfo = getSharedPreferences("loginInfo",MODE_PRIVATE);
-                if(getBanInfo.contains("banTime")){
-                    long value = Long.parseLong(getBanInfo.getString("banTime",""));
-                    long currentTime = Long.parseLong(String.valueOf(System.currentTimeMillis()));
+                if(currentTime > value){
+                    getBanInfo.edit().remove("banTime").apply();
+                }else{
+                    Toast.makeText(MainActivity.this, "Wait till ban is removed " + TimeUnit.MILLISECONDS.toMinutes(value - currentTime) + " minutes Remaining", Toast.LENGTH_SHORT).show();
 
-                    if(currentTime > value){
-                        getBanInfo.edit().remove("banTime").apply();
-                    }else{
-                        Toast.makeText(MainActivity.this, "Wait till ban is removed " + TimeUnit.MILLISECONDS.toMinutes(value - currentTime) + " minutes Remaining", Toast.LENGTH_SHORT).show();
-
-                        return;
-                    }
-                }
-                if(fullName.length() == 0){
-                    fullName.requestFocus();
-                    fullName.setError("Field can't be Empty");
-                    return;
-                }if(emailAddress.length() == 0){
-                    emailAddress.requestFocus();
-                    emailAddress.setError("Field can't be Empty");
-                    return;
-                }if(phoneNumber.length() != 10){
-                    phoneNumber.requestFocus();
-                    phoneNumber.setError("Enter valid number");
-                    return;
-                }if(!ccp.getSelectedCountryCodeWithPlus().equals("+91")){
-                    Toast.makeText(MainActivity.this, "This app currently operates only in India", Toast.LENGTH_SHORT).show();
                     return;
                 }
-
-                new KAlertDialog(MainActivity.this,KAlertDialog.WARNING_TYPE)
-                        .setContentText("Do you sure wanna continue with this number")
-                        .setTitleText("Confirmation")
-                        .setConfirmText("Yes, Send OTP")
-                        .setCancelText("No, Wait")
-                        .setConfirmClickListener(new KAlertDialog.KAlertClickListener() {
-                            @Override
-                            public void onClick(KAlertDialog kAlertDialog) {
-                                name = fullName.getText().toString();
-                                email = emailAddress.getText().toString();
-                                number = ccp.getSelectedCountryCodeWithPlus() + phoneNumber.getText().toString() + "";
-                                fastDialog = new FastDialogBuilder(MainActivity.this, Type.PROGRESS)
-                                        .progressText("Sending OTP Please wait")
-                                        .setAnimation(Animations.FADE_IN)
-                                        .create();
-                                fastDialog.show();
-                                startVerification.setVisibility(View.INVISIBLE);
-                                startPhoneNumberVerification(number);
-
-                                kAlertDialog.dismissWithAnimation();
-                            }
-                        }).setCancelClickListener(new KAlertDialog.KAlertClickListener() {
-                    @Override
-                    public void onClick(KAlertDialog kAlertDialog) {
-                        kAlertDialog.dismissWithAnimation();
-                    }
-                }).show();
-
-//                CFAlertDialog.Builder builder = new CFAlertDialog.Builder(MainActivity.this)
-//                        .setDialogStyle(CFAlertDialog.CFAlertStyle.ALERT)
-//                        .setTitle("Confirmation")
-//                        .setMessage("Do you wanna continue with this number " + phoneNumber.getText().toString())
-//                        .addButton("Yes", Color.BLACK,Color.LTGRAY, CFAlertDialog.CFAlertActionStyle.POSITIVE, CFAlertDialog.CFAlertActionAlignment.JUSTIFIED,
-//                                ((dialogInterface, i) -> {
-//                                    name = fullName.getText().toString();
-//                                    email = emailAddress.getText().toString();
-//                                    number = ccp.getSelectedCountryCodeWithPlus() + phoneNumber.getText().toString() + "";
-//
-//                                    startVerification.setVisibility(View.INVISIBLE);
-//                                    startPhoneNumberVerification(number);
-//
-//                                    dialogInterface.dismiss();
-//                                }))
-//                        .addButton("No",Color.BLACK,Color.YELLOW, CFAlertDialog.CFAlertActionStyle.POSITIVE, CFAlertDialog.CFAlertActionAlignment.JUSTIFIED
-//                        ,((dialogInterface, i) -> {
-//                                    phoneNumber.requestFocus();
-//                                    dialogInterface.dismiss();
-//                                }));
-//
-//                builder.show();
-
             }
+            if(fullName.length() == 0){
+                fullName.requestFocus();
+                fullName.setError("Field can't be Empty");
+                return;
+            }if(emailAddress.length() == 0){
+                emailAddress.requestFocus();
+                emailAddress.setError("Field can't be Empty");
+                return;
+            }if(phoneNumber.length() != 10){
+                phoneNumber.requestFocus();
+                phoneNumber.setError("Enter valid number");
+                return;
+            }if(!ccp.getSelectedCountryCodeWithPlus().equals("+91")){
+                Toast.makeText(MainActivity.this, "This app currently operates only in India", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            new KAlertDialog(MainActivity.this,KAlertDialog.WARNING_TYPE)
+                    .setContentText("Do you sure wanna continue with this number")
+                    .setTitleText("Confirmation")
+                    .setConfirmText("Yes, Send OTP")
+                    .setCancelText("No, Wait")
+                    .setConfirmClickListener(kAlertDialog -> {
+                        name = fullName.getText().toString();
+                        email = emailAddress.getText().toString();
+                        number = ccp.getSelectedCountryCodeWithPlus() + phoneNumber.getText().toString() + "";
+                        fastDialog = new FastDialogBuilder(MainActivity.this, Type.PROGRESS)
+                                .progressText("Sending OTP Please wait")
+                                .setAnimation(Animations.FADE_IN)
+                                .create();
+                        fastDialog.show();
+                        startVerification.setVisibility(View.INVISIBLE);
+                        startPhoneNumberVerification(number);
+
+                        kAlertDialog.dismissWithAnimation();
+                    }).setCancelClickListener(KAlertDialog::dismissWithAnimation).show();
+
         });
 
     }
@@ -269,38 +214,35 @@ public class MainActivity extends AppCompatActivity {
         SettingsClient client = LocationServices.getSettingsClient(this);
         Task<LocationSettingsResponse> task = client.checkLocationSettings(builder.build());
 
-        task.addOnCompleteListener(new OnCompleteListener<LocationSettingsResponse>() {
-            @Override
-            public void onComplete(Task<LocationSettingsResponse> task) {
-                try {
-                    LocationSettingsResponse response = task.getResult(ApiException.class);
-                    // All location settings are satisfied. The client can initialize location
-                    // requests here.
+        task.addOnCompleteListener(task1 -> {
+            try {
+                LocationSettingsResponse response = task1.getResult(ApiException.class);
+                // All location settings are satisfied. The client can initialize location
+                // requests here.
 
-                } catch (ApiException exception) {
-                    switch (exception.getStatusCode()) {
-                        case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
-                            // Location settings are not satisfied. But could be fixed by showing the
-                            // user a dialog.
-                            try {
-                                // Cast to a resolvable exception.
-                                ResolvableApiException resolvable = (ResolvableApiException) exception;
-                                // Show the dialog by calling startResolutionForResult(),
-                                // and check the result in onActivityResult().
-                                resolvable.startResolutionForResult(
-                                        MainActivity.this,
-                                        101);
-                            } catch (IntentSender.SendIntentException e) {
-                                // Ignore the error.
-                            } catch (ClassCastException e) {
-                                // Ignore, should be an impossible error.
-                            }
-                            break;
-                        case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
-                            // Location settings are not satisfied. However, we have no way to fix the
-                            // settings so we won't show the dialog.
-                            break;
-                    }
+            } catch (ApiException exception) {
+                switch (exception.getStatusCode()) {
+                    case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+                        // Location settings are not satisfied. But could be fixed by showing the
+                        // user a dialog.
+                        try {
+                            // Cast to a resolvable exception.
+                            ResolvableApiException resolvable = (ResolvableApiException) exception;
+                            // Show the dialog by calling startResolutionForResult(),
+                            // and check the result in onActivityResult().
+                            resolvable.startResolutionForResult(
+                                    MainActivity.this,
+                                    101);
+                        } catch (IntentSender.SendIntentException e) {
+                            // Ignore the error.
+                        } catch (ClassCastException e) {
+                            // Ignore, should be an impossible error.
+                        }
+                        break;
+                    case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
+                        // Location settings are not satisfied. However, we have no way to fix the
+                        // settings so we won't show the dialog.
+                        break;
                 }
             }
         });
@@ -318,8 +260,6 @@ public class MainActivity extends AppCompatActivity {
             Geocoder geocoder = new Geocoder(MainActivity.this, Locale.getDefault());
             List<Address> addresses = null;
             String cityName;
-            String stateName;
-            String countryName;
             try {
                 addresses = geocoder.getFromLocation(lati, longi, 1);
             } catch (IOException e) {
@@ -378,38 +318,25 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void signInWithPhoneAuthCredentials(PhoneAuthCredential phoneAuthCredential) {
-        loginAuth.signInWithCredential(phoneAuthCredential).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                if(task.isSuccessful()){
+        loginAuth.signInWithCredential(phoneAuthCredential).addOnCompleteListener(this, task -> {
+            if(task.isSuccessful()){
 
-                    Map<String,Object> map = new HashMap<>();
-                    map.put("name",name);
-                    map.put("email",email);
-                    reciverMailID = email;
-                    editor.putString("name",name);
-                    editor.putString("email",email);
-                    editor.apply();
+                Map<String,Object> map = new HashMap<>();
+                map.put("name",name);
+                map.put("email",email);
+                reciverMailID = email;
+                editor.putString("name",name);
+                editor.putString("email",email);
+                editor.apply();
 //                    wait.setVisibility(View.INVISIBLE);
-                    Toast.makeText(MainActivity.this, "Login Successfully", Toast.LENGTH_SHORT).show();
-                    DatabaseAdmin user = new DatabaseAdmin(name,email,number);
-                    db.collection(Objects.requireNonNull(loginAuth.getUid())).document("info")
-                            .set(map).addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            Toast.makeText(MainActivity.this, "Data Uploaded Successfully", Toast.LENGTH_SHORT).show();
-                        }
-                    }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Toast.makeText(MainActivity.this, e.getLocalizedMessage()+"", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                    clientsLocation.removeLocationUpdates(mLocationCallback);
-                    reference.child("Admin").child(loginAuth.getUid()+"").setValue(user);
-                    startActivity(new Intent(MainActivity.this, Info.class));
-                    finish();
-                }
+                Toast.makeText(MainActivity.this, "Login Successfully", Toast.LENGTH_SHORT).show();
+                DatabaseAdmin user = new DatabaseAdmin(name,email,number);
+                db.collection(Objects.requireNonNull(loginAuth.getUid())).document("info")
+                        .set(map).addOnSuccessListener(aVoid -> Toast.makeText(MainActivity.this, "Data Uploaded Successfully", Toast.LENGTH_SHORT).show()).addOnFailureListener(e -> Toast.makeText(MainActivity.this, e.getLocalizedMessage()+"", Toast.LENGTH_SHORT).show());
+                clientsLocation.removeLocationUpdates(mLocationCallback);
+                reference.child("Admin").child(loginAuth.getUid()+"").setValue(user);
+                startActivity(new Intent(MainActivity.this, Info.class));
+                finish();
             }
         });
     }
@@ -440,74 +367,65 @@ public class MainActivity extends AppCompatActivity {
                 .negativeText("Cancel")
                 .create();
 
-        verifyCodeDialog.positiveClickListener(new PositiveClick() {
-            @Override
-            public void onClick(View view) {
-                if(verifyCodeDialog.getInputText().length() <= 5){
-                    Toast.makeText(MainActivity.this, "Enter Valid Code", Toast.LENGTH_SHORT).show();
-                    return;
-                }else{
-                    credential = PhoneAuthProvider.getCredential(verId,verifyCodeDialog.getInputText());
+        verifyCodeDialog.positiveClickListener(view -> {
+            if(verifyCodeDialog.getInputText().length() <= 5){
+                Toast.makeText(MainActivity.this, "Enter Valid Code", Toast.LENGTH_SHORT).show();
+            }else{
+                credential = PhoneAuthProvider.getCredential(verId,verifyCodeDialog.getInputText());
 
-                    loginAuth.signInWithCredential(credential).addOnCompleteListener(MainActivity.this, new OnCompleteListener<AuthResult>() {
-                        @Override
-                        public void onComplete(@NonNull Task<AuthResult> task) {
-                            if(task.isSuccessful()){
-                                Toast.makeText(MainActivity.this, "Login Successfully", Toast.LENGTH_SHORT).show();
-                                DatabaseAdmin user = new DatabaseAdmin(name,email,number);
-                                editor.putString("name",name);
-                                editor.putString("email",email);
-                                editor.apply();
-                                verifyCodeDialog.dismiss();
-                                loginAuth = FirebaseAuth.getInstance();
+                loginAuth.signInWithCredential(credential).addOnCompleteListener(MainActivity.this, task -> {
+                    if(task.isSuccessful()){
+                        Toast.makeText(MainActivity.this, "Login Successfully", Toast.LENGTH_SHORT).show();
+                        DatabaseAdmin user = new DatabaseAdmin(name,email,number);
+                        editor.putString("name",name);
+                        editor.putString("email",email);
+                        editor.apply();
+                        verifyCodeDialog.dismiss();
+                        loginAuth = FirebaseAuth.getInstance();
 //                                reference.child("Admin").child(Objects.requireNonNull(loginAuth.getUid())).setValue(user);
-                                reference.child("Admin").addListenerForSingleValueEvent(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                        if(!snapshot.hasChild(Objects.requireNonNull(loginAuth.getUid()))){
-                                            sender = new GMailSender(emailOfSender,passOfSender);
-                                            new MyAsyncClass().execute();
-                                            reference.child("Admin").child(Objects.requireNonNull(loginAuth.getUid())).setValue(user);
-                                            reference.child("Admin").child(loginAuth.getUid()).child("registrationDate").setValue(System.currentTimeMillis() + "");
-                                        }
-                                    }
-
-                                    @Override
-                                    public void onCancelled(@NonNull DatabaseError error) {
-
-                                    }
-                                });
-                                clientsLocation.removeLocationUpdates(mLocationCallback);
-                                startActivity(new Intent(getApplicationContext(),Info.class));
-                                finish();
-                            }else{
-                                Toast.makeText(MainActivity.this, "Something went wrong", Toast.LENGTH_SHORT).show();
+                        reference.child("Admin").addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                if(!snapshot.hasChild(Objects.requireNonNull(loginAuth.getUid()))){
+                                    sender = new GMailSender(emailOfSender,passOfSender);
+                                    new MyAsyncClass().execute();
+                                    reference.child("Admin").child(Objects.requireNonNull(loginAuth.getUid())).setValue(user);
+                                    reference.child("Admin").child(loginAuth.getUid()).child("registrationDate").setValue(System.currentTimeMillis() + "");
+                                }
                             }
-                        }
-                    });
-                }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+
+                            }
+                        });
+                        clientsLocation.removeLocationUpdates(mLocationCallback);
+                        startActivity(new Intent(getApplicationContext(),Info.class));
+                        finish();
+                    }else{
+                        Toast.makeText(MainActivity.this, "Something went wrong", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
         });
 
-        verifyCodeDialog.negativeClickListener(new NegativeClick() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(MainActivity.this, "Cancelled", Toast.LENGTH_SHORT).show();
-                startVerification.setVisibility(View.VISIBLE);
-                verifyCodeDialog.dismiss();
+        verifyCodeDialog.negativeClickListener(view -> {
+            Toast.makeText(MainActivity.this, "Cancelled", Toast.LENGTH_SHORT).show();
+            startVerification.setVisibility(View.VISIBLE);
+            verifyCodeDialog.dismiss();
 
-                SharedPreferences sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedPreferences.edit();
+            SharedPreferences sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
 
-                long nowPlus5Minutes = System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(5);
-                editor.putString("banTime",String.valueOf(nowPlus5Minutes));
-                editor.apply();
-            }
+            long nowPlus5Minutes = System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(5);
+            editor.putString("banTime",String.valueOf(nowPlus5Minutes));
+            editor.apply();
         });
 
 
 
     }
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -519,18 +437,7 @@ public class MainActivity extends AppCompatActivity {
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                 builder.setTitle("Important");
                 builder.setMessage("Location is required for this app to work properly");
-                builder.setPositiveButton("Allow", new DialogInterface.OnClickListener() {
-                    @RequiresApi(api = Build.VERSION_CODES.M)
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        checkPermissions();
-                    }
-                }).setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                    }
-                }).create();
+                builder.setPositiveButton("Allow", (dialogInterface, i) -> checkPermissions()).setNegativeButton("No", (dialogInterface, i) -> dialogInterface.dismiss()).create();
 
                 builder.show();
             }
@@ -581,42 +488,39 @@ public class MainActivity extends AppCompatActivity {
         AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
         Log.i("credentials",String.valueOf(credential));
         loginAuth.signInWithCredential(credential)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            loginAuth = FirebaseAuth.getInstance();
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.d("TAG", "signInWithCredential:success");
-                            FirebaseUser user = loginAuth.getCurrentUser();
-                            assert user != null;
-                            loginAuth.updateCurrentUser(user);
-                            reference.child("Admin").addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                    if(!snapshot.hasChild(Objects.requireNonNull(loginAuth.getUid()))){
-                                        sender = new GMailSender(emailOfSender,passOfSender);
-                                        new MyAsyncClass().execute();
-                                        GoogleSignInDB googleSignInDB = new GoogleSignInDB(account.getDisplayName(),account.getEmail());
-                                        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(user.getUid());
-                                        reference.setValue(googleSignInDB);
-                                    }
+                .addOnCompleteListener(this, task -> {
+                    if (task.isSuccessful()) {
+                        loginAuth = FirebaseAuth.getInstance();
+                        // Sign in success, update UI with the signed-in user's information
+                        Log.d("TAG", "signInWithCredential:success");
+                        FirebaseUser user = loginAuth.getCurrentUser();
+                        assert user != null;
+                        loginAuth.updateCurrentUser(user);
+                        reference.child("Admin").addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                if(!snapshot.hasChild(Objects.requireNonNull(loginAuth.getUid()))){
+                                    sender = new GMailSender(emailOfSender,passOfSender);
+                                    new MyAsyncClass().execute();
+                                    GoogleSignInDB googleSignInDB = new GoogleSignInDB(account.getDisplayName(),account.getEmail());
+                                    reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(user.getUid());
+                                    reference.setValue(googleSignInDB);
                                 }
+                            }
 
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError error) {
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
 
-                                }
-                            });
-                            clientsLocation.removeLocationUpdates(mLocationCallback);
-                            startActivity(new Intent(MainActivity.this,Info.class));
-                            finish();
+                            }
+                        });
+                        clientsLocation.removeLocationUpdates(mLocationCallback);
+                        startActivity(new Intent(MainActivity.this,Info.class));
+                        finish();
 //                            updateUI(user);
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            Log.w("TAG", "signInWithCredential:failure", task.getException());
+                    } else {
+                        // If sign in fails, display a message to the user.
+                        Log.w("TAG", "signInWithCredential:failure", task.getException());
 //                            updateUI(null);
-                        }
                     }
                 });
     }
@@ -625,12 +529,9 @@ public class MainActivity extends AppCompatActivity {
         GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(getApplicationContext());
         if (acct != null) {
             String personName = acct.getDisplayName();
-            String personGivenName = acct.getGivenName();
             String personFamilyName = acct.getFamilyName();
             String personEmail = acct.getEmail();
             reciverMailID = personEmail;
-            String personId = acct.getId();
-            Uri personPhoto = acct.getPhotoUrl();
             editor.putString("email",personEmail);
             editor.putString("name",personName);
             editor.putString("storeInDevice","yes");
