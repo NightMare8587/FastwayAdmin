@@ -70,7 +70,7 @@ public class SplashScreen extends AppCompatActivity {
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         boolean isConnected = activeNetwork != null &&
                 activeNetwork.isConnectedOrConnecting();
-
+        //checking is app is connected to internet
         if(!isConnected){
             View parentLayout = findViewById(android.R.id.content);
             Snackbar.make(parentLayout, "Please connect to internet :)", Snackbar.LENGTH_LONG)
@@ -106,7 +106,7 @@ public class SplashScreen extends AppCompatActivity {
         }else
             createLocationRequest();
     }
-
+    //creating location request
     private void createLocationRequest() {
         locationRequest = LocationRequest.create();
         locationRequest.setInterval(1000);
@@ -170,7 +170,7 @@ public class SplashScreen extends AppCompatActivity {
             }
         });
     }
-
+    //location callback for handling location
     private final LocationCallback mLocationCallback = new LocationCallback() {
 
         @Override
