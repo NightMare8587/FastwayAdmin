@@ -96,7 +96,6 @@ public class MainActivity extends AppCompatActivity {
     SharedPreferences loginInfo;
     SharedPreferences.Editor editor;
      ImageView signInButton;
-//    ProgressBar wait;
     PhoneAuthProvider.ForceResendingToken myToken;
     EditText fullName,emailAddress,phoneNumber;
     CountryCodePicker ccp;
