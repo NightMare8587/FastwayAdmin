@@ -104,7 +104,6 @@ public class MainActivity extends AppCompatActivity {
     String name,email,number;
     PhoneAuthCredential credential;
     FirebaseUser currentUser;
-
     GMailSender sender;
     String emailOfSender = "fastway85187@gmail.com";
     String passOfSender = "@Ploya8587";
