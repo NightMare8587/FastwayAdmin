@@ -95,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
     FirebaseFirestore db =  FirebaseFirestore.getInstance();
     SharedPreferences loginInfo;
     SharedPreferences.Editor editor;
-     ImageView signInButton;
+    ImageView signInButton;
     PhoneAuthProvider.ForceResendingToken myToken;
     EditText fullName,emailAddress,phoneNumber;
     CountryCodePicker ccp;
