@@ -76,8 +76,6 @@ import karpuzoglu.enes.com.fastdialog.Animations;
 import karpuzoglu.enes.com.fastdialog.FastDialog;
 import karpuzoglu.enes.com.fastdialog.FastDialogBuilder;
 import karpuzoglu.enes.com.fastdialog.Type;
-
-
 public class MainActivity extends AppCompatActivity {
     String subject = "Welcome to Fastway";
     String body = "Haha you nigga";
