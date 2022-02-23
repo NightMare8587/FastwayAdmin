@@ -1,6 +1,7 @@
 package com.consumers.fastwayadmin.NavFrags.homeFrag;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -74,6 +75,10 @@ public class ApproveCurrentOrder extends AppCompatActivity {
     DatabaseReference totalOrders;
     String customisation = "";
     String userName,userEmail;
+    SharedPreferences restaurantDailyTrack;
+    SharedPreferences.Editor restaurantTrackEditor;
+    SharedPreferences restaurantTrackRecords;
+    SharedPreferences.Editor restaurantTrackRecordsEditor;
     Bitmap bmp,scaled,bmp1,scaled1;
     String URL = "https://fcm.googleapis.com/fcm/send";
     String url = "https://intercellular-stabi.000webhostapp.com/refunds/initiateRefund.php";
@@ -103,6 +108,10 @@ public class ApproveCurrentOrder extends AppCompatActivity {
         table = getIntent().getStringExtra("table");
         id = getIntent().getStringExtra("id");
         state = getIntent().getStringExtra("state");
+        restaurantDailyTrack = getSharedPreferences("RestaurantTrackingDaily", Context.MODE_PRIVATE);
+        restaurantTrackRecords = getSharedPreferences("RestaurantTrackRecords",Context.MODE_PRIVATE);
+        restaurantTrackRecordsEditor = restaurantTrackRecords.edit();
+        restaurantTrackEditor = restaurantDailyTrack.edit();
         showCustomisation = findViewById(R.id.showCustomisationButton);
         SharedPreferences sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
         bmp = BitmapFactory.decodeResource(getResources(), R.drawable.logo);
@@ -191,6 +200,21 @@ public class ApproveCurrentOrder extends AppCompatActivity {
 
                 }
             });
+            if(restaurantDailyTrack.contains("totalOrdersToday")){
+                int val = Integer.parseInt(restaurantDailyTrack.getString("totalOrdersToday",""));
+                val = val + 1;
+                restaurantTrackEditor.putString("totalOrdersToday",String.valueOf(val));
+            }else{
+                restaurantTrackEditor.putString("totalOrdersToday",String.valueOf(1));
+            }
+            if(restaurantDailyTrack.contains("totalTransactionsToday")){
+                int val = Integer.parseInt(restaurantDailyTrack.getString("totalTransactionsToday",""));
+                val = val + Integer.parseInt(orderAmount);
+                restaurantTrackEditor.putString("totalTransactionsToday",String.valueOf(val));
+            }else{
+                restaurantTrackEditor.putString("totalTransactionsToday",String.valueOf(orderAmount));
+            }
+            restaurantTrackEditor.apply();
             DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(Objects.requireNonNull(auth.getUid())).child("Tables").child(table);
             new MakePayout().execute();
             try{
@@ -410,7 +434,7 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                     DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid())).child("Transactions");
                     PaymentClass paymentClass = new PaymentClass(genratedID,id);
                     databaseReference.child(time).setValue(paymentClass);
-                    params.put("amount",String.valueOf("1"));
+                    params.put("amount", "1");
                     return params;
                 }
             };

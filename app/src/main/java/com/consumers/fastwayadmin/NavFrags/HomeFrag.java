@@ -25,6 +25,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
@@ -71,6 +72,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
 
@@ -81,8 +83,11 @@ import karpuzoglu.enes.com.fastdialog.Type;
 
 public class HomeFrag extends Fragment {
     String currentTime;
+    Calendar calendar;
+    int currentDay;
     @SuppressLint("UseSwitchCompatOrMaterialCode")
     Switch acceptOrders;
+    TextView totalOrdersToday,totalTransactionsToday;
     List<String> customisationList = new ArrayList<>();
     boolean check = false;
     List<String> time = new ArrayList<>();
@@ -125,6 +130,10 @@ public class HomeFrag extends Fragment {
     SharedPreferences sharedPreferences;
     Switch onlineOrOffline;
     DatabaseReference reference;
+    SharedPreferences restaurantDailyTrack;
+    SharedPreferences.Editor restaurantTrackEditor;
+    SharedPreferences restaurantTrackRecords;
+    SharedPreferences.Editor restaurantTrackRecordsEditor;
     FusedLocationProviderClient client;
     List<String> resId = new ArrayList<>();
     List<String> tableNum = new ArrayList<>();
@@ -166,9 +175,19 @@ public class HomeFrag extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         toolbar = view.findViewById(R.id.homeFragToolBar);
+        calendar = Calendar.getInstance();
+        currentDay = calendar.get(Calendar.DAY_OF_MONTH);
+//        Toast.makeText(view.getContext(), "" + currentDay, Toast.LENGTH_SHORT).show();
         ((AppCompatActivity) requireActivity()).setSupportActionBar(toolbar);
         inAppUpdateInfo();
         UID = auth.getUid() + "";
+        totalOrdersToday = view.findViewById(R.id.valueOfTotalOrdersMadeHome);
+        totalTransactionsToday = view.findViewById(R.id.valueOfTotalTransactionsTodayHome);
+        restaurantDailyTrack = view.getContext().getSharedPreferences("RestaurantTrackingDaily",Context.MODE_PRIVATE);
+        restaurantTrackRecords = view.getContext().getSharedPreferences("RestaurantTrackRecords",Context.MODE_PRIVATE);
+        restaurantTrackRecordsEditor = restaurantTrackRecords.edit();
+        restaurantTrackEditor = restaurantDailyTrack.edit();
+        new dailyRestaurantTrackUpdate().execute();
         SharedPreferences stopServices = requireActivity().getSharedPreferences("Stop Services",Context.MODE_PRIVATE);
          editor = stopServices.edit();
          acceptOrders = view.findViewById(R.id.acceptingOrdersSwitchHomeFrag);
@@ -533,7 +552,7 @@ public class HomeFrag extends Fragment {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.exists()){
                     for(DataSnapshot dataSnapshot : snapshot.getChildren()){
-                        if(dataSnapshot.child("status").getValue(String.class).equals("unavailable")){
+                        if(Objects.equals(dataSnapshot.child("status").getValue(String.class), "unavailable")){
                             check = true;
                             AlertDialog.Builder alert = new AlertDialog.Builder(requireContext());
                             alert.setTitle("Error").setMessage("You still have an active table. Contact user before not accepting orders");
@@ -542,7 +561,7 @@ public class HomeFrag extends Fragment {
                             acceptOrders.setChecked(true);
                             alert.show();
                             break;
-                        }else if(dataSnapshot.child("status").getValue(String.class).equals("Reserved")){
+                        }else if(Objects.equals(dataSnapshot.child("status").getValue(String.class), "Reserved")){
                             check = true;
                             AlertDialog.Builder alert = new AlertDialog.Builder(requireContext());
                             alert.setTitle("Error").setMessage("You still have an active Reserved Table. Contact user before not accepting orders");
@@ -578,7 +597,7 @@ public class HomeFrag extends Fragment {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.exists()){
                     for(DataSnapshot dataSnapshot : snapshot.getChildren()){
-                        if(dataSnapshot.child("status").getValue(String.class).equals("unavailable")){
+                        if(Objects.equals(dataSnapshot.child("status").getValue(String.class), "unavailable")){
                             check = true;
                             AlertDialog.Builder alert = new AlertDialog.Builder(requireContext());
                             alert.setTitle("Error").setMessage("You still have an active table. Contact user before closing restaurant");
@@ -587,7 +606,7 @@ public class HomeFrag extends Fragment {
                             acceptOrders.setChecked(true);
                             alert.show();
                             break;
-                        }else if(dataSnapshot.child("status").getValue(String.class).equals("Reserved")){
+                        }else if(Objects.equals(dataSnapshot.child("status").getValue(String.class), "Reserved")){
                             check = true;
                             AlertDialog.Builder alert = new AlertDialog.Builder(requireContext());
                             alert.setTitle("Error").setMessage("You still have an active Reserved Table. Contact user before closing restaurant");
@@ -671,7 +690,7 @@ public class HomeFrag extends Fragment {
                 // Request the update.
 
                 try {
-                    appUpdateManager.startUpdateFlowForResult(appUpdateInfo, IMMEDIATE, (Activity) getContext(),UPDATE_REQUEST_CODE);
+                    appUpdateManager.startUpdateFlowForResult(appUpdateInfo, IMMEDIATE, (Activity) requireContext(),UPDATE_REQUEST_CODE);
                 } catch (IntentSender.SendIntentException e) {
                     Toast.makeText(getContext(), "" + e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                 }
@@ -706,8 +725,6 @@ public class HomeFrag extends Fragment {
                     recyclerView.setLayoutManager(horizonatl);
 //                    Toast.makeText(view.getContext(), ""+seats.toString(), Toast.LENGTH_SHORT).show();
                     recyclerView.setAdapter(new homeFragClass(tableNum,seats,resId,isCurrentOrder));
-                }else{
-
                 }
             }
 
@@ -727,19 +744,11 @@ public class HomeFrag extends Fragment {
                 AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
                 builder.setCancelable(false);
                 builder.setTitle("Important").setMessage("Camera is required for proper functioning of app. Wanna provide permission??")
-                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                if(ContextCompat.checkSelfPermission(requireActivity(),Manifest.permission.CAMERA) + ContextCompat.checkSelfPermission(requireActivity(),Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
-                                    requestPermissions(new String[]{Manifest.permission.CAMERA,Manifest.permission.ACCESS_COARSE_LOCATION},1);
-                                }
+                        .setPositiveButton("Yes", (dialogInterface, i) -> {
+                            if(ContextCompat.checkSelfPermission(requireActivity(),Manifest.permission.CAMERA) + ContextCompat.checkSelfPermission(requireActivity(),Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+                                requestPermissions(new String[]{Manifest.permission.CAMERA,Manifest.permission.ACCESS_COARSE_LOCATION},1);
                             }
-                        }).setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                    }
-                }).create();
+                        }).setNegativeButton("No", (dialogInterface, i) -> dialogInterface.dismiss()).create();
                 builder.show();
             }
         }
@@ -789,10 +798,8 @@ public class HomeFrag extends Fragment {
                         seats.clear();
                         resId.clear();
                         isCurrentOrder.clear();
-//                    Toast.makeText(view.getContext(), "I am invoked", Toast.LENGTH_SHORT).show();
-//                    Toast.makeText(view.getContext(), ""+snapshot.getChildrenCount(), Toast.LENGTH_SHORT).show();
                         for(DataSnapshot dataSnapshot : snapshot.getChildren()){
-                            if(dataSnapshot.child("status").getValue(String.class).equals("unavailable")){
+                            if(Objects.equals(dataSnapshot.child("status").getValue(String.class), "unavailable")){
                                 resId.add(dataSnapshot.child("customerId").getValue(String.class));
                                 tableNum.add(dataSnapshot.child("tableNum").getValue(String.class));
                                 seats.add(dataSnapshot.child("numSeats").getValue(String.class));
@@ -1053,6 +1060,31 @@ public class HomeFrag extends Fragment {
                 }
             });
 
+            return null;
+        }
+    }
+    public class dailyRestaurantTrackUpdate extends AsyncTask<Void,Void,Void>{
+
+        @SuppressLint("SetTextI18n")
+        @Override
+        protected Void doInBackground(Void... voids) {
+            if(restaurantDailyTrack.contains("currentDate")){
+                if(Integer.parseInt(restaurantDailyTrack.getString("currentDate","")) == currentDay){
+                    if(restaurantDailyTrack.contains("totalOrdersToday"))
+                        totalOrdersToday.setText(restaurantDailyTrack.getString("totalOrdersToday",""));
+
+                    if(restaurantDailyTrack.contains("totalTransactionsToday"))
+                        totalTransactionsToday.setText("\u20B9" + restaurantDailyTrack.getString("totalTransactionsToday",""));
+                }else{
+                    restaurantTrackEditor.putString("currentDate", String.valueOf(currentDay));
+                    restaurantTrackEditor.putString("totalOrdersToday","0");
+                    restaurantTrackEditor.putString("totalTransactionsToday","0");
+                    restaurantTrackEditor.apply();
+                }
+            }else{
+                restaurantTrackEditor.putString("currentDate",String.valueOf(currentDay));
+                restaurantTrackEditor.apply();
+            }
             return null;
         }
     }

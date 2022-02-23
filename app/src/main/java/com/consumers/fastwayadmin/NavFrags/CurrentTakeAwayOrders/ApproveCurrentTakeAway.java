@@ -1,5 +1,6 @@
 package com.consumers.fastwayadmin.NavFrags.CurrentTakeAwayOrders;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -69,7 +70,6 @@ import java.util.Objects;
 import karpuzoglu.enes.com.fastdialog.Animations;
 import karpuzoglu.enes.com.fastdialog.FastDialog;
 import karpuzoglu.enes.com.fastdialog.FastDialogBuilder;
-import karpuzoglu.enes.com.fastdialog.NegativeClick;
 import karpuzoglu.enes.com.fastdialog.PositiveClick;
 import karpuzoglu.enes.com.fastdialog.Type;
 
@@ -80,6 +80,10 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
     StorageReference storageReference;
     String userName,userEmail;
     String paymentMode;
+    SharedPreferences restaurantDailyTrack;
+    SharedPreferences.Editor restaurantTrackEditor;
+    SharedPreferences restaurantTrackRecords;
+    SharedPreferences.Editor restaurantTrackRecordsEditor;
     String genratedToken;
     String customisation;
     String testPayoutToken = "https://intercellular-stabi.000webhostapp.com/CheckoutPayouts/testToken.php";
@@ -109,6 +113,10 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
         id = getIntent().getStringExtra("id");
         showCustom = findViewById(R.id.showCustomisationCurrentTakeaway);
         bmp = BitmapFactory.decodeResource(getResources(), R.drawable.logo);
+        restaurantDailyTrack = getSharedPreferences("RestaurantTrackingDaily", Context.MODE_PRIVATE);
+        restaurantTrackRecords = getSharedPreferences("RestaurantTrackRecords",Context.MODE_PRIVATE);
+        restaurantTrackRecordsEditor = restaurantTrackRecords.edit();
+        restaurantTrackEditor = restaurantDailyTrack.edit();
         scaled = Bitmap.createScaledBitmap(bmp,500,500,false);
         bmp1 = BitmapFactory.decodeResource(getResources(), R.drawable.orderdeclined);
         scaled1 = Bitmap.createScaledBitmap(bmp1,500,500,false);
@@ -132,24 +140,16 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
 
         showCustom.setOnClickListener(click -> {
             AlertDialog.Builder alert = new AlertDialog.Builder(ApproveCurrentTakeAway.this);
-            alert.setTitle("Customisation").setMessage("User has requested for following customisation to his/her order\n\n\n" + customisation).setPositiveButton("Exit", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    dialogInterface.dismiss();
-                }
-            }).create();
+            alert.setTitle("Customisation").setMessage("User has requested for following customisation to his/her order\n\n\n" + customisation).setPositiveButton("Exit", (dialogInterface, i) -> dialogInterface.dismiss()).create();
 
             alert.show();
         });
 
         if(!customisation.equals("")){
             AlertDialog.Builder alert = new AlertDialog.Builder(ApproveCurrentTakeAway.this);
-            alert.setTitle("Customisation").setMessage("User has requested for following customisation to his/her order\n\n\n" + customisation).setPositiveButton("Exit", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    dialogInterface.dismiss();
-                    showCustom.setVisibility(View.VISIBLE);
-                }
+            alert.setTitle("Customisation").setMessage("User has requested for following customisation to his/her order\n\n\n" + customisation).setPositiveButton("Exit", (dialogInterface, i) -> {
+                dialogInterface.dismiss();
+                showCustom.setVisibility(View.VISIBLE);
             }).create();
 
             alert.show();
@@ -170,329 +170,325 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
 
             }
         });
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,quantity);
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, quantity);
         listView.setAdapter(arrayAdapter);
 
-        ArrayAdapter<String> arrayAdapter1 = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,dishName);
+        ArrayAdapter<String> arrayAdapter1 = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, dishName);
         dishNames.setAdapter(arrayAdapter1);
 
-        ArrayAdapter<String> arrayAdapter2 = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,halfOr);
+        ArrayAdapter<String> arrayAdapter2 = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, halfOr);
         halfOrList.setAdapter(arrayAdapter2);
 
-        approve.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(paymentMode.equals("cash")){
-                    totalOrders.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            if(snapshot.hasChild("totalOrdersMade")){
-                                int totalOrder = Integer.parseInt(String.valueOf(snapshot.child("totalOrdersMade").getValue()));
-                                totalOrder = totalOrder + 1;
-                                totalOrders.child("totalOrdersMade").setValue(totalOrder);
-                            }else{
-                                totalOrders.child("totalOrdersMade").setValue("1");
-                            }
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError error) {
-
-                        }
-                    });
-                    new KAlertDialog(ApproveCurrentTakeAway.this,KAlertDialog.WARNING_TYPE)
-                            .setTitleText("Warning")
-                            .setContentText("Approve order only after you received cash payment")
-                            .setConfirmText("Confirm Order")
-                            .setConfirmClickListener(new KAlertDialog.KAlertClickListener() {
-                                @Override
-                                public void onClick(KAlertDialog kAlertDialog) {
-                                    kAlertDialog.dismissWithAnimation();
-                                    FirebaseAuth auth = FirebaseAuth.getInstance();
-                                    DatabaseReference trackTotalCash = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
-                                    trackTotalCash.addListenerForSingleValueEvent(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                            if(snapshot.hasChild("totalCashTakeAway")){
-                                                int prevAmount = Integer.parseInt(String.valueOf(snapshot.child("totalCashTakeAway").getValue()));
-                                                int currAmount = Integer.parseInt(orderAmount);
-                                                trackTotalCash.child("totalCashTakeAway").setValue(String.valueOf(currAmount + prevAmount));
-                                            }else{
-                                                trackTotalCash.child("totalCashTakeAway").setValue(String.valueOf(orderAmount));
-                                            }
-                                        }
-
-                                        @Override
-                                        public void onCancelled(@NonNull DatabaseError error) {
-
-                                        }
-                                    });
-                                    Toast.makeText(ApproveCurrentTakeAway.this, "Order Confirmed", Toast.LENGTH_SHORT).show();
-                                    RequestQueue requestQueue = Volley.newRequestQueue(ApproveCurrentTakeAway.this);
-                                    JSONObject main = new JSONObject();
-
-                                    CashTransactionClass cashTransactionClass = new CashTransactionClass(orderId,orderAmount,time,id);
-                                    DatabaseReference saveOrderInfo = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
-                                    saveOrderInfo.child("Cash Transactions").child(time).setValue(cashTransactionClass);
-                                    DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(Objects.requireNonNull(auth.getUid())).child("Current TakeAway").child(id);
-
-                                    try {
-                                        main.put("to", "/topics/" + id + "");
-                                        JSONObject notification = new JSONObject();
-                                        notification.put("title", "Order Confirmed");
-                                        notification.put("click_action", "Table Frag");
-                                        notification.put("body", "Your order is confirmed by the owner");
-                                        main.put("notification", notification);
-
-                                        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, main, new Response.Listener<JSONObject>() {
-                                            @Override
-                                            public void onResponse(JSONObject response) {
-
-                                            }
-                                        }, new Response.ErrorListener() {
-                                            @Override
-                                            public void onErrorResponse(VolleyError error) {
-                                                Toast.makeText(ApproveCurrentTakeAway.this, error.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
-                                            }
-                                        }) {
-                                            @Override
-                                            public Map<String, String> getHeaders() throws AuthFailureError {
-                                                Map<String, String> header = new HashMap<>();
-                                                header.put("content-type", "application/json");
-                                                header.put("authorization", "key=AAAAsigSEMs:APA91bEUF9ZFwIu84Jctci56DQd0TQOepztGOIKIBhoqf7N3ueQrkClw0xBTlWZEWyvwprXZmZgW2MNywF1pNBFpq1jFBr0CmlrJ0wygbZIBOnoZ0jP1zZC6nPxqF2MAP6iF3wuBHD2R");
-                                                return header;
-                                            }
-                                        };
-                                        reference.removeValue();
-                                        requestQueue.add(jsonObjectRequest);
-                                    } catch (Exception e) {
-                                        Toast.makeText(ApproveCurrentTakeAway.this, e.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
-                                    }
-                                    new Handler().postDelayed(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            finish();
-                                        }
-                                    }, 1500);
-                                }
-                            }).setCancelText("No Wait")
-                            .setCancelClickListener(new KAlertDialog.KAlertClickListener() {
-                                @Override
-                                public void onClick(KAlertDialog kAlertDialog) {
-                                    kAlertDialog.dismissWithAnimation();
-                                }
-                            }).show();
-                }else {
-                    FastDialog fastDialog = new FastDialogBuilder(ApproveCurrentTakeAway.this, Type.DIALOG)
-                            .setTitleText("OTP Code")
-                            .setText("Enter 6 digit code below provided by user")
-                            .setHint("Enter Code here")
-                            .positiveText("Confirm")
-                            .negativeText("Cancel")
-                            .setAnimation(Animations.SLIDE_TOP)
-                            .create();
-
-                    fastDialog.show();
-
-                    fastDialog.positiveClickListener(new PositiveClick() {
-                        @Override
-                        public void onClick(View view) {
-                            if (fastDialog.getInputText().equals("")) {
-                                Toast.makeText(ApproveCurrentTakeAway.this, "Field can't be empty", Toast.LENGTH_SHORT).show();
-                                fastDialog.dismiss();
-                            } else if (fastDialog.getInputText().equals(digitCode.trim())) {
-                                totalOrders.addListenerForSingleValueEvent(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                        if(snapshot.hasChild("totalOrdersMade")){
-                                            int totalOrder = Integer.parseInt(String.valueOf(snapshot.child("totalOrdersMade").getValue()));
-                                            totalOrder = totalOrder + 1;
-                                            totalOrders.child("totalOrdersMade").setValue(totalOrder);
-                                        }else{
-                                            totalOrders.child("totalOrdersMade").setValue("1");
-                                        }
-                                    }
-
-                                    @Override
-                                    public void onCancelled(@NonNull DatabaseError error) {
-
-                                    }
-                                });
-                                Toast.makeText(ApproveCurrentTakeAway.this, "Order Confirmed", Toast.LENGTH_SHORT).show();
-                                new MakePayout().execute();
-                                RequestQueue requestQueue = Volley.newRequestQueue(ApproveCurrentTakeAway.this);
-                                fastDialog.dismiss();
-                                JSONObject main = new JSONObject();
-                                FirebaseAuth auth = FirebaseAuth.getInstance();
-                                DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(Objects.requireNonNull(auth.getUid())).child("Current TakeAway").child(id);
-
-                                try {
-                                    main.put("to", "/topics/" + id + "");
-                                    JSONObject notification = new JSONObject();
-                                    notification.put("title", "Order Confirmed");
-                                    notification.put("click_action", "Table Frag");
-                                    notification.put("body", "Your order is confirmed by the owner");
-                                    main.put("notification", notification);
-
-                                    JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, main, new Response.Listener<JSONObject>() {
-                                        @Override
-                                        public void onResponse(JSONObject response) {
-
-                                        }
-                                    }, new Response.ErrorListener() {
-                                        @Override
-                                        public void onErrorResponse(VolleyError error) {
-                                            Toast.makeText(ApproveCurrentTakeAway.this, error.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
-                                        }
-                                    }) {
-                                        @Override
-                                        public Map<String, String> getHeaders() throws AuthFailureError {
-                                            Map<String, String> header = new HashMap<>();
-                                            header.put("content-type", "application/json");
-                                            header.put("authorization", "key=AAAAsigSEMs:APA91bEUF9ZFwIu84Jctci56DQd0TQOepztGOIKIBhoqf7N3ueQrkClw0xBTlWZEWyvwprXZmZgW2MNywF1pNBFpq1jFBr0CmlrJ0wygbZIBOnoZ0jP1zZC6nPxqF2MAP6iF3wuBHD2R");
-                                            return header;
-                                        }
-                                    };
-                                    reference.removeValue();
-                                    userRef.child("digitCode").removeValue();
-                                    requestQueue.add(jsonObjectRequest);
-                                } catch (Exception e) {
-                                    Toast.makeText(ApproveCurrentTakeAway.this, e.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
-                                }
-                                new Handler().postDelayed(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        finish();
-                                    }
-                                }, 1500);
-                            } else {
-                                Toast.makeText(ApproveCurrentTakeAway.this, "Wrong Code", Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                    });
-
-                    fastDialog.negativeClickListener(new NegativeClick() {
-                        @Override
-                        public void onClick(View view) {
-                            fastDialog.dismiss();
-                        }
-                    });
-                }
-
-            }
-        });
-
-        decline.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AlertDialog.Builder alert  = new AlertDialog.Builder(v.getContext());
-                alert.setTitle("Reason");
-                alert.setMessage("Enter reason for order cancellation below");
-                EditText editText = new EditText(v.getContext());
-                editText.setMaxLines(200);
-                editText.setHint("Enter reason here");
-                LinearLayout linearLayout = new LinearLayout(v.getContext());
-                linearLayout.setOrientation(LinearLayout.VERTICAL);
-                linearLayout.addView(editText);
-                alert.setView(linearLayout);
-
-                alert.setPositiveButton("submit", new DialogInterface.OnClickListener() {
+        approve.setOnClickListener(view -> {
+            if(paymentMode.equals("cash")){
+                totalOrders.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        if(!editText.getText().toString().equals("")) {
-                            RequestQueue requestQueue = Volley.newRequestQueue(ApproveCurrentTakeAway.this);
-                            JSONObject main = new JSONObject();
-                            new GenratePDF().execute();
-                            FirebaseAuth auth = FirebaseAuth.getInstance();
-                            DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(Objects.requireNonNull(auth.getUid())).child("Current TakeAway").child(id);
-                            if (paymentMode.equals("online")) {
-                                new InitiateRefund().execute();
-                                try {
-                                    main.put("to", "/topics/" + id + "");
-                                    JSONObject notification = new JSONObject();
-                                    notification.put("title", "Order Declined");
-                                    notification.put("click_action", "Table Frag");
-                                    notification.put("body", "Your order is declined by the owner. You can download updated invoice from my orders for future reference. Refund will be initiated Shortly\n" + editText.getText().toString());
-                                    main.put("notification", notification);
-
-                                    JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, main, new Response.Listener<JSONObject>() {
-                                        @Override
-                                        public void onResponse(JSONObject response) {
-
-                                        }
-                                    }, new Response.ErrorListener() {
-                                        @Override
-                                        public void onErrorResponse(VolleyError error) {
-                                            Toast.makeText(ApproveCurrentTakeAway.this, error.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
-                                        }
-                                    }) {
-                                        @Override
-                                        public Map<String, String> getHeaders() throws AuthFailureError {
-                                            Map<String, String> header = new HashMap<>();
-                                            header.put("content-type", "application/json");
-                                            header.put("authorization", "key=AAAAsigSEMs:APA91bEUF9ZFwIu84Jctci56DQd0TQOepztGOIKIBhoqf7N3ueQrkClw0xBTlWZEWyvwprXZmZgW2MNywF1pNBFpq1jFBr0CmlrJ0wygbZIBOnoZ0jP1zZC6nPxqF2MAP6iF3wuBHD2R");
-                                            return header;
-                                        }
-                                    };
-                                    reference.removeValue();
-                                    userRef.child("digitCode").removeValue();
-                                    requestQueue.add(jsonObjectRequest);
-                                } catch (Exception e) {
-                                    Toast.makeText(ApproveCurrentTakeAway.this, e.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
-                                }
-                            } else {
-                                try {
-                                    main.put("to", "/topics/" + id + "");
-                                    JSONObject notification = new JSONObject();
-                                    notification.put("title", "Order Declined");
-                                    notification.put("click_action", "Table Frag");
-                                    notification.put("body", "Your order is declined by the owner. If you paid cash already then ask owner to refund it");
-                                    main.put("notification", notification);
-
-                                    JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, main, new Response.Listener<JSONObject>() {
-                                        @Override
-                                        public void onResponse(JSONObject response) {
-
-                                        }
-                                    }, new Response.ErrorListener() {
-                                        @Override
-                                        public void onErrorResponse(VolleyError error) {
-                                            Toast.makeText(ApproveCurrentTakeAway.this, error.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
-                                        }
-                                    }) {
-                                        @Override
-                                        public Map<String, String> getHeaders() throws AuthFailureError {
-                                            Map<String, String> header = new HashMap<>();
-                                            header.put("content-type", "application/json");
-                                            header.put("authorization", "key=AAAAsigSEMs:APA91bEUF9ZFwIu84Jctci56DQd0TQOepztGOIKIBhoqf7N3ueQrkClw0xBTlWZEWyvwprXZmZgW2MNywF1pNBFpq1jFBr0CmlrJ0wygbZIBOnoZ0jP1zZC6nPxqF2MAP6iF3wuBHD2R");
-                                            return header;
-                                        }
-                                    };
-                                    reference.removeValue();
-                                    requestQueue.add(jsonObjectRequest);
-                                } catch (Exception e) {
-                                    Toast.makeText(ApproveCurrentTakeAway.this, e.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
-                                }
-                            }
-                            new Handler().postDelayed(new Runnable() {
-                                @Override
-                                public void run() {
-                                    finish();
-                                }
-                            }, 1500);
-                        }else
-                            Toast.makeText(v.getContext(), "Enter reason for table cancellation", Toast.LENGTH_SHORT).show();
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if(snapshot.hasChild("totalOrdersMade")){
+                            int totalOrder = Integer.parseInt(String.valueOf(snapshot.child("totalOrdersMade").getValue()));
+                            totalOrder = totalOrder + 1;
+                            totalOrders.child("totalOrdersMade").setValue(totalOrder);
+                        }else{
+                            totalOrders.child("totalOrdersMade").setValue("1");
+                        }
                     }
-                }).setNegativeButton("back", new DialogInterface.OnClickListener() {
+
                     @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
+                    public void onCancelled(@NonNull DatabaseError error) {
 
                     }
                 });
+                if(restaurantDailyTrack.contains("totalOrdersToday")){
+                    int val = Integer.parseInt(restaurantDailyTrack.getString("totalOrdersToday",""));
+                    val = val + 1;
+                    restaurantTrackEditor.putString("totalOrdersToday",String.valueOf(val));
+                }else{
+                    restaurantTrackEditor.putString("totalOrdersToday",String.valueOf(1));
+                }
+                if(restaurantDailyTrack.contains("totalTransactionsToday")){
+                    int val = Integer.parseInt(restaurantDailyTrack.getString("totalTransactionsToday",""));
+                    val = val + Integer.parseInt(orderAmount);
+                    restaurantTrackEditor.putString("totalTransactionsToday",String.valueOf(val));
+                }else{
+                    restaurantTrackEditor.putString("totalTransactionsToday",String.valueOf(orderAmount));
+                }
+                restaurantTrackEditor.apply();
+                new KAlertDialog(ApproveCurrentTakeAway.this,KAlertDialog.WARNING_TYPE)
+                        .setTitleText("Warning")
+                        .setContentText("Approve order only after you received cash payment")
+                        .setConfirmText("Confirm Order")
+                        .setConfirmClickListener(kAlertDialog -> {
 
-                alert.create().show();
+                            kAlertDialog.dismissWithAnimation();
+                            FirebaseAuth auth = FirebaseAuth.getInstance();
+                            DatabaseReference trackTotalCash = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
+                            trackTotalCash.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                    if(snapshot.hasChild("totalCashTakeAway")){
+                                        int prevAmount = Integer.parseInt(String.valueOf(snapshot.child("totalCashTakeAway").getValue()));
+                                        int currAmount = Integer.parseInt(orderAmount);
+                                        trackTotalCash.child("totalCashTakeAway").setValue(String.valueOf(currAmount + prevAmount));
+                                    }else{
+                                        trackTotalCash.child("totalCashTakeAway").setValue(String.valueOf(orderAmount));
+                                    }
+                                }
 
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError error) {
+
+                                }
+                            });
+                            Toast.makeText(ApproveCurrentTakeAway.this, "Order Confirmed", Toast.LENGTH_SHORT).show();
+                            RequestQueue requestQueue = Volley.newRequestQueue(ApproveCurrentTakeAway.this);
+                            JSONObject main = new JSONObject();
+
+                            CashTransactionClass cashTransactionClass = new CashTransactionClass(orderId,orderAmount,time,id);
+                            DatabaseReference saveOrderInfo = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
+                            saveOrderInfo.child("Cash Transactions").child(time).setValue(cashTransactionClass);
+                            DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(Objects.requireNonNull(auth.getUid())).child("Current TakeAway").child(id);
+
+                            try {
+                                main.put("to", "/topics/" + id + "");
+                                JSONObject notification = new JSONObject();
+                                notification.put("title", "Order Confirmed");
+                                notification.put("click_action", "Table Frag");
+                                notification.put("body", "Your order is confirmed by the owner");
+                                main.put("notification", notification);
+
+                                JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, main, response -> {
+
+                                }, error -> Toast.makeText(ApproveCurrentTakeAway.this, error.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show()) {
+                                    @Override
+                                    public Map<String, String> getHeaders() {
+                                        Map<String, String> header = new HashMap<>();
+                                        header.put("content-type", "application/json");
+                                        header.put("authorization", "key=AAAAsigSEMs:APA91bEUF9ZFwIu84Jctci56DQd0TQOepztGOIKIBhoqf7N3ueQrkClw0xBTlWZEWyvwprXZmZgW2MNywF1pNBFpq1jFBr0CmlrJ0wygbZIBOnoZ0jP1zZC6nPxqF2MAP6iF3wuBHD2R");
+                                        return header;
+                                    }
+                                };
+                                reference.removeValue();
+                                requestQueue.add(jsonObjectRequest);
+                            } catch (Exception e) {
+                                Toast.makeText(ApproveCurrentTakeAway.this, e.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
+                            }
+                            new Handler().postDelayed(() -> finish(), 1500);
+                        }).setCancelText("No Wait")
+                        .setCancelClickListener(new KAlertDialog.KAlertClickListener() {
+                            @Override
+                            public void onClick(KAlertDialog kAlertDialog) {
+                                kAlertDialog.dismissWithAnimation();
+                            }
+                        }).show();
+            }else {
+                FastDialog fastDialog = new FastDialogBuilder(ApproveCurrentTakeAway.this, Type.DIALOG)
+                        .setTitleText("OTP Code")
+                        .setText("Enter 6 digit code below provided by user")
+                        .setHint("Enter Code here")
+                        .positiveText("Confirm")
+                        .negativeText("Cancel")
+                        .setAnimation(Animations.SLIDE_TOP)
+                        .create();
+
+                fastDialog.show();
+
+                fastDialog.positiveClickListener(new PositiveClick() {
+                    @Override
+                    public void onClick(View view) {
+                        if (fastDialog.getInputText().equals("")) {
+                            Toast.makeText(ApproveCurrentTakeAway.this, "Field can't be empty", Toast.LENGTH_SHORT).show();
+                            fastDialog.dismiss();
+                        } else if (fastDialog.getInputText().equals(digitCode.trim())) {
+                            if(restaurantDailyTrack.contains("totalOrdersToday")){
+                                int val = Integer.parseInt(restaurantDailyTrack.getString("totalOrdersToday",""));
+                                val = val + 1;
+                                restaurantTrackEditor.putString("totalOrdersToday",String.valueOf(val));
+                            }else{
+                                restaurantTrackEditor.putString("totalOrdersToday",String.valueOf(1));
+                            }
+                            if(restaurantDailyTrack.contains("totalTransactionsToday")){
+                                int val = Integer.parseInt(restaurantDailyTrack.getString("totalTransactionsToday",""));
+                                val = val + Integer.parseInt(orderAmount);
+                                restaurantTrackEditor.putString("totalTransactionsToday",String.valueOf(val));
+                            }else{
+                                restaurantTrackEditor.putString("totalTransactionsToday",String.valueOf(orderAmount));
+                            }
+                            restaurantTrackEditor.apply();
+                            totalOrders.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                    if(snapshot.hasChild("totalOrdersMade")){
+                                        int totalOrder = Integer.parseInt(String.valueOf(snapshot.child("totalOrdersMade").getValue()));
+                                        totalOrder = totalOrder + 1;
+                                        totalOrders.child("totalOrdersMade").setValue(totalOrder);
+                                    }else{
+                                        totalOrders.child("totalOrdersMade").setValue("1");
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError error) {
+
+                                }
+                            });
+                            Toast.makeText(ApproveCurrentTakeAway.this, "Order Confirmed", Toast.LENGTH_SHORT).show();
+                            new MakePayout().execute();
+                            RequestQueue requestQueue = Volley.newRequestQueue(ApproveCurrentTakeAway.this);
+                            fastDialog.dismiss();
+                            JSONObject main = new JSONObject();
+                            FirebaseAuth auth = FirebaseAuth.getInstance();
+                            DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(Objects.requireNonNull(auth.getUid())).child("Current TakeAway").child(id);
+
+                            try {
+                                main.put("to", "/topics/" + id + "");
+                                JSONObject notification = new JSONObject();
+                                notification.put("title", "Order Confirmed");
+                                notification.put("click_action", "Table Frag");
+                                notification.put("body", "Your order is confirmed by the owner");
+                                main.put("notification", notification);
+
+                                JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, main, response -> {
+
+                                }, new Response.ErrorListener() {
+                                    @Override
+                                    public void onErrorResponse(VolleyError error) {
+                                        Toast.makeText(ApproveCurrentTakeAway.this, error.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
+                                    }
+                                }) {
+                                    @Override
+                                    public Map<String, String> getHeaders() throws AuthFailureError {
+                                        Map<String, String> header = new HashMap<>();
+                                        header.put("content-type", "application/json");
+                                        header.put("authorization", "key=AAAAsigSEMs:APA91bEUF9ZFwIu84Jctci56DQd0TQOepztGOIKIBhoqf7N3ueQrkClw0xBTlWZEWyvwprXZmZgW2MNywF1pNBFpq1jFBr0CmlrJ0wygbZIBOnoZ0jP1zZC6nPxqF2MAP6iF3wuBHD2R");
+                                        return header;
+                                    }
+                                };
+                                reference.removeValue();
+                                userRef.child("digitCode").removeValue();
+                                requestQueue.add(jsonObjectRequest);
+                            } catch (Exception e) {
+                                Toast.makeText(ApproveCurrentTakeAway.this, e.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
+                            }
+                            new Handler().postDelayed(() -> finish(), 1500);
+                        } else {
+                            Toast.makeText(ApproveCurrentTakeAway.this, "Wrong Code", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+
+                fastDialog.negativeClickListener(view1 -> fastDialog.dismiss());
             }
+
+        });
+
+        decline.setOnClickListener(v -> {
+            AlertDialog.Builder alert  = new AlertDialog.Builder(v.getContext());
+            alert.setTitle("Reason");
+            alert.setMessage("Enter reason for order cancellation below");
+            EditText editText = new EditText(v.getContext());
+            editText.setMaxLines(200);
+            editText.setHint("Enter reason here");
+            LinearLayout linearLayout = new LinearLayout(v.getContext());
+            linearLayout.setOrientation(LinearLayout.VERTICAL);
+            linearLayout.addView(editText);
+            alert.setView(linearLayout);
+
+            alert.setPositiveButton("submit", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    if(!editText.getText().toString().equals("")) {
+                        RequestQueue requestQueue = Volley.newRequestQueue(ApproveCurrentTakeAway.this);
+                        JSONObject main = new JSONObject();
+                        new GenratePDF().execute();
+                        FirebaseAuth auth = FirebaseAuth.getInstance();
+                        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(Objects.requireNonNull(auth.getUid())).child("Current TakeAway").child(id);
+                        if (paymentMode.equals("online")) {
+                            new InitiateRefund().execute();
+                            try {
+                                main.put("to", "/topics/" + id + "");
+                                JSONObject notification = new JSONObject();
+                                notification.put("title", "Order Declined");
+                                notification.put("click_action", "Table Frag");
+                                notification.put("body", "Your order is declined by the owner. You can download updated invoice from my orders for future reference. Refund will be initiated Shortly\n" + editText.getText().toString());
+                                main.put("notification", notification);
+
+                                JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, main, new Response.Listener<JSONObject>() {
+                                    @Override
+                                    public void onResponse(JSONObject response) {
+
+                                    }
+                                }, new Response.ErrorListener() {
+                                    @Override
+                                    public void onErrorResponse(VolleyError error) {
+                                        Toast.makeText(ApproveCurrentTakeAway.this, error.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
+                                    }
+                                }) {
+                                    @Override
+                                    public Map<String, String> getHeaders() throws AuthFailureError {
+                                        Map<String, String> header = new HashMap<>();
+                                        header.put("content-type", "application/json");
+                                        header.put("authorization", "key=AAAAsigSEMs:APA91bEUF9ZFwIu84Jctci56DQd0TQOepztGOIKIBhoqf7N3ueQrkClw0xBTlWZEWyvwprXZmZgW2MNywF1pNBFpq1jFBr0CmlrJ0wygbZIBOnoZ0jP1zZC6nPxqF2MAP6iF3wuBHD2R");
+                                        return header;
+                                    }
+                                };
+                                reference.removeValue();
+                                userRef.child("digitCode").removeValue();
+                                requestQueue.add(jsonObjectRequest);
+                            } catch (Exception e) {
+                                Toast.makeText(ApproveCurrentTakeAway.this, e.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
+                            }
+                        } else {
+                            try {
+                                main.put("to", "/topics/" + id + "");
+                                JSONObject notification = new JSONObject();
+                                notification.put("title", "Order Declined");
+                                notification.put("click_action", "Table Frag");
+                                notification.put("body", "Your order is declined by the owner. If you paid cash already then ask owner to refund it");
+                                main.put("notification", notification);
+
+                                JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, main, new Response.Listener<JSONObject>() {
+                                    @Override
+                                    public void onResponse(JSONObject response) {
+
+                                    }
+                                }, new Response.ErrorListener() {
+                                    @Override
+                                    public void onErrorResponse(VolleyError error) {
+                                        Toast.makeText(ApproveCurrentTakeAway.this, error.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
+                                    }
+                                }) {
+                                    @Override
+                                    public Map<String, String> getHeaders() throws AuthFailureError {
+                                        Map<String, String> header = new HashMap<>();
+                                        header.put("content-type", "application/json");
+                                        header.put("authorization", "key=AAAAsigSEMs:APA91bEUF9ZFwIu84Jctci56DQd0TQOepztGOIKIBhoqf7N3ueQrkClw0xBTlWZEWyvwprXZmZgW2MNywF1pNBFpq1jFBr0CmlrJ0wygbZIBOnoZ0jP1zZC6nPxqF2MAP6iF3wuBHD2R");
+                                        return header;
+                                    }
+                                };
+                                reference.removeValue();
+                                requestQueue.add(jsonObjectRequest);
+                            } catch (Exception e) {
+                                Toast.makeText(ApproveCurrentTakeAway.this, e.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                finish();
+                            }
+                        }, 1500);
+                    }else
+                        Toast.makeText(v.getContext(), "Enter reason for table cancellation", Toast.LENGTH_SHORT).show();
+                }
+            }).setNegativeButton("back", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+
+                }
+            });
+
+            alert.create().show();
+
         });
     }
     public class InitiateRefund extends AsyncTask<Void,Void,Void> {
@@ -500,13 +496,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
         @Override
         protected Void doInBackground(Void... voids) {
             RequestQueue requestQueue = Volley.newRequestQueue(ApproveCurrentTakeAway.this);
-            StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
-                @Override
-                public void onResponse(String response) {
-                    Log.i("res",response.toString());
-
-                }
-            }, new Response.ErrorListener() {
+            StringRequest stringRequest = new StringRequest(Request.Method.POST, url, response -> Log.i("res",response.toString()), new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
 
@@ -514,7 +504,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
             }){
                 @NonNull
                 @Override
-                protected Map<String, String> getParams() throws AuthFailureError {
+                protected Map<String, String> getParams() {
                     Map<String,String> params = new HashMap<>();
                     FirebaseAuth auth = FirebaseAuth.getInstance();
                     String referid = orderId;
@@ -570,7 +560,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
             }){
                 @NonNull
                 @Override
-                protected Map<String, String> getParams() throws AuthFailureError {
+                protected Map<String, String> getParams() {
                     Map<String,String> params = new HashMap<>();
                     params.put("token",genratedToken);
                     return params;
@@ -587,12 +577,9 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
         protected Void doInBackground(Void... voids) {
             Log.i("statusTwo", String.valueOf(makePaymentToVendor.getStatus()));
             RequestQueue requestQueue = Volley.newRequestQueue(ApproveCurrentTakeAway.this);
-            StringRequest stringRequest = new StringRequest(Request.Method.POST, testPaymentToVendor, new Response.Listener<String>() {
-                @Override
-                public void onResponse(String response) {
-                    Log.i("response",response);
-                    Log.i("statusOne", String.valueOf(makePaymentToVendor.getStatus()));
-                }
+            StringRequest stringRequest = new StringRequest(Request.Method.POST, testPaymentToVendor, response -> {
+                Log.i("response",response);
+                Log.i("statusOne", String.valueOf(makePaymentToVendor.getStatus()));
             }, error -> {
 
             }){
