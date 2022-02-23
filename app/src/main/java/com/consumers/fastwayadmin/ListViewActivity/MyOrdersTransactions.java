@@ -331,12 +331,16 @@ public class MyOrdersTransactions extends AppCompatActivity {
                                     days++;
                                     if(resp[0].equals("PENDING")) {
                                     }else{
-                                        Double d = Double.parseDouble(resp[1]);
-                                        totalAmount = totalAmount + d.intValue();
-                                    }
-                                    amount.add(resp[1]);
-                                    transactionID.add(resp[2]);
+                                        if(!resp[1].equals("")) {
+                                            Double d = Double.parseDouble(resp[1]);
+                                            totalAmount = totalAmount + d.intValue();
+                                            amount.add(resp[1]);
+                                        }else{
+                                            amount.add("");
+                                        }
+                                        transactionID.add(resp[2]);
 
+                                    }
 
                                     amountList.add(totalAmount);
                                     daysList.add(days);
@@ -359,11 +363,8 @@ public class MyOrdersTransactions extends AppCompatActivity {
                                         earningAmount.setText("\u20B9" + totalAmount);
                                     }
                                 }
-                            }, new Response.ErrorListener() {
-                                @Override
-                                public void onErrorResponse(VolleyError error) {
+                            }, error -> {
 
-                                }
                             }){
                                 @Nullable
                                 @Override
