@@ -149,7 +149,7 @@ public class DishView extends RecyclerView.Adapter<DishView.DishAdapter> {
             }
         });
         else
-            Picasso.get().load("https://image.shutterstock.com/image-vector/no-image-vector-isolated-on-600w-1481369594.jpg").centerCrop().resize(100, 100).into(holder.imageView);
+            Picasso.get().load("https://image.shutterstock.com/image-vector/no-image-vector-isolated-on-600w-1481369594.jpg").into(holder.imageView);
 
         if(!half.get(position).isEmpty()){
             holder.available.setText("Half Plate Available");
