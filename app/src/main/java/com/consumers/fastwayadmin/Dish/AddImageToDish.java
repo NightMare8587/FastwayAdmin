@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.StrictMode;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.widget.Toast;
@@ -48,6 +49,7 @@ public class AddImageToDish extends AppCompatActivity {
     OutputStream outputStream;
     DatabaseReference reference;
     FirebaseStorage storage;
+    File outputFile;
     String type;
     FirebaseAuth dishAuth = FirebaseAuth.getInstance();
     StorageReference storageReference;
@@ -59,6 +61,8 @@ public class AddImageToDish extends AppCompatActivity {
         type = getIntent().getStringExtra("type");
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
+        StrictMode.VmPolicy.Builder builderaaa = new StrictMode.VmPolicy.Builder();
+        StrictMode.setVmPolicy(builderaaa.build());
         dishName = getIntent().getStringExtra("dishName");
         fastDialog = new FastDialogBuilder(AddImageToDish.this, Type.PROGRESS)
                 .progressText("Uploading Image please wait")
@@ -78,11 +82,11 @@ public class AddImageToDish extends AppCompatActivity {
                         intent.setAction(Intent.ACTION_GET_CONTENT);
                         startActivityForResult(Intent.createChooser(intent, "Select Picture"), 1);
                     }
-                }).setNegativeButton("Take Photo", new DialogInterface.OnClickListener() {
+                }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE); //IMAGE CAPTURE CODE
-                startActivityForResult(intent, 20);
+                dialogInterface.dismiss();
+                finish();
             }
         }).create();
         builder.show();
@@ -104,7 +108,7 @@ public class AddImageToDish extends AppCompatActivity {
     private void showDialogBox() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Choose Image").setMessage("Select Any One Option")
-                .setPositiveButton("Search Online", new DialogInterface.OnClickListener() {
+                .setPositiveButton("Upload From Device", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         dialogInterface.dismiss();
@@ -113,12 +117,11 @@ public class AddImageToDish extends AppCompatActivity {
                         intent.setAction(Intent.ACTION_GET_CONTENT);
                         startActivityForResult(Intent.createChooser(intent, "Select Picture"), 1);
                     }
-                }).setNegativeButton("Take Photo", new DialogInterface.OnClickListener() {
+                }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 dialogInterface.dismiss();
-                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE); //IMAGE CAPTURE CODE
-                startActivityForResult(intent, 20);
+                finish();
             }
         }).create();
         builder.show();

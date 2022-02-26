@@ -137,7 +137,7 @@ public class DishView extends RecyclerView.Adapter<DishView.DishAdapter> {
             holder.removeOffers.setVisibility(View.INVISIBLE);
         }
         if(!image.get(position).equals(""))
-        Picasso.get().load(image.get(position)).centerCrop().resize(100,100).into(holder.imageView, new Callback() {
+        Picasso.get().load(image.get(position)).into(holder.imageView, new Callback() {
             @Override
             public void onSuccess() {
                 holder.progressBar.setVisibility(View.INVISIBLE);
