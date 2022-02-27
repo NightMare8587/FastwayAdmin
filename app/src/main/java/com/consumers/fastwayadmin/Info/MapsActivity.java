@@ -137,9 +137,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onClick(View view) {
                 List<Address> addressList = null;
-                if(editText.length() == 0){
+                if (editText.length() == 0) {
                     editText.requestFocus();
                     editText.setError("Field can't be Empty");
+                    return;
                 }
 
                 String location = editText.getText().toString();
@@ -151,13 +152,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     e.printStackTrace();
                 }
 
-                Address address = addressList.get(0);
-                LatLng current = new LatLng(address.getLatitude(),address.getLongitude());
-                mMap.clear();
-                latitude = address.getLatitude();
-                longitude = address.getLongitude();
-                mMap.addMarker(new MarkerOptions().position(current).title("Current Location"));
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(current,15));
+                if (addressList.size() > 0) {
+                    Address address = addressList.get(0);
+                    LatLng current = new LatLng(address.getLatitude(), address.getLongitude());
+                    mMap.clear();
+                    latitude = address.getLatitude();
+                    longitude = address.getLongitude();
+                    mMap.addMarker(new MarkerOptions().position(current).title("Current Location"));
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(current, 15));
+                }else{
+                    Toast.makeText(MapsActivity.this, "Invalid location. Try something popular location", Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }
