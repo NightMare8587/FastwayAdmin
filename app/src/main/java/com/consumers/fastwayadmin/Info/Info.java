@@ -2,7 +2,6 @@ package com.consumers.fastwayadmin.Info;
 
 import android.Manifest;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
@@ -47,7 +46,6 @@ import com.google.android.gms.location.LocationSettingsResponse;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
@@ -113,11 +111,8 @@ public class Info extends AppCompatActivity {
         if(!isConnected){
             View parentLayout = findViewById(android.R.id.content);
             Snackbar.make(parentLayout, "Please connect to internet :)", Snackbar.LENGTH_LONG)
-                    .setAction("CLOSE", new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
+                    .setAction("CLOSE", view -> {
 
-                        }
                     })
                     .setActionTextColor(getResources().getColor(android.R.color.holo_red_light ))
                     .show();
@@ -176,56 +171,39 @@ public class Info extends AppCompatActivity {
             createLocationRequest();
             fastDialog.dismiss();
         }
-//        if(!sharedPreferences.contains("state")){
-//            fastDialog.dismiss();
-//            createLocationRequest();
-//        }else{
-//            if(checkLocationInfo.contains("location")){
-//                startActivity(new Intent(Info.this,HomeScreen.class));
-//                fastDialog.dismiss();
-//                finish();
-//            }
-//            fastDialog.dismiss();
-//        }
-//        Log.i("myLocation",sharedPreferences.getString("state",""));
 
-
-
-        proceed.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(nameOfRestaurant.length() == 0){
-                    nameOfRestaurant.requestFocus();
-                    nameOfRestaurant.setError("Field can't be Empty");
-                    return;
-                }else if(AddressOfRestaurant.length() == 0){
-                    AddressOfRestaurant.requestFocus();
-                    AddressOfRestaurant.setError("Field cant be Empty");
-                    return;
-                }else if(pinCode.length() <= 5){
-                    pinCode.requestFocus();
-                    pinCode.setError("Invalid PinCode");
-                    return;
-                }else if(nearbyPlace.length() == 0){
-                    nearbyPlace.requestFocus();
-                    nearbyPlace.setError("Field can't be Empty");
-                    return;
-                }else if(contactNumber.length() <= 9 && contactNumber.length() >= 11){
-                    contactNumber.requestFocus();
-                    contactNumber.setError("Invalid Number");
-                    return;
-                }else if(!codePicker.getSelectedCountryCodeWithPlus().equals("+91")){
-                    Toast.makeText(Info.this, "This app currently operates only in India", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                name = nameOfRestaurant.getText().toString();
-                address = AddressOfRestaurant.getText().toString();
-                pin = pinCode.getText().toString();
-                nearby = nearbyPlace.getText().toString();
-                number = codePicker.getSelectedCountryCodeWithPlus() +  contactNumber.getText().toString() + "";
-
-                createChildForRestaurant();
+        proceed.setOnClickListener(view -> {
+            if(nameOfRestaurant.length() == 0){
+                nameOfRestaurant.requestFocus();
+                nameOfRestaurant.setError("Field can't be Empty");
+                return;
+            }else if(AddressOfRestaurant.length() == 0){
+                AddressOfRestaurant.requestFocus();
+                AddressOfRestaurant.setError("Field cant be Empty");
+                return;
+            }else if(pinCode.length() <= 5){
+                pinCode.requestFocus();
+                pinCode.setError("Invalid PinCode");
+                return;
+            }else if(nearbyPlace.length() == 0){
+                nearbyPlace.requestFocus();
+                nearbyPlace.setError("Field can't be Empty");
+                return;
+            }else if(contactNumber.length() <= 9 && contactNumber.length() >= 11){
+                contactNumber.requestFocus();
+                contactNumber.setError("Invalid Number");
+                return;
+            }else if(!codePicker.getSelectedCountryCodeWithPlus().equals("+91")){
+                Toast.makeText(Info.this, "This app currently operates only in India", Toast.LENGTH_SHORT).show();
+                return;
             }
+            name = nameOfRestaurant.getText().toString();
+            address = AddressOfRestaurant.getText().toString();
+            pin = pinCode.getText().toString();
+            nearby = nearbyPlace.getText().toString();
+            number = codePicker.getSelectedCountryCodeWithPlus() +  contactNumber.getText().toString() + "";
+
+            createChildForRestaurant();
         });
     }
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -239,6 +217,7 @@ public class Info extends AppCompatActivity {
             createLocationRequest();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     private void createChildForRestaurant() {
         SharedPreferences sharedPreferences = getSharedPreferences("RestaurantInfo",MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -246,8 +225,6 @@ public class Info extends AppCompatActivity {
         editor.putString("hotelAddress",address);
         editor.putString("hotelNumber",number);
         editor.apply();
-//        InfoRestaurant infoRestaurant = new InfoRestaurant(name,address,pin,number,nearby,"0","0","0","online");
-//        infoRef.child("Restaurants").child(Objects.requireNonNull(infoAuth.getUid())).setValue(infoRestaurant);
         infoRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(this.sharedPreferences.getString("state","")).child(Objects.requireNonNull(infoAuth.getUid()));
         infoRef.child("name").setValue(name);
         infoRef.child("address").setValue(address);
@@ -264,21 +241,14 @@ public class Info extends AppCompatActivity {
         AlertDialog.Builder alert = new AlertDialog.Builder(Info.this);
         alert.setTitle("Images");
         alert.setMessage("Do you wanna add display image for your restaurant\n(This image will be visible to user)!!\nYou can skip this step and add image later");
-        alert.setPositiveButton("Add Image", new DialogInterface.OnClickListener() {
-            @RequiresApi(api = Build.VERSION_CODES.M)
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                dialogInterface.dismiss();
-                CheckPermission();
-            }
-        }).setNegativeButton("Skip", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                dialogInterface.dismiss();
-                infoRef.child("DisplayImage").setValue("");
-                startActivity(new Intent(Info.this, MapsActivity.class));
-                finish();
-            }
+        alert.setPositiveButton("Add Image", (dialogInterface, i) -> {
+            dialogInterface.dismiss();
+            CheckPermission();
+        }).setNegativeButton("Skip", (dialogInterface, i) -> {
+            dialogInterface.dismiss();
+            infoRef.child("DisplayImage").setValue("");
+            startActivity(new Intent(Info.this, MapsActivity.class));
+            finish();
         }).create();
 
         alert.setCancelable(false);
@@ -302,7 +272,7 @@ public class Info extends AppCompatActivity {
     private void createLocationRequest() {
         locationRequest = LocationRequest.create();
         locationRequest.setInterval(1000);
-        locationRequest.setFastestInterval(5000);
+        locationRequest.setFastestInterval(1000);
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
@@ -313,38 +283,35 @@ public class Info extends AppCompatActivity {
         SettingsClient client = LocationServices.getSettingsClient(this);
         Task<LocationSettingsResponse> task = client.checkLocationSettings(builder.build());
 
-        task.addOnCompleteListener(new OnCompleteListener<LocationSettingsResponse>() {
-            @Override
-            public void onComplete(Task<LocationSettingsResponse> task) {
-                try {
-                    LocationSettingsResponse response = task.getResult(ApiException.class);
-                    // All location settings are satisfied. The client can initialize location
-                    // requests here.
+        task.addOnCompleteListener(task1 -> {
+            try {
+                LocationSettingsResponse response = task1.getResult(ApiException.class);
+                // All location settings are satisfied. The client can initialize location
+                // requests here.
 
-                } catch (ApiException exception) {
-                    switch (exception.getStatusCode()) {
-                        case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
-                            // Location settings are not satisfied. But could be fixed by showing the
-                            // user a dialog.
-                            try {
-                                // Cast to a resolvable exception.
-                                ResolvableApiException resolvable = (ResolvableApiException) exception;
-                                // Show the dialog by calling startResolutionForResult(),
-                                // and check the result in onActivityResult().
-                                resolvable.startResolutionForResult(
-                                        Info.this,
-                                        101);
-                            } catch (IntentSender.SendIntentException e) {
-                                // Ignore the error.
-                            } catch (ClassCastException e) {
-                                // Ignore, should be an impossible error.
-                            }
-                            break;
-                        case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
-                            // Location settings are not satisfied. However, we have no way to fix the
-                            // settings so we won't show the dialog.
-                            break;
-                    }
+            } catch (ApiException exception) {
+                switch (exception.getStatusCode()) {
+                    case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+                        // Location settings are not satisfied. But could be fixed by showing the
+                        // user a dialog.
+                        try {
+                            // Cast to a resolvable exception.
+                            ResolvableApiException resolvable = (ResolvableApiException) exception;
+                            // Show the dialog by calling startResolutionForResult(),
+                            // and check the result in onActivityResult().
+                            resolvable.startResolutionForResult(
+                                    Info.this,
+                                    101);
+                        } catch (IntentSender.SendIntentException e) {
+                            // Ignore the error.
+                        } catch (ClassCastException e) {
+                            // Ignore, should be an impossible error.
+                        }
+                        break;
+                    case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
+                        // Location settings are not satisfied. However, we have no way to fix the
+                        // settings so we won't show the dialog.
+                        break;
                 }
             }
         });
@@ -362,8 +329,6 @@ public class Info extends AppCompatActivity {
             Geocoder geocoder = new Geocoder(Info.this, Locale.getDefault());
             List<Address> addresses = null;
             String cityName;
-            String stateName;
-            String countryName;
             try {
                 addresses = geocoder.getFromLocation(lati, longi, 1);
             } catch (IOException e) {
@@ -412,23 +377,15 @@ public class Info extends AppCompatActivity {
             AlertDialog.Builder newDialog = new AlertDialog.Builder(Info.this);
             newDialog.setTitle("Choose One Option");
             newDialog.setMessage("Choose one option from below")
-                    .setPositiveButton("Choose From Gallery", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            dialogInterface.dismiss();
-                            Intent intent = new Intent();
-                            intent.setType("image/*");
-                            intent.setAction(Intent.ACTION_GET_CONTENT);
-                            startActivityForResult(Intent.createChooser(intent, "Select Picture"), 1);
-                        }
-                    }).setNegativeButton("Take Photo", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    dialogInterface.dismiss();
-                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE); //IMAGE CAPTURE CODE
-                    startActivityForResult(intent, 20);
-                }
-            }).create();
+                    .setPositiveButton("Choose From Gallery", (dialogInterface, i) -> {
+                        dialogInterface.dismiss();
+                        Intent intent = new Intent();
+                        intent.setType("image/*");
+                        intent.setAction(Intent.ACTION_GET_CONTENT);
+                        startActivityForResult(Intent.createChooser(intent, "Select Picture"), 1);
+                    }).setNegativeButton("Cancel", (dialogInterface, i) -> {
+                        dialogInterface.dismiss();
+                    }).create();
 
             newDialog.setCancelable(false);
             newDialog.show();
@@ -444,18 +401,12 @@ public class Info extends AppCompatActivity {
                 AlertDialog.Builder newDialog = new AlertDialog.Builder(Info.this);
                 newDialog.setTitle("Choose One Option");
                 newDialog.setMessage("Choose one option from below")
-                        .setPositiveButton("Choose From Gallery", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
+                        .setPositiveButton("Choose From Gallery", (dialogInterface, i) -> {
 
-                            }
-                        }).setNegativeButton("Take Photo", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE); //IMAGE CAPTURE CODE
-                        startActivityForResult(intent, 20);
-                    }
-                }).create();
+                        }).setNegativeButton("Cancel", (dialogInterface, i) -> {
+                            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE); //IMAGE CAPTURE CODE
+                            startActivityForResult(intent, 20);
+                        }).create();
 
                 newDialog.setCancelable(false);
                 newDialog.show();
@@ -513,13 +464,10 @@ public class Info extends AppCompatActivity {
                         });
 
                     }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(Info.this,
-                                "Something went wrong", Toast.LENGTH_SHORT).show();
-                        loading.dismiss();
-                    }
+                }).addOnFailureListener(e -> {
+                    Toast.makeText(Info.this,
+                            "Something went wrong", Toast.LENGTH_SHORT).show();
+                    loading.dismiss();
                 });
             }catch (Exception e){
                 Toast.makeText(Info.this, ""+e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
@@ -549,28 +497,20 @@ public class Info extends AppCompatActivity {
     private void uploadImage() {
         if(filePath != null){
             StorageReference reference = storageReference.child(infoAuth.getUid() + "/" + "image" + "/"  + "DisplayImage");
-            reference.putFile(filePath).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onSuccess(@NonNull UploadTask.TaskSnapshot taskSnapshot) {
-                    StorageReference reference = storageReference.child(infoAuth.getUid() + "/" + "image" + "/"  + "DisplayImage");
-                    reference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                        @Override
-                        public void onSuccess(@NonNull Uri uri) {
-                            Toast.makeText(Info.this, "Upload Complete and image saved in phone successfully", Toast.LENGTH_SHORT).show();
-                            loading.dismiss();
-                            DatabaseReference dish = FirebaseDatabase.getInstance().getReference().getRoot();
-                            dish.child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(infoAuth.getUid())).child("DisplayImage").setValue(uri + "");
-                            startActivity(new Intent(Info.this, UploadRequiredDocuments.class));
-                            finish();
-                        }
-                    });
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    loading.dismiss();
-                }
-            });
+            reference.putFile(filePath).addOnSuccessListener(taskSnapshot -> {
+                StorageReference reference1 = storageReference.child(infoAuth.getUid() + "/" + "image" + "/"  + "DisplayImage");
+                reference1.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(@NonNull Uri uri) {
+                        Toast.makeText(Info.this, "Upload Complete and image saved in phone successfully", Toast.LENGTH_SHORT).show();
+                        loading.dismiss();
+                        DatabaseReference dish = FirebaseDatabase.getInstance().getReference().getRoot();
+                        dish.child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(infoAuth.getUid())).child("DisplayImage").setValue(uri + "");
+                        startActivity(new Intent(Info.this, UploadRequiredDocuments.class));
+                        finish();
+                    }
+                });
+            }).addOnFailureListener(e -> loading.dismiss());
         }else
             loading.dismiss();
     }
