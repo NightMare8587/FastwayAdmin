@@ -43,6 +43,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -59,6 +61,8 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
     GoogleSignInOptions gso;
     SharedPreferences sharedPreferences;
     String UID;
+    StorageReference storageReference;
+    FirebaseStorage storage;
     TextView resNameText;
     ModalBottomSheetDialog modalBottomSheetDialog;
     SharedPreferences.Editor editor;
@@ -70,6 +74,8 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_account);
         initialise();
+        storage = FirebaseStorage.getInstance();
+        storageReference = storage.getReference();
         SharedPreferences resInfoSharedPref = getSharedPreferences("RestaurantInfo",MODE_PRIVATE);
         editor = resInfoSharedPref.edit();
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this, R.layout.list, names);
@@ -120,7 +126,7 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
                 case 2:
                     new KAlertDialog(MyAccount.this,KAlertDialog.WARNING_TYPE)
                             .setTitleText("Delete Account")
-                            .setContentText("Do you sure wanna delete your account!!!\n"+"This action can't be revert")
+                            .setContentText("Do you sure wanna delete your account!!! All of your data will be removed\n"+"This action can't be revert")
                             .setConfirmText("Yes, Delete")
                             .setConfirmClickListener(kAlertDialog -> {
 
@@ -131,7 +137,7 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
                                     Log.i("logs",e.getLocalizedMessage());
                                 }
                             }).setCancelText("No, Wait")
-                            .setCancelClickListener(kAlertDialog -> kAlertDialog.dismissWithAnimation()).show();
+                            .setCancelClickListener(KAlertDialog::dismissWithAnimation).show();
                     break;
                 case 3:
                     Intent intent = new Intent(MyAccount.this, EditVendorDetails.class);
@@ -360,49 +366,6 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
                     modalBottomSheetDialog.dismiss();
                     break;
                 case R.id.changeAddressBottomSheetRestaurant:
-//                    FlatDialog flatDialog4 = new FlatDialog(MyAccount.this);
-//                    flatDialog4.setTitle("Enter New Address")
-//                            .setBackgroundColor(Color.WHITE)
-//                            .setTitleColor(Color.BLACK)
-//                            .setFirstTextFieldBorderColor(Color.BLACK)
-//                            .setFirstTextFieldHintColor(Color.BLACK)
-//                            .setFirstTextFieldTextColor(Color.BLACK)
-//                            .setFirstTextFieldHint("Enter New Address")
-//                            .setSecondTextFieldHint("Enter New Nearby place")
-//                            .setSecondTextFieldBorderColor(Color.BLACK)
-//                            .setSecondTextFieldHintColor(Color.BLACK)
-//                            .setSecondTextFieldTextColor(Color.BLACK)
-//                            .setFirstButtonText("Make Changes")
-//                            .setFirstButtonColor(Color.LTGRAY)
-//                            .setFirstButtonTextColor(Color.BLACK)
-//                            .setSecondButtonText("Cancel")
-//                            .setSecondButtonColor(Color.CYAN)
-//                            .setSecondButtonTextColor(Color.BLACK)
-//                            .withFirstButtonListner(new View.OnClickListener() {
-//                                @Override
-//                                public void onClick(View view) {
-//                                    if(flatDialog4.getFirstTextField().length() == 0 && flatDialog4.getSecondTextField().length() == 0){
-//                                        Toast.makeText(MyAccount.this, "Field can't be empty", Toast.LENGTH_SHORT).show();
-//                                        return;
-//                                    }else {
-//                                        reference.child("address").setValue(flatDialog4.getFirstTextField().toString());
-//                                        reference.child("nearby").setValue(flatDialog4.getSecondTextField().toString());
-////                                        reference.child("pin").setValue(flatDialog4.getLargeTextField().toString());
-//                                        Toast.makeText(MyAccount.this, "Address And Nearby Changed Successfully", Toast.LENGTH_SHORT).show();
-//                                        startActivityForResult(new Intent(MyAccount.this, MapsActivity2.class),69);
-//                                        flatDialog4.dismiss();
-//                                    }
-//                                }
-//                            })
-//                            .withSecondButtonListner(new View.OnClickListener() {
-//                                @Override
-//                                public void onClick(View view) {
-//                                    flatDialog4.dismiss();
-//                                }
-//                            });
-//
-//                    flatDialog4.create();
-//                    flatDialog4.show();
                     AlertDialog.Builder alert = new AlertDialog.Builder(MyAccount.this);
                     alert.setTitle("Change Info");
                     LinearLayout layout = new LinearLayout(MyAccount.this);
@@ -466,6 +429,10 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
         @Override
         protected Void doInBackground(Void... voids) {
             auth = FirebaseAuth.getInstance();
+            reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(UID);
+            reference.removeValue();
+            reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(UID);
+            reference.removeValue();
             SharedPreferences settings = getSharedPreferences("loginInfo", MODE_PRIVATE);
             settings.edit().clear().commit();
 
@@ -474,26 +441,11 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
 
             SharedPreferences intro = getSharedPreferences("IntroAct", MODE_PRIVATE);
             intro.edit().clear().apply();
-//            reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin");
-//            reference.child(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser().getUid())).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
-//                @Override
-//                public void onComplete(@NonNull Task<Void> task) {
-//
-//                }
-//            });
-//            reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state", ""));
-//            reference.child(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser().getUid())).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-//                @Override
-//                public void onSuccess(Void aVoid) {
-//
-//                }
-//            });
             auth.signOut();
             gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                     .requestIdToken("765176451275-u1ati379eiinc9b21472ml968chmlsqh.apps.googleusercontent.com")
                     .requestEmail()
                     .build();
-
             client = GoogleSignIn.getClient(MyAccount.this, gso);
             try {
 

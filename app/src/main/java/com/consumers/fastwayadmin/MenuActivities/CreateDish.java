@@ -5,7 +5,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -13,10 +12,10 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.StrictMode;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -29,34 +28,24 @@ import androidx.core.content.ContextCompat;
 import com.consumers.fastwayadmin.Dish.DishInfo;
 import com.consumers.fastwayadmin.Dish.SearchDishFastway.SearchFastwayDatabase;
 import com.consumers.fastwayadmin.R;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.util.Objects;
 
 public class CreateDish extends AppCompatActivity {
     EditText nameOfDish,halfPlate,fullPlate;
     FirebaseAuth dishAuth;
+    String descriptionToSubmit;
     CheckBox checkBox;
-    Bitmap bitmap;
-    File file;
     DatabaseReference dish;
     boolean imageAddedOr = false;
-    OutputStream outputStream;
     String mrp;
     FirebaseStorage storage;
     File outputFile;
@@ -116,18 +105,73 @@ public class CreateDish extends AppCompatActivity {
                         else
                             mrp = "no";
 
+                        if(imageAddedOr && outputFile.exists()) {
+                            AlertDialog.Builder myAlert = new AlertDialog.Builder(CreateDish.this);
+                            LinearLayout linearLayout = new LinearLayout(CreateDish.this);
+                            EditText editText = new EditText(CreateDish.this);
+                            editText.setHint("Enter Description Here");
+                            linearLayout.setOrientation(LinearLayout.VERTICAL);
+                            myAlert.setTitle("Description").setMessage("Do you wanna add some description to your dish like how much quantity will be provided and all!!\n")
+                                    .setPositiveButton("Submit Description", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                            if(editText.getText().toString().equals("")){
+                                                Toast.makeText(CreateDish.this, "Field can't be empty", Toast.LENGTH_SHORT).show();
+                                            }else {
+                                                descriptionToSubmit = editText.getText().toString();
+                                                new Upload().execute();
+                                                finish();
+                                            }
+                                        }
+                                    }).setNegativeButton("Skip", (dialogInterface, i) -> {
+                                        DishInfo info = new DishInfo(name,half,full,image,mrp,"0","0","0","yes","");
+                                        dish.child("Restaurants").child(state).child(Objects.requireNonNull(dishAuth.getUid())).child("List of Dish").child(menuType).child(name).setValue(info);
+                                        Toast.makeText(CreateDish.this, "Dish Added Successfully", Toast.LENGTH_SHORT).show();
+                                        imageAddedOr = false;
+                                        finish();
+                                    }).create();
+                            myAlert.setCancelable(false);
+                            linearLayout.addView(editText);
+                            myAlert.setView(linearLayout);
+                            myAlert.show();
 
-                        if(imageAddedOr && outputFile.exists())
-                        new Upload().execute();
-                        else{
-                            DishInfo info = new DishInfo(name,half,full,image,mrp,"0","0","0","yes");
-                            dish.child("Restaurants").child(state).child(Objects.requireNonNull(dishAuth.getUid())).child("List of Dish").child(menuType).child(name).setValue(info);
-                            Toast.makeText(CreateDish.this, "Dish Added Successfully", Toast.LENGTH_SHORT).show();
-                            imageAddedOr = false;
                         }
+                        else{
+                            AlertDialog.Builder myAlert = new AlertDialog.Builder(CreateDish.this);
+                            LinearLayout linearLayout = new LinearLayout(CreateDish.this);
+                            EditText editText = new EditText(CreateDish.this);
+                            editText.setHint("Enter Description Here");
+                            linearLayout.setOrientation(LinearLayout.VERTICAL);
+                            myAlert.setTitle("Description").setMessage("Do you wanna add some description to your dish like how much quantity will be provided and all!!\n")
+                                    .setPositiveButton("Submit Description", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                            if(editText.getText().toString().equals("")){
+                                                Toast.makeText(CreateDish.this, "Field can't be empty", Toast.LENGTH_SHORT).show();
+                                            }else{
+                                                DishInfo info = new DishInfo(name,half,full,image,mrp,"0","0","0","yes",editText.getText().toString());
+                                                dish.child("Restaurants").child(state).child(Objects.requireNonNull(dishAuth.getUid())).child("List of Dish").child(menuType).child(name).setValue(info);
+                                                Toast.makeText(CreateDish.this, "Dish Added Successfully", Toast.LENGTH_SHORT).show();
+                                                imageAddedOr = false;
+                                                finish();
+                                            }
+                                        }
+                                    }).setNegativeButton("Skip", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    DishInfo info = new DishInfo(name,half,full,image,mrp,"0","0","0","yes","");
+                                    dish.child("Restaurants").child(state).child(Objects.requireNonNull(dishAuth.getUid())).child("List of Dish").child(menuType).child(name).setValue(info);
+                                    Toast.makeText(CreateDish.this, "Dish Added Successfully", Toast.LENGTH_SHORT).show();
+                                    imageAddedOr = false;
+                                    finish();
+                                }
+                            }).create();
+                            myAlert.setCancelable(false);
+                            linearLayout.addView(editText);
+                            myAlert.setView(linearLayout);
+                            myAlert.show();
 
-
-            finish();
+                        }
         });
     }
 
@@ -171,7 +215,7 @@ public class CreateDish extends AppCompatActivity {
     }
 
     private void addToDatabase(String name, String half, String full,String image,String mrp) {
-        DishInfo info = new DishInfo(name,half,full,image,mrp,"0","0","0","yes");
+        DishInfo info = new DishInfo(name,half,full,image,mrp,"0","0","0","yes",descriptionToSubmit);
         try {
             dish.child("Restaurants").child(state).child(Objects.requireNonNull(dishAuth.getUid())).child("List of Dish").child(menuType).child(name).setValue(info);
             StorageReference reference = storageReference.child(dishAuth.getUid() + "/" + "image" + "/"  + nameOfDish.getText().toString());
@@ -204,19 +248,6 @@ public class CreateDish extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == 20 && resultCode == RESULT_OK && data != null){
-//            imageAddedOr = true;
-//             bitmap = (Bitmap) data.getExtras().get("data");
-//            File filepath = Environment.getExternalStorageDirectory();
-//            File dir = new File(filepath.getAbsolutePath());
-//            dir.mkdir();
-//            file = new File(dir, nameOfDish.getText().toString() + ".jpg");
-//            try {
-//                Log.i("file stored","yes");
-//                outputStream = new FileOutputStream(file);
-//            } catch (FileNotFoundException e) {
-//                e.printStackTrace();
-//            }
-
         }
     }
 
@@ -250,11 +281,8 @@ public class CreateDish extends AppCompatActivity {
 
                     Toast.makeText(CreateDish.this, "Upload Complete", Toast.LENGTH_SHORT).show();
                     addToDatabase(name,half,full,image,mrp);
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
+                }).addOnFailureListener(e -> {
 
-                    }
                 });
             }catch (Exception e){
                 Toast.makeText(CreateDish.this, ""+e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();

@@ -24,7 +24,7 @@ import java.util.Objects;
 
 public class EditMenu extends AppCompatActivity {
 
-    EditText fullPlate,halfPlate,name;
+    EditText fullPlate,halfPlate,name,newDescription;
     Button saveChanges;
     FirebaseAuth editAuth;
     SharedPreferences sharedPreferences;
@@ -64,6 +64,10 @@ public class EditMenu extends AppCompatActivity {
                 if(halfPlate.length() != 0){
                     editRef.child("half").setValue(halfPlate.getText().toString());
                 }
+
+                if(newDescription.length() != 0){
+                    editRef.child("description").setValue(newDescription.getText().toString());
+                }
                 Toast.makeText(EditMenu.this, "Changes saved successfully", Toast.LENGTH_SHORT).show();
                 finish();
             }
@@ -78,14 +82,8 @@ public class EditMenu extends AppCompatActivity {
         name = findViewById(R.id.editDishName);
         editAuth = FirebaseAuth.getInstance();
         type = getIntent().getStringExtra("type");
+        newDescription = findViewById(R.id.newDescriptionToAddToDish);
         dish = getIntent().getStringExtra("dish");
-//        change = getIntent().getStringExtra("change");
-//        if(change.equals("price")){
-//            fullPlate.setVisibility(View.VISIBLE);
-//            halfPlate.setVisibility(View.VISIBLE);
-//        }else{
-//            name.setVisibility(View.VISIBLE);
-//        }
         editRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(editAuth.getUid())).child("List of Dish")
                                 .child(type).child(dish);
     }

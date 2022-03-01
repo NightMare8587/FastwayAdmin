@@ -67,9 +67,11 @@ public class SearchFastwayClass extends RecyclerView.Adapter<SearchFastwayClass.
             EditText halfPrice = new EditText(v.getContext());
             EditText fullPrice = new EditText(v.getContext());
             EditText ownDishName = new EditText(v.getContext());
+            EditText dishDescription = new EditText(v.getContext());
             halfPrice.setHint("Enter Half price if available");
             fullPrice.setHint("Enter Full price (Mandatory)");
             ownDishName.setHint("Enter if you want your own dish name");
+            dishDescription.setHint("Enter dish description");
             alertDialog.setPositiveButton("Create", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
@@ -80,11 +82,11 @@ public class SearchFastwayClass extends RecyclerView.Adapter<SearchFastwayClass.
                         String half = halfPrice.getText().toString();
                         String full = fullPrice.getText().toString();
                         if(ownDishName.getText().toString().equals("")) {
-                            DishInfo info = new DishInfo(dishName.get(position), half, full, dishImage.get(position), "false", "0", "0", "0", "yes");
+                            DishInfo info = new DishInfo(dishName.get(position), half, full, dishImage.get(position), "false", "0", "0", "0", "yes",dishDescription.getText().toString());
                             reference.child(dishName.get(position)).setValue(info);
                             dishNameToAdd = dishName.get(position);
                         }else{
-                            DishInfo info = new DishInfo(ownDishName.getText().toString(), half, full, dishImage.get(position), "false", "0", "0", "0", "yes");
+                            DishInfo info = new DishInfo(ownDishName.getText().toString(), half, full, dishImage.get(position), "false", "0", "0", "0", "yes",dishDescription.getText().toString());
                             reference.child(ownDishName.getText().toString()).setValue(info);
                             dishNameToAdd = ownDishName.getText().toString();
                         }

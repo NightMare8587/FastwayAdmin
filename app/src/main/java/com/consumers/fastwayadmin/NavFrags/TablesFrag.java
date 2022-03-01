@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -42,6 +41,7 @@ import java.util.Objects;
 public class TablesFrag extends Fragment {
     Toolbar tableBar;
     FloatingActionButton addTable;
+    int called = 0;
     TableView tableView;
     FirebaseAuth tableAuth;
     SharedPreferences sharedPreferences;
@@ -96,68 +96,28 @@ public class TablesFrag extends Fragment {
         tableRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(tableAuth.getUid())).child("Tables");
         tableNumber.clear();
         status.clear();
-//        tableRef.addListenerForSingleValueEvent(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                if(snapshot.exists()){
-//                    HashMap<String,List<String>> map = new HashMap<>();
-//                    timeInMillis.clear();
-//                    timeOfBooking.clear();
-//                    timeOfUnavailability.clear();
-//                    for(DataSnapshot dataSnapshot : snapshot.getChildren()){
-//                        tableNumber.add(Objects.requireNonNull(dataSnapshot.child("tableNum").getValue()).toString());
-//                        status.add(dataSnapshot.child("status").getValue().toString());
-//                        if(dataSnapshot.hasChild("customerId")) {
-////                            map.put(String.valueOf(dataSnapshot.child("tableNum").getValue(String.class)),String.valueOf(dataSnapshot.child("customerId").getValue()));
-//                            List<String> list = new ArrayList<>();
-//                            list.add(String.valueOf(dataSnapshot.child("customerId").getValue()));
-//                            list.add(String.valueOf(dataSnapshot.child("time").getValue()));
-//                            map.put(String.valueOf(dataSnapshot.child("tableNum").getValue(String.class)), list);
-//                            if(dataSnapshot.hasChild("timeInMillis")) {
-//                                timeInMillis.add(String.valueOf(dataSnapshot.child("timeInMillis").getValue()));
-//                                timeOfBooking.add(String.valueOf(dataSnapshot.child("timeOfBooking").getValue()));
-//                            }
-//                            else {
-//                                timeInMillis.add("");
-//                                timeOfBooking.add("");
-//                            }
-//
-//                            if(dataSnapshot.hasChild("timeOfUnavailability")){
-//                                timeOfUnavailability.add(String.valueOf(dataSnapshot.child("timeOfUnavailability").getValue()));
-//                            }else
-//                                timeOfUnavailability.add("");
-//                        }
-//                    }
-//                    tableView = new TableView(tableNumber,status,map,getContext(),timeInMillis,timeOfBooking,timeOfUnavailability);
-//                    table.setAdapter(tableView);
-//                    tableView.notifyDataSetChanged();
-//
-//                }else{
-//                    Toast.makeText(view.getContext(), "Add Some Tables!!!", Toast.LENGTH_SHORT).show();
-//                }
-//
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//
-//            }
-//        });
+
 
         tableRef.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
                 updateChild();
+                called++;
+                Log.i("call",called + "");
             }
 
             @Override
             public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
                 updateChild();
+                called++;
+                Log.i("call",called + "");
             }
 
             @Override
             public void onChildRemoved(@NonNull DataSnapshot snapshot) {
                 updateChild();
+                called++;
+                Log.i("call",called + "");
             }
 
             @Override
@@ -288,52 +248,6 @@ public class TablesFrag extends Fragment {
 
             }
         });
-    }
-
-    private class MyTask extends AsyncTask<Void,Void,Void>{
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            tableRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    if(snapshot.exists()){
-                        timeInMillis.clear();
-                        HashMap<String,List<String>> map = new HashMap<>();
-                        for(DataSnapshot dataSnapshot : snapshot.getChildren()){
-                            tableNumber.add(Objects.requireNonNull(dataSnapshot.child("tableNum").getValue()).toString());
-                            status.add(dataSnapshot.child("status").getValue().toString());
-                            if(dataSnapshot.hasChild("customerId")) {
-//                            map.put(String.valueOf(dataSnapshot.child("tableNum").getValue(String.class)),String.valueOf(dataSnapshot.child("customerId").getValue()));
-                                List<String> list = new ArrayList<>();
-                                list.add(String.valueOf(dataSnapshot.child("customerId").getValue()));
-                                list.add(String.valueOf(dataSnapshot.child("time").getValue()));
-                                map.put(String.valueOf(dataSnapshot.child("tableNum").getValue(String.class)), list);
-                                if(dataSnapshot.hasChild("timeInMillis")) {
-                                    timeInMillis.add(String.valueOf(dataSnapshot.child("timeInMillis").getValue()));
-                                    timeOfBooking.add(String.valueOf(dataSnapshot.child("timeOfBooking").getValue()));
-                                }
-                                else {
-                                    timeInMillis.add("");
-                                    timeOfBooking.add("");
-                                }
-                            }
-                        }
-                        tableView = new TableView(tableNumber,status,map,getContext(),timeInMillis,timeOfBooking,timeOfUnavailability);
-                        table.setAdapter(tableView);
-                        tableView.notifyDataSetChanged();
-
-                    }
-
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-
-                }
-            });
-            return null;
-        }
     }
 
 

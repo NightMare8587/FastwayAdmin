@@ -57,59 +57,53 @@ public class DisplayDish extends RecyclerView.Adapter<DisplayDish.Adapter> {
         holder.name.setText(names.get(position));
         if(!image.get(position).equals(""))
         Picasso.get().load(image.get(position)).centerCrop().resize(100,100).into(holder.imageView);
-        holder.name.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
-                builder.setTitle("Add Dish");
-                Context context = view.getContext();
-                LinearLayout linearLayout = new LinearLayout(context);
-                linearLayout.setPadding(8,8,8,8);
-                linearLayout.setOrientation(LinearLayout.VERTICAL);
+        holder.name.setOnClickListener(view -> {
+            AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
+            builder.setTitle("Add Dish");
+            Context context = view.getContext();
+            LinearLayout linearLayout = new LinearLayout(context);
+            linearLayout.setPadding(8,8,8,8);
+            linearLayout.setOrientation(LinearLayout.VERTICAL);
 
-                final EditText halfPlate = new EditText(context);
-                halfPlate.setHint("Enter Half Plate Price");
-                linearLayout.addView(halfPlate);
+            final EditText halfPlate = new EditText(context);
+            halfPlate.setHint("Enter Half Plate Price");
+            linearLayout.addView(halfPlate);
 
-                final TextView textView = new TextView(context);
-                textView.setText("Keep field Empty is half plate not available");
-                linearLayout.addView(textView);
+            final TextView textView = new TextView(context);
+            textView.setText("Keep field Empty is half plate not available");
+            linearLayout.addView(textView);
 
-                final EditText fullPlate = new EditText(context);
-                fullPlate.setHint("Enter full Plate price");
-                linearLayout.addView(fullPlate);
+            final EditText fullPlate = new EditText(context);
+            fullPlate.setHint("Enter full Plate price");
+            linearLayout.addView(fullPlate);
 
-                final CheckBox checkBox = new CheckBox(context);
-                checkBox.setText("Sell On MRP (Discount will not be applied on MRP products)");
-                linearLayout.addView(checkBox);
+            final CheckBox checkBox = new CheckBox(context);
+            checkBox.setText("Sell On MRP (Discount will not be applied on MRP products)");
+            linearLayout.addView(checkBox);
 
-                final Button button = new Button(context);
-                button.setText("Add Dish");
-                linearLayout.addView(button);
+            final Button button = new Button(context);
+            button.setText("Add Dish");
+            linearLayout.addView(button);
 
-                button.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        SharedPreferences preferences = view.getContext().getSharedPreferences("DishType",Context.MODE_PRIVATE);
-                        String type = preferences.getString("Type","");
-                        String mrp;
-                        if(checkBox.isChecked())
-                            mrp = "yes";
-                        else
-                            mrp = "false";
-                        CreateDishClass createDishClass = new CreateDishClass(holder.name.getText().toString(),image.get(position),halfPlate.getText().toString(),fullPlate.getText().toString(),mrp,"0","0","0","yes");
-                        reference.child("List of Dish").child(type).child(holder.name.getText().toString()).setValue(createDishClass);
-                        Toast.makeText(context, "Dish added Successfully", Toast.LENGTH_SHORT).show();
-                        dialog.dismiss();
-                    }
-                });
+            button.setOnClickListener(view1 -> {
+                SharedPreferences preferences = view1.getContext().getSharedPreferences("DishType",Context.MODE_PRIVATE);
+                String type = preferences.getString("Type","");
+                String mrp;
+                if(checkBox.isChecked())
+                    mrp = "yes";
+                else
+                    mrp = "false";
+                CreateDishClass createDishClass = new CreateDishClass(holder.name.getText().toString(),image.get(position),halfPlate.getText().toString(),fullPlate.getText().toString(),mrp,"0","0","0","yes");
+                reference.child("List of Dish").child(type).child(holder.name.getText().toString()).setValue(createDishClass);
+                Toast.makeText(context, "Dish added Successfully", Toast.LENGTH_SHORT).show();
+                dialog.dismiss();
+            });
 
-                builder.setView(linearLayout);
-                dialog = builder.create();
-                builder.setCancelable(true);
-                builder.show();
+            builder.setView(linearLayout);
+            dialog = builder.create();
+            builder.setCancelable(true);
+            builder.show();
 
-            }
         });
     }
 
