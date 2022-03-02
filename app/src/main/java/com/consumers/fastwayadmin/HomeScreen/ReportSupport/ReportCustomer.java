@@ -47,7 +47,7 @@ public class ReportCustomer extends AppCompatActivity {
         setContentView(R.layout.activity_report_customer);
         initialise();
 
-        reference.child("Recent Orders").addListenerForSingleValueEvent(new ValueEventListener() {
+        reference.child("Recent Orders").limitToLast(20).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(!snapshot.exists()){
@@ -129,7 +129,7 @@ public class ReportCustomer extends AppCompatActivity {
     }
 
     private void updateChild(){
-        reference.child("Recent Orders").addListenerForSingleValueEvent(new ValueEventListener() {
+        reference.child("Recent Orders").limitToLast(20).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(!snapshot.exists()){
