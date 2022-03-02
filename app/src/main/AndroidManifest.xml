@@ -31,6 +31,9 @@
         android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         tools:replace="android:icon,android:allowBackup">
         <activity
+            android:name=".Info.RestaurantImages.AddRestaurantImages"
+            android:exported="false" />
+        <activity
             android:name=".ListViewActivity.ResTimingsPackage.AddRestaurantTimings"
             android:exported="false" />
         <activity
@@ -185,9 +188,7 @@
             android:label="@string/title_activity_maps" />
         <activity
             android:name=".NotificationActivity"
-            android:exported="true">
-        </activity>
-
+            android:exported="true"></activity>
         <activity
             android:name=".Login.AlreadyHavAccount"
             android:exported="true" />
@@ -211,8 +212,6 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
-
-
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"

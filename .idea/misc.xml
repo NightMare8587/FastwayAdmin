@@ -15,6 +15,7 @@
         <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/drawable/report_edittext.xml" value="0.2703125" />
         <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/drawable/toolbar_background_layout.xml" value="0.17604166666666668" />
         <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/layout/account_frag.xml" value="0.16799999999999998" />
+        <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/layout/activity_add_restaurant_images.xml" value="0.25416666666666665" />
         <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/layout/activity_add_restaurant_timings.xml" value="0.15572916666666667" />
         <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/layout/activity_all_menu_dish.xml" value="0.25416666666666665" />
         <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/layout/activity_approve_current_order.xml" value="0.264" />
@@ -65,6 +66,7 @@
         <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/layout/frag_two_layout.xml" value="0.25416666666666665" />
         <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/layout/home_frag.xml" value="0.25416666666666665" />
         <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/layout/home_frag_recycler_adapter.xml" value="0.22509057971014493" />
+        <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/layout/images_res_card.xml" value="0.25416666666666665" />
         <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/layout/list.xml" value="0.15989583333333332" />
         <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/layout/menu_frag.xml" value="0.15989583333333332" />
         <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/layout/order_trans_card.xml" value="0.264" />

@@ -33,6 +33,7 @@ import androidx.core.content.ContextCompat;
 
 import com.consumers.fastwayadmin.HomeScreen.HomeScreen;
 import com.consumers.fastwayadmin.Info.RestaurantDocuments.UploadRequiredDocuments;
+import com.consumers.fastwayadmin.Info.RestaurantImages.AddRestaurantImages;
 import com.consumers.fastwayadmin.R;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.ResolvableApiException;
@@ -240,10 +241,11 @@ public class Info extends AppCompatActivity {
         clientsLocation.removeLocationUpdates(mLocationCallback);
         AlertDialog.Builder alert = new AlertDialog.Builder(Info.this);
         alert.setTitle("Images");
-        alert.setMessage("Do you wanna add display image for your restaurant\n(This image will be visible to user)!!\nYou can skip this step and add image later");
+        alert.setMessage("Do you wanna add images of your restaurant\n(This image will be visible to user)!!\nYou can skip this step and add image later");
         alert.setPositiveButton("Add Image", (dialogInterface, i) -> {
-            dialogInterface.dismiss();
-            CheckPermission();
+               Intent intent = new Intent(Info.this,AddRestaurantImages.class);
+               intent.putExtra("state",sharedPreferences.getString("state",""));
+               startActivity(intent);
         }).setNegativeButton("Skip", (dialogInterface, i) -> {
             dialogInterface.dismiss();
             infoRef.child("DisplayImage").setValue("");
