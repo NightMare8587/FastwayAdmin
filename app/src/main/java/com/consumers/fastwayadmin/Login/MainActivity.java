@@ -22,11 +22,17 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.consumers.fastwayadmin.GMailSender;
 import com.consumers.fastwayadmin.Info.Info;
 import com.consumers.fastwayadmin.R;
@@ -77,8 +83,6 @@ import karpuzoglu.enes.com.fastdialog.FastDialog;
 import karpuzoglu.enes.com.fastdialog.FastDialogBuilder;
 import karpuzoglu.enes.com.fastdialog.Type;
 public class MainActivity extends AppCompatActivity {
-    String subject = "Welcome to Fastway";
-    String body = "Haha you nigga";
     FirebaseAuth loginAuth;
     String reciverMailID;
     double longi,lati;
@@ -103,8 +107,6 @@ public class MainActivity extends AppCompatActivity {
     PhoneAuthCredential credential;
     FirebaseUser currentUser;
     GMailSender sender;
-    String emailOfSender = "fastway85187@gmail.com";
-    String passOfSender = "@Ploya8587";
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -198,8 +200,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void createLocationRequest() {
          locationRequest = LocationRequest.create();
-        locationRequest.setInterval(10000);
-        locationRequest.setFastestInterval(50000);
+        locationRequest.setInterval(1000);
+        locationRequest.setFastestInterval(1000);
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
@@ -375,6 +377,7 @@ public class MainActivity extends AppCompatActivity {
                         DatabaseAdmin user = new DatabaseAdmin(name,email,number);
                         editor.putString("name",name);
                         editor.putString("email",email);
+
                         editor.apply();
                         verifyCodeDialog.dismiss();
                         loginAuth = FirebaseAuth.getInstance();
@@ -383,8 +386,7 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot snapshot) {
                                 if(!snapshot.hasChild(Objects.requireNonNull(loginAuth.getUid()))){
-                                    sender = new GMailSender(emailOfSender,passOfSender);
-                                    new MyAsyncClass().execute();
+                                    sendEmailFunction(email);
                                     reference.child("Admin").child(Objects.requireNonNull(loginAuth.getUid())).setValue(user);
                                     reference.child("Admin").child(loginAuth.getUid()).child("registrationDate").setValue(System.currentTimeMillis() + "");
                                 }
@@ -421,6 +423,31 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
+
+    private void sendEmailFunction(String email) {
+        try {
+            RequestQueue requestQueue = Volley.newRequestQueue(MainActivity.this);
+            String emailSendingURL = "https://intercellular-stabi.000webhostapp.com/email/adminEmail/sendEmail.php";
+            StringRequest stringRequest = new StringRequest(Request.Method.POST, emailSendingURL, response -> {
+
+            }, error -> {
+
+            }){
+                @Nullable
+                @Override
+                protected Map<String, String> getParams() throws AuthFailureError {
+                    Map<String,String> params = new HashMap<>();
+                    params.put("to",email);
+                    return params;
+                }
+            };
+            requestQueue.add(stringRequest);
+        }
+        catch (Exception ex) {
+            Log.d("exceptionsending", ex.toString());
+        }
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -469,7 +496,6 @@ public class MainActivity extends AppCompatActivity {
             // Signed in successfully, show authenticated UI.
             Toast.makeText(this, "Sign In", Toast.LENGTH_SHORT).show();
             createFirebaseAuthID(account.getIdToken());
-            sender = new GMailSender(emailOfSender,passOfSender);
             getSignInInformation();
 
         } catch (ApiException e) {
@@ -496,8 +522,7 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot snapshot) {
                                 if(!snapshot.hasChild(Objects.requireNonNull(loginAuth.getUid()))){
-                                    sender = new GMailSender(emailOfSender,passOfSender);
-                                    new MyAsyncClass().execute();
+                                    sendEmailFunction(account.getEmail());
                                     GoogleSignInDB googleSignInDB = new GoogleSignInDB(account.getDisplayName(),account.getEmail());
                                     reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(user.getUid());
                                     reference.setValue(googleSignInDB);
@@ -550,7 +575,6 @@ public class MainActivity extends AppCompatActivity {
             try {
 
                 // Add subject, Body, your mail Id, and receiver mail Id.
-                sender.sendMail(subject, body, emailOfSender, reciverMailID);
                 Log.d("send", "done");
             }
             catch (Exception ex) {
