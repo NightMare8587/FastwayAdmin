@@ -1,13 +1,18 @@
 package com.consumers.fastwayadmin.MenuActivities.Combo;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -59,9 +64,30 @@ public void onBindViewHolder(@NonNull holder holder, @SuppressLint("RecyclerView
                 .setContentText("You sure wanna add this to combo")
                 .setConfirmText("Yes, Add it")
                 .setConfirmClickListener(kAlertDialog -> {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
+                    builder.setTitle("Add Quantity").setMessage("Enter new quantity in below field");
+                    LinearLayout linearLayout = new LinearLayout(view.getContext());
+                    linearLayout.setOrientation(LinearLayout.VERTICAL);
+                    EditText editText = new EditText(view.getContext());
+                    editText.setHint("Enter quantity here");
+                    editText.setInputType(InputType.TYPE_CLASS_NUMBER);
+                    builder.setPositiveButton("Add Quantity", (dialogInterface1, i1) -> {
+                        if(editText.getText().toString().equals("") || editText.getText().toString().equals("0")){
+                            Toast.makeText(view.getContext(), "Invalid Input", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
                         reference.child("Combo").child(comboName).child(name.get(position)).child("name").child("name").setValue(name.get(position));
+                        reference.child("Combo").child(comboName).child(name.get(position)).child("name").child("quantity").setValue(editText.getText().toString());
                         kAlertDialog.dismissWithAnimation();
-                        }).setCancelText("No, Wait").setCancelClickListener(kAlertDialog -> kAlertDialog.dismissWithAnimation()).show());
+                        Toast.makeText(view.getContext(), "Quantity Changed Successfully", Toast.LENGTH_SHORT).show();
+                        dialogInterface1.dismiss();
+                    }).setNegativeButton("Cancel", (dialogInterface, i) -> dialogInterface.dismiss()).create();
+                    linearLayout.addView(editText);
+                    builder.setView(linearLayout);
+                    builder.setCancelable(false);
+                    builder.create().show();
+
+                        }).setCancelText("No, Wait").setCancelClickListener(KAlertDialog::dismissWithAnimation).show());
                 }
 
         @Override
