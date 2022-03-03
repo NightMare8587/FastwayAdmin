@@ -52,29 +52,16 @@ public void onBindViewHolder(@NonNull holder holder, @SuppressLint("RecyclerView
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(Objects.requireNonNull(auth.getUid())).child("List of Dish");
         holder.nameOfDish.setText(name.get(position));
         if(!image.get(position).equals("")){
-        Picasso.get().load(image.get(position)).centerCrop().resize(100,100).into(holder.imageView);
+        Picasso.get().load(image.get(position)).into(holder.imageView);
         }
-        holder.nameOfDish.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-                new KAlertDialog(context,KAlertDialog.WARNING_TYPE)
-                        .setTitleText("Add To Combo")
-                        .setContentText("You sure wanna add this to combo")
-                        .setConfirmText("Yes, Add it")
-                        .setConfirmClickListener(new KAlertDialog.KAlertClickListener() {
-        @Override
-        public void onClick(KAlertDialog kAlertDialog) {
-                reference.child("Combo").child(comboName).child(name.get(position)).child("name").child("name").setValue(name.get(position));
-                kAlertDialog.dismissWithAnimation();
-                }
-                }).setCancelText("No, Wait").setCancelClickListener(new KAlertDialog.KAlertClickListener() {
-        @Override
-        public void onClick(KAlertDialog kAlertDialog) {
-                kAlertDialog.dismissWithAnimation();
-        }
-                }).show();
-                 }
-                     });
+        holder.nameOfDish.setOnClickListener(view -> new KAlertDialog(context,KAlertDialog.WARNING_TYPE)
+                .setTitleText("Add To Combo")
+                .setContentText("You sure wanna add this to combo")
+                .setConfirmText("Yes, Add it")
+                .setConfirmClickListener(kAlertDialog -> {
+                        reference.child("Combo").child(comboName).child(name.get(position)).child("name").child("name").setValue(name.get(position));
+                        kAlertDialog.dismissWithAnimation();
+                        }).setCancelText("No, Wait").setCancelClickListener(kAlertDialog -> kAlertDialog.dismissWithAnimation()).show());
                 }
 
         @Override

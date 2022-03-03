@@ -1,6 +1,7 @@
 package com.consumers.fastwayadmin.MenuActivities.Combo;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -14,6 +15,7 @@ import com.consumers.fastwayadmin.DiscountCombo.ComboAndOffers;
 import com.consumers.fastwayadmin.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -33,6 +35,7 @@ public class ComboMenuDish extends AppCompatActivity {
     String state;
     List<String> comboImage = new ArrayList<>();
     List<String> dish = new ArrayList<>();
+    List<String> descriptionOfCombo = new ArrayList<>();
     List<String> price = new ArrayList<>();
     DatabaseReference reference;
     List<List<String>> dishNames = new ArrayList<>();
@@ -59,15 +62,47 @@ public class ComboMenuDish extends AppCompatActivity {
                         for(DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()){
                             dish.add(String.valueOf(dataSnapshot1.child("name").child("name").getValue()));
                         }
+
+                        if(dataSnapshot.hasChild("description"))
+                            descriptionOfCombo.add(dataSnapshot.child("description").getValue(String.class));
+                        else
+                            descriptionOfCombo.add("");
                         dish.removeAll(Collections.singleton("null"));
                         dishNames.add(new ArrayList<>(dish));
                         dish.clear();
                     }
                     recyclerView.setLayoutManager(new LinearLayoutManager(ComboMenuDish.this));
-                    recyclerView.setAdapter(new ComboRecyclerView(comboNames,dishNames,price,ComboMenuDish.this,comboImage));
+                    recyclerView.setAdapter(new ComboRecyclerView(comboNames,dishNames,price,ComboMenuDish.this,comboImage,descriptionOfCombo));
 
                     Log.i("tag",comboNames.toString());
                 }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        reference.child("Combo").addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                updateChild();
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                updateChild();
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+                updateChild();
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
             }
 
             @Override
@@ -80,6 +115,49 @@ public class ComboMenuDish extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(ComboMenuDish.this, ComboAndOffers.class));
+            }
+        });
+    }
+
+    private void updateChild() {
+        reference.child("Combo").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists()){
+                    comboNames.clear();
+                    price.clear();
+                    comboImage.clear();
+                    descriptionOfCombo.clear();
+                    dishNames.clear();
+                    for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                        comboNames.add(dataSnapshot.getKey().toString());
+                        price.add(String.valueOf(dataSnapshot.child("price").getValue()));
+                        if(dataSnapshot.hasChild("image"))
+                            comboImage.add(String.valueOf(dataSnapshot.child("image").getValue()));
+                        else
+                            comboImage.add("");
+                        for(DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()){
+                            dish.add(String.valueOf(dataSnapshot1.child("name").child("name").getValue()));
+                        }
+
+                        if(dataSnapshot.hasChild("description"))
+                            descriptionOfCombo.add(dataSnapshot.child("description").getValue(String.class));
+                        else
+                            descriptionOfCombo.add("");
+                        dish.removeAll(Collections.singleton("null"));
+                        dishNames.add(new ArrayList<>(dish));
+                        dish.clear();
+                    }
+                    recyclerView.setLayoutManager(new LinearLayoutManager(ComboMenuDish.this));
+                    recyclerView.setAdapter(new ComboRecyclerView(comboNames,dishNames,price,ComboMenuDish.this,comboImage,descriptionOfCombo));
+
+                    Log.i("tag",comboNames.toString());
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
             }
         });
     }

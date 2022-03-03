@@ -40,38 +40,24 @@ public class AddRemoveItemCombo extends AppCompatActivity {
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,dishNames);
         listView.setAdapter(arrayAdapter);
 
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                AlertDialog.Builder alert = new AlertDialog.Builder(AddRemoveItemCombo.this);
-                alert.setTitle("Important");
-                alert.setMessage("Do you sure wanna remove this item???");
-                alert.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        String name = dishNames.get(position);
-                        reference.child(name).removeValue();
-                        dishNames.remove(position);
-                        arrayAdapter.notifyDataSetChanged();
-                        dialog.dismiss();
-                    }
-                }).setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                }).create().show();
+        listView.setOnItemClickListener((parent, view, position, id) -> {
+            AlertDialog.Builder alert = new AlertDialog.Builder(AddRemoveItemCombo.this);
+            alert.setTitle("Important");
+            alert.setMessage("Do you sure wanna remove this item???");
+            alert.setPositiveButton("Yes", (dialog, which) -> {
+                String name = dishNames.get(position);
+                reference.child(name).removeValue();
+                dishNames.remove(position);
+                arrayAdapter.notifyDataSetChanged();
+                dialog.dismiss();
+            }).setNegativeButton("No", (dialog, which) -> dialog.dismiss()).create().show();
 
-            }
         });
 
-        floatingActionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(AddRemoveItemCombo.this,AddDishToCurrentCombo.class);
-                intent.putExtra("name",comboName);
-                startActivity(intent);
-            }
+        floatingActionButton.setOnClickListener(v -> {
+            Intent intent = new Intent(AddRemoveItemCombo.this,AddDishToCurrentCombo.class);
+            intent.putExtra("name",comboName);
+            startActivity(intent);
         });
 
     }

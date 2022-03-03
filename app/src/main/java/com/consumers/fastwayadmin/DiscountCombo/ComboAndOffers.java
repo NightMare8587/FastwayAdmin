@@ -1,12 +1,16 @@
 package com.consumers.fastwayadmin.DiscountCombo;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -34,7 +38,6 @@ import java.util.Objects;
 import karpuzoglu.enes.com.fastdialog.Animations;
 import karpuzoglu.enes.com.fastdialog.FastDialog;
 import karpuzoglu.enes.com.fastdialog.FastDialogBuilder;
-import karpuzoglu.enes.com.fastdialog.PositiveClick;
 import karpuzoglu.enes.com.fastdialog.Type;
 import mehdi.sakout.fancybuttons.FancyButton;
 
@@ -133,40 +136,83 @@ public class ComboAndOffers extends AppCompatActivity {
                                                 name.clear();
                                                 dishQuantity.clear();
                                                 recyclerView.setAdapter(new comboAdapter(name));
-                                                new KAlertDialog(ComboAndOffers.this, KAlertDialog.SUCCESS_TYPE)
-                                                        .setTitleText("Success")
-                                                        .setContentText("combo created successfully")
-                                                        .setConfirmText("Ok, Great")
-                                                        .setConfirmClickListener(new KAlertDialog.KAlertClickListener() {
-                                                            @Override
-                                                            public void onClick(KAlertDialog kAlertDialog1) {
+                                                android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(ComboAndOffers.this);
+                                                builder.setTitle("New Description").setMessage("Enter new description in below field");
+                                                LinearLayout linearLayout = new LinearLayout(ComboAndOffers.this);
+                                                linearLayout.setOrientation(LinearLayout.VERTICAL);
+                                                EditText editText = new EditText(ComboAndOffers.this);
+                                                editText.setHint("Enter description here");
+                                                editText.setMaxLines(200);
+                                                editText.setInputType(InputType.TYPE_CLASS_TEXT);
+                                                builder.setPositiveButton("Add Description", (dialogInterface1, i1) -> {
+                                                    if(editText.getText().toString().equals("")){
+                                                        Toast.makeText(ComboAndOffers.this, "Invalid Input", Toast.LENGTH_SHORT).show();
+                                                        return;
+                                                    }
+                                                    SharedPreferences sharedPreferences = getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
+                                                    FirebaseAuth auth = FirebaseAuth.getInstance();
+                                                    DatabaseReference reference =  FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid())).child("List of Dish").child("Combo").child(comboName);
+                                                    reference.child("description").setValue(editText.getText().toString());
+                                                    Toast.makeText(ComboAndOffers.this, "Description Added Successfully", Toast.LENGTH_SHORT).show();
+                                                    dialogInterface1.dismiss();
+                                                    new KAlertDialog(ComboAndOffers.this, KAlertDialog.SUCCESS_TYPE)
+                                                            .setTitleText("Success")
+                                                            .setContentText("combo created successfully")
+                                                            .setConfirmText("Ok, Great")
+                                                            .setConfirmClickListener(kAlertDialog1 -> {
                                                                 AlertDialog.Builder alert = new AlertDialog.Builder(ComboAndOffers.this);
                                                                 alert.setTitle("Add Image");
                                                                 alert.setMessage("Do you wanna add image to your combo. You can skip this step for now if you want");
-                                                                alert.setPositiveButton("Skip", new DialogInterface.OnClickListener() {
-                                                                    @Override
-                                                                    public void onClick(DialogInterface dialogInterface, int i) {
-                                                                        dialogInterface.dismiss();
-                                                                        finish();
-                                                                    }
-                                                                }).setNegativeButton("Add Image", new DialogInterface.OnClickListener() {
-                                                                    @Override
-                                                                    public void onClick(DialogInterface dialogInterface, int i) {
-                                                                        dialogInterface.dismiss();
-                                                                        Intent intent = new Intent(ComboAndOffers.this, AddImageToDish.class);
-                                                                        intent.putExtra("type","Combo");
-                                                                        intent.putExtra("dishName",comboName);
-                                                                        startActivity(intent);
-                                                                        finish();
-                                                                    }
+                                                                alert.setPositiveButton("Skip", (dialogInterface, i) -> {
+                                                                    dialogInterface.dismiss();
+                                                                    finish();
+                                                                }).setNegativeButton("Add Image", (dialogInterface, i) -> {
+                                                                    dialogInterface.dismiss();
+                                                                    Intent intent = new Intent(ComboAndOffers.this, AddImageToDish.class);
+                                                                    intent.putExtra("type","Combo");
+                                                                    intent.putExtra("dishName",comboName);
+                                                                    startActivity(intent);
                                                                 });
 
                                                                 alert.create().show();
                                                                 kAlertDialog1.dismissWithAnimation();
                                                                 priceDialog.dismiss();
 
-                                                            }
-                                                        }).show();
+                                                            }).show();
+                                                }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                                        new KAlertDialog(ComboAndOffers.this, KAlertDialog.SUCCESS_TYPE)
+                                                                .setTitleText("Success")
+                                                                .setContentText("combo created successfully")
+                                                                .setConfirmText("Ok, Great")
+                                                                .setConfirmClickListener(kAlertDialog1 -> {
+                                                                    AlertDialog.Builder alert = new AlertDialog.Builder(ComboAndOffers.this);
+                                                                    alert.setTitle("Add Image");
+                                                                    alert.setMessage("Do you wanna add image to your combo. You can skip this step for now if you want");
+                                                                    alert.setPositiveButton("Skip", (dialogInterface12, i12) -> {
+                                                                        dialogInterface12.dismiss();
+                                                                        finish();
+                                                                    }).setNegativeButton("Add Image", (dialogInterface13, i13) -> {
+                                                                        dialogInterface13.dismiss();
+                                                                        Intent intent = new Intent(ComboAndOffers.this, AddImageToDish.class);
+                                                                        intent.putExtra("type","Combo");
+                                                                        intent.putExtra("dishName",comboName);
+                                                                        startActivity(intent);
+                                                                    });
+
+                                                                    alert.create().show();
+                                                                    kAlertDialog1.dismissWithAnimation();
+                                                                    priceDialog.dismiss();
+
+                                                                }).show();
+                                                    }
+                                                }).create();
+                                                linearLayout.addView(editText);
+                                                builder.setView(linearLayout);
+                                                builder.setCancelable(false);
+                                                builder.create().show();
+
                                             }
                                         }
 

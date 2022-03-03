@@ -28,7 +28,6 @@ public class AddDishToCurrentCombo extends AppCompatActivity {
     FancyButton mainCourse,breads,snacks,deserts,drinks;
     SharedPreferences sharedPreferences;
     DatabaseReference reference;
-    List<String> name = new ArrayList<>();
     FirebaseAuth auth;
     String comboName;
     LinearLayoutManager horizonatl;
@@ -45,111 +44,70 @@ public class AddDishToCurrentCombo extends AppCompatActivity {
         snacks = findViewById(R.id.comboSnacks);
         deserts = findViewById(R.id.comboDeserts);
         drinks = findViewById(R.id.comboDrinks);
-        mainCourse.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                new KAlertDialog(AddDishToCurrentCombo.this,KAlertDialog.NORMAL_TYPE)
-                        .setTitleText("Info")
-                        .setContentText("Click On Dish Name to select for combo")
-                        .setConfirmText("Ok, Got it")
-                        .setConfirmClickListener(new KAlertDialog.KAlertClickListener() {
-                            @Override
-                            public void onClick(KAlertDialog kAlertDialog) {
-                                kAlertDialog.dismissWithAnimation();
-                                Intent intent = new Intent(AddDishToCurrentCombo.this,SelectDishForCurrentCombo.class);
-                                intent.putExtra("dishType","Main Course");
-                                intent.putExtra("comboName",comboName);
-                                intent.putExtra("state",sharedPreferences.getString("state",""));
-                                startActivity(intent);
-                            }
-                        }).show();
-            }
-        });
-        breads.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                new KAlertDialog(AddDishToCurrentCombo.this,KAlertDialog.NORMAL_TYPE)
-                        .setTitleText("Info")
-                        .setContentText("Click On Dish Name to select for combo")
-                        .setConfirmText("Ok, Got it")
-                        .setConfirmClickListener(new KAlertDialog.KAlertClickListener() {
-                            @Override
-                            public void onClick(KAlertDialog kAlertDialog) {
-                                kAlertDialog.dismissWithAnimation();
-                                Intent intent = new Intent(AddDishToCurrentCombo.this, SelectDishForCurrentCombo.class);
-                                intent.putExtra("dishType","Breads");
-                                intent.putExtra("comboName",comboName);
-                                intent.putExtra("state",sharedPreferences.getString("state",""));
-                                startActivity(intent);
+        mainCourse.setOnClickListener(view -> new KAlertDialog(AddDishToCurrentCombo.this,KAlertDialog.NORMAL_TYPE)
+                .setTitleText("Info")
+                .setContentText("Click On Dish Name to select for combo")
+                .setConfirmText("Ok, Got it")
+                .setConfirmClickListener(kAlertDialog -> {
+                    kAlertDialog.dismissWithAnimation();
+                    Intent intent = new Intent(AddDishToCurrentCombo.this,SelectDishForCurrentCombo.class);
+                    intent.putExtra("dishType","Main Course");
+                    intent.putExtra("comboName",comboName);
+                    intent.putExtra("state",sharedPreferences.getString("state",""));
+                    startActivity(intent);
+                }).show());
+        breads.setOnClickListener(view -> new KAlertDialog(AddDishToCurrentCombo.this,KAlertDialog.NORMAL_TYPE)
+                .setTitleText("Info")
+                .setContentText("Click On Dish Name to select for combo")
+                .setConfirmText("Ok, Got it")
+                .setConfirmClickListener(kAlertDialog -> {
+                    kAlertDialog.dismissWithAnimation();
+                    Intent intent = new Intent(AddDishToCurrentCombo.this, SelectDishForCurrentCombo.class);
+                    intent.putExtra("dishType","Breads");
+                    intent.putExtra("comboName",comboName);
+                    intent.putExtra("state",sharedPreferences.getString("state",""));
+                    startActivity(intent);
 
 //                                kAlertDialog.dismissWithAnimation();
-                            }
-                        }).show();
-
-            }
-        });
-        deserts.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                new KAlertDialog(AddDishToCurrentCombo.this,KAlertDialog.NORMAL_TYPE)
-                        .setTitleText("Info")
-                        .setContentText("Click On Dish Name to select for combo")
-                        .setConfirmText("Ok, Got it")
-                        .setConfirmClickListener(new KAlertDialog.KAlertClickListener() {
-                            @Override
-                            public void onClick(KAlertDialog kAlertDialog) {
-                                kAlertDialog.dismissWithAnimation();
-                                Intent intent = new Intent(AddDishToCurrentCombo.this,SelectDishForCurrentCombo.class);
-                                intent.putExtra("dishType","Deserts");
-                                intent.putExtra("comboName",comboName);
-                                intent.putExtra("state",sharedPreferences.getString("state",""));
-                                startActivity(intent);
+                }).show());
+        deserts.setOnClickListener(view -> new KAlertDialog(AddDishToCurrentCombo.this,KAlertDialog.NORMAL_TYPE)
+                .setTitleText("Info")
+                .setContentText("Click On Dish Name to select for combo")
+                .setConfirmText("Ok, Got it")
+                .setConfirmClickListener(kAlertDialog -> {
+                    kAlertDialog.dismissWithAnimation();
+                    Intent intent = new Intent(AddDishToCurrentCombo.this,SelectDishForCurrentCombo.class);
+                    intent.putExtra("dishType","Deserts");
+                    intent.putExtra("comboName",comboName);
+                    intent.putExtra("state",sharedPreferences.getString("state",""));
+                    startActivity(intent);
 //                                kAlertDialog.dismissWithAnimation();
-                            }
-                        }).show();
-            }
-        });
-        snacks.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                new KAlertDialog(AddDishToCurrentCombo.this,KAlertDialog.NORMAL_TYPE)
-                        .setTitleText("Info")
-                        .setContentText("Click On Dish Name to select for combo")
-                        .setConfirmText("Ok, Got it")
-                        .setConfirmClickListener(new KAlertDialog.KAlertClickListener() {
-                            @Override
-                            public void onClick(KAlertDialog kAlertDialog) {
-                                kAlertDialog.dismissWithAnimation();
-                                Intent intent = new Intent(AddDishToCurrentCombo.this,SelectDishForCurrentCombo.class);
-                                intent.putExtra("dishType","Snacks");
-                                intent.putExtra("comboName",comboName);
-                                intent.putExtra("state",sharedPreferences.getString("state",""));
-                                startActivity(intent);
+                }).show());
+        snacks.setOnClickListener(view -> new KAlertDialog(AddDishToCurrentCombo.this,KAlertDialog.NORMAL_TYPE)
+                .setTitleText("Info")
+                .setContentText("Click On Dish Name to select for combo")
+                .setConfirmText("Ok, Got it")
+                .setConfirmClickListener(kAlertDialog -> {
+                    kAlertDialog.dismissWithAnimation();
+                    Intent intent = new Intent(AddDishToCurrentCombo.this,SelectDishForCurrentCombo.class);
+                    intent.putExtra("dishType","Snacks");
+                    intent.putExtra("comboName",comboName);
+                    intent.putExtra("state",sharedPreferences.getString("state",""));
+                    startActivity(intent);
 //                                kAlertDialog.dismissWithAnimation();
-                            }
-                        }).show();
-            }
-        });
-        drinks.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                new KAlertDialog(AddDishToCurrentCombo.this,KAlertDialog.NORMAL_TYPE)
-                        .setTitleText("Info")
-                        .setContentText("Click On Dish Name to select for combo")
-                        .setConfirmText("Ok, Got it")
-                        .setConfirmClickListener(new KAlertDialog.KAlertClickListener() {
-                            @Override
-                            public void onClick(KAlertDialog kAlertDialog) {
-                                kAlertDialog.dismissWithAnimation();
-                                Intent intent = new Intent(AddDishToCurrentCombo.this,SelectDishForCurrentCombo.class);
-                                intent.putExtra("dishType","Drinks");
-                                intent.putExtra("comboName",comboName);
-                                intent.putExtra("state",sharedPreferences.getString("state",""));
-                                startActivity(intent);
+                }).show());
+        drinks.setOnClickListener(view -> new KAlertDialog(AddDishToCurrentCombo.this,KAlertDialog.NORMAL_TYPE)
+                .setTitleText("Info")
+                .setContentText("Click On Dish Name to select for combo")
+                .setConfirmText("Ok, Got it")
+                .setConfirmClickListener(kAlertDialog -> {
+                    kAlertDialog.dismissWithAnimation();
+                    Intent intent = new Intent(AddDishToCurrentCombo.this,SelectDishForCurrentCombo.class);
+                    intent.putExtra("dishType","Drinks");
+                    intent.putExtra("comboName",comboName);
+                    intent.putExtra("state",sharedPreferences.getString("state",""));
+                    startActivity(intent);
 //                                kAlertDialog.dismissWithAnimation();
-                            }
-                        }).show();
-            }
-        });
+                }).show());
     }
 }
