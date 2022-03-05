@@ -151,7 +151,7 @@ public class UploadRequiredDocuments extends AppCompatActivity {
                                 dialogInterface.dismiss();
                                 Intent intent = new Intent();
                                 intent.setType("image/*");
-                                intent.setAction(Intent.ACTION_GET_CONTENT);
+                                intent.setAction("android.intent.action.PICK");
                                 startActivityForResult(Intent.createChooser(intent, "Select Picture"), 1);
                             }
                         }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -180,7 +180,7 @@ public class UploadRequiredDocuments extends AppCompatActivity {
                                 dialogInterface.dismiss();
                                 Intent intent = new Intent();
                                 intent.setType("image/*");
-                                intent.setAction(Intent.ACTION_GET_CONTENT);
+                                intent.setAction("android.intent.action.PICK");
                                 startActivityForResult(Intent.createChooser(intent, "Select Picture"), 2);
                             }
                         }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -209,7 +209,7 @@ public class UploadRequiredDocuments extends AppCompatActivity {
                                 dialogInterface.dismiss();
                                 Intent intent = new Intent();
                                 intent.setType("image/*");
-                                intent.setAction(Intent.ACTION_GET_CONTENT);
+                                intent.setAction("android.intent.action.PICK");
                                 startActivityForResult(Intent.createChooser(intent, "Select Picture"), 3);
                             }
                         }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -238,7 +238,7 @@ public class UploadRequiredDocuments extends AppCompatActivity {
                                 dialogInterface.dismiss();
                                 Intent intent = new Intent();
                                 intent.setType("image/*");
-                                intent.setAction(Intent.ACTION_GET_CONTENT);
+                                intent.setAction("android.intent.action.PICK");
                                 startActivityForResult(Intent.createChooser(intent, "Select Picture"), 4);
                             }
                         }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {

@@ -70,25 +70,16 @@ public class AddImageToDish extends AppCompatActivity {
                 .create();
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Choose Image").setMessage("Select Any One Option")
-                .setPositiveButton("Upload from device", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-//                        String nameDish = dishName;
-//                        Intent intent = new Intent(getApplicationContext(), CustomDishImageSearch.class);
-//                        intent.putExtra("name",nameDish);
-//                        startActivity(intent);
-                        Intent intent = new Intent();
-                        intent.setType("image/*");
-                        intent.setAction(Intent.ACTION_GET_CONTENT);
-                        startActivityForResult(Intent.createChooser(intent, "Select Picture"), 1);
-                    }
-                }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                dialogInterface.dismiss();
-                finish();
-            }
-        }).create();
+                .setPositiveButton("Upload from device", (dialogInterface, i) -> {
+
+                    Intent intent = new Intent();
+                    intent.setType("image/*");
+                    intent.setAction(Intent.ACTION_GET_CONTENT);
+                    startActivityForResult(Intent.createChooser(intent, "Select Picture"), 1);
+                }).setNegativeButton("Cancel", (dialogInterface, i) -> {
+                    dialogInterface.dismiss();
+                    finish();
+                }).create();
         builder.show();
     }
 
@@ -108,22 +99,16 @@ public class AddImageToDish extends AppCompatActivity {
     private void showDialogBox() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Choose Image").setMessage("Select Any One Option")
-                .setPositiveButton("Upload From Device", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                        Intent intent = new Intent();
-                        intent.setType("image/*");
-                        intent.setAction(Intent.ACTION_GET_CONTENT);
-                        startActivityForResult(Intent.createChooser(intent, "Select Picture"), 1);
-                    }
-                }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                dialogInterface.dismiss();
-                finish();
-            }
-        }).create();
+                .setPositiveButton("Upload From Device", (dialogInterface, i) -> {
+                    dialogInterface.dismiss();
+                    Intent intent = new Intent();
+                    intent.setType("image/*");
+                    intent.setAction("android.intent.action.PICK");
+                    startActivityForResult(Intent.createChooser(intent, "Select Picture"), 1);
+                }).setNegativeButton("Cancel", (dialogInterface, i) -> {
+                    dialogInterface.dismiss();
+                    finish();
+                }).create();
         builder.show();
     }
     @Override
@@ -177,25 +162,19 @@ public class AddImageToDish extends AppCompatActivity {
             fastDialog.show();
             Uri filepath = data.getData();
             StorageReference ref = storageReference.child(Objects.requireNonNull(dishAuth.getUid()) + "/" + "image" + "/"  + dishName);
-            ref.putFile(filepath).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onSuccess(@NonNull UploadTask.TaskSnapshot taskSnapshot) {
+            ref.putFile(filepath).addOnSuccessListener(taskSnapshot -> {
 //                    Toast.makeText(AddImageToDish.this, "File Uploaded", Toast.LENGTH_SHORT).show();
-                    SharedPreferences sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
-                    reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(dishAuth.getUid()))
-                    .child("List of Dish").child(type).child(dishName);
+                SharedPreferences sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
+                reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(dishAuth.getUid()))
+                .child("List of Dish").child(type).child(dishName);
 
-            StorageReference ref = storageReference.child(dishAuth.getUid() + "/" + "image" + "/"  + dishName);
-            ref.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                @Override
-                public void onSuccess(@NonNull Uri uri) {
-                    Toast.makeText(AddImageToDish.this, "New Image Uploaded", Toast.LENGTH_SHORT).show();
-                    reference.child("image").setValue(uri + "");
-                    fastDialog.dismiss();
-                    finish();
-                }
-            });
-                }
+        StorageReference ref1 = storageReference.child(dishAuth.getUid() + "/" + "image" + "/"  + dishName);
+        ref1.getDownloadUrl().addOnSuccessListener(uri -> {
+            Toast.makeText(AddImageToDish.this, "New Image Uploaded", Toast.LENGTH_SHORT).show();
+            reference.child("image").setValue(uri + "");
+            fastDialog.dismiss();
+            finish();
+        });
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception e) {

@@ -98,28 +98,13 @@ public class ReUploadDocumentsAgain extends AppCompatActivity {
             }else {
                 AlertDialog.Builder alert = new AlertDialog.Builder(ReUploadDocumentsAgain.this);
                 alert.setTitle("Choose one option")
-                        .setPositiveButton("Upload from gallery", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                dialogInterface.dismiss();
-                                Intent intent = new Intent();
-                                intent.setType("image/*");
-                                intent.setAction(Intent.ACTION_GET_CONTENT);
-                                startActivityForResult(Intent.createChooser(intent, "Select Picture"), 1);
-                            }
-                        }).setNegativeButton("Take Photo", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE); //IMAGE CAPTURE CODE
-                        startActivityForResult(intent, 20);
-                    }
-                }).setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                    }
-                }).create();
+                        .setPositiveButton("Upload from gallery", (dialogInterface, i) -> {
+                            dialogInterface.dismiss();
+                            Intent intent = new Intent();
+                            intent.setType("image/*");
+                            intent.setAction("android.intent.action.PICK");
+                            startActivityForResult(Intent.createChooser(intent, "Select Picture"), 1);
+                        }).setNegativeButton("Cancel", (dialogInterface, i) -> dialogInterface.dismiss()).create();
 
                 alert.show();
             }
@@ -134,28 +119,13 @@ public class ReUploadDocumentsAgain extends AppCompatActivity {
             }else {
                 AlertDialog.Builder alert = new AlertDialog.Builder(ReUploadDocumentsAgain.this);
                 alert.setTitle("Choose one option")
-                        .setPositiveButton("Upload from gallery", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                dialogInterface.dismiss();
-                                Intent intent = new Intent();
-                                intent.setType("image/*");
-                                intent.setAction(Intent.ACTION_GET_CONTENT);
-                                startActivityForResult(Intent.createChooser(intent, "Select Picture"), 2);
-                            }
-                        }).setNegativeButton("Take Photo", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE); //IMAGE CAPTURE CODE
-                        startActivityForResult(intent, 21);
-                    }
-                }).setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                    }
-                }).create();
+                        .setPositiveButton("Upload from gallery", (dialogInterface, i) -> {
+                            dialogInterface.dismiss();
+                            Intent intent = new Intent();
+                            intent.setType("image/*");
+                            intent.setAction("android.intent.action.PICK");
+                            startActivityForResult(Intent.createChooser(intent, "Select Picture"), 2);
+                        }).setNegativeButton("Cancel", (dialogInterface, i) -> dialogInterface.dismiss()).create();
 
                 alert.show();
             }
@@ -170,28 +140,13 @@ public class ReUploadDocumentsAgain extends AppCompatActivity {
             }else {
                 AlertDialog.Builder alert = new AlertDialog.Builder(ReUploadDocumentsAgain.this);
                 alert.setTitle("Choose one option")
-                        .setPositiveButton("Upload from gallery", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                dialogInterface.dismiss();
-                                Intent intent = new Intent();
-                                intent.setType("image/*");
-                                intent.setAction(Intent.ACTION_GET_CONTENT);
-                                startActivityForResult(Intent.createChooser(intent, "Select Picture"), 3);
-                            }
-                        }).setNegativeButton("Take Photo", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE); //IMAGE CAPTURE CODE
-                        startActivityForResult(intent, 22);
-                    }
-                }).setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                    }
-                }).create();
+                        .setPositiveButton("Upload from gallery", (dialogInterface, i) -> {
+                            dialogInterface.dismiss();
+                            Intent intent = new Intent();
+                            intent.setType("image/*");
+                            intent.setAction("android.intent.action.PICK");
+                            startActivityForResult(Intent.createChooser(intent, "Select Picture"), 3);
+                        }).setNegativeButton("Cancel", (dialogInterface, i) -> dialogInterface.dismiss()).create();
 
                 alert.show();
             }
@@ -206,28 +161,13 @@ public class ReUploadDocumentsAgain extends AppCompatActivity {
             }else {
                 AlertDialog.Builder alert = new AlertDialog.Builder(ReUploadDocumentsAgain.this);
                 alert.setTitle("Choose one option")
-                        .setPositiveButton("Upload from gallery", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                dialogInterface.dismiss();
-                                Intent intent = new Intent();
-                                intent.setType("image/*");
-                                intent.setAction(Intent.ACTION_GET_CONTENT);
-                                startActivityForResult(Intent.createChooser(intent, "Select Picture"), 4);
-                            }
-                        }).setNegativeButton("Take Photo", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE); //IMAGE CAPTURE CODE
-                        startActivityForResult(intent, 23);
-                    }
-                }).setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                    }
-                }).create();
+                        .setPositiveButton("Upload from gallery", (dialogInterface, i) -> {
+                            dialogInterface.dismiss();
+                            Intent intent = new Intent();
+                            intent.setType("image/*");
+                            intent.setAction(Intent.ACTION_GET_CONTENT);
+                            startActivityForResult(Intent.createChooser(intent, "Select Picture"), 4);
+                        }).setNegativeButton("Cancel", (dialogInterface, i) -> dialogInterface.dismiss()).create();
 
                 alert.show();
             }
@@ -289,32 +229,23 @@ public class ReUploadDocumentsAgain extends AppCompatActivity {
             }
             try {
                 StorageReference reference = storageReference.child(auth.getUid() + "/" + "Documents" + "/"  + "pan");
-                reference.putFile(Uri.fromFile(file)).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-                        StorageReference reference = storageReference.child(auth.getUid() + "/" + "Documents" + "/"  + "pan");
-                        reference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                            @Override
-                            public void onSuccess(@NonNull Uri uri) {
-                                pan = true;
-                                Toast.makeText(ReUploadDocumentsAgain.this, "Upload Complete and image saved in phone successfully", Toast.LENGTH_SHORT).show();
-                                loading.dismiss();
-                                panText.setVisibility(View.VISIBLE);
-                                DatabaseReference dish = FirebaseDatabase.getInstance().getReference().getRoot();
-                                panUrl = uri + "";
-                                dish.child("Admin").child(Objects.requireNonNull(auth.getUid())).child("Restaurant Documents").child("pan").setValue(uri + "");
-                                checkIfAllUploaded();
-                            }
-                        });
-
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(ReUploadDocumentsAgain.this,
-                                "Something went wrong", Toast.LENGTH_SHORT).show();
+                reference.putFile(Uri.fromFile(file)).addOnCompleteListener(task -> {
+                    StorageReference reference1 = storageReference.child(auth.getUid() + "/" + "Documents" + "/"  + "pan");
+                    reference1.getDownloadUrl().addOnSuccessListener(uri -> {
+                        pan = true;
+                        Toast.makeText(ReUploadDocumentsAgain.this, "Upload Complete and image saved in phone successfully", Toast.LENGTH_SHORT).show();
                         loading.dismiss();
-                    }
+                        panText.setVisibility(View.VISIBLE);
+                        DatabaseReference dish = FirebaseDatabase.getInstance().getReference().getRoot();
+                        panUrl = uri + "";
+                        dish.child("Admin").child(Objects.requireNonNull(auth.getUid())).child("Restaurant Documents").child("pan").setValue(uri + "");
+                        checkIfAllUploaded();
+                    });
+
+                }).addOnFailureListener(e -> {
+                    Toast.makeText(ReUploadDocumentsAgain.this,
+                            "Something went wrong", Toast.LENGTH_SHORT).show();
+                    loading.dismiss();
                 });
             }catch (Exception e){
                 Toast.makeText(ReUploadDocumentsAgain.this, ""+e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
@@ -354,28 +285,22 @@ public class ReUploadDocumentsAgain extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
                         StorageReference reference = storageReference.child(auth.getUid() + "/" + "Documents" + "/"  + "fssai");
-                        reference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                            @Override
-                            public void onSuccess(@NonNull Uri uri) {
-                                Toast.makeText(ReUploadDocumentsAgain.this, "Upload Complete and image saved in phone successfully", Toast.LENGTH_SHORT).show();
-                                loading.dismiss();
-                                fssai = true;
-                                FssaiText.setVisibility(View.VISIBLE);
-                                fssaiUrl = uri + "";
-                                DatabaseReference dish = FirebaseDatabase.getInstance().getReference().getRoot();
-                                dish.child("Admin").child(Objects.requireNonNull(auth.getUid())).child("Restaurant Documents").child("fssai").setValue(uri + "");
-                                checkIfAllUploaded();
-                            }
+                        reference.getDownloadUrl().addOnSuccessListener(uri -> {
+                            Toast.makeText(ReUploadDocumentsAgain.this, "Upload Complete and image saved in phone successfully", Toast.LENGTH_SHORT).show();
+                            loading.dismiss();
+                            fssai = true;
+                            FssaiText.setVisibility(View.VISIBLE);
+                            fssaiUrl = uri + "";
+                            DatabaseReference dish = FirebaseDatabase.getInstance().getReference().getRoot();
+                            dish.child("Admin").child(Objects.requireNonNull(auth.getUid())).child("Restaurant Documents").child("fssai").setValue(uri + "");
+                            checkIfAllUploaded();
                         });
 
                     }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(ReUploadDocumentsAgain.this,
-                                "Something went wrong", Toast.LENGTH_SHORT).show();
-                        loading.dismiss();
-                    }
+                }).addOnFailureListener(e -> {
+                    Toast.makeText(ReUploadDocumentsAgain.this,
+                            "Something went wrong", Toast.LENGTH_SHORT).show();
+                    loading.dismiss();
                 });
             }catch (Exception e){
                 Toast.makeText(ReUploadDocumentsAgain.this, ""+e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
@@ -430,13 +355,10 @@ public class ReUploadDocumentsAgain extends AppCompatActivity {
                         });
 
                     }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(ReUploadDocumentsAgain.this,
-                                "Something went wrong", Toast.LENGTH_SHORT).show();
-                        loading.dismiss();
-                    }
+                }).addOnFailureListener(e -> {
+                    Toast.makeText(ReUploadDocumentsAgain.this,
+                            "Something went wrong", Toast.LENGTH_SHORT).show();
+                    loading.dismiss();
                 });
             }catch (Exception e){
                 Toast.makeText(ReUploadDocumentsAgain.this, ""+e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
@@ -472,32 +394,26 @@ public class ReUploadDocumentsAgain extends AppCompatActivity {
             }
             try {
                 StorageReference reference = storageReference.child(auth.getUid() + "/" + "Documents" + "/"  + "gst");
-                reference.putFile(Uri.fromFile(file)).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-                        StorageReference reference = storageReference.child(auth.getUid() + "/" + "Documents" + "/"  + "gst");
-                        reference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                            @Override
-                            public void onSuccess(@NonNull Uri uri) {
-                                Toast.makeText(ReUploadDocumentsAgain.this, "Upload Complete and image saved in phone successfully", Toast.LENGTH_SHORT).show();
-                                loading.dismiss();
-                                gst = true;
-                                gstText.setVisibility(View.VISIBLE);
-                                gstUrl = uri + "";
-                                DatabaseReference dish = FirebaseDatabase.getInstance().getReference().getRoot();
-                                dish.child("Admin").child(Objects.requireNonNull(auth.getUid())).child("Restaurant Documents").child("gst").setValue(uri + "");
-                                checkIfAllUploaded();
-                            }
-                        });
+                reference.putFile(Uri.fromFile(file)).addOnCompleteListener(task -> {
+                    StorageReference reference12 = storageReference.child(auth.getUid() + "/" + "Documents" + "/"  + "gst");
+                    reference12.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(@NonNull Uri uri) {
+                            Toast.makeText(ReUploadDocumentsAgain.this, "Upload Complete and image saved in phone successfully", Toast.LENGTH_SHORT).show();
+                            loading.dismiss();
+                            gst = true;
+                            gstText.setVisibility(View.VISIBLE);
+                            gstUrl = uri + "";
+                            DatabaseReference dish = FirebaseDatabase.getInstance().getReference().getRoot();
+                            dish.child("Admin").child(Objects.requireNonNull(auth.getUid())).child("Restaurant Documents").child("gst").setValue(uri + "");
+                            checkIfAllUploaded();
+                        }
+                    });
 
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(ReUploadDocumentsAgain.this,
-                                "Something went wrong", Toast.LENGTH_SHORT).show();
-                        loading.dismiss();
-                    }
+                }).addOnFailureListener(e -> {
+                    Toast.makeText(ReUploadDocumentsAgain.this,
+                            "Something went wrong", Toast.LENGTH_SHORT).show();
+                    loading.dismiss();
                 });
             }catch (Exception e){
                 Toast.makeText(ReUploadDocumentsAgain.this, ""+e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
@@ -570,41 +486,38 @@ public class ReUploadDocumentsAgain extends AppCompatActivity {
     private void uploadImage(String value) {
         if(filePath != null){
             StorageReference reference = storageReference.child(auth.getUid() + "/" + "Documents" + "/"  + value);
-            reference.putFile(filePath).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onSuccess(@NonNull UploadTask.TaskSnapshot taskSnapshot) {
-                    StorageReference reference = storageReference.child(auth.getUid() + "/" + "Documents" + "/"  + value);
-                    reference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                        @Override
-                        public void onSuccess(@NonNull Uri uri) {
-                            if(value.equals("pan")) {
-                                panUrl = uri + "";
-                                pan = true;
-                                panText.setVisibility(View.VISIBLE);
-                            }
-                            if(value.equals("fssai")) {
-                                fssai = true;
-                                fssaiUrl = uri + "";
-                                FssaiText.setVisibility(View.VISIBLE);
-                            }
-                            if(value.equals("adhaar")) {
-                                adhaar = true;
-                                adhaarUrl = uri + "";
-                                adhaarText.setVisibility(View.VISIBLE);
-                            }
-                            if(value.equals("gst")) {
-                                gst = true;
-                                gstUrl = uri + "";
-                                gstText.setVisibility(View.VISIBLE);
-                            }
-                            Toast.makeText(ReUploadDocumentsAgain.this, "Upload Complete and image saved in phone successfully", Toast.LENGTH_SHORT).show();
-                            loading.dismiss();
-                            DatabaseReference dish = FirebaseDatabase.getInstance().getReference().getRoot();
-                            dish.child("Admin").child(Objects.requireNonNull(auth.getUid())).child("Restaurant Documents").child(value).setValue(uri + "");
-                            checkIfAllUploaded();
+            reference.putFile(filePath).addOnSuccessListener(taskSnapshot -> {
+                StorageReference reference1 = storageReference.child(auth.getUid() + "/" + "Documents" + "/"  + value);
+                reference1.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(@NonNull Uri uri) {
+                        if(value.equals("pan")) {
+                            panUrl = uri + "";
+                            pan = true;
+                            panText.setVisibility(View.VISIBLE);
                         }
-                    });
-                }
+                        if(value.equals("fssai")) {
+                            fssai = true;
+                            fssaiUrl = uri + "";
+                            FssaiText.setVisibility(View.VISIBLE);
+                        }
+                        if(value.equals("adhaar")) {
+                            adhaar = true;
+                            adhaarUrl = uri + "";
+                            adhaarText.setVisibility(View.VISIBLE);
+                        }
+                        if(value.equals("gst")) {
+                            gst = true;
+                            gstUrl = uri + "";
+                            gstText.setVisibility(View.VISIBLE);
+                        }
+                        Toast.makeText(ReUploadDocumentsAgain.this, "Upload Complete and image saved in phone successfully", Toast.LENGTH_SHORT).show();
+                        loading.dismiss();
+                        DatabaseReference dish = FirebaseDatabase.getInstance().getReference().getRoot();
+                        dish.child("Admin").child(Objects.requireNonNull(auth.getUid())).child("Restaurant Documents").child(value).setValue(uri + "");
+                        checkIfAllUploaded();
+                    }
+                });
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception e) {

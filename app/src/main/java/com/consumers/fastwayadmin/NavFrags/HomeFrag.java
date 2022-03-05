@@ -944,7 +944,6 @@ public class HomeFrag extends Fragment {
 
         @Override
         protected Void doInBackground(Void... voids) {
-            FirebaseAuth auth = FirebaseAuth.getInstance();
             checkForBank = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(UID));
             checkForBank.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override

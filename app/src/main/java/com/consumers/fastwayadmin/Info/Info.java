@@ -178,23 +178,23 @@ public class Info extends AppCompatActivity {
                 nameOfRestaurant.requestFocus();
                 nameOfRestaurant.setError("Field can't be Empty");
                 return;
-            }else if(AddressOfRestaurant.length() == 0){
+            } if(AddressOfRestaurant.length() == 0){
                 AddressOfRestaurant.requestFocus();
                 AddressOfRestaurant.setError("Field cant be Empty");
                 return;
-            }else if(pinCode.length() <= 5){
+            } if(pinCode.length() != 6){
                 pinCode.requestFocus();
                 pinCode.setError("Invalid PinCode");
                 return;
-            }else if(nearbyPlace.length() == 0){
+            } if(nearbyPlace.length() == 0){
                 nearbyPlace.requestFocus();
                 nearbyPlace.setError("Field can't be Empty");
                 return;
-            }else if(contactNumber.length() <= 9 && contactNumber.length() >= 11){
+            } if(contactNumber.length() != 10){
                 contactNumber.requestFocus();
                 contactNumber.setError("Invalid Number");
                 return;
-            }else if(!codePicker.getSelectedCountryCodeWithPlus().equals("+91")){
+            } if(!codePicker.getSelectedCountryCodeWithPlus().equals("+91")){
                 Toast.makeText(Info.this, "This app currently operates only in India", Toast.LENGTH_SHORT).show();
                 return;
             }
@@ -249,7 +249,7 @@ public class Info extends AppCompatActivity {
         }).setNegativeButton("Skip", (dialogInterface, i) -> {
             dialogInterface.dismiss();
             infoRef.child("DisplayImage").setValue("");
-            startActivity(new Intent(Info.this, MapsActivity.class));
+            startActivity(new Intent(Info.this, UploadRequiredDocuments.class));
             finish();
         }).create();
 

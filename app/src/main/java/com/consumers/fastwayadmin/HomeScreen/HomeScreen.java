@@ -101,21 +101,12 @@ public class HomeScreen extends AppCompatActivity {
                                 if(Objects.equals(dataSnapshot.child("verified").getValue(String.class), "no")){
                                      AlertDialog.Builder alert = new AlertDialog.Builder(HomeScreen.this);
                                      alert.setTitle("Error")
-                                             .setMessage("Your restaurant is either not verified or has been disbanded by Fastway")
+                                             .setMessage("Your restaurant is not yet verified so you can't accept orders until verified")
                                              .setPositiveButton("Exit", (dialogInterface, i) -> {
                                                  dialogInterface.dismiss();
-                                                 Intent homeIntent = new Intent(Intent.ACTION_MAIN);
-                                                 homeIntent.addCategory( Intent.CATEGORY_HOME );
-                                                 homeIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                                 startActivity(homeIntent);
-                                                 finish();
                                              }).setNegativeButton("Contact Fastway", (dialogInterface, i) -> {
                                                  dialogInterface.dismiss();
-                                                 Intent homeIntent = new Intent(HomeScreen.this,SupportActivity.class);
-                                                 homeIntent.addCategory( Intent.CATEGORY_HOME );
-                                                 homeIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                                 startActivity(homeIntent);
-                                                 finish();
+
                                              }).create();
                                      alert.setCancelable(false);
                                      alert.show();

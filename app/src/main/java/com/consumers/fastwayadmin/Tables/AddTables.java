@@ -79,11 +79,8 @@ public class AddTables extends AppCompatActivity {
             }
         }
 
-        imageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        imageView.setOnClickListener(view -> {
 
-            }
         });
 
         generateQrCode.setOnClickListener(new View.OnClickListener() {
