@@ -80,7 +80,6 @@ public class AddTables extends AppCompatActivity {
         }
 
         imageView.setOnClickListener(view -> {
-
         });
 
         generateQrCode.setOnClickListener(new View.OnClickListener() {
