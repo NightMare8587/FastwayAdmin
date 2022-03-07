@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,6 +26,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 import com.thecode.aestheticdialogs.AestheticDialog;
 import com.thecode.aestheticdialogs.DialogAnimation;
 import com.thecode.aestheticdialogs.DialogStyle;
@@ -37,15 +39,16 @@ import java.util.Objects;
 public class DiscountRecycler extends RecyclerView.Adapter<DiscountRecycler.Holder> {
     List<String> name;
     Context context;
-
+    List<String> image;
     SharedPreferences sharedPreferences;
     HashMap<String,String> dishName;
     FirebaseAuth auth = FirebaseAuth.getInstance();
     DatabaseReference addToDB = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid()));
     DatabaseReference dis = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
     DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid()));
-    public DiscountRecycler(HashMap<String,String> dishName,Context context,List<String> name){
+    public DiscountRecycler(HashMap<String,String> dishName,Context context,List<String> name,List<String> image){
         this.dishName = dishName;
+        this.image = image;
         this.context = context;
         this.name = name;
     }
@@ -60,6 +63,10 @@ public class DiscountRecycler extends RecyclerView.Adapter<DiscountRecycler.Hold
     @Override
     public void onBindViewHolder(@NonNull Holder holder, @SuppressLint("RecyclerView") int position) {
         holder.textView.setText(name.get(position));
+        if(!image.get(position).equals("")){
+            Picasso.get().load(image.get(position)).into(holder.imageView);
+        }else
+            Picasso.get().load("https://image.shutterstock.com/image-vector/no-image-vector-isolated-on-600w-1481369594.jpg").into(holder.imageView);
         holder.cardView.setOnClickListener(v -> {
             Log.i("info",dishName.get(name.get(position)) + " " + name.get(position));
             sharedPreferences = v.getContext().getSharedPreferences("loginInfo",Context.MODE_PRIVATE);
@@ -123,10 +130,12 @@ public class DiscountRecycler extends RecyclerView.Adapter<DiscountRecycler.Hold
     public static class Holder extends RecyclerView.ViewHolder{
         TextView textView;
         CardView cardView;
+        ImageView imageView;
         public Holder(@NonNull View itemView) {
             super(itemView);
             textView = itemView.findViewById(R.id.discountViewDishName);
             cardView = itemView.findViewById(R.id.discountCard);
+            imageView = itemView.findViewById(R.id.discountCardImageView);
         }
     }
 

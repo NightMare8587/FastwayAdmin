@@ -29,10 +29,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import com.consumers.fastwayadmin.R;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -82,178 +78,159 @@ public class AddTables extends AppCompatActivity {
         imageView.setOnClickListener(view -> {
         });
 
-        generateQrCode.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                progressBar.setVisibility(View.VISIBLE);
-                if(tableNumber.length() == 0){
-                    tableNumber.requestFocus();
-                    tableNumber.setError("Field can't be Empty");
-                    progressBar.setVisibility(View.INVISIBLE);
-                    return;
-                }else if(numberOfSeats.length()==0){
-                    numberOfSeats.requestFocus();
-                    numberOfSeats.setError("Field can't be Empty");
-                    progressBar.setVisibility(View.INVISIBLE);
-                    return;
-                }
-                tableClass tableClass = new tableClass(numberOfSeats.getText().toString(),tableNumber.getText().toString());
-                tableRef.child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(Objects.requireNonNull(tableAuth.getCurrentUser()).getUid())).child("Tables").child(tableNumber.getText().toString())
-                        .setValue(tableClass)
-                        .addOnCompleteListener(new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Void> task) {
-                                if(task.isSuccessful()){
-                                    Toast.makeText(AddTables.this, "Table added Successfully", Toast.LENGTH_SHORT).show();
-                                    progressBar.setVisibility(View.INVISIBLE);
-                                }
-                            }
-                        }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
+        generateQrCode.setOnClickListener(view -> {
+            progressBar.setVisibility(View.VISIBLE);
+            if(tableNumber.length() == 0){
+                tableNumber.requestFocus();
+                tableNumber.setError("Field can't be Empty");
+                progressBar.setVisibility(View.INVISIBLE);
+                return;
+            }else if(numberOfSeats.length()==0){
+                numberOfSeats.requestFocus();
+                numberOfSeats.setError("Field can't be Empty");
+                progressBar.setVisibility(View.INVISIBLE);
+                return;
+            }
+            tableClass tableClass = new tableClass(numberOfSeats.getText().toString(),tableNumber.getText().toString());
+            tableRef.child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(Objects.requireNonNull(tableAuth.getCurrentUser()).getUid())).child("Tables").child(tableNumber.getText().toString())
+                    .setValue(tableClass)
+                    .addOnCompleteListener(task -> {
+                        if(task.isSuccessful()){
+                            Toast.makeText(AddTables.this, "Table added Successfully", Toast.LENGTH_SHORT).show();
+                            progressBar.setVisibility(View.INVISIBLE);
+                        }
+                    }).addOnFailureListener(e -> {
                         Toast.makeText(AddTables.this, e.getMessage()+"", Toast.LENGTH_SHORT).show();
                         progressBar.setVisibility(View.INVISIBLE);
-                    }
-                });
-
-                QRCodeWriter writer = new QRCodeWriter();
-                try {
-                    BitMatrix bitMatrix = writer.encode(tableAuth.getUid() + "," + tableNumber.getText().toString() + "," + sharedPreferences.getString("state","") + "," + "FastwayQR", BarcodeFormat.QR_CODE, 512, 512);
-                    int width = bitMatrix.getWidth();
-                    int height = bitMatrix.getHeight();
-                    Bitmap bmp = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
-                    for (int x = 0; x < width; x++) {
-                        for (int y = 0; y < height; y++) {
-                            bmp.setPixel(x, y, bitMatrix.get(x, y) ? Color.BLACK : Color.WHITE);
-                        }
-                    }
-//                    Toast.makeText(AddTables.this, "Click on Image to download it..", Toast.LENGTH_SHORT).show();
-                    ((ImageView) findViewById(R.id.img_result_qr)).setImageBitmap(bmp);
-
-                    BitmapDrawable draw = (BitmapDrawable) imageView.getDrawable();
-                    Bitmap bitmap = draw.getBitmap();
-
-                    FileOutputStream outStream = null;
-                    File sdCard = Environment.getExternalStorageDirectory();
-                    File dir = new File(sdCard.getAbsolutePath());
-                    dir.mkdirs();
-                    String fileName = String.format("Table " + tableNumber.getText().toString() + ".jpg", "Table " + tableNumber.getText().toString());
-                    File outFile = new File(dir, fileName);
-
-                    try {
-                        outStream = new FileOutputStream(outFile);
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
-                    }
-                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outStream);
-                    try {
-                        assert outStream != null;
-                        outStream.flush();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    try {
-                        outStream.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-
-                    Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-                    intent.setData(Uri.fromFile(outFile));
-                    sendBroadcast(intent);
-                    Toast.makeText(AddTables.this, "Image and PDF saved in Root directory. Check your Internal Storage", Toast.LENGTH_SHORT).show();
-
-                    Document document = new Document();
-
-                    String directoryPath = android.os.Environment.getExternalStorageDirectory().toString();
-
-                    try {
-                        PdfWriter.getInstance(document, new FileOutputStream(directoryPath + "/Table " + tableNumber.getText().toString() +".pdf")); //  Change pdf name.
-                    } catch (DocumentException e) {
-                        Toast.makeText(AddTables.this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
-                    } catch (FileNotFoundException e) {
-                        Toast.makeText(AddTables.this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
-                    }
-
-                    document.open();
-
-                    Image image = null;  // Change image's name and extension.
-                    try {
-                        image = Image.getInstance(directoryPath + "/Table " + tableNumber.getText().toString() + ".jpg");
-                    } catch (BadElementException e) {
-                        Toast.makeText(AddTables.this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
-                    } catch (IOException e) {
-                        Toast.makeText(AddTables.this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
-                    }
-
-                    float scaler = ((document.getPageSize().getWidth() - document.leftMargin()
-                            - document.rightMargin() - 0) / image.getWidth()) * 100; // 0 means you have no indentation. If you have any, change it.
-                    image.scalePercent(scaler);
-                    image.setAlignment(Image.ALIGN_CENTER | Image.ALIGN_TOP);
-
-                    try {
-                        document.add(image);
-                    } catch (DocumentException e) {
-                        Toast.makeText(AddTables.this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                    document.close();
-
-                    imageView.setDrawingCacheEnabled(true);
-                    imageView.buildDrawingCache();
-                    Bitmap map = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-                    byte[] data = baos.toByteArray();
-
-                    UploadTask uploadTask = reference.child(tableAuth.getUid()+"/"+tableNumber.getText().toString()).putBytes(data);
-                    uploadTask.addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception exception) {
-                            Toast.makeText(AddTables.this, "" + exception.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
-                        }
-                    }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                            // taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
-                            // ...
-                        }
                     });
 
-                    PdfDocument pdfDocument = new PdfDocument();
-                    Paint myPaint = new Paint();
-                    PdfDocument.PageInfo myPage = new  PdfDocument.PageInfo.Builder(1024,720,1).create();
-                    PdfDocument.Page page = pdfDocument.startPage(myPage);
-
-                    Paint text = new Paint();
-
-                    Canvas canvas = page.getCanvas();
-
-                    canvas.drawBitmap(bitmap,275,70,myPaint);
-                    text.setTextAlign(Paint.Align.LEFT);
-                    text.setTypeface(Typeface.create(Typeface.DEFAULT,Typeface.BOLD));
-                    text.setTextSize(70);
-                    canvas.drawText("Table Number: " + tableNumber.getText().toString(),275,85,text);
-                    canvas.drawText("Seats: " + numberOfSeats.getText().toString(),395,595,text);
-
-                    pdfDocument.finishPage(page);
-
-                    String fileNames = "/Table " + tableNumber.getText().toString() + ".pdf";
-                    File file = new File(Environment.getExternalStorageDirectory() + fileNames);
-
-                    try{
-                        pdfDocument.writeTo(new FileOutputStream(file));
-                    } catch (IOException e) {
-                        e.printStackTrace();
+            QRCodeWriter writer = new QRCodeWriter();
+            try {
+                BitMatrix bitMatrix = writer.encode(tableAuth.getUid() + "," + tableNumber.getText().toString() + "," + sharedPreferences.getString("state","") + "," + "FastwayQR", BarcodeFormat.QR_CODE, 512, 512);
+                int width = bitMatrix.getWidth();
+                int height = bitMatrix.getHeight();
+                Bitmap bmp = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
+                for (int x = 0; x < width; x++) {
+                    for (int y = 0; y < height; y++) {
+                        bmp.setPixel(x, y, bitMatrix.get(x, y) ? Color.BLACK : Color.WHITE);
                     }
+                }
+//                    Toast.makeText(AddTables.this, "Click on Image to download it..", Toast.LENGTH_SHORT).show();
+                ((ImageView) findViewById(R.id.img_result_qr)).setImageBitmap(bmp);
 
-                    pdfDocument.close();
+                BitmapDrawable draw = (BitmapDrawable) imageView.getDrawable();
+                Bitmap bitmap = draw.getBitmap();
 
-                } catch (WriterException e) {
+                FileOutputStream outStream = null;
+                File sdCard = Environment.getExternalStorageDirectory();
+                File dir = new File(sdCard.getAbsolutePath());
+                dir.mkdirs();
+                String fileName = String.format("Table " + tableNumber.getText().toString() + ".jpg", "Table " + tableNumber.getText().toString());
+                File outFile = new File(dir, fileName);
+
+                try {
+                    outStream = new FileOutputStream(outFile);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outStream);
+                try {
+                    assert outStream != null;
+                    outStream.flush();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    outStream.close();
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
 
+
+                Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+                intent.setData(Uri.fromFile(outFile));
+                sendBroadcast(intent);
+                Toast.makeText(AddTables.this, "Image and PDF saved in Root directory. Check your Internal Storage", Toast.LENGTH_SHORT).show();
+
+                Document document = new Document();
+
+                String directoryPath = Environment.getExternalStorageDirectory().toString();
+
+                try {
+                    PdfWriter.getInstance(document, new FileOutputStream(directoryPath + "/Table " + tableNumber.getText().toString() +".pdf")); //  Change pdf name.
+                } catch (DocumentException e) {
+                    Toast.makeText(AddTables.this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                } catch (FileNotFoundException e) {
+                    Toast.makeText(AddTables.this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                }
+
+                document.open();
+
+                Image image = null;  // Change image's name and extension.
+                try {
+                    image = Image.getInstance(directoryPath + "/Table " + tableNumber.getText().toString() + ".jpg");
+                } catch (BadElementException | IOException e) {
+                    Toast.makeText(AddTables.this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                }
+
+                float scaler = ((document.getPageSize().getWidth() - document.leftMargin()
+                        - document.rightMargin() - 0) / image.getWidth()) * 100; // 0 means you have no indentation. If you have any, change it.
+                image.scalePercent(scaler);
+                image.setAlignment(Image.ALIGN_CENTER | Image.ALIGN_TOP);
+
+                try {
+                    document.add(image);
+                } catch (DocumentException e) {
+                    Toast.makeText(AddTables.this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                }
+                document.close();
+
+                imageView.setDrawingCacheEnabled(true);
+                imageView.buildDrawingCache();
+                Bitmap map = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+                byte[] data = baos.toByteArray();
+
+                UploadTask uploadTask = reference.child(tableAuth.getUid()+"/"+tableNumber.getText().toString()).putBytes(data);
+                uploadTask.addOnFailureListener(exception -> Toast.makeText(AddTables.this, "" + exception.getLocalizedMessage(), Toast.LENGTH_SHORT).show()).addOnSuccessListener(taskSnapshot -> {
+                    // taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
+                    // ...
+                });
+
+                PdfDocument pdfDocument = new PdfDocument();
+                Paint myPaint = new Paint();
+                PdfDocument.PageInfo myPage = new  PdfDocument.PageInfo.Builder(1024,720,1).create();
+                PdfDocument.Page page = pdfDocument.startPage(myPage);
+
+                Paint text = new Paint();
+
+                Canvas canvas = page.getCanvas();
+
+                canvas.drawBitmap(bitmap,275,70,myPaint);
+                text.setTextAlign(Paint.Align.LEFT);
+                text.setTypeface(Typeface.create(Typeface.DEFAULT,Typeface.BOLD));
+                text.setTextSize(70);
+                canvas.drawText("Table Number: " + tableNumber.getText().toString(),275,85,text);
+                canvas.drawText("Seats: " + numberOfSeats.getText().toString(),395,595,text);
+
+                pdfDocument.finishPage(page);
+
+                String fileNames = "/Table " + tableNumber.getText().toString() + ".pdf";
+                File file = new File(Environment.getExternalStorageDirectory() + fileNames);
+
+                try{
+                    pdfDocument.writeTo(new FileOutputStream(file));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                pdfDocument.close();
+
+            } catch (WriterException e) {
+                e.printStackTrace();
             }
+
         });
     }
 

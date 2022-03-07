@@ -43,6 +43,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
@@ -58,6 +59,7 @@ public class DiscountActivity extends AppCompatActivity {
     String resName;
     String URL = "https://fcm.googleapis.com/fcm/send";
     List<String> name = new ArrayList<>();
+    List<String> image = new ArrayList<>();
     HashMap<String,String> map = new HashMap<>();
     RecyclerView recyclerView;
 
@@ -85,8 +87,8 @@ public class DiscountActivity extends AppCompatActivity {
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
                             if (snapshot.exists()) {
                                 name.clear();
+                                map.clear();
                                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-
                                     for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
                                         if (dataSnapshot1.exists() && String.valueOf(dataSnapshot1.child("mrp").getValue()).equals("no")) {
                                             map.put(dataSnapshot1.child("name").getValue(String.class), dataSnapshot.getKey());
@@ -95,7 +97,7 @@ public class DiscountActivity extends AppCompatActivity {
                                     }
                                 }
                                 recyclerView.setLayoutManager(new LinearLayoutManager(DiscountActivity.this));
-                                recyclerView.setAdapter(new DiscountRecycler(map,DiscountActivity.this,name));
+                                recyclerView.setAdapter(new DiscountRecycler(map,DiscountActivity.this,name,image));
                             }
                         }
 
@@ -104,6 +106,7 @@ public class DiscountActivity extends AppCompatActivity {
 
                         }
                     });
+                    return;
                 }
 
                 String searchText = charSequence.toString();
@@ -113,16 +116,21 @@ public class DiscountActivity extends AppCompatActivity {
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         if (snapshot.exists()) {
                             name.clear();
+                            map.clear();
                             for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                                 for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
-                                    if (dataSnapshot1.exists() && String.valueOf(dataSnapshot1.child("mrp").getValue()).equals("no") && dataSnapshot1.child("name").getValue(String.class).contains(searchText)) {
+                                    if (dataSnapshot1.exists() && String.valueOf(dataSnapshot1.child("mrp").getValue()).equals("no") && Objects.requireNonNull(dataSnapshot1.child("name").getValue(String.class).toLowerCase(Locale.ROOT)).contains(searchText.toLowerCase(Locale.ROOT))) {
                                         map.put(dataSnapshot1.child("name").getValue(String.class), dataSnapshot.getKey());
                                         name.add(dataSnapshot1.child("name").getValue(String.class));
+                                        if(dataSnapshot1.hasChild("image"))
+                                            image.add(String.valueOf(dataSnapshot1.child("image").getValue()));
+                                        else
+                                            image.add("");
                                     }
                                 }
                             }
                             recyclerView.setLayoutManager(new LinearLayoutManager(DiscountActivity.this));
-                            recyclerView.setAdapter(new DiscountRecycler(map,DiscountActivity.this,name));
+                            recyclerView.setAdapter(new DiscountRecycler(map,DiscountActivity.this,name,image));
                         }
                     }
 
@@ -143,11 +151,16 @@ public class DiscountActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
                     name.clear();
+                    map.clear();
                     for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                         for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
                             if (dataSnapshot1.exists() && String.valueOf(dataSnapshot1.child("mrp").getValue()).equals("no")) {
                                 map.put(dataSnapshot1.child("name").getValue(String.class), dataSnapshot.getKey());
                                 name.add(dataSnapshot1.child("name").getValue(String.class));
+                                if(dataSnapshot1.hasChild("image"))
+                                    image.add(String.valueOf(dataSnapshot1.child("image").getValue()));
+                                else
+                                    image.add("");
                             }
                         }
                     }
@@ -162,13 +175,10 @@ public class DiscountActivity extends AppCompatActivity {
 
         FlatDialog flatDialog = new FlatDialog(DiscountActivity.this);
         flatDialog.setCanceledOnTouchOutside(true);
-        flatDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-            @Override
-            public void onCancel(DialogInterface dialog) {
-                dialog.dismiss();
-                Toast.makeText(DiscountActivity.this, "Cancelled", Toast.LENGTH_SHORT).show();
-                finish();
-            }
+        flatDialog.setOnCancelListener(dialog -> {
+            dialog.dismiss();
+            Toast.makeText(DiscountActivity.this, "Cancelled", Toast.LENGTH_SHORT).show();
+            finish();
         });
         flatDialog.setTitle("Choose One Option")
                 .setTitleColor(Color.BLACK)
@@ -179,74 +189,56 @@ public class DiscountActivity extends AppCompatActivity {
                 .setSecondButtonColor(Color.parseColor("#fee9b2"))
                 .setSecondButtonTextColor(Color.parseColor("#000000"))
                 .setSecondButtonText("LET ME CHOOSE")
-                .withFirstButtonListner(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        FlatDialog flatDialog1 = new FlatDialog(DiscountActivity.this);
-                        flatDialog1.setCanceledOnTouchOutside(true);
-                        flatDialog1.setOnCancelListener(new DialogInterface.OnCancelListener() {
-                            @Override
-                            public void onCancel(DialogInterface dialogInterface) {
-                                finish();
-                                Toast.makeText(DiscountActivity.this, "Cancelled", Toast.LENGTH_SHORT).show();
-                                dialogInterface.dismiss();
-                            }
-                        });
-                        flatDialog1.setTitle("Choose One Option")
-                                .setSubtitle("Only Applicable for items above 149")
-                                .setSubtitleColor(Color.BLACK)
-                                .setTitleColor(Color.BLACK)
-                                .setBackgroundColor(Color.parseColor("#f9fce1"))
-                                .setFirstButtonColor(Color.parseColor("#d3f6f3"))
-                                .setFirstButtonTextColor(Color.parseColor("#000000"))
-                                .setFirstButtonText("50% OFF ON ALL")
-                                .setSecondButtonColor(Color.parseColor("#fee9b2"))
-                                .setSecondButtonTextColor(Color.parseColor("#000000"))
-                                .setSecondButtonText("40% OFF ON ALL")
-                                .setThirdButtonText("ADD YOUR OWN")
-                                .setThirdButtonColor(Color.parseColor("#fbd1b7"))
-                                .setThirdButtonTextColor(Color.parseColor("#000000"))
-                                .setFirstTextFieldHint("Enter How much discount!!")
-                                .setFirstTextFieldBorderColor(Color.BLACK)
-                                .setFirstTextFieldHintColor(Color.BLACK)
-                                .setFirstTextFieldTextColor(Color.BLACK)
-                                .withFirstButtonListner(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View view) {
-                                        fiftyDiscount();
-                                        flatDialog1.dismiss();
-                                    }
-                                })
-                                .withSecondButtonListner(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View view) {
-                                        fourtyDiscount();
-                                        flatDialog1.dismiss();
-                                    }
-                                })
-                                .withThirdButtonListner(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View view) {
-                                        if (flatDialog1.getFirstTextField().equals("")) {
+                .withFirstButtonListner(view -> {
+                    FlatDialog flatDialog1 = new FlatDialog(DiscountActivity.this);
+                    flatDialog1.setCanceledOnTouchOutside(true);
+                    flatDialog1.setOnCancelListener(dialogInterface -> {
+                        finish();
+                        Toast.makeText(DiscountActivity.this, "Cancelled", Toast.LENGTH_SHORT).show();
+                        dialogInterface.dismiss();
+                    });
+                    flatDialog1.setTitle("Choose One Option")
+                            .setSubtitle("Only Applicable for items above 149")
+                            .setSubtitleColor(Color.BLACK)
+                            .setTitleColor(Color.BLACK)
+                            .setBackgroundColor(Color.parseColor("#f9fce1"))
+                            .setFirstButtonColor(Color.parseColor("#d3f6f3"))
+                            .setFirstButtonTextColor(Color.parseColor("#000000"))
+                            .setFirstButtonText("50% OFF ON ALL")
+                            .setSecondButtonColor(Color.parseColor("#fee9b2"))
+                            .setSecondButtonTextColor(Color.parseColor("#000000"))
+                            .setSecondButtonText("40% OFF ON ALL")
+                            .setThirdButtonText("ADD YOUR OWN")
+                            .setThirdButtonColor(Color.parseColor("#fbd1b7"))
+                            .setThirdButtonTextColor(Color.parseColor("#000000"))
+                            .setFirstTextFieldHint("Enter How much discount!!")
+                            .setFirstTextFieldBorderColor(Color.BLACK)
+                            .setFirstTextFieldHintColor(Color.BLACK)
+                            .setFirstTextFieldTextColor(Color.BLACK)
+                            .withFirstButtonListner(view1 -> {
+                                fiftyDiscount();
+                                flatDialog1.dismiss();
+                            })
+                            .withSecondButtonListner(view12 -> {
+                                fourtyDiscount();
+                                flatDialog1.dismiss();
+                            })
+                            .withThirdButtonListner(view13 -> {
+                                if (flatDialog1.getFirstTextField().equals("")) {
 
-                                            Toast.makeText(DiscountActivity.this, "Field Can't be Empty", Toast.LENGTH_SHORT).show();
-                                            return;
-                                        } else {
-                                            customDiscount(flatDialog1.getFirstTextField());
-                                            flatDialog1.dismiss();
-                                        }
-                                    }
-                                }).show();
-                        flatDialog.dismiss();
-                    }
+                                    Toast.makeText(DiscountActivity.this, "Field Can't be Empty", Toast.LENGTH_SHORT).show();
+                                    return;
+                                } else {
+                                    customDiscount(flatDialog1.getFirstTextField());
+                                    flatDialog1.dismiss();
+                                }
+                            }).show();
+                    flatDialog.dismiss();
                 })
-                .withSecondButtonListner(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        recyclerView.setLayoutManager(new LinearLayoutManager(DiscountActivity.this));
-                        recyclerView.setAdapter(new DiscountRecycler(map,DiscountActivity.this,name));
-                        flatDialog.dismiss();
-                    }
+                .withSecondButtonListner(view -> {
+                    recyclerView.setLayoutManager(new LinearLayoutManager(DiscountActivity.this));
+                    recyclerView.setAdapter(new DiscountRecycler(map,DiscountActivity.this,name,image));
+                    flatDialog.dismiss();
                 }).show();
     }
 
@@ -484,12 +476,7 @@ public class DiscountActivity extends AppCompatActivity {
 
             JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, main, response -> {
 
-            }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    Toast.makeText(DiscountActivity.this, error.getLocalizedMessage()+"null", Toast.LENGTH_SHORT).show();
-                }
-            }){
+            }, error -> Toast.makeText(DiscountActivity.this, error.getLocalizedMessage()+"null", Toast.LENGTH_SHORT).show()){
                 @Override
                 public Map<String, String> getHeaders() throws AuthFailureError {
                     Map<String,String> header = new HashMap<>();
