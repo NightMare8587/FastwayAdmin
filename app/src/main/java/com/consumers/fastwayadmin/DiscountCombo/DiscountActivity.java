@@ -1,6 +1,5 @@
 package com.consumers.fastwayadmin.DiscountCombo;
 
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -8,7 +7,6 @@ import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -18,11 +16,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.consumers.fastwayadmin.R;
@@ -227,7 +222,6 @@ public class DiscountActivity extends AppCompatActivity {
                                 if (flatDialog1.getFirstTextField().equals("")) {
 
                                     Toast.makeText(DiscountActivity.this, "Field Can't be Empty", Toast.LENGTH_SHORT).show();
-                                    return;
                                 } else {
                                     customDiscount(flatDialog1.getFirstTextField());
                                     flatDialog1.dismiss();
@@ -254,14 +248,9 @@ public class DiscountActivity extends AppCompatActivity {
 
             JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, main, response -> {
 
-            }, new Response.ErrorListener() {
+            }, error -> Toast.makeText(DiscountActivity.this, error.getLocalizedMessage()+"null", Toast.LENGTH_SHORT).show()){
                 @Override
-                public void onErrorResponse(VolleyError error) {
-                    Toast.makeText(DiscountActivity.this, error.getLocalizedMessage()+"null", Toast.LENGTH_SHORT).show();
-                }
-            }){
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
+                public Map<String, String> getHeaders() {
                     Map<String,String> header = new HashMap<>();
                     header.put("content-type","application/json");
                     header.put("authorization","key=AAAAsigSEMs:APA91bEUF9ZFwIu84Jctci56DQd0TQOepztGOIKIBhoqf7N3ueQrkClw0xBTlWZEWyvwprXZmZgW2MNywF1pNBFpq1jFBr0CmlrJ0wygbZIBOnoZ0jP1zZC6nPxqF2MAP6iF3wuBHD2R");
@@ -326,12 +315,9 @@ public class DiscountActivity extends AppCompatActivity {
 
                 builder.show();
 
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        builder.dismiss();
-                        finish();
-                    }
+                new Handler().postDelayed(() -> {
+                    builder.dismiss();
+                    finish();
                 },3000);
             }
 
@@ -356,14 +342,9 @@ public class DiscountActivity extends AppCompatActivity {
 
             JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, main, response -> {
 
-            }, new Response.ErrorListener() {
+            }, error -> Toast.makeText(DiscountActivity.this, error.getLocalizedMessage()+"null", Toast.LENGTH_SHORT).show()){
                 @Override
-                public void onErrorResponse(VolleyError error) {
-                    Toast.makeText(DiscountActivity.this, error.getLocalizedMessage()+"null", Toast.LENGTH_SHORT).show();
-                }
-            }){
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
+                public Map<String, String> getHeaders() {
                     Map<String,String> header = new HashMap<>();
                     header.put("content-type","application/json");
                     header.put("authorization","key=AAAAsigSEMs:APA91bEUF9ZFwIu84Jctci56DQd0TQOepztGOIKIBhoqf7N3ueQrkClw0xBTlWZEWyvwprXZmZgW2MNywF1pNBFpq1jFBr0CmlrJ0wygbZIBOnoZ0jP1zZC6nPxqF2MAP6iF3wuBHD2R");
@@ -429,12 +410,9 @@ public class DiscountActivity extends AppCompatActivity {
 
                 builder.show();
 
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                       builder.dismiss();
-                        finish();
-                    }
+                new Handler().postDelayed(() -> {
+                   builder.dismiss();
+                    finish();
                 },3000);
                 }
 
@@ -478,7 +456,7 @@ public class DiscountActivity extends AppCompatActivity {
 
             }, error -> Toast.makeText(DiscountActivity.this, error.getLocalizedMessage()+"null", Toast.LENGTH_SHORT).show()){
                 @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
+                public Map<String, String> getHeaders() {
                     Map<String,String> header = new HashMap<>();
                     header.put("content-type","application/json");
                     header.put("authorization","key=AAAAsigSEMs:APA91bEUF9ZFwIu84Jctci56DQd0TQOepztGOIKIBhoqf7N3ueQrkClw0xBTlWZEWyvwprXZmZgW2MNywF1pNBFpq1jFBr0CmlrJ0wygbZIBOnoZ0jP1zZC6nPxqF2MAP6iF3wuBHD2R");
@@ -544,12 +522,9 @@ public class DiscountActivity extends AppCompatActivity {
 
                 builder.show();
 
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        builder.dismiss();
-                        finish();
-                    }
+                new Handler().postDelayed(() -> {
+                    builder.dismiss();
+                    finish();
                 },3000);
             }
 
