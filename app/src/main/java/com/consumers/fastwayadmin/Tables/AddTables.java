@@ -122,7 +122,7 @@ public class AddTables extends AppCompatActivity {
                 Bitmap bitmap = draw.getBitmap();
 
                 FileOutputStream outStream = null;
-                File sdCard = Environment.getExternalStorageDirectory();
+                File sdCard = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
                 File dir = new File(sdCard.getAbsolutePath());
                 dir.mkdirs();
                 String fileName = String.format("Table " + tableNumber.getText().toString() + ".jpg", "Table " + tableNumber.getText().toString());
@@ -154,13 +154,11 @@ public class AddTables extends AppCompatActivity {
 
                 Document document = new Document();
 
-                String directoryPath = Environment.getExternalStorageDirectory().toString();
+                String directoryPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).toString();
 
                 try {
                     PdfWriter.getInstance(document, new FileOutputStream(directoryPath + "/Table " + tableNumber.getText().toString() +".pdf")); //  Change pdf name.
-                } catch (DocumentException e) {
-                    Toast.makeText(AddTables.this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
-                } catch (FileNotFoundException e) {
+                } catch (DocumentException | FileNotFoundException e) {
                     Toast.makeText(AddTables.this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                 }
 
@@ -187,7 +185,7 @@ public class AddTables extends AppCompatActivity {
 
                 imageView.setDrawingCacheEnabled(true);
                 imageView.buildDrawingCache();
-                Bitmap map = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
+//                Bitmap map = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
                 byte[] data = baos.toByteArray();
@@ -217,7 +215,7 @@ public class AddTables extends AppCompatActivity {
                 pdfDocument.finishPage(page);
 
                 String fileNames = "/Table " + tableNumber.getText().toString() + ".pdf";
-                File file = new File(Environment.getExternalStorageDirectory() + fileNames);
+                File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS) + fileNames);
 
                 try{
                     pdfDocument.writeTo(new FileOutputStream(file));
@@ -244,21 +242,13 @@ public class AddTables extends AppCompatActivity {
                 AlertDialog.Builder builder = new AlertDialog.Builder(AddTables.this);
                 builder.setTitle("Important").setCancelable(false)
                         .setMessage("External storage is required for proper functioning of app. Wanna provide permission???")
-                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                if (ContextCompat.checkSelfPermission(AddTables.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                                        requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
-                                    }
+                        .setPositiveButton("Yes", (dialogInterface, i) -> {
+                            if (ContextCompat.checkSelfPermission(AddTables.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                    requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
                                 }
                             }
-                        }).setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                    }
-                }).create();
+                        }).setNegativeButton("No", (dialogInterface, i) -> dialogInterface.dismiss()).create();
                 builder.show();
             }
         }

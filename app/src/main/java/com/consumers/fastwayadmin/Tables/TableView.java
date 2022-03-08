@@ -91,8 +91,6 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
     @Override
     public void onBindViewHolder(@NonNull TableAdapter holder, @SuppressLint("RecyclerView") int position) {
         auth = FirebaseAuth.getInstance();
-
-
         holder.tableNum.setText("Table Number : " + tables.get(position));
         holder.status.setText(status.get(position));
         if(status.get(position).equals("unavailable")){
@@ -204,18 +202,15 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
             holder.checkBox.setVisibility(View.VISIBLE);
         }
 
-        holder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                SharedPreferences sharedPreferences = compoundButton.getContext().getSharedPreferences("loginInfo",Context.MODE_PRIVATE);
-                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid())).child("Tables").child(tables.get(position));
-                if(b){
-                    databaseReference.child("status").setValue("available");
-                    holder.checkBox.setText("Enabled");
-                }else{
-                    databaseReference.child("status").setValue("NotAvailable");
-                    holder.checkBox.setText("Disabled");
-                }
+        holder.checkBox.setOnCheckedChangeListener((compoundButton, b) -> {
+            SharedPreferences sharedPreferences = compoundButton.getContext().getSharedPreferences("loginInfo",Context.MODE_PRIVATE);
+            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid())).child("Tables").child(tables.get(position));
+            if(b){
+                databaseReference.child("status").setValue("available");
+                holder.checkBox.setText("Enabled");
+            }else{
+                databaseReference.child("status").setValue("NotAvailable");
+                holder.checkBox.setText("Disabled");
             }
         });
 
@@ -664,7 +659,7 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
                                               @Override
                                               public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
                                                   try {
-                                                      String root = Environment.getExternalStorageDirectory().toString();
+                                                      String root = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).toString();
                                                       File myDir = new File(root);
 
                                                       if (!myDir.exists()) {
@@ -675,7 +670,7 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
                                                       myDir = new File(myDir, name);
                                                       FileOutputStream out = new FileOutputStream(myDir);
                                                       bitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);
-
+                                                      Toast.makeText(context, "Image Saved Successfully", Toast.LENGTH_SHORT).show();
                                                       out.flush();
                                                       out.close();
                                                   } catch(Exception e){
