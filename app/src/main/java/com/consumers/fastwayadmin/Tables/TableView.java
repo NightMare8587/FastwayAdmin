@@ -84,9 +84,7 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
         View view = inflater.inflate(R.layout.table_info,parent,false);
         return new TableAdapter(view);
     }
-
-
-
+    
     @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull TableAdapter holder, @SuppressLint("RecyclerView") int position) {
