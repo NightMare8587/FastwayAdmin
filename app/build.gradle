@@ -104,5 +104,11 @@ dependencies {
 
     implementation 'com.google.firebase:firebase-dynamic-links'
     implementation 'com.google.firebase:firebase-analytics'
+    compile (group: 'com.aspose', name: 'aspose-words', version: '20.2', classifier: 'android.via.java')
+    compile (
+            group: 'com.aspose',
+            name: 'aspose-cells',
+            version: '21.3',
+            classifier: 'android.via.java')
 
 }

@@ -20,6 +20,9 @@ allprojects {
         jcenter()
         maven { url "https://jitpack.io" }
         maven { url 'https://maven.cashfree.com/release'}
+        maven { url "https://repository.aspose.com/webapp/#/artifacts/browse/tree/General/repo/" }
+        maven {
+            url "https://repository.aspose.com/repo/" }
     }
 }
 

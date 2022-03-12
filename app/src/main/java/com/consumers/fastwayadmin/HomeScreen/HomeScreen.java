@@ -8,6 +8,9 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.StrictMode;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,6 +25,8 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.aspose.cells.SaveFormat;
+import com.aspose.cells.Workbook;
 import com.consumers.fastwayadmin.Chat.RandomChatFolder.RandomChatWithUsers;
 import com.consumers.fastwayadmin.Info.RestaurantDocuments.ReUploadDocumentsAgain;
 import com.consumers.fastwayadmin.NavFrags.AccountFrag;
@@ -43,6 +48,7 @@ import com.google.firebase.messaging.FirebaseMessaging;
 
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -55,6 +61,7 @@ public class HomeScreen extends AppCompatActivity {
     String URL = "https://fcm.googleapis.com/fcm/send";
     FragmentManager manager;
     SharedPreferences sharedPreferences;
+    SharedPreferences.Editor myEditor;
     FirebaseAuth auth = FirebaseAuth.getInstance();
     long currentTime = System.currentTimeMillis();
     Timer timer = new Timer();
@@ -68,6 +75,7 @@ public class HomeScreen extends AppCompatActivity {
         setContentView(R.layout.activity_home_screen);
         initialise();
         sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
+        myEditor = sharedPreferences.edit();
         manager.beginTransaction().replace(R.id.homescreen,new HomeFrag()).commit();
         ConnectivityManager cm =
                 (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -91,6 +99,28 @@ public class HomeScreen extends AppCompatActivity {
                     break;
             }
         });
+        StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+        StrictMode.setVmPolicy(builder.build());
+        File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
+        Workbook workbook;
+        if(!sharedPreferences.contains("workbookCreated")) {
+            try {
+                workbook = new Workbook();
+                workbook.getWorksheets().get(0).getCells().get("A1").putValue("Hello World My Name!");
+                workbook.getWorksheets().get(0).getCells().get("A2").putValue("Pulli Oya!");
+                try {
+                    workbook.save(path + "/ResTransactions.xlsx", SaveFormat.XLSX);
+                    Log.i("info","FILE SAVED");
+                    Toast.makeText(this, "File saved", Toast.LENGTH_SHORT).show();
+                    myEditor.putString("workbookCreated","yes");
+                    myEditor.apply();
+                } catch (Exception e) {
+                    Log.i("info",e.getLocalizedMessage());
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
 
         DatabaseReference myRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(UID).child("Restaurant Documents");
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(UID)).child("Tables");
