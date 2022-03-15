@@ -69,25 +69,22 @@ public class CurrentTakeAway extends RecyclerView.Adapter<CurrentTakeAway.Holder
                 view.getContext().startActivity(intent);
             }
         });
-        holder.checkOrder.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(view.getContext(),ApproveCurrentTakeAway.class);
-                List<String> dishQuantityCurrentTakeAway = new ArrayList<>(finalDishQuantity.get(position));
-                intent.putExtra("id",currentTakeAwayAuth.get(position));
-                List<String> dishNameCurrentTakeAway = new ArrayList<>(finalDishNames.get(position));
-                List<String> halfOr = new ArrayList<>(finalHalfOr.get(position));
-                intent.putStringArrayListExtra("dishName", (ArrayList<String>) dishNameCurrentTakeAway);
-                intent.putStringArrayListExtra("DishQ",(ArrayList<String>) dishQuantityCurrentTakeAway);
-                intent.putStringArrayListExtra("halfOr",(ArrayList<String>) halfOr);
-                intent.putExtra("orderID",orderId.get(position));
-                intent.putExtra("payment",finalPayment.get(position));
-                intent.putExtra("time",time.get(position));
-                intent.putExtra("orderAmount",orderAmount.get(position));
-                intent.putExtra("customisation",customisationList.get(position));
-                Log.i("log",customisationList.get(position));
-                view.getContext().startActivity(intent);
-            }
+        holder.checkOrder.setOnClickListener(view -> {
+            Intent intent = new Intent(view.getContext(),ApproveCurrentTakeAway.class);
+            List<String> dishQuantityCurrentTakeAway = new ArrayList<>(finalDishQuantity.get(position));
+            intent.putExtra("id",currentTakeAwayAuth.get(position));
+            List<String> dishNameCurrentTakeAway = new ArrayList<>(finalDishNames.get(position));
+            List<String> halfOr = new ArrayList<>(finalHalfOr.get(position));
+            intent.putStringArrayListExtra("dishName", (ArrayList<String>) dishNameCurrentTakeAway);
+            intent.putStringArrayListExtra("DishQ",(ArrayList<String>) dishQuantityCurrentTakeAway);
+            intent.putStringArrayListExtra("halfOr",(ArrayList<String>) halfOr);
+            intent.putExtra("orderID",orderId.get(position));
+            intent.putExtra("payment",finalPayment.get(position));
+            intent.putExtra("time",time.get(position));
+            intent.putExtra("orderAmount",orderAmount.get(position));
+            intent.putExtra("customisation",customisationList.get(position));
+            Log.i("log",customisationList.get(position));
+            view.getContext().startActivity(intent);
         });
     }
 

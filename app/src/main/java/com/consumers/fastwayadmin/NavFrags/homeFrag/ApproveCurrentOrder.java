@@ -2,6 +2,7 @@ package com.consumers.fastwayadmin.NavFrags.homeFrag;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -162,6 +163,44 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                     }).create();
 
                     alert.show();
+                }
+
+                if(System.currentTimeMillis() - Long.parseLong(time) >= 600000){
+                    AlertDialog.Builder builder = new AlertDialog.Builder(ApproveCurrentOrder.this);
+                    RequestQueue requestQueue = Volley.newRequestQueue(ApproveCurrentOrder.this);
+                    JSONObject main = new JSONObject();
+                    new GenratePDF().execute();
+                    FirebaseAuth auth = FirebaseAuth.getInstance();
+                    DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(Objects.requireNonNull(auth.getUid())).child("Tables").child(table);
+                    new InitiateRefund().execute();
+                    try {
+                        main.put("to", "/topics/" + id + "");
+                        JSONObject notification = new JSONObject();
+                        notification.put("title", "Order Cancelled");
+                        notification.put("click_action", "Table Frag");
+                        notification.put("body", "Your order is cancelled because it was neither approved not denied. Refund will be initiated Shortly");
+                        main.put("notification", notification);
+
+                        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, main, response -> {
+
+                        }, error -> Toast.makeText(ApproveCurrentOrder.this, error.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show()) {
+                            @Override
+                            public Map<String, String> getHeaders() {
+                                Map<String, String> header = new HashMap<>();
+                                header.put("content-type", "application/json");
+                                header.put("authorization", "key=AAAAsigSEMs:APA91bEUF9ZFwIu84Jctci56DQd0TQOepztGOIKIBhoqf7N3ueQrkClw0xBTlWZEWyvwprXZmZgW2MNywF1pNBFpq1jFBr0CmlrJ0wygbZIBOnoZ0jP1zZC6nPxqF2MAP6iF3wuBHD2R");
+                                return header;
+                            }
+                        };
+                        reference.child("Current Order").removeValue();
+                        requestQueue.add(jsonObjectRequest);
+                    } catch (Exception e) {
+                        Toast.makeText(ApproveCurrentOrder.this, e.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
+                    }
+                    builder.setTitle("Cancelled").setMessage("Order is cancelled automatically due to inactivity")
+                            .setPositiveButton("Exit", (dialogInterface, i) -> new Handler().postDelayed(() -> finish(),300)).create();
+                    builder.setCancelable(false);
+                    builder.show();
                 }
             }
 

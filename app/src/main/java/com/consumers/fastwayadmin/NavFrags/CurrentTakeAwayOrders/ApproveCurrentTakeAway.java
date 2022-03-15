@@ -110,8 +110,10 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_approve_current_take_away);
+
         id = getIntent().getStringExtra("id");
         showCustom = findViewById(R.id.showCustomisationCurrentTakeaway);
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(id);
         bmp = BitmapFactory.decodeResource(getResources(), R.drawable.logo);
         restaurantDailyTrack = getSharedPreferences("RestaurantTrackingDaily", Context.MODE_PRIVATE);
         restaurantTrackRecords = getSharedPreferences("RestaurantTrackRecords",Context.MODE_PRIVATE);
@@ -138,6 +140,85 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
         dishNames = findViewById(R.id.DishNamesTakeAwayListView);
         approve = findViewById(R.id.approveTakeAwayButton);
 
+        if(System.currentTimeMillis() - Long.parseLong(time) >= 600000){
+            AlertDialog.Builder builder = new AlertDialog.Builder(ApproveCurrentTakeAway.this);
+            RequestQueue requestQueue = Volley.newRequestQueue(ApproveCurrentTakeAway.this);
+            JSONObject main = new JSONObject();
+            new GenratePDF().execute();
+            FirebaseAuth auth = FirebaseAuth.getInstance();
+            DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(Objects.requireNonNull(auth.getUid())).child("Current TakeAway").child(id);
+            if (paymentMode.equals("online")) {
+                new InitiateRefund().execute();
+                try {
+                    main.put("to", "/topics/" + id + "");
+                    JSONObject notification = new JSONObject();
+                    notification.put("title", "Order Declined");
+                    notification.put("click_action", "Table Frag");
+                    notification.put("body", "Your order is cancelled automatically because it was neither accepted nor denied. You can download updated invoice from my orders for future reference. Refund will be initiated Shortly");
+                    main.put("notification", notification);
+
+                    JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, main, response -> {
+
+                    }, error -> Toast.makeText(ApproveCurrentTakeAway.this, error.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show()) {
+                        @Override
+                        public Map<String, String> getHeaders() {
+                            Map<String, String> header = new HashMap<>();
+                            header.put("content-type", "application/json");
+                            header.put("authorization", "key=AAAAsigSEMs:APA91bEUF9ZFwIu84Jctci56DQd0TQOepztGOIKIBhoqf7N3ueQrkClw0xBTlWZEWyvwprXZmZgW2MNywF1pNBFpq1jFBr0CmlrJ0wygbZIBOnoZ0jP1zZC6nPxqF2MAP6iF3wuBHD2R");
+                            return header;
+                        }
+                    };
+                    reference.removeValue();
+                    userRef.child("digitCode").removeValue();
+                    requestQueue.add(jsonObjectRequest);
+                } catch (Exception e) {
+                    Toast.makeText(ApproveCurrentTakeAway.this, e.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                try {
+                    main.put("to", "/topics/" + id + "");
+                    JSONObject notification = new JSONObject();
+                    notification.put("title", "Order Declined");
+                    notification.put("click_action", "Table Frag");
+                    notification.put("body", "Your order is declined by the owner. If you paid cash already then ask owner to refund it");
+                    main.put("notification", notification);
+
+                    JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, main, new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+
+                        }
+                    }, error -> Toast.makeText(ApproveCurrentTakeAway.this, error.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show()) {
+                        @Override
+                        public Map<String, String> getHeaders() throws AuthFailureError {
+                            Map<String, String> header = new HashMap<>();
+                            header.put("content-type", "application/json");
+                            header.put("authorization", "key=AAAAsigSEMs:APA91bEUF9ZFwIu84Jctci56DQd0TQOepztGOIKIBhoqf7N3ueQrkClw0xBTlWZEWyvwprXZmZgW2MNywF1pNBFpq1jFBr0CmlrJ0wygbZIBOnoZ0jP1zZC6nPxqF2MAP6iF3wuBHD2R");
+                            return header;
+                        }
+                    };
+                    reference.removeValue();
+                    requestQueue.add(jsonObjectRequest);
+                } catch (Exception e) {
+                    Toast.makeText(ApproveCurrentTakeAway.this, e.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
+                }
+            }
+           builder.setTitle("Info").setMessage("Order has been automatically cancelled because it was neither accepted nor denied")
+                   .setPositiveButton("Exit", new DialogInterface.OnClickListener() {
+                       @Override
+                       public void onClick(DialogInterface dialogInterface, int i) {
+                           new Handler().postDelayed(new Runnable() {
+                               @Override
+                               public void run() {
+                                  finish();
+                               }
+                           },300);
+                       }
+                   }).create();
+            builder.setCancelable(false);
+            builder.show();
+        }
+
         showCustom.setOnClickListener(click -> {
             AlertDialog.Builder alert = new AlertDialog.Builder(ApproveCurrentTakeAway.this);
             alert.setTitle("Customisation").setMessage("User has requested for following customisation to his/her order\n\n\n" + customisation).setPositiveButton("Exit", (dialogInterface, i) -> dialogInterface.dismiss()).create();
@@ -156,7 +237,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
         }
         DatabaseReference totalOrders = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
 
-        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(id);
+
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
