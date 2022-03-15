@@ -2,7 +2,6 @@ package com.consumers.fastwayadmin.NavFrags.homeFrag;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
