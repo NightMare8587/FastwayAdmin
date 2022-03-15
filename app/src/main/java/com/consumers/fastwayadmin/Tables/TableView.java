@@ -2,6 +2,7 @@ package com.consumers.fastwayadmin.Tables;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.content.ActivityNotFoundException;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -9,9 +10,14 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.graphics.pdf.PdfDocument;
 import android.net.Uri;
 import android.os.Environment;
+import android.os.StrictMode;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,6 +55,7 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -59,6 +66,7 @@ import java.util.Objects;
 public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
     List<String> tables;
     List<String> status;
+    List<String> seats;
     List<String> timeOfBooking;
     List<String> timeOfUnavailability;
     HashMap<String,List<String>> map;
@@ -67,9 +75,10 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
     DatabaseReference reference;
     Context context;
     FirebaseAuth auth;
-    public TableView(List<String> tables,List<String> status,HashMap<String,List<String>> map,Context context,List<String> timeInMillis,List<String> timeOfBooking,List<String> timeOfUnavailability){
+    public TableView(List<String> tables,List<String> status,HashMap<String,List<String>> map,Context context,List<String> timeInMillis,List<String> timeOfBooking,List<String> timeOfUnavailability,List<String> seats){
         this.status = status;
         this.map = map;
+        this.seats = seats;
         this.timeOfUnavailability = timeOfUnavailability;
         this.timeInMillis = timeInMillis;
         this.timeOfBooking = timeOfBooking;
@@ -89,6 +98,8 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
     @Override
     public void onBindViewHolder(@NonNull TableAdapter holder, @SuppressLint("RecyclerView") int position) {
         auth = FirebaseAuth.getInstance();
+        StrictMode.VmPolicy.Builder builders = new StrictMode.VmPolicy.Builder();
+        StrictMode.setVmPolicy(builders.build());
         holder.tableNum.setText("Table Number : " + tables.get(position));
         holder.status.setText(status.get(position));
         if(status.get(position).equals("unavailable")){
@@ -236,12 +247,7 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
                         Toast.makeText(click.getContext(), "10min added successfully", Toast.LENGTH_SHORT).show();
 
                     }
-                }).setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                    }
-                }).create();
+                }).setNegativeButton("No", (dialogInterface, i) -> dialogInterface.dismiss()).create();
                 alert.show();
                 return true;
             });
@@ -644,53 +650,85 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
             alertDialog.setTitle("Important");
             alertDialog.setMessage("Choose one option");
             alertDialog.setCancelable(true);
-            alertDialog.setPositiveButton("Get QR Code", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
-                    imageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                        @Override
-                        public void onSuccess(@NonNull Uri uri) {
-                            Picasso.get()
-                                    .load("" + uri)
-                                    .into(new Target() {
-                                              @Override
-                                              public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                                                  try {
-                                                      String root = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).toString();
-                                                      File myDir = new File(root);
+            alertDialog.setPositiveButton("Get QR Code", (dialog, which) -> {
+                dialog.dismiss();
+                imageRef.getDownloadUrl().addOnSuccessListener(uri -> Picasso.get()
+                        .load("" + uri)
+                        .into(new Target() {
+                                  @Override
+                                  public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                                      try {
+                                          String root = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).toString();
+                                          File myDir = new File(root);
 
-                                                      if (!myDir.exists()) {
-                                                          myDir.mkdirs();
-                                                      }
-
-                                                      String name = "Table " + tables.get(position) +  ".jpg";
-                                                      myDir = new File(myDir, name);
-                                                      FileOutputStream out = new FileOutputStream(myDir);
-                                                      bitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);
-                                                      Toast.makeText(context, "Image Saved Successfully", Toast.LENGTH_SHORT).show();
-                                                      out.flush();
-                                                      out.close();
-                                                  } catch(Exception e){
-                                                      // some action
-                                                  }
-                                              }
-
-                                              @Override
-                                              public void onBitmapFailed(Exception e, Drawable errorDrawable) {
-
-                                              }
-
-                                              @Override
-                                              public void onPrepareLoad(Drawable placeHolderDrawable) {
-
-                                              }
+                                          if (!myDir.exists()) {
+                                              myDir.mkdirs();
                                           }
-                                    );
-                        }
-                    }).addOnFailureListener(e -> Toast.makeText(context, "Failed :) " + e.getLocalizedMessage(), Toast.LENGTH_SHORT).show());
 
-                }
+                                          String name = "Table " + tables.get(position) +  ".jpg";
+                                          myDir = new File(myDir, name);
+                                          FileOutputStream out = new FileOutputStream(myDir);
+                                          bitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);
+                                          Toast.makeText(context, "Image Saved Successfully", Toast.LENGTH_SHORT).show();
+                                          PdfDocument pdfDocument = new PdfDocument();
+                                          Paint myPaint = new Paint();
+                                          PdfDocument.PageInfo myPage = new  PdfDocument.PageInfo.Builder(1024,720,1).create();
+                                          PdfDocument.Page page = pdfDocument.startPage(myPage);
+
+                                          Paint text = new Paint();
+
+                                          Canvas canvas = page.getCanvas();
+
+                                          canvas.drawBitmap(bitmap,275,70,myPaint);
+                                          text.setTextAlign(Paint.Align.LEFT);
+                                          text.setTypeface(Typeface.create(Typeface.DEFAULT,Typeface.BOLD));
+                                          text.setTextSize(70);
+                                          canvas.drawText("Table Number: " + tables.get(position),275,85,text);
+                                          canvas.drawText("Seats: " + seats.get(position),395,595,text);
+
+                                          pdfDocument.finishPage(page);
+
+                                          String fileNames = "/Table " + tables.get(position)+ ".pdf";
+                                          File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS) + fileNames);
+
+                                          try{
+                                              pdfDocument.writeTo(new FileOutputStream(file));
+                                              Intent target = new Intent(Intent.ACTION_VIEW);
+                                              target.setDataAndType(Uri.fromFile(file),"application/pdf");
+                                              target.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                                              Intent intent = Intent.createChooser(target, "Open File");
+                                              try {
+                                                  v.getContext().startActivity(intent);
+                                              } catch (ActivityNotFoundException e) {
+                                                  // Instruct the user to install a PDF reader here, or something
+                                              }
+                                          } catch (IOException e) {
+                                              e.printStackTrace();
+                                          }
+
+                                          pdfDocument.close();
+                                          out.flush();
+                                          out.close();
+                                      } catch(Exception e){
+                                          // some action
+                                      }
+                                  }
+
+                                  @Override
+                                  public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+
+                                  }
+
+                                  @Override
+                                  public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+                                  }
+                              }
+                        )).addOnFailureListener(e -> Toast.makeText(context, "Failed :) " + e.getLocalizedMessage(), Toast.LENGTH_SHORT).show());
+
+            });
+            alertDialog.setNeutralButton("Open PDF", (dialogInterface, i) -> {
+
             });
             alertDialog.setNegativeButton("Delete Table", (dialog, which) -> {
 
@@ -704,8 +742,6 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         List<String> myList = map.get(""+tables.get(position));
-                        assert myList != null;
-                        assert myList != null;
                         assert myList != null;
                         reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(myList.get(0));
                         reference.addListenerForSingleValueEvent(new ValueEventListener() {

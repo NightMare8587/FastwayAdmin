@@ -49,6 +49,7 @@ public class TablesFrag extends Fragment {
     DatabaseReference tableRef;
     List<String> tableNumber = new ArrayList<>();
     List<String> status  = new ArrayList<>();
+    List<String> seats  = new ArrayList<>();
     List<String> timeInMillis  = new ArrayList<>();
     List<String> timeOfBooking  = new ArrayList<>();
     List<String> timeOfUnavailability  = new ArrayList<>();
@@ -143,12 +144,14 @@ public class TablesFrag extends Fragment {
                     if(snapshot.exists()){
                         tableNumber.clear();
                         status.clear();
+                        seats.clear();
                         timeOfBooking.clear();
                         timeInMillis.clear();
                         timeOfUnavailability.clear();
                         HashMap<String,List<String>> map = new HashMap<>();
                         for(DataSnapshot dataSnapshot : snapshot.getChildren()) {
                             tableNumber.add(Objects.requireNonNull(dataSnapshot.child("tableNum").getValue()).toString());
+                            seats.add(Objects.requireNonNull(dataSnapshot.child("numSeats").getValue()).toString());
                             status.add(dataSnapshot.child("status").getValue().toString());
                             if (dataSnapshot.hasChild("customerId")) {
                                 List<String> list = new ArrayList<>();
@@ -173,7 +176,7 @@ public class TablesFrag extends Fragment {
                                 timeOfUnavailability.add("");
                             }
                         }
-                        tableView = new TableView(tableNumber,status,map,getContext(),timeInMillis,timeOfBooking,timeOfUnavailability);
+                        tableView = new TableView(tableNumber,status,map,getContext(),timeInMillis,timeOfBooking,timeOfUnavailability,seats);
                         table.setAdapter(tableView);
                         tableView.notifyDataSetChanged();
 
@@ -204,11 +207,13 @@ public class TablesFrag extends Fragment {
                     timeOfUnavailability.clear();
                     status.clear();
                     timeOfBooking.clear();
+                    seats.clear();
                     timeInMillis.clear();
                     HashMap<String,List<String>> map = new HashMap<>();
                     for(DataSnapshot dataSnapshot : snapshot.getChildren()) {
 
                         tableNumber.add(Objects.requireNonNull(dataSnapshot.child("tableNum").getValue()).toString());
+                        seats.add(Objects.requireNonNull(dataSnapshot.child("numSeats").getValue()).toString());
                         status.add(dataSnapshot.child("status").getValue().toString());
                         if (dataSnapshot.hasChild("customerId")) {
                             List<String> list = new ArrayList<>();
@@ -234,7 +239,7 @@ public class TablesFrag extends Fragment {
                             timeOfUnavailability.add("");
                         }
                     }
-                    tableView = new TableView(tableNumber,status,map,getContext(),timeInMillis,timeOfBooking,timeOfUnavailability);
+                    tableView = new TableView(tableNumber,status,map,getContext(),timeInMillis,timeOfBooking,timeOfUnavailability,seats);
                     table.setAdapter(tableView);
                     Log.i("info",timeOfBooking.toString());
                     tableView.notifyDataSetChanged();
