@@ -119,7 +119,6 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
                 intent.putExtra("id",myList.get(0));
                 view.getContext().startActivity(intent);
             });
-
             holder.cancel.setOnClickListener(view -> {
                 SharedPreferences sharedPreferences = view.getContext().getSharedPreferences("loginInfo",Context.MODE_PRIVATE);
                 reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid())).child("Tables");
