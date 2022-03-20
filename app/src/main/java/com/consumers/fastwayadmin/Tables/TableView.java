@@ -179,7 +179,6 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
                                     holder.cancel.setVisibility(View.INVISIBLE);
                                     holder.status.setText("available");
 //                                    holder.timeOfReserved.setVisibility(View.INVISIBLE);
-
                                 }
                             });
                             alertD.setNegativeButton("No, Wait", (dialogInterface, i) -> {
