@@ -165,7 +165,6 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
                                                 return header;
                                             }
                                         };
-
                                         requestQueue.add(jsonObjectRequest);
                                     } catch (Exception e) {
                                         Toast.makeText(view.getContext(), e.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
