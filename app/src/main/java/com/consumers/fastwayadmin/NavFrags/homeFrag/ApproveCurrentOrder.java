@@ -15,6 +15,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.StrictMode;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -38,7 +39,10 @@ import com.android.volley.Response;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.aspose.cells.SaveFormat;
+import com.aspose.cells.Workbook;
 import com.consumers.fastwayadmin.CancelClass;
+import com.consumers.fastwayadmin.NavFrags.CurrentTakeAwayOrders.ApproveCurrentTakeAway;
 import com.consumers.fastwayadmin.PaymentClass;
 import com.consumers.fastwayadmin.R;
 import com.google.firebase.auth.FirebaseAuth;
@@ -55,6 +59,7 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -66,6 +71,7 @@ import java.util.Random;
 
 public class ApproveCurrentOrder extends AppCompatActivity {
     List<String> dishNamePdf;
+    String transactionIdForExcel;
     DatabaseReference databaseReference;
     FirebaseAuth auth = FirebaseAuth.getInstance();
     ListView listView,halfOrList;
@@ -90,6 +96,8 @@ public class ApproveCurrentOrder extends AppCompatActivity {
     MakePaymentToVendor makePaymentToVendor = new MakePaymentToVendor();
     String orderID,orderAmount;
     String table;
+    File path;
+    Workbook workbook;
     TextView textView;
     int totalPrice = 0;
     String time;
@@ -112,6 +120,8 @@ public class ApproveCurrentOrder extends AppCompatActivity {
         restaurantTrackRecords = getSharedPreferences("RestaurantTrackRecords",Context.MODE_PRIVATE);
         restaurantTrackRecordsEditor = restaurantTrackRecords.edit();
         restaurantTrackEditor = restaurantDailyTrack.edit();
+        StrictMode.VmPolicy.Builder builders = new StrictMode.VmPolicy.Builder();
+        StrictMode.setVmPolicy(builders.build());
         showCustomisation = findViewById(R.id.showCustomisationButton);
         SharedPreferences sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
         bmp = BitmapFactory.decodeResource(getResources(), R.drawable.logo);
@@ -120,6 +130,7 @@ public class ApproveCurrentOrder extends AppCompatActivity {
         scaled1 = Bitmap.createScaledBitmap(bmp1,500,500,false);
         initialise();
         textView.setText("Table Number: " + table);
+        path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
         saveRefundInfo = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(id);
         totalOrders = FirebaseDatabase.getInstance().getReference().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
         saveRefundInfo.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -450,12 +461,29 @@ public class ApproveCurrentOrder extends AppCompatActivity {
         protected Void doInBackground(Void... voids) {
             Log.i("statusTwo", String.valueOf(makePaymentToVendor.getStatus()));
             RequestQueue requestQueue = Volley.newRequestQueue(ApproveCurrentOrder.this);
-            StringRequest stringRequest = new StringRequest(Request.Method.POST, testPaymentToVendor, new Response.Listener<String>() {
-                @Override
-                public void onResponse(String response) {
-                    Log.i("response",response);
-                    Log.i("statusOne", String.valueOf(makePaymentToVendor.getStatus()));
+            StringRequest stringRequest = new StringRequest(Request.Method.POST, testPaymentToVendor, response -> {
+                Log.i("response",response);
+                try {
+                    workbook = new Workbook(path + "/ResTransactions.xlsx");
+                    int max = workbook.getWorksheets().get(0).getCells().getMaxDataRow();
+                    max = max + 2;
+                    DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                    Date date = new Date(Long.parseLong(time));
+                    workbook.getWorksheets().get(0).getCells().get("A" + max).putValue("" + dateFormat.format(date));
+                    workbook.getWorksheets().get(0).getCells().get("B" + max).putValue("" + transactionIdForExcel);
+                    workbook.getWorksheets().get(0).getCells().get("C" + max).putValue("" + id);
+                    workbook.getWorksheets().get(0).getCells().get("D" + max).putValue("\u20B9" + orderAmount);
+                    try {
+                        workbook.save(path + "/ResTransactions.xlsx", SaveFormat.XLSX);
+                        Log.i("info","FILE SAVED");
+//                            Toast.makeText(ApproveCurrentOrder.this, "File saved successfully", Toast.LENGTH_SHORT).show();
+                    } catch (Exception e) {
+                        Log.i("info",e.getLocalizedMessage());
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
+                Log.i("statusOne", String.valueOf(makePaymentToVendor.getStatus()));
             }, error -> {
 
             }){
@@ -466,7 +494,8 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                     params.put("benID",auth.getUid());
                     String genratedID = ApproveCurrentOrder.RandomString
                             .getAlphaNumericString(8);
-                    genratedID = genratedID + String.valueOf(System.currentTimeMillis());
+                    genratedID = genratedID + System.currentTimeMillis();
+                    transactionIdForExcel = genratedID;
                     params.put("transID",genratedID);
                     params.put("token",genratedToken);
                     DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid())).child("Transactions");

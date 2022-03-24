@@ -530,12 +530,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                                     public void onResponse(JSONObject response) {
 
                                     }
-                                }, new Response.ErrorListener() {
-                                    @Override
-                                    public void onErrorResponse(VolleyError error) {
-                                        Toast.makeText(ApproveCurrentTakeAway.this, error.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
-                                    }
-                                }) {
+                                }, error -> Toast.makeText(ApproveCurrentTakeAway.this, error.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show()) {
                                     @Override
                                     public Map<String, String> getHeaders() throws AuthFailureError {
                                         Map<String, String> header = new HashMap<>();
@@ -559,19 +554,11 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                                 notification.put("body", "Your order is declined by the owner. If you paid cash already then ask owner to refund it");
                                 main.put("notification", notification);
 
-                                JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, main, new Response.Listener<JSONObject>() {
-                                    @Override
-                                    public void onResponse(JSONObject response) {
+                                JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, main, response -> {
 
-                                    }
-                                }, new Response.ErrorListener() {
+                                }, error -> Toast.makeText(ApproveCurrentTakeAway.this, error.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show()) {
                                     @Override
-                                    public void onErrorResponse(VolleyError error) {
-                                        Toast.makeText(ApproveCurrentTakeAway.this, error.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
-                                    }
-                                }) {
-                                    @Override
-                                    public Map<String, String> getHeaders() throws AuthFailureError {
+                                    public Map<String, String> getHeaders() {
                                         Map<String, String> header = new HashMap<>();
                                         header.put("content-type", "application/json");
                                         header.put("authorization", "key=AAAAsigSEMs:APA91bEUF9ZFwIu84Jctci56DQd0TQOepztGOIKIBhoqf7N3ueQrkClw0xBTlWZEWyvwprXZmZgW2MNywF1pNBFpq1jFBr0CmlrJ0wygbZIBOnoZ0jP1zZC6nPxqF2MAP6iF3wuBHD2R");
@@ -584,20 +571,12 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                                 Toast.makeText(ApproveCurrentTakeAway.this, e.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
                             }
                         }
-                        new Handler().postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                finish();
-                            }
-                        }, 1500);
+                        new Handler().postDelayed(() -> finish(), 1500);
                     }else
                         Toast.makeText(v.getContext(), "Enter reason for table cancellation", Toast.LENGTH_SHORT).show();
                 }
-            }).setNegativeButton("back", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
+            }).setNegativeButton("back", (dialogInterface, i) -> {
 
-                }
             });
 
             alert.create().show();
@@ -609,11 +588,8 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
         @Override
         protected Void doInBackground(Void... voids) {
             RequestQueue requestQueue = Volley.newRequestQueue(ApproveCurrentTakeAway.this);
-            StringRequest stringRequest = new StringRequest(Request.Method.POST, url, response -> Log.i("res",response.toString()), new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
+            StringRequest stringRequest = new StringRequest(Request.Method.POST, url, response -> Log.i("res", response), error -> {
 
-                }
             }){
                 @NonNull
                 @Override
