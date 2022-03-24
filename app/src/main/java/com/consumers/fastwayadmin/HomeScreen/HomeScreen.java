@@ -25,8 +25,12 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.aspose.cells.Cell;
+import com.aspose.cells.Cells;
 import com.aspose.cells.SaveFormat;
 import com.aspose.cells.Workbook;
+import com.aspose.cells.Worksheet;
+import com.aspose.cells.WorksheetCollection;
 import com.consumers.fastwayadmin.Chat.RandomChatFolder.RandomChatWithUsers;
 import com.consumers.fastwayadmin.Info.RestaurantDocuments.ReUploadDocumentsAgain;
 import com.consumers.fastwayadmin.NavFrags.AccountFrag;
@@ -106,12 +110,16 @@ public class HomeScreen extends AppCompatActivity {
         if(!sharedPreferences.contains("workbookCreated")) {
             try {
                 workbook = new Workbook();
-                workbook.getWorksheets().get(0).getCells().get("A1").putValue("Hello World My Name!");
-                workbook.getWorksheets().get(0).getCells().get("A2").putValue("Pulli Oya!");
+                workbook.getWorksheets().get(0).getCells().get("A1").putValue("Date");
+                workbook.getWorksheets().get(0).getCells().get("B1").putValue("Transaction ID");
+                workbook.getWorksheets().get(0).getCells().get("C1").putValue("User ID");
+                workbook.getWorksheets().get(0).getCells().get("D1").putValue("Order Amount");
+//                Toast.makeText(this, "" + workbook.getWorksheets().get(0).getCells().getMaxRow(), Toast.LENGTH_SHORT).show();
+//               Log.i("info","" + workbook.getWorksheets().get(0).getCells().getMaxRow());
                 try {
                     workbook.save(path + "/ResTransactions.xlsx", SaveFormat.XLSX);
                     Log.i("info","FILE SAVED");
-                    Toast.makeText(this, "File saved", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "File saved successfully", Toast.LENGTH_SHORT).show();
                     myEditor.putString("workbookCreated","yes");
                     myEditor.apply();
                 } catch (Exception e) {

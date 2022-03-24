@@ -4,7 +4,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
+import android.os.StrictMode;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +20,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
+import com.aspose.cells.SaveFormat;
+import com.aspose.cells.Workbook;
 import com.consumers.fastwayadmin.MenuActivities.AllMenuDish;
 import com.consumers.fastwayadmin.MenuActivities.Combo.ComboMenuDish;
 import com.consumers.fastwayadmin.R;
@@ -28,6 +33,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.io.File;
 import java.util.Objects;
 
 import karpuzoglu.enes.com.fastdialog.Animations;
@@ -86,6 +92,7 @@ public class MenuFrag extends Fragment {
         combo = view.findViewById(R.id.Combo);
         drinks = view.findViewById(R.id.Drinks);
         FirebaseAuth auth = FirebaseAuth.getInstance();
+
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -101,6 +108,29 @@ public class MenuFrag extends Fragment {
             }
         });
 
+//        StrictMode.VmPolicy.Builder builders = new StrictMode.VmPolicy.Builder();
+//        StrictMode.setVmPolicy(builders.build());
+//        File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
+//        Workbook workbook;
+
+//        if(sharedPreferences.contains("workbookCreated")) {
+//            try {
+//                workbook = new Workbook(path + "/ResTransactions.xlsx");
+//                workbook.getWorksheets().get(0).getCells().get("A1").putValue("Hello World My Name!");
+//                workbook.getWorksheets().get(0).getCells().get("A2").putValue("Pulli ienifnienifnienfieOya!");
+//                try {
+//                    workbook.save(path + "/ResTransactions.xlsx", SaveFormat.XLSX);
+//                    Log.i("info","FILE SAVED");
+//                    Toast.makeText(requireContext(), "File saved successfully", Toast.LENGTH_SHORT).show();
+////                    editor.putString("workbookCreated","yes");
+////                    editor.apply();
+//                } catch (Exception e) {
+//                    Log.i("info",e.getLocalizedMessage());
+//                }
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        }
         appliedOffers.setOnClickListener(click -> {
             KAlertDialog kAlertDialog = new KAlertDialog(requireContext(),KAlertDialog.ERROR_TYPE)
                     .setTitleText("Warning")
