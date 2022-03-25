@@ -49,11 +49,16 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONObject;
 
 import java.io.File;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Timer;
@@ -65,6 +70,8 @@ public class HomeScreen extends AppCompatActivity {
     String URL = "https://fcm.googleapis.com/fcm/send";
     FragmentManager manager;
     SharedPreferences sharedPreferences;
+    String json;
+    Gson gson;
     SharedPreferences.Editor myEditor;
     FirebaseAuth auth = FirebaseAuth.getInstance();
     long currentTime = System.currentTimeMillis();
@@ -84,9 +91,31 @@ public class HomeScreen extends AppCompatActivity {
         ConnectivityManager cm =
                 (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
 
-
       new BackgroundWork().execute();
-
+//        if(sharedPreferences.contains("myListStored")){
+//            Type type = new TypeToken<List<List<String>>>() {
+//            }.getType();
+//            gson = new Gson();
+//            json = sharedPreferences.getString("myListStored","");
+//            List<List<String>> arrPackageData = gson.fromJson(json, type);
+//            Toast.makeText(this, "" + arrPackageData.toString(), Toast.LENGTH_SHORT).show();
+//        }else{
+//            List<String> lits = new ArrayList<>();
+//            lits.add("a");
+//            lits.add("b");
+//            lits.add("c");
+//            List<String> litss = new ArrayList<>();
+//            litss.add("a");
+//            litss.add("b");
+//            litss.add("c");
+//            List<List<String>> myList = new ArrayList<>();
+//            myList.add(lits);
+//            myList.add(litss);
+//             gson = new Gson();
+//             json = gson.toJson(myList);
+//            myEditor.putString("myListStored",json);
+//            myEditor.apply();
+//        }
         bubble.setNavigationChangeListener((view, position) -> {
             switch (position){
                 case 0:

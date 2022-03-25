@@ -34,7 +34,6 @@ import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
@@ -48,6 +47,7 @@ import com.developer.kalert.KAlertDialog;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
+import com.google.common.reflect.TypeToken;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -57,6 +57,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.google.gson.Gson;
 
 import org.json.JSONObject;
 
@@ -66,6 +67,7 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -82,6 +84,14 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
     List<String> dishName;
     String transactionIdForExcel;
     FirebaseStorage storage;
+    Gson gson;
+    String json;
+    String[] monthName = {"January", "February",
+            "March", "April", "May", "June", "July",
+            "August", "September", "October", "November",
+            "December"};
+    SharedPreferences storeOrdersForAdminInfo;
+    SharedPreferences.Editor storeEditor;
     StorageReference storageReference;
     String userName,userEmail;
     String paymentMode;
@@ -137,6 +147,8 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
         sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
         editor = sharedPreferences.edit();
         state = sharedPreferences.getString("state","");
+        storeOrdersForAdminInfo = getSharedPreferences("StoreOrders",MODE_PRIVATE);
+        storeEditor = storeOrdersForAdminInfo.edit();
         saveRefundInfo = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(id);
         orderAmount = getIntent().getStringExtra("orderAmount");
         customisation = getIntent().getStringExtra("customisation");
@@ -315,6 +327,56 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                         .setContentText("Approve order only after you received cash payment")
                         .setConfirmText("Confirm Order")
                         .setConfirmClickListener(kAlertDialog -> {
+                            Calendar calendar = Calendar.getInstance();
+                            String month = monthName[calendar.get(Calendar.MONTH)];
+                            if(storeOrdersForAdminInfo.contains(month)){
+                                java.lang.reflect.Type type = new TypeToken<List<List<String>>>() {
+                                }.getType();
+                                gson = new Gson();
+                                json = storeOrdersForAdminInfo.getString(month,"");
+                                List<List<String>> mainDataList = gson.fromJson(json, type);
+                                List<String> date = new ArrayList<>(mainDataList.get(0));
+                                List<String> transID = new ArrayList<>(mainDataList.get(1));
+                                List<String> userID = new ArrayList<>(mainDataList.get(2));
+                                List<String> orderAmountList = new ArrayList<>(mainDataList.get(3));
+
+                                date.add(time);
+                                transID.add("Cash");
+                                userID.add(id);
+                                orderAmountList.add(orderAmount + "");
+
+                                List<List<String>> storeNewList = new ArrayList<>();
+                                storeNewList.add(date);
+                                storeNewList.add(transID);
+                                storeNewList.add(userID);
+                                storeNewList.add(orderAmountList);
+
+                                json = gson.toJson(storeNewList);
+                                storeEditor.putString( month,json);
+                                storeEditor.apply();
+                                Log.i("myInfo",storeNewList.toString());
+                            }else{
+                                List<List<String>> mainDataList = new ArrayList<>();
+                                List<String> date = new ArrayList<>();
+                                List<String> transID = new ArrayList<>();
+                                List<String> userID = new ArrayList<>();
+                                List<String> orderAmountList = new ArrayList<>();
+
+                                date.add(time);
+                                transID.add("Cash");
+                                userID.add(id);
+                                orderAmountList.add(orderAmount + "");
+                                mainDataList.add(date);
+                                mainDataList.add(transID);
+                                mainDataList.add(userID);
+                                mainDataList.add(orderAmountList);
+
+                                gson = new Gson();
+                                json = gson.toJson(mainDataList);
+                                storeEditor.putString( month,json);
+                                storeEditor.apply();
+                                Log.i("myInfo",mainDataList.toString());
+                            }
 
                                 try {
                                     workbook = new Workbook(path + "/ResTransactions.xlsx");
@@ -664,10 +726,60 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
 
         @Override
         protected Void doInBackground(Void... voids) {
+            Calendar calendar  = Calendar.getInstance();
             Log.i("statusTwo", String.valueOf(makePaymentToVendor.getStatus()));
             RequestQueue requestQueue = Volley.newRequestQueue(ApproveCurrentTakeAway.this);
             StringRequest stringRequest = new StringRequest(Request.Method.POST, testPaymentToVendor, response -> {
                 Log.i("response",response);
+                String month = monthName[calendar.get(Calendar.MONTH)];
+                if(storeOrdersForAdminInfo.contains(month)){
+                    java.lang.reflect.Type type = new TypeToken<List<List<String>>>() {
+                    }.getType();
+                    gson = new Gson();
+                    json = storeOrdersForAdminInfo.getString(month,"");
+                    List<List<String>> mainDataList = gson.fromJson(json, type);
+                    List<String> date = new ArrayList<>(mainDataList.get(0));
+                    List<String> transID = new ArrayList<>(mainDataList.get(1));
+                    List<String> userID = new ArrayList<>(mainDataList.get(2));
+                    List<String> orderAmountList = new ArrayList<>(mainDataList.get(3));
+
+                    date.add(time);
+                    transID.add(transactionIdForExcel);
+                    userID.add(id);
+                    orderAmountList.add(orderAmount + "");
+
+                    List<List<String>> storeNewList = new ArrayList<>();
+                    storeNewList.add(date);
+                    storeNewList.add(transID);
+                    storeNewList.add(userID);
+                    storeNewList.add(orderAmountList);
+
+                    json = gson.toJson(storeNewList);
+                    storeEditor.putString( month,json);
+                    storeEditor.apply();
+                    Log.i("myInfo",storeNewList.toString());
+                }else{
+                    List<List<String>> mainDataList = new ArrayList<>();
+                    List<String> date = new ArrayList<>();
+                    List<String> transID = new ArrayList<>();
+                    List<String> userID = new ArrayList<>();
+                    List<String> orderAmountList = new ArrayList<>();
+
+                    date.add(time);
+                    transID.add(transactionIdForExcel);
+                    userID.add(id);
+                    orderAmountList.add(orderAmount + "");
+                    mainDataList.add(date);
+                    mainDataList.add(transID);
+                    mainDataList.add(userID);
+                    mainDataList.add(orderAmountList);
+
+                    gson = new Gson();
+                    json = gson.toJson(mainDataList);
+                    storeEditor.putString( month,json);
+                    storeEditor.apply();
+                    Log.i("myInfo",mainDataList.toString());
+                }
                 try {
                     workbook = new Workbook(path + "/ResTransactions.xlsx");
                     int max = workbook.getWorksheets().get(0).getCells().getMaxDataRow();
@@ -699,8 +811,9 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                     params.put("benID",auth.getUid());
                     String genratedID = ApproveCurrentTakeAway.RandomString
                             .getAlphaNumericString(11);
-                    transactionIdForExcel = genratedID;
+
                     genratedID = genratedID + System.currentTimeMillis();
+                    transactionIdForExcel = genratedID;
                     params.put("transID",genratedID);
                     params.put("token",genratedToken);
                     DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid())).child("Transactions");

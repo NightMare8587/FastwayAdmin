@@ -45,6 +45,7 @@ import com.consumers.fastwayadmin.CancelClass;
 import com.consumers.fastwayadmin.NavFrags.CurrentTakeAwayOrders.ApproveCurrentTakeAway;
 import com.consumers.fastwayadmin.PaymentClass;
 import com.consumers.fastwayadmin.R;
+import com.google.common.reflect.TypeToken;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -53,15 +54,18 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.google.gson.Gson;
 
 import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -71,6 +75,14 @@ import java.util.Random;
 
 public class ApproveCurrentOrder extends AppCompatActivity {
     List<String> dishNamePdf;
+    Gson gson;
+    String json;
+    SharedPreferences storeOrdersForAdminInfo;
+    SharedPreferences.Editor storeEditor;
+    String[] monthName = {"January", "February",
+            "March", "April", "May", "June", "July",
+            "August", "September", "October", "November",
+            "December"};
     String transactionIdForExcel;
     DatabaseReference databaseReference;
     FirebaseAuth auth = FirebaseAuth.getInstance();
@@ -106,6 +118,7 @@ public class ApproveCurrentOrder extends AppCompatActivity {
     ListView dishQ;
     List<String> dishNames = new ArrayList<>();
     List<String> dishQuantity = new ArrayList<>();
+    Calendar calendar = Calendar.getInstance();
     List<String> dishHalfOr = new ArrayList<>();
     Button approve,decline,showCustomisation;
     @SuppressLint("SetTextI18n")
@@ -122,6 +135,8 @@ public class ApproveCurrentOrder extends AppCompatActivity {
         restaurantTrackEditor = restaurantDailyTrack.edit();
         StrictMode.VmPolicy.Builder builders = new StrictMode.VmPolicy.Builder();
         StrictMode.setVmPolicy(builders.build());
+        storeOrdersForAdminInfo = getSharedPreferences("StoreOrders",MODE_PRIVATE);
+        storeEditor = storeOrdersForAdminInfo.edit();
         showCustomisation = findViewById(R.id.showCustomisationButton);
         SharedPreferences sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
         bmp = BitmapFactory.decodeResource(getResources(), R.drawable.logo);
@@ -249,6 +264,9 @@ public class ApproveCurrentOrder extends AppCompatActivity {
 
                 }
             });
+
+
+
             if(restaurantDailyTrack.contains("totalOrdersToday")){
                 int val = Integer.parseInt(restaurantDailyTrack.getString("totalOrdersToday",""));
                 val = val + 1;
@@ -463,6 +481,55 @@ public class ApproveCurrentOrder extends AppCompatActivity {
             RequestQueue requestQueue = Volley.newRequestQueue(ApproveCurrentOrder.this);
             StringRequest stringRequest = new StringRequest(Request.Method.POST, testPaymentToVendor, response -> {
                 Log.i("response",response);
+                String month = monthName[calendar.get(Calendar.MONTH)];
+                if(storeOrdersForAdminInfo.contains(month)){
+                    Type type = new TypeToken<List<List<String>>>() {
+                    }.getType();
+                    gson = new Gson();
+                    json = storeOrdersForAdminInfo.getString(month,"");
+                    List<List<String>> mainDataList = gson.fromJson(json, type);
+                    List<String> date = new ArrayList<>(mainDataList.get(0));
+                    List<String> transID = new ArrayList<>(mainDataList.get(1));
+                    List<String> userID = new ArrayList<>(mainDataList.get(2));
+                    List<String> orderAmountList = new ArrayList<>(mainDataList.get(3));
+
+                    date.add(time);
+                    transID.add(transactionIdForExcel);
+                    userID.add(id);
+                    orderAmountList.add(orderAmount + "");
+
+                    List<List<String>> storeNewList = new ArrayList<>();
+                    storeNewList.add(date);
+                    storeNewList.add(transID);
+                    storeNewList.add(userID);
+                    storeNewList.add(orderAmountList);
+
+                    json = gson.toJson(storeNewList);
+                    storeEditor.putString( month,json);
+                    storeEditor.apply();
+                    Log.i("myInfo",storeNewList.toString());
+                }else{
+                    List<List<String>> mainDataList = new ArrayList<>();
+                    List<String> date = new ArrayList<>();
+                    List<String> transID = new ArrayList<>();
+                    List<String> userID = new ArrayList<>();
+                    List<String> orderAmountList = new ArrayList<>();
+
+                    date.add(time);
+                    transID.add(transactionIdForExcel);
+                    userID.add(id);
+                    orderAmountList.add(orderAmount + "");
+                    mainDataList.add(date);
+                    mainDataList.add(transID);
+                    mainDataList.add(userID);
+                    mainDataList.add(orderAmountList);
+
+                    gson = new Gson();
+                    json = gson.toJson(mainDataList);
+                    storeEditor.putString( month,json);
+                    storeEditor.apply();
+                    Log.i("myInfo",mainDataList.toString());
+                }
                 try {
                     workbook = new Workbook(path + "/ResTransactions.xlsx");
                     int max = workbook.getWorksheets().get(0).getCells().getMaxDataRow();
