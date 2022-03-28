@@ -377,7 +377,6 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                                 storeEditor.apply();
                                 Log.i("myInfo",mainDataList.toString());
                             }
-
                                 try {
                                     workbook = new Workbook(path + "/ResTransactions.xlsx");
                                     Worksheet ws = workbook.getWorksheets().get(0);
