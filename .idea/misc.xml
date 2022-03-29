@@ -5,8 +5,11 @@
       <map>
         <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/drawable-hdpi/inreo_button_back.xml" value="0.21354166666666666" />
         <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/drawable-hdpi/inreo_button_next.xml" value="0.21354166666666666" />
+        <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/drawable-xhdpi/button_bacl.xml" value="0.244" />
         <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/drawable/android_shadow_view.xml" value="0.17604166666666668" />
+        <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/drawable/button_back.xml" value="0.244" />
         <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/drawable/chat_with_customer_button.xml" value="0.17604166666666668" />
+        <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/drawable/edittext_back.xml" value="0.244" />
         <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/drawable/frag_one_back.xml" value="0.2535" />
         <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/drawable/frag_two_back.xml" value="0.21354166666666666" />
         <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/drawable/gradient2.xml" value="0.2703125" />
@@ -43,6 +46,7 @@
         <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/layout/activity_re_upload_documents_again.xml" value="0.12291666666666666" />
         <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/layout/activity_report_customer.xml" value="0.25416666666666665" />
         <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/layout/activity_report_options.xml" value="0.25416666666666665" />
+        <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/layout/activity_res_earning_tracker.xml" value="0.25416666666666665" />
         <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/layout/activity_restaurant_staff.xml" value="0.125" />
         <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/layout/activity_restaurants_reviews.xml" value="0.13489583333333333" />
         <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/layout/activity_search_fastway_database.xml" value="0.264" />
@@ -80,6 +84,7 @@
         <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/layout/table_info.xml" value="0.536" />
         <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/layout/tables.xml" value="0.24818840579710144" />
         <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/layout/takeaway_recycler_adapter.xml" value="0.264" />
+        <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/layout/tracker_card_file.xml" value="0.25416666666666665" />
         <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/layout/upi_vendor_layout.xml" value="0.2427536231884058" />
         <entry key="..\:/Users/91807/AndroidStudioProjects/FastwayAdmin/app/src/main/res/menu/notification.xml" value="0.25416666666666665" />
         <entry key="..\:/Users/91807/AppData/Local/Android/Sdk/platforms/android-31/data/res/layout/simple_list_item_1.xml" value="0.16666666666666666" />

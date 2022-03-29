@@ -42,6 +42,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.consumers.fastwayadmin.DiscountCombo.ComboAndOffers;
 import com.consumers.fastwayadmin.DiscountCombo.DiscountActivity;
 import com.consumers.fastwayadmin.NavFrags.CurrentTakeAwayOrders.CurrentTakeAway;
+import com.consumers.fastwayadmin.NavFrags.ResEarningTracker.ResEarningTrackerActivity;
 import com.consumers.fastwayadmin.NavFrags.homeFrag.homeFragClass;
 import com.consumers.fastwayadmin.R;
 import com.example.flatdialoglibrary.dialog.FlatDialog;
@@ -85,6 +86,7 @@ public class HomeFrag extends Fragment {
     String currentTime;
     Calendar calendar;
     int currentDay;
+    Button seeMoreDetails;
     @SuppressLint("UseSwitchCompatOrMaterialCode")
     Switch acceptOrders;
     TextView totalOrdersToday,totalTransactionsToday;
@@ -201,7 +203,10 @@ public class HomeFrag extends Fragment {
         vendorIdCreated = view.getContext().getSharedPreferences("VendorID",Context.MODE_PRIVATE);
         vendorIdEditor = vendorIdCreated.edit();
         new checkBank().execute();
-
+        seeMoreDetails = view.findViewById(R.id.seeMoreDetailsHomeFragButton);
+        seeMoreDetails.setOnClickListener(click -> {
+            view.getContext().startActivity(new Intent(requireContext(), ResEarningTrackerActivity.class));
+        });
 
 
         recyclerView = view.findViewById(R.id.homeFragRecyclerView);

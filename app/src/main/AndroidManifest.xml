@@ -31,6 +31,9 @@
         android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         tools:replace="android:icon,android:allowBackup">
         <activity
+            android:name=".NavFrags.ResEarningTracker.ResEarningTrackerActivity"
+            android:exported="false" />
+        <activity
             android:name=".Info.RestaurantImages.AddRestaurantImages"
             android:exported="false" />
         <activity
@@ -188,7 +191,7 @@
             android:label="@string/title_activity_maps" />
         <activity
             android:name=".NotificationActivity"
-            android:exported="true"></activity>
+            android:exported="true" />
         <activity
             android:name=".Login.AlreadyHavAccount"
             android:exported="true" />
