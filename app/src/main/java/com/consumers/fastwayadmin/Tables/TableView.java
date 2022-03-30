@@ -725,7 +725,6 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
 
             });
             alertDialog.setNeutralButton("Open PDF", (dialogInterface, i) -> {
-
             });
             alertDialog.setNegativeButton("Delete Table", (dialog, which) -> {
                 if(status.get(position).equals("available")) {
