@@ -586,11 +586,8 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                                 notification.put("body", "Your order is declined by the owner. You can download updated invoice from my orders for future reference. Refund will be initiated Shortly\n" + editText.getText().toString());
                                 main.put("notification", notification);
 
-                                JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, main, new Response.Listener<JSONObject>() {
-                                    @Override
-                                    public void onResponse(JSONObject response) {
+                                JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, main, response -> {
 
-                                    }
                                 }, error -> Toast.makeText(ApproveCurrentTakeAway.this, error.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show()) {
                                     @Override
                                     public Map<String, String> getHeaders() throws AuthFailureError {
