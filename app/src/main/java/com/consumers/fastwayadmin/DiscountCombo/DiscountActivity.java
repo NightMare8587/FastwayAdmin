@@ -381,7 +381,7 @@ public class DiscountActivity extends AppCompatActivity {
                                     auth = FirebaseAuth.getInstance();
                                     Log.i("type", type);
                                     Log.i("name", dishName);
-                                    reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid()));
+//                                    reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid()));
                                     reference.child("List of Dish").child(type).child(dishName).child("full").setValue(afterDis);
                                     reference.child("List of Dish").child(type).child(dishName).child("half").setValue(afterDisHalf);
                                 }else{
@@ -393,7 +393,7 @@ public class DiscountActivity extends AppCompatActivity {
                                     auth = FirebaseAuth.getInstance();
                                     Log.i("type",type);
                                     Log.i("name",dishName);
-                                    reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid()));
+//                                    reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid()));
                                     reference.child("List of Dish").child(type).child(dishName).child("full").setValue(afterDis);
                                 }
                              }
