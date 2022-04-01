@@ -93,7 +93,7 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
 
         for(int i=0;i<12;i++){
             if(storeOrdersForAdminInfo.contains(monthName[i])) {
-                json = storeOrdersForAdminInfo.getString(month,"");
+                json = storeOrdersForAdminInfo.getString(monthName[i],"");
                 List<List<String>> mainDataList = gson.fromJson(json, type);
                 List<String> date = new ArrayList<>(mainDataList.get(0));
                 List<String> transID = new ArrayList<>(mainDataList.get(1));
@@ -101,7 +101,7 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
                 List<String> orderAmountList = new ArrayList<>(mainDataList.get(3));
                 float orderAmountTotal = 0;
                 for(int ij=0;ij<orderAmountList.size();ij++)
-                    orderAmountTotal += Float.parseFloat(orderAmountList.get(i));
+                    orderAmountTotal += Float.parseFloat(orderAmountList.get(ij));
 
                 mBarChart.addBar(new BarModel(orderAmountTotal, 0xFF1BA4E6));
             }else{
