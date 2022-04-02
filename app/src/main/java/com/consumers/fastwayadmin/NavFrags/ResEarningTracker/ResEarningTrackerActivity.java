@@ -138,5 +138,4 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
             }
         }
     };
-
 }
