@@ -76,7 +76,6 @@ import karpuzoglu.enes.com.fastdialog.FastDialogBuilder;
 import karpuzoglu.enes.com.fastdialog.Type;
 
 public class Info extends AppCompatActivity {
-
     EditText nameOfRestaurant,AddressOfRestaurant,nearbyPlace,pinCode,contactNumber;
     Button proceed;
     FastDialog loading;
