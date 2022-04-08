@@ -107,7 +107,6 @@ public class Info extends AppCompatActivity {
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         boolean isConnected = activeNetwork != null &&
                 activeNetwork.isConnectedOrConnecting();
-
         if(!isConnected){
             View parentLayout = findViewById(android.R.id.content);
             Snackbar.make(parentLayout, "Please connect to internet :)", Snackbar.LENGTH_LONG)
