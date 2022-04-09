@@ -714,7 +714,6 @@ public class ApproveCurrentOrder extends AppCompatActivity {
 
             pdfDocument.close();
         }
-
         @Override
         protected Void doInBackground(Void... voids) {
 
