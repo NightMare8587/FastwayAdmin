@@ -705,13 +705,10 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                     deleteFile(newString);
                     file.delete();
                 }).addOnFailureListener(e -> {
-
                 });
             }catch (Exception e){
                 Toast.makeText(ApproveCurrentOrder.this, ""+e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
-
             }
-
             pdfDocument.close();
         }
         @Override
