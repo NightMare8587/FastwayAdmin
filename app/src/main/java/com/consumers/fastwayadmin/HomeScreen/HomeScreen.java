@@ -42,6 +42,7 @@ import com.consumers.fastwayadmin.R;
 import com.consumers.fastwayadmin.RandomChatNoww;
 import com.gauravk.bubblenavigation.BubbleNavigationConstraintView;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.common.reflect.TypeToken;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -50,7 +51,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONObject;
 
@@ -114,6 +114,26 @@ public class HomeScreen extends AppCompatActivity {
 //             gson = new Gson();
 //             json = gson.toJson(myList);
 //            myEditor.putString("myListStored",json);
+//            myEditor.apply();
+//        }
+
+//        if(sharedPreferences.contains("sastaHasp")){
+//            gson = new Gson();
+//            String storedHash = sharedPreferences.getString("sastaHasp","");
+//            Type type = new TypeToken<HashMap<String,String>>(){
+//
+//            }.getType();
+//            HashMap<String, String> testHashMap2 = gson.fromJson(storedHash, type);
+//            Toast.makeText(this, "" + testHashMap2.toString(), Toast.LENGTH_SHORT).show();
+//            Log.i("map",testHashMap2.toString());
+//        }else{
+//            HashMap<String,String> map = new HashMap<>();
+//            map.put("one","1");
+//            map.put("two","2");
+//            map.put("three","3");
+//            map.put("four","4");
+//            gson = new Gson();
+//            myEditor.putString("sastaHasp",gson.toJson(map));
 //            myEditor.apply();
 //        }
         bubble.setNavigationChangeListener((view, position) -> {

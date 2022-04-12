@@ -182,6 +182,15 @@ public class AccountFrag extends Fragment {
                                 SharedPreferences cashCommission = view1.getContext().getSharedPreferences("CashCommission", MODE_PRIVATE);
                                 cashCommission.edit().clear().commit();
 
+                                SharedPreferences RestaurantTrackingDaily = view1.getContext().getSharedPreferences("RestaurantTrackingDaily", MODE_PRIVATE);
+                                RestaurantTrackingDaily.edit().clear().commit();
+
+                                SharedPreferences RestaurantTrackRecords = view1.getContext().getSharedPreferences("RestaurantTrackRecords", MODE_PRIVATE);
+                                RestaurantTrackRecords.edit().clear().commit();
+
+                                SharedPreferences DishAnalysis = view1.getContext().getSharedPreferences("DishAnalysis", MODE_PRIVATE);
+                                DishAnalysis.edit().clear().commit();
+
                                 startActivity(new Intent(getActivity(), SplashScreen.class));
                                 getActivity().finish();
                             })

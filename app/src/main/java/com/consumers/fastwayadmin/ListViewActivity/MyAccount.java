@@ -441,6 +441,25 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
 
             SharedPreferences intro = getSharedPreferences("IntroAct", MODE_PRIVATE);
             intro.edit().clear().apply();
+
+            SharedPreferences location = getSharedPreferences("LocationMaps", MODE_PRIVATE);
+            location.edit().clear().commit();
+
+            SharedPreferences storeOrders = getSharedPreferences("StoreOrders", MODE_PRIVATE);
+            storeOrders.edit().clear().commit();
+
+
+            SharedPreferences cashCommission = getSharedPreferences("CashCommission", MODE_PRIVATE);
+            cashCommission.edit().clear().commit();
+
+            SharedPreferences RestaurantTrackingDaily = getSharedPreferences("RestaurantTrackingDaily", MODE_PRIVATE);
+            RestaurantTrackingDaily.edit().clear().commit();
+
+            SharedPreferences RestaurantTrackRecords = getSharedPreferences("RestaurantTrackRecords", MODE_PRIVATE);
+            RestaurantTrackRecords.edit().clear().commit();
+
+            SharedPreferences DishAnalysis = getSharedPreferences("DishAnalysis", MODE_PRIVATE);
+            DishAnalysis.edit().clear().commit();
             auth.signOut();
             gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                     .requestIdToken("765176451275-u1ati379eiinc9b21472ml968chmlsqh.apps.googleusercontent.com")

@@ -75,6 +75,7 @@ import java.util.Random;
 
 public class ApproveCurrentOrder extends AppCompatActivity {
     List<String> dishNamePdf;
+    List<String> type = new ArrayList<>();
     Gson gson;
     String json;
     SharedPreferences storeOrdersForAdminInfo;
@@ -121,6 +122,8 @@ public class ApproveCurrentOrder extends AppCompatActivity {
     Calendar calendar = Calendar.getInstance();
     List<String> dishHalfOr = new ArrayList<>();
     Button approve,decline,showCustomisation;
+    SharedPreferences storeForDishAnalysis;
+    SharedPreferences.Editor dishAnalysis;
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -131,6 +134,8 @@ public class ApproveCurrentOrder extends AppCompatActivity {
         state = getIntent().getStringExtra("state");
         restaurantDailyTrack = getSharedPreferences("RestaurantTrackingDaily", Context.MODE_PRIVATE);
         restaurantTrackRecords = getSharedPreferences("RestaurantTrackRecords",Context.MODE_PRIVATE);
+        storeForDishAnalysis = getSharedPreferences("DishAnalysis",MODE_PRIVATE);
+        dishAnalysis = storeForDishAnalysis.edit();
         restaurantTrackRecordsEditor = restaurantTrackRecords.edit();
         restaurantTrackEditor = restaurantDailyTrack.edit();
         StrictMode.VmPolicy.Builder builders = new StrictMode.VmPolicy.Builder();
@@ -172,7 +177,7 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                     time = String.valueOf(dataSnapshot.child("time").getValue());
                     totalPrice = totalPrice + Integer.parseInt(String.valueOf(dataSnapshot.child("price").getValue()));
                     customisation = String.valueOf(dataSnapshot.child("customisation").getValue());
-
+                    type.add(String.valueOf(dataSnapshot.child("type").getValue()));
                 }
                 progressBar.setVisibility(View.INVISIBLE);
                 uploadToArrayAdapter(dishNames,dishQuantity,dishHalfOr);
@@ -243,6 +248,45 @@ public class ApproveCurrentOrder extends AppCompatActivity {
         });
 
         approve.setOnClickListener(v -> {
+
+                String month = monthName[calendar.get(Calendar.MONTH)];
+                if(storeForDishAnalysis.contains("DishAnalysisMonthBasis")){
+                    gson = new Gson();
+                    Type type = new TypeToken<HashMap<String,HashMap<String,String>>>(){}.getType();
+                    String storedHash = storeForDishAnalysis.getString("DishAnalysisMonthBasis","");
+                    HashMap<String,HashMap<String,String>> myMap = gson.fromJson(storedHash,type);
+                    if(myMap.containsKey(month)){
+                        HashMap<String,String> map = new HashMap<>(myMap.get(month));
+                        for(int k=0;k<dishNames.size();k++){
+                            if(map.containsKey(dishNames.get(k))){
+                                int val = Integer.parseInt(map.get(dishNames.get(k)));
+                                val++;
+                                map.put(dishNames.get(k),String.valueOf(val));
+                            }else{
+                                map.put(dishNames.get(k),"1");
+                            }
+                        }
+                    }else{
+                        HashMap<String,String> map = new HashMap<>();
+                        for(int i=0;i<dishNames.size();i++){
+                            map.put(dishNames.get(i),"1");
+                        }
+                        myMap.put(month,map);
+                        dishAnalysis.putString("DishAnalysisMonthBasis",gson.toJson(myMap));
+                        dishAnalysis.apply();
+                    }
+                }else{
+                    HashMap<String,HashMap<String,String>> map = new HashMap<>();
+                    HashMap<String,String> myMap = new HashMap<>();
+                    for(int j=0;j<dishNames.size();j++){
+                        myMap.put(dishNames.get(j),"1");
+                    }
+                    map.put(month,myMap);
+                    gson = new Gson();
+                    dishAnalysis.putString("DishAnalysisMonthBasis",gson.toJson(map));
+                    dishAnalysis.apply();
+                }
+
 
             RequestQueue requestQueue = Volley.newRequestQueue(ApproveCurrentOrder.this);
             JSONObject main = new JSONObject();

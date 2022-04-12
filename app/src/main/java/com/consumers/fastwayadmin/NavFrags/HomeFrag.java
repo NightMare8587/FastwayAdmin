@@ -63,6 +63,7 @@ import com.google.android.play.core.appupdate.AppUpdateInfo;
 import com.google.android.play.core.appupdate.AppUpdateManager;
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory;
 import com.google.android.play.core.install.model.UpdateAvailability;
+import com.google.common.reflect.TypeToken;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -71,9 +72,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -100,6 +103,7 @@ public class HomeFrag extends Fragment {
     List<String> orderIDs = new ArrayList<>();
     List<String> orderAmounts = new ArrayList<>();
     SharedPreferences resInfoShared;
+    Gson gson;
     String usernameOfTakeAway;
     String orderId,orderAmount;
     List<String> finalUserNames = new ArrayList<>();
@@ -207,8 +211,15 @@ public class HomeFrag extends Fragment {
         seeMoreDetails.setOnClickListener(click -> {
             view.getContext().startActivity(new Intent(requireContext(), ResEarningTrackerActivity.class));
         });
-
-
+        SharedPreferences dish = requireContext().getSharedPreferences("DishAnalysis",Context.MODE_PRIVATE);
+        if(dish.contains("DishAnalysisMonthBasis")){
+            gson = new Gson();
+            java.lang.reflect.Type type = new TypeToken<HashMap<String, HashMap<String,String>>>(){}.getType();
+            String storedHash = dish.getString("DishAnalysisMonthBasis","");
+            HashMap<String,HashMap<String,String>> myMap = gson.fromJson(storedHash,type);
+            Log.i("info",myMap.toString());
+            Toast.makeText(requireContext(), "" + myMap.toString(), Toast.LENGTH_SHORT).show();
+        }
         recyclerView = view.findViewById(R.id.homeFragRecyclerView);
         refershRecyclerView = view.findViewById(R.id.refreshCurrentTables);
         refreshTakeAway = view.findViewById(R.id.refreshCurrentTakeAway);
@@ -1072,6 +1083,7 @@ public class HomeFrag extends Fragment {
         @SuppressLint("SetTextI18n")
         @Override
         protected Void doInBackground(Void... voids) {
+
             if(restaurantDailyTrack.contains("currentDate")){
                 if(Integer.parseInt(restaurantDailyTrack.getString("currentDate","")) == currentDay){
                     if(restaurantDailyTrack.contains("totalOrdersToday"))
