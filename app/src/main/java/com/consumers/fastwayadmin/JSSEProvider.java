@@ -2,8 +2,6 @@ package com.consumers.fastwayadmin;
 
 import java.security.AccessController;
 import java.security.Provider;
-
-
 public class JSSEProvider extends Provider{
     public JSSEProvider() {
         super("HarmonyJSSE", 1.0, "Harmony JSSE Provider");

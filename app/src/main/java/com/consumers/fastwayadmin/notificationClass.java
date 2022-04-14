@@ -1,7 +1,6 @@
 package com.consumers.fastwayadmin;
 
 import java.util.Map;
-
 public class notificationClass {
     public String title,message;
     public Map<String,String> timestamp;
