@@ -87,6 +87,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
     FirebaseStorage storage;
     Gson gson;
     String json;
+    Calendar calendar = Calendar.getInstance();
     String[] monthName = {"January", "February",
             "March", "April", "May", "June", "July",
             "August", "September", "October", "November",
@@ -123,7 +124,8 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
     String id,orderId,orderAmount;
     String URL = "https://fcm.googleapis.com/fcm/send";
     String state;
-
+    SharedPreferences storeForDishAnalysis;
+    SharedPreferences.Editor dishAnalysis;
 
     File path;
     Workbook workbook;
@@ -143,6 +145,8 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
         StrictMode.VmPolicy.Builder builders = new StrictMode.VmPolicy.Builder();
         StrictMode.setVmPolicy(builders.build());
         scaled = Bitmap.createScaledBitmap(bmp,500,500,false);
+        storeForDishAnalysis = getSharedPreferences("DishAnalysis",MODE_PRIVATE);
+        dishAnalysis = storeForDishAnalysis.edit();
         bmp1 = BitmapFactory.decodeResource(getResources(), R.drawable.orderdeclined);
         scaled1 = Bitmap.createScaledBitmap(bmp1,500,500,false);
         sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
@@ -291,6 +295,47 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
 
         approve.setOnClickListener(view -> {
             if(paymentMode.equals("cash")){
+                String month = monthName[calendar.get(Calendar.MONTH)];
+                if(storeForDishAnalysis.contains("DishAnalysisMonthBasis")){
+                    gson = new Gson();
+                    java.lang.reflect.Type type = new TypeToken<HashMap<String,HashMap<String,String>>>(){}.getType();
+                    String storedHash = storeForDishAnalysis.getString("DishAnalysisMonthBasis","");
+                    HashMap<String,HashMap<String,String>> myMap = gson.fromJson(storedHash,type);
+                    if(myMap.containsKey(month)){
+                        HashMap<String,String> map = new HashMap<>(myMap.get(month));
+                        Log.i("checking",map.toString());
+                        for(int k=0;k<dishName.size();k++){
+                            if(map.containsKey(dishName.get(k))){
+                                int val = Integer.parseInt(map.get(dishName.get(k)));
+                                val++;
+                                map.put(dishName.get(k),String.valueOf(val));
+                            }else{
+                                map.put(dishName.get(k),"1");
+                            }
+                        }
+                        myMap.put(month,map);
+                        dishAnalysis.putString("DishAnalysisMonthBasis",gson.toJson(myMap));
+                        dishAnalysis.apply();
+                    }else{
+                        HashMap<String,String> map = new HashMap<>();
+                        for(int i=0;i<dishName.size();i++){
+                            map.put(dishName.get(i),"1");
+                        }
+                        myMap.put(month,map);
+                        dishAnalysis.putString("DishAnalysisMonthBasis",gson.toJson(myMap));
+                        dishAnalysis.apply();
+                    }
+                }else{
+                    HashMap<String,HashMap<String,String>> map = new HashMap<>();
+                    HashMap<String,String> myMap = new HashMap<>();
+                    for(int j=0;j<dishName.size();j++){
+                        myMap.put(dishName.get(j),"1");
+                    }
+                    map.put(month,myMap);
+                    gson = new Gson();
+                    dishAnalysis.putString("DishAnalysisMonthBasis",gson.toJson(map));
+                    dishAnalysis.apply();
+                }
                 totalOrders.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -329,7 +374,6 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                         .setConfirmText("Confirm Order")
                         .setConfirmClickListener(kAlertDialog -> {
                             Calendar calendar = Calendar.getInstance();
-                            String month = monthName[calendar.get(Calendar.MONTH)];
                             if(storeOrdersForAdminInfo.contains(month)){
                                 java.lang.reflect.Type type = new TypeToken<List<List<String>>>() {
                                 }.getType();
@@ -727,8 +771,49 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
             Log.i("statusTwo", String.valueOf(makePaymentToVendor.getStatus()));
             RequestQueue requestQueue = Volley.newRequestQueue(ApproveCurrentTakeAway.this);
             StringRequest stringRequest = new StringRequest(Request.Method.POST, testPaymentToVendor, response -> {
-                Log.i("response",response);
                 String month = monthName[calendar.get(Calendar.MONTH)];
+                if(storeForDishAnalysis.contains("DishAnalysisMonthBasis")){
+                    gson = new Gson();
+                    java.lang.reflect.Type type = new TypeToken<HashMap<String,HashMap<String,String>>>(){}.getType();
+                    String storedHash = storeForDishAnalysis.getString("DishAnalysisMonthBasis","");
+                    HashMap<String,HashMap<String,String>> myMap = gson.fromJson(storedHash,type);
+                    if(myMap.containsKey(month)){
+                        HashMap<String,String> map = new HashMap<>(myMap.get(month));
+                        Log.i("checking",map.toString());
+                        for(int k=0;k<dishName.size();k++){
+                            if(map.containsKey(dishName.get(k))){
+                                int val = Integer.parseInt(map.get(dishName.get(k)));
+                                val++;
+                                map.put(dishName.get(k),String.valueOf(val));
+                            }else{
+                                map.put(dishName.get(k),"1");
+                            }
+                        }
+                        myMap.put(month,map);
+                        dishAnalysis.putString("DishAnalysisMonthBasis",gson.toJson(myMap));
+                        dishAnalysis.apply();
+                    }else{
+                        HashMap<String,String> map = new HashMap<>();
+                        for(int i=0;i<dishName.size();i++){
+                            map.put(dishName.get(i),"1");
+                        }
+                        myMap.put(month,map);
+                        dishAnalysis.putString("DishAnalysisMonthBasis",gson.toJson(myMap));
+                        dishAnalysis.apply();
+                    }
+                }else{
+                    HashMap<String,HashMap<String,String>> map = new HashMap<>();
+                    HashMap<String,String> myMap = new HashMap<>();
+                    for(int j=0;j<dishName.size();j++){
+                        myMap.put(dishName.get(j),"1");
+                    }
+                    map.put(month,myMap);
+                    gson = new Gson();
+                    dishAnalysis.putString("DishAnalysisMonthBasis",gson.toJson(map));
+                    dishAnalysis.apply();
+                }
+                Log.i("response",response);
+
                 if(storeOrdersForAdminInfo.contains(month)){
                     java.lang.reflect.Type type = new TypeToken<List<List<String>>>() {
                     }.getType();

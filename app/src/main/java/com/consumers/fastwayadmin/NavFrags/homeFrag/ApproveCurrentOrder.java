@@ -257,6 +257,7 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                     HashMap<String,HashMap<String,String>> myMap = gson.fromJson(storedHash,type);
                     if(myMap.containsKey(month)){
                         HashMap<String,String> map = new HashMap<>(myMap.get(month));
+                        Log.i("checking",map.toString());
                         for(int k=0;k<dishNames.size();k++){
                             if(map.containsKey(dishNames.get(k))){
                                 int val = Integer.parseInt(map.get(dishNames.get(k)));
@@ -266,6 +267,9 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                                 map.put(dishNames.get(k),"1");
                             }
                         }
+                        myMap.put(month,map);
+                        dishAnalysis.putString("DishAnalysisMonthBasis",gson.toJson(myMap));
+                        dishAnalysis.apply();
                     }else{
                         HashMap<String,String> map = new HashMap<>();
                         for(int i=0;i<dishNames.size();i++){
