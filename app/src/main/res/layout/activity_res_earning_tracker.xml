@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<ScrollView xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    tools:ignore="HardcodedText"
+    xmlns:android="http://schemas.android.com/apk/res/android" >
+
+<androidx.constraintlayout.widget.ConstraintLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     tools:context=".NavFrags.ResEarningTracker.ResEarningTrackerActivity">
 
     <org.eazegraph.lib.charts.BarChart
@@ -12,6 +17,7 @@
         android:layout_height="300dp"
         android:padding="10dp"
         app:egBarWidth="20dp"
+        android:orientation="vertical"
         app:egFixedBarWidth="true"
         app:egLegendHeight="40dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -34,7 +40,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="15dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="15dp"
         android:fontFamily="@font/merriweather_sans_bold"
         android:text="Total Orders Made: "
         android:textSize="18sp"
@@ -54,4 +60,42 @@
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/totalOrdersMadeTextViewResTransactions" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        app:layout_constraintTop_toBottomOf="@+id/totalTransactionAmountTextViewResTrans"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:layout_editor_absoluteY="415dp">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/dishTrackerRecyclerViewAnalysis"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/seeMoreDishAnalysisDetails"
+            app:layout_constraintTop_toBottomOf="@+id/dishTrackerRecyclerViewAnalysis"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            android:layout_marginTop="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="See More Details"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:padding="10dp"
+            android:textColor="#000000"
+            android:background="@drawable/edittext_back"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+</ScrollView>

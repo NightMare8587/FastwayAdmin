@@ -212,14 +212,14 @@ public class HomeFrag extends Fragment {
             view.getContext().startActivity(new Intent(requireContext(), ResEarningTrackerActivity.class));
         });
         SharedPreferences dish = requireContext().getSharedPreferences("DishAnalysis",Context.MODE_PRIVATE);
-        if(dish.contains("DishAnalysisMonthBasis")){
-            gson = new Gson();
-            java.lang.reflect.Type type = new TypeToken<HashMap<String, HashMap<String,String>>>(){}.getType();
-            String storedHash = dish.getString("DishAnalysisMonthBasis","");
-            HashMap<String,HashMap<String,String>> myMap = gson.fromJson(storedHash,type);
-            Log.i("info",myMap.toString());
-            Toast.makeText(requireContext(), "" + myMap.toString(), Toast.LENGTH_SHORT).show();
-        }
+//        if(dish.contains("DishAnalysisMonthBasis")){
+//            gson = new Gson();
+//            java.lang.reflect.Type type = new TypeToken<HashMap<String, HashMap<String,String>>>(){}.getType();
+//            String storedHash = dish.getString("DishAnalysisMonthBasis","");
+//            HashMap<String,HashMap<String,String>> myMap = gson.fromJson(storedHash,type);
+//            Log.i("info",myMap.toString());
+//            Toast.makeText(requireContext(), "" + myMap.toString(), Toast.LENGTH_SHORT).show();
+//        }
         recyclerView = view.findViewById(R.id.homeFragRecyclerView);
         refershRecyclerView = view.findViewById(R.id.refreshCurrentTables);
         refreshTakeAway = view.findViewById(R.id.refreshCurrentTakeAway);

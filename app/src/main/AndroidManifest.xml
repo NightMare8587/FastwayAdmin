@@ -25,12 +25,15 @@
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:requestLegacyExternalStorage="true"
         android:preserveLegacyExternalStorage="true"
+        android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         tools:replace="android:icon,android:allowBackup">
+        <activity
+            android:name=".NavFrags.ResDishTracker.seeAllDishAnalysis"
+            android:exported="false" />
         <activity
             android:name=".NavFrags.ResEarningTracker.ResEarningTrackerActivity"
             android:exported="false" />

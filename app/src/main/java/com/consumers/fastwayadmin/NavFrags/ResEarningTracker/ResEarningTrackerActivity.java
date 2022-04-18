@@ -1,5 +1,8 @@
 package com.consumers.fastwayadmin.NavFrags.ResEarningTracker;
 
+import static java.util.stream.Collectors.toMap;
+
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -11,18 +14,23 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.consumers.fastwayadmin.NavFrags.ResDishTracker.RecyclerClassView;
 import com.consumers.fastwayadmin.R;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
+import com.google.protobuf.Value;
 
 import org.eazegraph.lib.charts.BarChart;
 import org.eazegraph.lib.models.BarModel;
@@ -31,24 +39,31 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ResEarningTrackerActivity extends AppCompatActivity  {
     SharedPreferences resTrackInfo;
     SharedPreferences storeOrdersForAdminInfo;
     Calendar calendar;
-    RecyclerView recyclerView;
+    RecyclerView recyclerView,dishRecyclerView;
     TackerAdapter tackerAdapter;
     int totalAmountPerMonth = 0;
+    Button seeMoreDetails;
     Gson gson;
     TextView totalOrdersMade,totalTransactionsMade;
     String json;
+    SharedPreferences dish;
     String[] monthName = {"January", "February",
             "March", "April", "May", "June", "July",
             "August", "September", "October", "November",
             "December"};
     List<String> allMonthsNames;
     int currentDay;
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +71,8 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
         setContentView(R.layout.activity_res_earning_tracker);
         resTrackInfo = getSharedPreferences("RestaurantTrackingDaily",MODE_PRIVATE);
         calendar = Calendar.getInstance();
+        dishRecyclerView = findViewById(R.id.dishTrackerRecyclerViewAnalysis);
+        dish = getSharedPreferences("DishAnalysis",Context.MODE_PRIVATE);
         storeOrdersForAdminInfo = getSharedPreferences("StoreOrders",MODE_PRIVATE);
         totalOrdersMade = findViewById(R.id.totalOrdersMadeTextViewResTransactions);
         totalTransactionsMade = findViewById(R.id.totalTransactionAmountTextViewResTrans);
@@ -64,6 +81,8 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
         java.lang.reflect.Type type = new TypeToken<List<List<String>>>() {
         }.getType();
         gson = new Gson();
+        seeMoreDetails = findViewById(R.id.seeMoreDishAnalysisDetails);
+
         if(storeOrdersForAdminInfo.contains(month)) {
             json = storeOrdersForAdminInfo.getString(month, "");
             List<List<String>> mainDataListText = gson.fromJson(json, type);
@@ -80,6 +99,8 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
             totalOrdersMade.setText("Total Transactions Made: " + 0);
             totalTransactionsMade.setText("Total Transactions Made: \u20B9" + 0);
         }
+
+
         recyclerView = findViewById(R.id.monthNamesListViewRes);
         allMonthsNames = new ArrayList<>(Arrays.asList(monthName));
         currentDay = calendar.get(Calendar.DAY_OF_MONTH);
@@ -109,8 +130,52 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
             }
         }
         mBarChart.startAnimation();
+
+
+        if(dish.contains("DishAnalysisMonthBasis")){
+            gson = new Gson();
+            java.lang.reflect.Type types = new TypeToken<HashMap<String, HashMap<String,String>>>(){}.getType();
+            String storedHash = dish.getString("DishAnalysisMonthBasis","");
+            HashMap<String,HashMap<String,String>> myMap = gson.fromJson(storedHash,types);
+            if(myMap.containsKey(month)){
+                HashMap<String,String> map = new HashMap<>(myMap.get(month));
+                List<String> values = new ArrayList<String>(map.values());
+                Log.i("info",values.toString());
+                Collections.sort(values,Collections.reverseOrder());
+                Log.i("info",values.toString());
+
+               Map<String,String> sorted = map
+                        .entrySet()
+                        .stream()
+                        .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
+                        .collect(
+                                toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2,
+                                        LinkedHashMap::new));
+
+               Log.i("info",map.toString());
+               Log.i("info",sorted.toString());
+
+               List<String> keysName = new ArrayList<>();
+               List<String> valuesName = new ArrayList<>();
+
+               for(int i=0;i<sorted.size();i++){
+                   valuesName.add("" + sorted.values().toArray()[i]);
+                   keysName.add("" + sorted.keySet().toArray()[i]);
+               }
+
+                Log.i("info",keysName.toString());
+                Log.i("info",valuesName.toString());
+                seeMoreDetails.setVisibility(View.VISIBLE);
+                dishRecyclerView.setLayoutManager(new LinearLayoutManager(ResEarningTrackerActivity.this));
+                dishRecyclerView.setAdapter(new RecyclerClassView(keysName,valuesName));
+            }else {
+                seeMoreDetails.setVisibility(View.INVISIBLE);
+                dishRecyclerView.setVisibility(View.INVISIBLE);
+            }
+        }
     }
     public BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @RequiresApi(api = Build.VERSION_CODES.N)
         @SuppressLint("SetTextI18n")
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -135,6 +200,51 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
                 totalOrdersMade.setText("Total Transactions Made: " + 0);
                 totalTransactionsMade.setText("Total Transactions Made: \u20B9" + 0);
                 Toast.makeText(context, "No transactions made in Month " + MonthName, Toast.LENGTH_SHORT).show();
+            }
+
+            if(dish.contains("DishAnalysisMonthBasis")){
+                gson = new Gson();
+                java.lang.reflect.Type types = new TypeToken<HashMap<String, HashMap<String,String>>>(){}.getType();
+                String storedHash = dish.getString("DishAnalysisMonthBasis","");
+                HashMap<String,HashMap<String,String>> myMap = gson.fromJson(storedHash,types);
+                if(myMap.containsKey(MonthName)){
+                    HashMap<String,String> map = new HashMap<>(myMap.get(MonthName));
+                    List<String> values = new ArrayList<String>(map.values());
+                    Log.i("info",values.toString());
+                    Collections.sort(values,Collections.reverseOrder());
+                    Log.i("info",values.toString());
+
+                    Map<String,String> sorted = map
+                            .entrySet()
+                            .stream()
+                            .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
+                            .collect(
+                                    toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2,
+                                            LinkedHashMap::new));
+
+                    Log.i("info",map.toString());
+                    Log.i("info",sorted.toString());
+
+                    List<String> keysName = new ArrayList<>();
+                    List<String> valuesName = new ArrayList<>();
+
+                    for(int i=0;i<sorted.size();i++){
+                        valuesName.add("" + sorted.values().toArray()[i]);
+                        keysName.add("" + sorted.keySet().toArray()[i]);
+                    }
+
+                    Log.i("info",keysName.toString());
+                    Log.i("info",valuesName.toString());
+                    seeMoreDetails.setVisibility(View.VISIBLE);
+                    seeMoreDetails.setOnClickListener(click -> {
+
+                    });
+                    dishRecyclerView.setLayoutManager(new LinearLayoutManager(ResEarningTrackerActivity.this));
+                    dishRecyclerView.setAdapter(new RecyclerClassView(keysName,valuesName));
+                }else {
+                    seeMoreDetails.setVisibility(View.INVISIBLE);
+                    recyclerView.setVisibility(View.INVISIBLE);
+                }
             }
         }
     };
