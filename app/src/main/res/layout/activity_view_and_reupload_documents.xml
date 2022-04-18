@@ -13,7 +13,7 @@
         android:layout_marginStart="1dp"
         android:layout_marginTop="1dp"
         android:layout_marginEnd="1dp"
-        app:columnCount="2"
+        app:columnCount="3"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -50,7 +50,6 @@
             android:backgroundTint="@color/quantum_googred50"
             android:text="FSSAI"
             android:textSize="25sp"
-
             app:layout_column="0"
             app:layout_columnWeight="1"
             app:layout_row="1" />
@@ -65,6 +64,19 @@
             app:layout_column="1"
             app:layout_columnWeight="1"
             app:layout_row="1" />
+
+        <Button
+            android:id="@+id/resProofGridViewButton"
+            android:layout_height="92dp"
+            android:layout_margin="10dp"
+            android:backgroundTint="@color/cfdialog_neutral_button_color"
+            android:text="RES\nPROOF"
+            android:textSize="25sp"
+            app:layout_column="2"
+            app:layout_columnWeight="2"
+            app:layout_row="1"
+
+            />
 
     </androidx.gridlayout.widget.GridLayout>
 

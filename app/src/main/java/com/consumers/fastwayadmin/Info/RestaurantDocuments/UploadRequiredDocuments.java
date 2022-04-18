@@ -56,16 +56,16 @@ import karpuzoglu.enes.com.fastdialog.Type;
 
 public class UploadRequiredDocuments extends AppCompatActivity {
     DatabaseReference databaseReference;
-    String panUrl,adhaarUrl,gstUrl,fssaiUrl;
+    String panUrl,adhaarUrl,gstUrl,fssaiUrl,residentialProofSubmitUrl;
     FirebaseAuth auth = FirebaseAuth.getInstance();
     SharedPreferences sharedPreferences;
-    Button panCard,adhaarCard,fssaiCard,gstCard;
+    Button panCard,adhaarCard,fssaiCard,gstCard,residentialProof;
     StorageReference storageReference;
     Uri filePath;
     FirebaseStorage storage;
     File file;
     Bitmap bitmap;
-    TextView panText,gstText,adhaarText,FssaiText;
+    TextView panText,gstText,adhaarText,FssaiText,resProofText;
     OutputStream outputStream;
     FastDialog loading;
     boolean pan = false;
@@ -73,6 +73,7 @@ public class UploadRequiredDocuments extends AppCompatActivity {
     boolean gst = false;
     boolean adhaar = false;
     boolean fssai = false;
+    boolean resProof = false;
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,6 +91,7 @@ public class UploadRequiredDocuments extends AppCompatActivity {
         panText = findViewById(R.id.panTextUploaded);
         adhaarText = findViewById(R.id.uploadAdhaarCardText);
         FssaiText = findViewById(R.id.uploadFssaiText);
+        resProofText = findViewById(R.id.uploadResidentialText);
         checkPermissions();
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
@@ -124,6 +126,12 @@ public class UploadRequiredDocuments extends AppCompatActivity {
                         adhaarText.setVisibility(View.VISIBLE);
                         adhaarUrl = snapshot.child("Restaurant Documents").child("adhaar").getValue(String.class);
                         adhaarCard.setClickable(false);
+                    }
+                    if(snapshot.child("Restaurant Documents").hasChild("resProof")){
+                        resProof = true;
+                        resProofText.setVisibility(View.VISIBLE);
+                        residentialProofSubmitUrl = snapshot.child("Restaurant Documents").child("resProof").getValue(String.class);
+                        residentialProof.setClickable(false);
                     }
 
                     checkIfAllUploaded();
@@ -223,6 +231,27 @@ public class UploadRequiredDocuments extends AppCompatActivity {
             }
         });
 
+        residentialProof.setOnClickListener(click -> {
+            if(ContextCompat.checkSelfPermission(UploadRequiredDocuments.this, Manifest.permission.ACCESS_FINE_LOCATION) + ContextCompat.checkSelfPermission(UploadRequiredDocuments.this , Manifest.permission.CAMERA)
+                    + ContextCompat.checkSelfPermission(UploadRequiredDocuments.this, Manifest.permission.WRITE_EXTERNAL_STORAGE )
+                    != PackageManager.PERMISSION_GRANTED){
+//            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},1);
+                requestPermissions(new String[]{Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.ACCESS_FINE_LOCATION},88);
+            }else {
+                AlertDialog.Builder alert = new AlertDialog.Builder(UploadRequiredDocuments.this);
+                alert.setTitle("Choose one option").setMessage("Residential Proof includes: Electricity Bill, Water Bill, Telephone Bill or Any other bill which proves the restaurant residential address")
+                        .setPositiveButton("Upload from gallery", (dialogInterface, i) -> {
+                            dialogInterface.dismiss();
+                            Intent intent = new Intent();
+                            intent.setType("image/*");
+                            intent.setAction("android.intent.action.PICK");
+                            startActivityForResult(Intent.createChooser(intent, "Select Picture"), 5);
+                        }).setNegativeButton("Cancel", (dialogInterface, i) -> dialogInterface.dismiss()).create();
+
+                alert.show();
+            }
+        });
+
         gstCard.setOnClickListener(click -> {
             if(ContextCompat.checkSelfPermission(UploadRequiredDocuments.this, Manifest.permission.ACCESS_FINE_LOCATION) + ContextCompat.checkSelfPermission(UploadRequiredDocuments.this , Manifest.permission.CAMERA)
                     + ContextCompat.checkSelfPermission(UploadRequiredDocuments.this, Manifest.permission.WRITE_EXTERNAL_STORAGE )
@@ -241,12 +270,7 @@ public class UploadRequiredDocuments extends AppCompatActivity {
                                 intent.setAction("android.intent.action.PICK");
                                 startActivityForResult(Intent.createChooser(intent, "Select Picture"), 4);
                             }
-                        }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                    }
-                }).create();
+                        }).setNegativeButton("Cancel", (dialogInterface, i) -> dialogInterface.dismiss()).create();
 
                 alert.show();
             }
@@ -258,10 +282,11 @@ public class UploadRequiredDocuments extends AppCompatActivity {
         adhaarCard = findViewById(R.id.uploadAdhaarCard);
         fssaiCard = findViewById(R.id.uploadFSSAIcard);
         gstCard= findViewById(R.id.uploadGSTcard);
+        residentialProof = findViewById(R.id.uploadResidentialProof);
     }
 
     private void checkIfAllUploaded() {
-        if(adhaar && pan && gst && fssai){
+        if(adhaar && pan && gst && fssai && resProof){
             DatabaseReference databaseReferenceCheck = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Registered Restaurants");
             databaseReferenceCheck.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
@@ -272,24 +297,24 @@ public class UploadRequiredDocuments extends AppCompatActivity {
                         databaseReference.child("bankVerified").setValue("yes");
                         startActivity(new Intent(getApplicationContext(), MapsActivity.class));
                     }else{
+                        ResDocuments resDocuments = new ResDocuments(panUrl,adhaarUrl,fssaiUrl,gstUrl,residentialProofSubmitUrl);
+                        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Restaurant Registration");
+                        databaseReference.child(Objects.requireNonNull(auth.getUid())).setValue(resDocuments);
+                        SharedPreferences sharedPreferences = getSharedPreferences("RestaurantInfo",MODE_PRIVATE);
+                        databaseReference.child(auth.getUid()).child("ResName").setValue(sharedPreferences.getString("hotelName",""));
+                        databaseReference.child(auth.getUid()).child("ResAddress").setValue(sharedPreferences.getString("hotelAddress",""));
+                        databaseReference.child(auth.getUid()).child("ResNumber").setValue(sharedPreferences.getString("hotelNumber",""));
+                        SharedPreferences loginShared = getSharedPreferences("loginInfo",MODE_PRIVATE);
+                        databaseReference.child(auth.getUid()).child("state").setValue(loginShared.getString("state",""));
+
+                        databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid()).child("Restaurant Documents");
+                        databaseReference.child("verified").setValue("no");
+                        databaseReference.child("bankVerified").setValue("no");
                         new KAlertDialog(UploadRequiredDocuments.this,KAlertDialog.SUCCESS_TYPE)
                                 .setTitleText("Documents Uploaded")
                                 .setContentText("Documents uploaded and will be verified by our fastway staff with an on-site verification")
                                 .setConfirmText("Exit")
                                 .setConfirmClickListener(click -> {
-                                    ResDocuments resDocuments = new ResDocuments(panUrl,adhaarUrl,fssaiUrl,gstUrl);
-                                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Restaurant Registration");
-                                    databaseReference.child(Objects.requireNonNull(auth.getUid())).setValue(resDocuments);
-                                    SharedPreferences sharedPreferences = getSharedPreferences("RestaurantInfo",MODE_PRIVATE);
-                                    databaseReference.child(auth.getUid()).child("ResName").setValue(sharedPreferences.getString("hotelName",""));
-                                    databaseReference.child(auth.getUid()).child("ResAddress").setValue(sharedPreferences.getString("hotelAddress",""));
-                                    databaseReference.child(auth.getUid()).child("ResNumber").setValue(sharedPreferences.getString("hotelNumber",""));
-                                    SharedPreferences loginShared = getSharedPreferences("loginInfo",MODE_PRIVATE);
-                                    databaseReference.child(auth.getUid()).child("state").setValue(loginShared.getString("state",""));
-
-                                    databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid()).child("Restaurant Documents");
-                                    databaseReference.child("verified").setValue("no");
-                                    databaseReference.child("bankVerified").setValue("no");
                                     click.dismissWithAnimation();
                                     startActivity(new Intent(getApplicationContext(), MapsActivity.class));
                                 }).show();
@@ -633,52 +658,61 @@ public class UploadRequiredDocuments extends AppCompatActivity {
                 e.printStackTrace();
                 loading.dismiss();
             }
+        }else if(requestCode == 5 && resultCode == RESULT_OK && data != null){
+            loading = new FastDialogBuilder(UploadRequiredDocuments.this,Type.PROGRESS)
+                    .setAnimation(Animations.SLIDE_BOTTOM)
+                    .progressText("Uploading Image.....")
+                    .create();
+
+            loading.show();
+            filePath = data.getData();
+            try {
+                bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(),filePath);
+                uploadImage("resProof");
+            } catch (IOException e) {
+                e.printStackTrace();
+                loading.dismiss();
+            }
         }
     }
     private void uploadImage(String value) {
         if(filePath != null){
             StorageReference reference = storageReference.child(auth.getUid() + "/" + "Documents" + "/"  + value);
-            reference.putFile(filePath).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onSuccess(@NonNull UploadTask.TaskSnapshot taskSnapshot) {
-                    StorageReference reference = storageReference.child(auth.getUid() + "/" + "Documents" + "/"  + value);
-                    reference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                        @Override
-                        public void onSuccess(@NonNull Uri uri) {
-                            if(value.equals("pan")) {
-                                panUrl = uri + "";
-                                pan = true;
-                                panText.setVisibility(View.VISIBLE);
-                            }
-                            if(value.equals("fssai")) {
-                                fssai = true;
-                                fssaiUrl = uri + "";
-                                FssaiText.setVisibility(View.VISIBLE);
-                            }
-                            if(value.equals("adhaar")) {
-                                adhaar = true;
-                                adhaarUrl = uri + "";
-                                adhaarText.setVisibility(View.VISIBLE);
-                            }
-                            if(value.equals("gst")) {
-                                gst = true;
-                                gstUrl = uri + "";
-                                gstText.setVisibility(View.VISIBLE);
-                            }
-                            Toast.makeText(UploadRequiredDocuments.this, "Upload Complete and image saved in phone successfully", Toast.LENGTH_SHORT).show();
-                            loading.dismiss();
-                            DatabaseReference dish = FirebaseDatabase.getInstance().getReference().getRoot();
-                            dish.child("Admin").child(Objects.requireNonNull(auth.getUid())).child("Restaurant Documents").child(value).setValue(uri + "");
-                           checkIfAllUploaded();
-                        }
-                    });
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
+            reference.putFile(filePath).addOnSuccessListener(taskSnapshot -> {
+                StorageReference reference1 = storageReference.child(auth.getUid() + "/" + "Documents" + "/"  + value);
+                reference1.getDownloadUrl().addOnSuccessListener(uri -> {
+                    if(value.equals("pan")) {
+                        panUrl = uri + "";
+                        pan = true;
+                        panText.setVisibility(View.VISIBLE);
+                    }
+                    if(value.equals("fssai")) {
+                        fssai = true;
+                        fssaiUrl = uri + "";
+                        FssaiText.setVisibility(View.VISIBLE);
+                    }
+                    if(value.equals("adhaar")) {
+                        adhaar = true;
+                        adhaarUrl = uri + "";
+                        adhaarText.setVisibility(View.VISIBLE);
+                    }
+                    if(value.equals("gst")) {
+                        gst = true;
+                        gstUrl = uri + "";
+                        gstText.setVisibility(View.VISIBLE);
+                    }
+                    if(value.equals("resProof")){
+                        resProof = true;
+                        residentialProofSubmitUrl = uri + "";
+                        resProofText.setVisibility(View.VISIBLE);
+                    }
+                    Toast.makeText(UploadRequiredDocuments.this, "Upload Complete and image saved in phone successfully", Toast.LENGTH_SHORT).show();
                     loading.dismiss();
-                }
-            });
+                    DatabaseReference dish = FirebaseDatabase.getInstance().getReference().getRoot();
+                    dish.child("Admin").child(Objects.requireNonNull(auth.getUid())).child("Restaurant Documents").child(value).setValue(uri + "");
+                   checkIfAllUploaded();
+                });
+            }).addOnFailureListener(e -> loading.dismiss());
         }else
             loading.dismiss();
     }

@@ -58,9 +58,9 @@ public class ViewAndReuploadDocuments extends AppCompatActivity {
     FirebaseAuth auth = FirebaseAuth.getInstance();
     String currentString = "";
     ProgressBar progressBar;
-    String pan,adhaar,fssai,gst;
+    String pan,adhaar,fssai,gst,resProof;
     FastDialog loading;
-    Button panButton,gstButton,adhaarButton,fssaiButton;
+    Button panButton,gstButton,adhaarButton,fssaiButton,resProofButton;
     File file;
     OutputStream outputStream;
     StorageReference storageReference;
@@ -83,6 +83,7 @@ public class ViewAndReuploadDocuments extends AppCompatActivity {
                 gst = String.valueOf(dataSnapshot.child("gst").getValue());
                 pan = String.valueOf(dataSnapshot.child("pan").getValue());
                 fssai = String.valueOf(dataSnapshot.child("fssai").getValue());
+                resProof = String.valueOf(dataSnapshot.child("resProof").getValue());
             }
 
             @Override
@@ -91,70 +92,78 @@ public class ViewAndReuploadDocuments extends AppCompatActivity {
             }
         });
 
-        gstButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(!gst.isEmpty())
-                showAlertDialog(gst,"gst");
+        gstButton.setOnClickListener(view -> {
+            if(!gst.isEmpty() && !gst.equals("null"))
+            showAlertDialog(gst,"gst");
+            else{
+                reuploadImageOrNotUploaded("gst");
             }
         });
-        fssaiButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(!fssai.isEmpty())
-                showAlertDialog(fssai,"fssai");
+        fssaiButton.setOnClickListener(view -> {
+            if(!fssai.isEmpty() && !fssai.equals("null"))
+            showAlertDialog(fssai,"fssai");
+            else{
+                reuploadImageOrNotUploaded("fssai");
             }
         });
-        panButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(!pan.isEmpty())
-                showAlertDialog(pan,"pan");
+        panButton.setOnClickListener(view -> {
+            if(!pan.isEmpty() && !pan.equals("null"))
+            showAlertDialog(pan,"pan");
+            else{
+                reuploadImageOrNotUploaded("pan");
             }
         });
-        adhaarButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(!adhaar.isEmpty())
-                showAlertDialog(adhaar,"adhaar");
+        adhaarButton.setOnClickListener(view -> {
+            if(!adhaar.isEmpty() && !adhaar.equals("null"))
+            showAlertDialog(adhaar,"adhaar");
+            else{
+                reuploadImageOrNotUploaded("adhaar");
+            }
+        });
+        resProofButton.setOnClickListener(click -> {
+            if(!resProof.isEmpty() && !resProof.equals("null"))
+                showAlertDialog(resProof,"resProof");
+            else{
+                reuploadImageOrNotUploaded("resProof");
             }
         });
     }
 
-    private void showAlertDialog(String str,String name) {
+    private void reuploadImageOrNotUploaded(String str) {
         AlertDialog.Builder builder = new AlertDialog.Builder(ViewAndReuploadDocuments.this);
-        builder.setTitle("Dialog").setMessage("Choose one option from below!").setPositiveButton("Reupload Document", new DialogInterface.OnClickListener() {
+        builder.setTitle("Choose one option").setPositiveButton("Choose from Gallery", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 dialogInterface.dismiss();
-                AlertDialog.Builder alert = new AlertDialog.Builder(ViewAndReuploadDocuments.this);
-                alert.setTitle("Dialog").setMessage("Choose one option from below")
-                        .setPositiveButton("Take Photo", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                dialogInterface.dismiss();
-                                currentString = name;
-                                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE); //IMAGE CAPTURE CODE
-                                startActivityForResult(intent, 22);
-                            }
-                        }).setNegativeButton("Choose from gallery", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
+                Intent intent = new Intent();
+                intent.setType("image/*");
+                intent.setAction("android.intent.action.PICK");
+                currentString = str;
+                startActivityForResult(Intent.createChooser(intent, "Select Picture"), 5);
+            }
+        }).setNegativeButton("Cancel", (dialogInterface, i) -> dialogInterface.dismiss()).create().show();
+    }
+
+    private void showAlertDialog(String str,String name) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(ViewAndReuploadDocuments.this);
+        builder.setTitle("Dialog").setMessage("Choose one option from below!").setPositiveButton("Reupload Document", (dialogInterface, i) -> {
+            dialogInterface.dismiss();
+            AlertDialog.Builder alert = new AlertDialog.Builder(ViewAndReuploadDocuments.this);
+            alert.setTitle("Dialog").setMessage("Choose one option from below")
+                    .setPositiveButton("Take Photo", (dialogInterface1, i1) -> {
+                        dialogInterface1.dismiss();
+                        currentString = name;
+                        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE); //IMAGE CAPTURE CODE
+                        startActivityForResult(intent, 22);
+                    }).setNegativeButton("Choose from gallery", (dialogInterface12, i12) -> {
+                        dialogInterface12.dismiss();
                         Intent intent = new Intent();
                         intent.setType("image/*");
-                        intent.setAction(Intent.ACTION_GET_CONTENT);
+                        intent.setAction("android.intent.action.PICK");
                         currentString = name;
                         startActivityForResult(Intent.createChooser(intent, "Select Picture"), 4);
-                    }
-                }).setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                    }
-                }).create();
-                alert.show();
-            }
+                    }).setNeutralButton("Cancel", (dialogInterface13, i13) -> dialogInterface13.dismiss()).create();
+            alert.show();
         }).setNegativeButton("View Document", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
@@ -186,6 +195,7 @@ public class ViewAndReuploadDocuments extends AppCompatActivity {
         fssaiButton = findViewById(R.id.fssaiGridViewButton);
         adhaarButton = findViewById(R.id.adhaarGridViewButton);
         panButton = findViewById(R.id.panGridViewButton);
+        resProofButton = findViewById(R.id.resProofGridViewButton);
         imageView = findViewById(R.id.imageViewViewAndReuploadDocuments);
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
@@ -285,27 +295,40 @@ public class ViewAndReuploadDocuments extends AppCompatActivity {
             try {
                 bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(),filePath);
                 StorageReference reference = storageReference.child(auth.getUid() + "/" + "Documents" + "/"  + currentString);
-                reference.putFile(filePath).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(@NonNull UploadTask.TaskSnapshot taskSnapshot) {
-                        StorageReference reference = storageReference.child(auth.getUid() + "/" + "Documents" + "/"  + currentString);
-                        reference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                            @Override
-                            public void onSuccess(@NonNull Uri uri) {
-                                Toast.makeText(ViewAndReuploadDocuments.this, "Upload Complete and image saved in phone successfully", Toast.LENGTH_SHORT).show();
-                                loading.dismiss();
-                                DatabaseReference dish = FirebaseDatabase.getInstance().getReference().getRoot();
-                                dish.child("Admin").child(Objects.requireNonNull(auth.getUid())).child("Restaurant Documents").child(currentString).setValue(uri + "");
-
-                            }
-                        });
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
+                reference.putFile(filePath).addOnSuccessListener(taskSnapshot -> {
+                    StorageReference reference1 = storageReference.child(auth.getUid() + "/" + "Documents" + "/"  + currentString);
+                    reference1.getDownloadUrl().addOnSuccessListener(uri -> {
+                        Toast.makeText(ViewAndReuploadDocuments.this, "Upload Complete and image saved in phone successfully", Toast.LENGTH_SHORT).show();
                         loading.dismiss();
-                    }
-                });
+                        DatabaseReference dish = FirebaseDatabase.getInstance().getReference().getRoot();
+                        dish.child("Admin").child(Objects.requireNonNull(auth.getUid())).child("Restaurant Documents").child(currentString).setValue(uri + "");
+
+                    });
+                }).addOnFailureListener(e -> loading.dismiss());
+            } catch (IOException e) {
+                e.printStackTrace();
+                loading.dismiss();
+            }
+        }else if(requestCode == 5 && resultCode == RESULT_OK && data != null){
+            loading = new FastDialogBuilder(ViewAndReuploadDocuments.this,Type.PROGRESS)
+                    .setAnimation(Animations.SLIDE_BOTTOM)
+                    .progressText("Uploading Image.....")
+                    .create();
+
+            loading.show();
+            filePath = data.getData();
+            try {
+                bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(),filePath);
+                StorageReference reference = storageReference.child(auth.getUid() + "/" + "Documents" + "/"  + currentString);
+                reference.putFile(filePath).addOnSuccessListener(taskSnapshot -> {
+                    StorageReference reference1 = storageReference.child(auth.getUid() + "/" + "Documents" + "/"  + currentString);
+                    reference1.getDownloadUrl().addOnSuccessListener(uri -> {
+                        Toast.makeText(ViewAndReuploadDocuments.this, "Upload Complete and image saved in phone successfully", Toast.LENGTH_SHORT).show();
+                        loading.dismiss();
+                        DatabaseReference dish = FirebaseDatabase.getInstance().getReference().getRoot();
+                        dish.child("Admin").child(Objects.requireNonNull(auth.getUid())).child("Restaurant Documents").child(currentString).setValue(uri + "");
+                    });
+                }).addOnFailureListener(e -> loading.dismiss());
             } catch (IOException e) {
                 e.printStackTrace();
                 loading.dismiss();

@@ -46,6 +46,16 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/ReuploadGSTcard" />
 
+    <Button
+        android:id="@+id/ReuploadResProofCard"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="21dp"
+        android:text="Upload Residential\nProof"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ReuploadAdhaarCard" />
+
     <TextView
         android:id="@+id/RepanTextUploaded"
         android:layout_width="wrap_content"
@@ -93,5 +103,18 @@
         android:visibility="invisible"
         app:layout_constraintStart_toEndOf="@+id/ReuploadAdhaarCard"
         app:layout_constraintTop_toBottomOf="@+id/ReuploadGstText" />
+
+    <TextView
+        android:id="@+id/ReuploadResProofCardText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="44dp"
+        android:text="uploaded"
+        android:textColor="@color/cfdialog_positive_button_color"
+        android:visibility="invisible"
+        app:layout_constraintStart_toEndOf="@+id/ReuploadResProofCard"
+        app:layout_constraintTop_toBottomOf="@+id/ReuploadAdhaarCard" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

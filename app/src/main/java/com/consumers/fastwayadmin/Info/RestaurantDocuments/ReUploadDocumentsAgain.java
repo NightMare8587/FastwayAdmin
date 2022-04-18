@@ -51,16 +51,16 @@ import karpuzoglu.enes.com.fastdialog.FastDialogBuilder;
 import karpuzoglu.enes.com.fastdialog.Type;
 
 public class ReUploadDocumentsAgain extends AppCompatActivity {
-    String panUrl,adhaarUrl,gstUrl,fssaiUrl;
+    String panUrl,adhaarUrl,gstUrl,fssaiUrl,resUrl;
     FirebaseAuth auth = FirebaseAuth.getInstance();
     SharedPreferences sharedPreferences;
-    Button panCard,adhaarCard,fssaiCard,gstCard;
+    Button panCard,adhaarCard,fssaiCard,gstCard,resProofCard;
     StorageReference storageReference;
     Uri filePath;
     FirebaseStorage storage;
     File file;
     Bitmap bitmap;
-    TextView panText,gstText,adhaarText,FssaiText;
+    TextView panText,gstText,adhaarText,FssaiText,resText;
     OutputStream outputStream;
     FastDialog loading;
     boolean pan = false;
@@ -68,6 +68,7 @@ public class ReUploadDocumentsAgain extends AppCompatActivity {
     boolean gst = false;
     boolean adhaar = false;
     boolean fssai = false;
+    boolean resProof = false;
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +84,7 @@ public class ReUploadDocumentsAgain extends AppCompatActivity {
         panText = findViewById(R.id.RepanTextUploaded);
         adhaarText = findViewById(R.id.ReuploadAdhaarCardText);
         FssaiText = findViewById(R.id.ReuploadFssaiText);
+        resText = findViewById(R.id.ReuploadResProofCardText);
         checkPermissions();
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
@@ -172,7 +174,27 @@ public class ReUploadDocumentsAgain extends AppCompatActivity {
                 alert.show();
             }
         });
-        
+
+        resProofCard.setOnClickListener(click -> {
+            if(ContextCompat.checkSelfPermission(ReUploadDocumentsAgain.this, Manifest.permission.ACCESS_FINE_LOCATION) + ContextCompat.checkSelfPermission(ReUploadDocumentsAgain.this , Manifest.permission.CAMERA)
+                    + ContextCompat.checkSelfPermission(ReUploadDocumentsAgain.this, Manifest.permission.WRITE_EXTERNAL_STORAGE )
+                    != PackageManager.PERMISSION_GRANTED){
+//            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},1);
+                requestPermissions(new String[]{Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.ACCESS_FINE_LOCATION},88);
+            }else {
+                AlertDialog.Builder alert = new AlertDialog.Builder(ReUploadDocumentsAgain.this);
+                alert.setTitle("Choose one option").setMessage("Residential Proof includes: Electricity Bill, Water Bill, Telephone Bill or Any other bill which proves the restaurant residential address")
+                        .setPositiveButton("Upload from gallery", (dialogInterface, i) -> {
+                            dialogInterface.dismiss();
+                            Intent intent = new Intent();
+                            intent.setType("image/*");
+                            intent.setAction("android.intent.action.PICK");
+                            startActivityForResult(Intent.createChooser(intent, "Select Picture"), 5);
+                        }).setNegativeButton("Cancel", (dialogInterface, i) -> dialogInterface.dismiss()).create();
+
+                alert.show();
+            }
+        });
     }
 
     @Override
@@ -480,6 +502,21 @@ public class ReUploadDocumentsAgain extends AppCompatActivity {
                 e.printStackTrace();
                 loading.dismiss();
             }
+        }else if(requestCode == 5 && resultCode == RESULT_OK && data != null){
+            loading = new FastDialogBuilder(ReUploadDocumentsAgain.this,Type.PROGRESS)
+                    .setAnimation(Animations.SLIDE_BOTTOM)
+                    .progressText("Uploading Image.....")
+                    .create();
+
+            loading.show();
+            filePath = data.getData();
+            try {
+                bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(),filePath);
+                uploadImage("resProof");
+            } catch (IOException e) {
+                e.printStackTrace();
+                loading.dismiss();
+            }
         }
     }
 
@@ -488,66 +525,63 @@ public class ReUploadDocumentsAgain extends AppCompatActivity {
             StorageReference reference = storageReference.child(auth.getUid() + "/" + "Documents" + "/"  + value);
             reference.putFile(filePath).addOnSuccessListener(taskSnapshot -> {
                 StorageReference reference1 = storageReference.child(auth.getUid() + "/" + "Documents" + "/"  + value);
-                reference1.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                    @Override
-                    public void onSuccess(@NonNull Uri uri) {
-                        if(value.equals("pan")) {
-                            panUrl = uri + "";
-                            pan = true;
-                            panText.setVisibility(View.VISIBLE);
-                        }
-                        if(value.equals("fssai")) {
-                            fssai = true;
-                            fssaiUrl = uri + "";
-                            FssaiText.setVisibility(View.VISIBLE);
-                        }
-                        if(value.equals("adhaar")) {
-                            adhaar = true;
-                            adhaarUrl = uri + "";
-                            adhaarText.setVisibility(View.VISIBLE);
-                        }
-                        if(value.equals("gst")) {
-                            gst = true;
-                            gstUrl = uri + "";
-                            gstText.setVisibility(View.VISIBLE);
-                        }
-                        Toast.makeText(ReUploadDocumentsAgain.this, "Upload Complete and image saved in phone successfully", Toast.LENGTH_SHORT).show();
-                        loading.dismiss();
-                        DatabaseReference dish = FirebaseDatabase.getInstance().getReference().getRoot();
-                        dish.child("Admin").child(Objects.requireNonNull(auth.getUid())).child("Restaurant Documents").child(value).setValue(uri + "");
-                        checkIfAllUploaded();
+                reference1.getDownloadUrl().addOnSuccessListener(uri -> {
+                    if(value.equals("pan")) {
+                        panUrl = uri + "";
+                        pan = true;
+                        panText.setVisibility(View.VISIBLE);
                     }
-                });
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
+                    if(value.equals("fssai")) {
+                        fssai = true;
+                        fssaiUrl = uri + "";
+                        FssaiText.setVisibility(View.VISIBLE);
+                    }
+                    if(value.equals("adhaar")) {
+                        adhaar = true;
+                        adhaarUrl = uri + "";
+                        adhaarText.setVisibility(View.VISIBLE);
+                    }
+                    if(value.equals("gst")) {
+                        gst = true;
+                        gstUrl = uri + "";
+                        gstText.setVisibility(View.VISIBLE);
+                    }
+                    if(value.equals("resProof")){
+                        resProof = true;
+                        resUrl = uri + "";
+                        resText.setVisibility(View.VISIBLE);
+                    }
+                    Toast.makeText(ReUploadDocumentsAgain.this, "Upload Complete and image saved in phone successfully", Toast.LENGTH_SHORT).show();
                     loading.dismiss();
-                }
-            });
+                    DatabaseReference dish = FirebaseDatabase.getInstance().getReference().getRoot();
+                    dish.child("Admin").child(Objects.requireNonNull(auth.getUid())).child("Restaurant Documents").child(value).setValue(uri + "");
+                    checkIfAllUploaded();
+                });
+            }).addOnFailureListener(e -> loading.dismiss());
         }else
             loading.dismiss();
     }
 
     private void checkIfAllUploaded() {
-        if(adhaar && pan && gst && fssai){
+        if(adhaar && pan && gst && fssai && resProof){
+            ResDocuments resDocuments = new ResDocuments(panUrl,adhaarUrl,fssaiUrl,gstUrl,resUrl);
+            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Restaurant Registration");
+            databaseReference.child(Objects.requireNonNull(auth.getUid())).setValue(resDocuments);
+            SharedPreferences sharedPreferences = getSharedPreferences("RestaurantInfo",MODE_PRIVATE);
+            databaseReference.child(auth.getUid()).child("ResName").setValue(sharedPreferences.getString("hotelName",""));
+            databaseReference.child(auth.getUid()).child("ResAddress").setValue(sharedPreferences.getString("hotelAddress",""));
+            databaseReference.child(auth.getUid()).child("ResNumber").setValue(sharedPreferences.getString("hotelNumber",""));
+            databaseReference.child(auth.getUid()).child("state").setValue(this.sharedPreferences.getString("state",""));
+
+            databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid()).child("Restaurant Documents");
+            databaseReference.child("verified").setValue("no");
+            databaseReference.child("bankVerified").setValue("no");
+            databaseReference.child("reasonForCancel").removeValue();
             new KAlertDialog(ReUploadDocumentsAgain.this,KAlertDialog.SUCCESS_TYPE)
                     .setTitleText("Documents Re-Uploaded")
                     .setContentText("Documents Re-Uploaded and will be verified by our fastway staff with an on-site verification")
                     .setConfirmText("Exit")
                     .setConfirmClickListener(click -> {
-                        ResDocuments resDocuments = new ResDocuments(panUrl,adhaarUrl,fssaiUrl,gstUrl);
-                        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Restaurant Registration");
-                        databaseReference.child(Objects.requireNonNull(auth.getUid())).setValue(resDocuments);
-                        SharedPreferences sharedPreferences = getSharedPreferences("RestaurantInfo",MODE_PRIVATE);
-                        databaseReference.child(auth.getUid()).child("ResName").setValue(sharedPreferences.getString("hotelName",""));
-                        databaseReference.child(auth.getUid()).child("ResAddress").setValue(sharedPreferences.getString("hotelAddress",""));
-                        databaseReference.child(auth.getUid()).child("ResNumber").setValue(sharedPreferences.getString("hotelNumber",""));
-                        databaseReference.child(auth.getUid()).child("state").setValue(this.sharedPreferences.getString("state",""));
-
-                        databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid()).child("Restaurant Documents");
-                        databaseReference.child("verified").setValue("no");
-                        databaseReference.child("bankVerified").setValue("no");
-                        databaseReference.child("reasonForCancel").removeValue();
                         click.dismissWithAnimation();
                         startActivity(new Intent(getApplicationContext(), HomeScreen.class));
                         finish();
@@ -560,5 +594,6 @@ public class ReUploadDocumentsAgain extends AppCompatActivity {
         adhaarCard = findViewById(R.id.ReuploadAdhaarCard);
         fssaiCard = findViewById(R.id.ReuploadFSSAIcard);
         gstCard= findViewById(R.id.ReuploadGSTcard);
+        resProofCard= findViewById(R.id.ReuploadResProofCard);
     }
 }
