@@ -16,6 +16,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -27,6 +28,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.consumers.fastwayadmin.NavFrags.ResDishTracker.RecyclerClassView;
+import com.consumers.fastwayadmin.NavFrags.ResDishTracker.seeAllDishAnalysis;
 import com.consumers.fastwayadmin.R;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
@@ -155,8 +157,8 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
                Log.i("info",map.toString());
                Log.i("info",sorted.toString());
 
-               List<String> keysName = new ArrayList<>();
-               List<String> valuesName = new ArrayList<>();
+               ArrayList<String> keysName = new ArrayList<>();
+               ArrayList<String> valuesName = new ArrayList<>();
 
                for(int i=0;i<sorted.size();i++){
                    valuesName.add("" + sorted.values().toArray()[i]);
@@ -166,6 +168,16 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
                 Log.i("info",keysName.toString());
                 Log.i("info",valuesName.toString());
                 seeMoreDetails.setVisibility(View.VISIBLE);
+                dishRecyclerView.setVisibility(View.VISIBLE);
+                seeMoreDetails.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent intent1 = new Intent(ResEarningTrackerActivity.this, seeAllDishAnalysis.class);
+                        intent1.putExtra("dishName", keysName);
+                        intent1.putExtra("dishValue",  valuesName);
+                        startActivity(intent1);
+                    }
+                });
                 dishRecyclerView.setLayoutManager(new LinearLayoutManager(ResEarningTrackerActivity.this));
                 dishRecyclerView.setAdapter(new RecyclerClassView(keysName,valuesName));
             }else {
@@ -225,8 +237,8 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
                     Log.i("info",map.toString());
                     Log.i("info",sorted.toString());
 
-                    List<String> keysName = new ArrayList<>();
-                    List<String> valuesName = new ArrayList<>();
+                    ArrayList<String> keysName = new ArrayList<>();
+                    ArrayList<String> valuesName = new ArrayList<>();
 
                     for(int i=0;i<sorted.size();i++){
                         valuesName.add("" + sorted.values().toArray()[i]);
@@ -236,14 +248,18 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
                     Log.i("info",keysName.toString());
                     Log.i("info",valuesName.toString());
                     seeMoreDetails.setVisibility(View.VISIBLE);
+                    dishRecyclerView.setVisibility(View.VISIBLE);
                     seeMoreDetails.setOnClickListener(click -> {
-
+                        Intent intent1 = new Intent(ResEarningTrackerActivity.this, seeAllDishAnalysis.class);
+                        intent1.putExtra("dishName",  keysName);
+                        intent1.putExtra("dishValue",  valuesName);
+                        startActivity(intent1);
                     });
                     dishRecyclerView.setLayoutManager(new LinearLayoutManager(ResEarningTrackerActivity.this));
                     dishRecyclerView.setAdapter(new RecyclerClassView(keysName,valuesName));
                 }else {
                     seeMoreDetails.setVisibility(View.INVISIBLE);
-                    recyclerView.setVisibility(View.INVISIBLE);
+                    dishRecyclerView.setVisibility(View.INVISIBLE);
                 }
             }
         }
