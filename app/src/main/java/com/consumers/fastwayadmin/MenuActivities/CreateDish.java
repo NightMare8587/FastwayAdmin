@@ -221,6 +221,10 @@ public class CreateDish extends AppCompatActivity {
             StorageReference reference = storageReference.child(dishAuth.getUid() + "/" + "image" + "/"  + nameOfDish.getText().toString());
             reference.getDownloadUrl().addOnSuccessListener(uri -> {
                 DatabaseReference dish = FirebaseDatabase.getInstance().getReference().getRoot();
+                SharedPreferences storeImages = getSharedPreferences("storeImages",MODE_PRIVATE);
+                SharedPreferences.Editor imageEdit = storeImages.edit();
+                imageEdit.putString(name,uri + "");
+                imageEdit.apply();
                 dish.child("Restaurants").child(state).child(Objects.requireNonNull(dishAuth.getUid())).child("List of Dish").child(menuType).child(name).child("image").setValue(uri + "");
             });
             Toast.makeText(this, "Dish Added Successfully", Toast.LENGTH_SHORT).show();
@@ -273,6 +277,7 @@ public class CreateDish extends AppCompatActivity {
         protected Void doInBackground(Void... voids) {
 
             try {
+
                 StorageReference reference = storageReference.child(dishAuth.getUid() + "/" + "image" + "/"  + nameOfDish.getText().toString());
                 reference.putFile(Uri.fromFile(outputFile)).addOnCompleteListener(task -> {
                     SharedPreferences sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);

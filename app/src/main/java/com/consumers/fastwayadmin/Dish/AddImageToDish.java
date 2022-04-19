@@ -74,7 +74,7 @@ public class AddImageToDish extends AppCompatActivity {
 
                     Intent intent = new Intent();
                     intent.setType("image/*");
-                    intent.setAction(Intent.ACTION_GET_CONTENT);
+                    intent.setAction("android.intent.action.PICK");
                     startActivityForResult(Intent.createChooser(intent, "Select Picture"), 1);
                 }).setNegativeButton("Cancel", (dialogInterface, i) -> {
                     dialogInterface.dismiss();
@@ -136,24 +136,16 @@ public class AddImageToDish extends AppCompatActivity {
             }
             try {
                 StorageReference reference = storageReference.child(dishAuth.getUid() + "/" + "image" + "/"  + dishName);
-                reference.putFile(Uri.fromFile(file)).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-                        Toast.makeText(AddImageToDish.this, "Upload Complete", Toast.LENGTH_SHORT).show();
-                        SharedPreferences sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
-                        if(sharedPreferences.getString("storeInDevice","").equals("no")){
-                            file.delete();
-                        }
-                        new UploadInBackground().execute();
-                        fastDialog.dismiss();
-                        finish();
+                reference.putFile(Uri.fromFile(file)).addOnCompleteListener(task -> {
+                    Toast.makeText(AddImageToDish.this, "Upload Complete", Toast.LENGTH_SHORT).show();
+                    SharedPreferences sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
+                    if(sharedPreferences.getString("storeInDevice","").equals("no")){
+                        file.delete();
                     }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        fastDialog.dismiss();
-                    }
-                });
+                    new UploadInBackground().execute();
+                    fastDialog.dismiss();
+                    finish();
+                }).addOnFailureListener(e -> fastDialog.dismiss());
             }catch (Exception e){
                 Toast.makeText(this, ""+e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                 fastDialog.dismiss();
@@ -172,6 +164,10 @@ public class AddImageToDish extends AppCompatActivity {
         ref1.getDownloadUrl().addOnSuccessListener(uri -> {
             Toast.makeText(AddImageToDish.this, "New Image Uploaded", Toast.LENGTH_SHORT).show();
             reference.child("image").setValue(uri + "");
+            SharedPreferences storeImages = getSharedPreferences("storeImages",MODE_PRIVATE);
+            SharedPreferences.Editor imageEdit = storeImages.edit();
+            imageEdit.putString(dishName,uri + "");
+            imageEdit.apply();
             fastDialog.dismiss();
             finish();
         });
@@ -205,11 +201,12 @@ public class AddImageToDish extends AppCompatActivity {
                     .child("List of Dish").child(type).child(dishName);
 
             StorageReference ref = storageReference.child(dishAuth.getUid() + "/" + "image" + "/"  + dishName);
-            ref.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                @Override
-                public void onSuccess(@NonNull Uri uri) {
-                    reference.child("image").setValue(uri + "");
-                }
+            ref.getDownloadUrl().addOnSuccessListener(uri -> {
+                SharedPreferences storeImages = getSharedPreferences("storeImages",MODE_PRIVATE);
+                SharedPreferences.Editor imageEdit = storeImages.edit();
+                imageEdit.putString(dishName,uri + "");
+                imageEdit.apply();
+                reference.child("image").setValue(uri + "");
             });
             return null;
         }

@@ -53,6 +53,7 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
     Calendar calendar;
     RecyclerView recyclerView,dishRecyclerView;
     TackerAdapter tackerAdapter;
+
     int totalAmountPerMonth = 0;
     Button seeMoreDetails;
     Gson gson;
@@ -169,17 +170,14 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
                 Log.i("info",valuesName.toString());
                 seeMoreDetails.setVisibility(View.VISIBLE);
                 dishRecyclerView.setVisibility(View.VISIBLE);
-                seeMoreDetails.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Intent intent1 = new Intent(ResEarningTrackerActivity.this, seeAllDishAnalysis.class);
-                        intent1.putExtra("dishName", keysName);
-                        intent1.putExtra("dishValue",  valuesName);
-                        startActivity(intent1);
-                    }
+                seeMoreDetails.setOnClickListener(view -> {
+                    Intent intent1 = new Intent(ResEarningTrackerActivity.this, seeAllDishAnalysis.class);
+                    intent1.putExtra("dishName", keysName);
+                    intent1.putExtra("dishValue",  valuesName);
+                    startActivity(intent1);
                 });
                 dishRecyclerView.setLayoutManager(new LinearLayoutManager(ResEarningTrackerActivity.this));
-                dishRecyclerView.setAdapter(new RecyclerClassView(keysName,valuesName));
+                dishRecyclerView.setAdapter(new RecyclerClassView(keysName,valuesName,ResEarningTrackerActivity.this));
             }else {
                 seeMoreDetails.setVisibility(View.INVISIBLE);
                 dishRecyclerView.setVisibility(View.INVISIBLE);
@@ -256,7 +254,7 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
                         startActivity(intent1);
                     });
                     dishRecyclerView.setLayoutManager(new LinearLayoutManager(ResEarningTrackerActivity.this));
-                    dishRecyclerView.setAdapter(new RecyclerClassView(keysName,valuesName));
+                    dishRecyclerView.setAdapter(new RecyclerClassView(keysName,valuesName,ResEarningTrackerActivity.this));
                 }else {
                     seeMoreDetails.setVisibility(View.INVISIBLE);
                     dishRecyclerView.setVisibility(View.INVISIBLE);

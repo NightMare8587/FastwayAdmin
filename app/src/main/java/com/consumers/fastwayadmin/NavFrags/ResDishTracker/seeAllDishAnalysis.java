@@ -23,6 +23,6 @@ import java.util.List;
         dishValue = (ArrayList<String>) getIntent().getSerializableExtra("dishValue");
         recyclerView = findViewById(R.id.recyclerViewSeeAllDishAnalysis);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setAdapter(new recyclerAllDish(dishName,dishValue));
+        recyclerView.setAdapter(new recyclerAllDish(dishName,dishValue,seeAllDishAnalysis.this));
     }
 }
