@@ -422,8 +422,9 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                                 storeEditor.apply();
                                 Log.i("myInfo",mainDataList.toString());
                             }
+                            File path = getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
                                 try {
-                                    workbook = new Workbook(getFilePath());
+                                    workbook = new Workbook(path + "/ResTransactions.xlsx");
                                     Worksheet ws = workbook.getWorksheets().get(0);
                                     int max = workbook.getWorksheets().get(0).getCells().getMaxDataRow();
                                     max = max + 2;
@@ -435,7 +436,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                                     workbook.getWorksheets().get(0).getCells().get("D" + max).putValue("\u20B9" + orderAmount);
                                     Log.i("info",max + "");
                                     try {
-                                        workbook.save(getFilePath(), SaveFormat.XLSX);
+                                        workbook.save(path + "/ResTransactions.xlsx", SaveFormat.XLSX);
                                         Log.i("info","FILE SAVED");
                                         Toast.makeText(this, "" + max, Toast.LENGTH_SHORT).show();
                                     } catch (Exception e) {
@@ -862,8 +863,9 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                     storeEditor.apply();
                     Log.i("myInfo",mainDataList.toString());
                 }
+                File path = getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
                 try {
-                    workbook = new Workbook(getFilePath());
+                    workbook = new Workbook(path + "/ResTransactions.xlsx");
                     int max = workbook.getWorksheets().get(0).getCells().getMaxDataRow();
                     max = max + 2;
                     DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
@@ -873,7 +875,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                     workbook.getWorksheets().get(0).getCells().get("C" + max).putValue("" + id);
                     workbook.getWorksheets().get(0).getCells().get("D" + max).putValue("\u20B9" + orderAmount);
                     try {
-                        workbook.save(getFilePath(), SaveFormat.XLSX);
+                        workbook.save(path + "/ResTransactions.xlsx", SaveFormat.XLSX);
                         Log.i("info","FILE SAVED");
                         Toast.makeText(ApproveCurrentTakeAway.this, "File saved successfully", Toast.LENGTH_SHORT).show();
                     } catch (Exception e) {
@@ -1061,10 +1063,10 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
         }
     }
 
-    public String getFilePath(){
-        ContextWrapper contextWrapper = new ContextWrapper(getApplicationContext());
-        File direc = contextWrapper.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
-        File file = new File(direc,"ResTransactions" + ".xlsx");
-        return file.getPath();
-    }
+//    public String getFilePath(){
+//        ContextWrapper contextWrapper = new ContextWrapper(getApplicationContext());
+//        File direc = contextWrapper.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
+//        File file = new File(direc,"ResTransactions" + ".xlsx");
+//        return file.getPath();
+//    }
 }

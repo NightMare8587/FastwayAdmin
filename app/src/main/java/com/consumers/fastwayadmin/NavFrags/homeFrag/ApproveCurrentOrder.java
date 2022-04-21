@@ -150,7 +150,7 @@ public class ApproveCurrentOrder extends AppCompatActivity {
         scaled1 = Bitmap.createScaledBitmap(bmp1,500,500,false);
         initialise();
         textView.setText("Table Number: " + table);
-        path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
+        path = getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
         saveRefundInfo = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(id);
         totalOrders = FirebaseDatabase.getInstance().getReference().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
         saveRefundInfo.addListenerForSingleValueEvent(new ValueEventListener() {

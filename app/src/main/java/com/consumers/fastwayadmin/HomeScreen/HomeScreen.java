@@ -154,8 +154,19 @@ public class HomeScreen extends AppCompatActivity {
         });
         StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
         StrictMode.setVmPolicy(builder.build());
-        File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
+        File path = getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
         Workbook workbook;
+//        workbook.getWorksheets().get(0).getCells().get("A1").putValue("Date");
+//        try {
+//            workbook.save(path + "/MyFile.xlsx",SaveFormat.XLSX);
+//            Log.i("info",path.getAbsolutePath() + "");
+//            Log.i("info",getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS).getAbsolutePath()+ "");
+//            Toast.makeText(this, "File Saved", Toast.LENGTH_SHORT).show();
+//        } catch (Exception e) {
+//            Toast.makeText(this, "File Not Saved", Toast.LENGTH_SHORT).show();
+//            e.printStackTrace();
+//        }
+
         if(!sharedPreferences.contains("workbookCreated")) {
             try {
                 workbook = new Workbook();
