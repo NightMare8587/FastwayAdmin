@@ -212,7 +212,7 @@ public class Info extends AppCompatActivity {
                 != PackageManager.PERMISSION_GRANTED){
 //            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},1);
             requestPermissions(new String[]{Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.ACCESS_FINE_LOCATION},1);
-        }
+        }else
             createLocationRequest();
     }
 
