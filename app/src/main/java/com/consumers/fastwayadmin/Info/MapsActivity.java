@@ -95,42 +95,36 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         assert mapFragment != null;
         mapFragment.getMapAsync(this);
 
-        actionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                createLocationRequest();
-                client.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
-                    @Override
-                    public void onSuccess(Location location) {
-                        if (location != null) {
-                            Toast.makeText(MapsActivity.this, "Yes", Toast.LENGTH_SHORT).show();
-                            mMap.clear();
-                            LatLng current = new LatLng(location.getLatitude(), location.getLongitude());
-                            mMap.addMarker(new MarkerOptions().position(current).title("Current Location"));
+        actionButton.setOnClickListener(view -> {
+            createLocationRequest();
+            client.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
+                @Override
+                public void onSuccess(Location location) {
+                    if (location != null) {
+                        Toast.makeText(MapsActivity.this, "Yes", Toast.LENGTH_SHORT).show();
+                        mMap.clear();
+                        LatLng current = new LatLng(location.getLatitude(), location.getLongitude());
+                        mMap.addMarker(new MarkerOptions().position(current).title("Current Location"));
 //                            mMap.animateCamera(CameraUpdateFactory.zoomIn());
-                            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(current, 15));
-                        }else
-                            createLocationRequest();
-                    }
-                });
-            }
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(current, 15));
+                    }else
+                        createLocationRequest();
+                }
+            });
         });
 
 
-        proceed.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                SharedPreferences locationShared = getSharedPreferences("LocationMaps",MODE_PRIVATE);
-                SharedPreferences.Editor editor = locationShared.edit();
-                ref = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
-                RestLocation restLocation = new RestLocation(String.valueOf(latitude),String.valueOf(longitude));
-                ref.child("location").setValue(restLocation);
-                startActivity(new Intent(getApplicationContext(), HomeScreen.class));
-                editor.putString("location","yes");
-                client.removeLocationUpdates(mLocationCallback);
-                editor.apply();
-                finish();
-            }
+        proceed.setOnClickListener(view -> {
+            SharedPreferences locationShared = getSharedPreferences("LocationMaps",MODE_PRIVATE);
+            SharedPreferences.Editor editor = locationShared.edit();
+            ref = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
+            RestLocation restLocation = new RestLocation(String.valueOf(latitude),String.valueOf(longitude));
+            ref.child("location").setValue(restLocation);
+            startActivity(new Intent(getApplicationContext(), HomeScreen.class));
+            editor.putString("location","yes");
+            client.removeLocationUpdates(mLocationCallback);
+            editor.apply();
+            finish();
         });
 
         imageButton.setOnClickListener(new View.OnClickListener() {
@@ -186,37 +180,34 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         client.requestLocationUpdates(locationRequest,mLocationCallback, Looper.myLooper());
         SettingsClient client = LocationServices.getSettingsClient(this);
         Task<LocationSettingsResponse> task = client.checkLocationSettings(builder.build());
-        task.addOnCompleteListener(new OnCompleteListener<LocationSettingsResponse>() {
-            @Override
-            public void onComplete(Task<LocationSettingsResponse> task) {
-                try {
-                    LocationSettingsResponse response = task.getResult(ApiException.class);
-                    // All location settings are satisfied. The client can initialize location
-                    // requests here.
-                } catch (ApiException exception) {
-                    switch (exception.getStatusCode()) {
-                        case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
-                            // Location settings are not satisfied. But could be fixed by showing the
-                            // user a dialog.
-                            try {
-                                // Cast to a resolvable exception.
-                                ResolvableApiException resolvable = (ResolvableApiException) exception;
-                                // Show the dialog by calling startResolutionForResult(),
-                                // and check the result in onActivityResult().
-                                resolvable.startResolutionForResult(
-                                        MapsActivity.this,
-                                        101);
-                            } catch (IntentSender.SendIntentException e) {
-                                // Ignore the error.
-                            } catch (ClassCastException e) {
-                                // Ignore, should be an impossible error.
-                            }
-                            break;
-                        case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
-                            // Location settings are not satisfied. However, we have no way to fix the
-                            // settings so we won't show the dialog.
-                            break;
-                    }
+        task.addOnCompleteListener(task1 -> {
+            try {
+                LocationSettingsResponse response = task1.getResult(ApiException.class);
+                // All location settings are satisfied. The client can initialize location
+                // requests here.
+            } catch (ApiException exception) {
+                switch (exception.getStatusCode()) {
+                    case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+                        // Location settings are not satisfied. But could be fixed by showing the
+                        // user a dialog.
+                        try {
+                            // Cast to a resolvable exception.
+                            ResolvableApiException resolvable = (ResolvableApiException) exception;
+                            // Show the dialog by calling startResolutionForResult(),
+                            // and check the result in onActivityResult().
+                            resolvable.startResolutionForResult(
+                                    MapsActivity.this,
+                                    101);
+                        } catch (IntentSender.SendIntentException e) {
+                            // Ignore the error.
+                        } catch (ClassCastException e) {
+                            // Ignore, should be an impossible error.
+                        }
+                        break;
+                    case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
+                        // Location settings are not satisfied. However, we have no way to fix the
+                        // settings so we won't show the dialog.
+                        break;
                 }
             }
         });
@@ -272,17 +263,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
-        client.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
-            @Override
-            public void onSuccess(Location location) {
-                if(location != null){
-                    Toast.makeText(MapsActivity.this, "Hello", Toast.LENGTH_SHORT).show();
-                    LatLng current = new LatLng(location.getLatitude(),location.getLongitude());
-                    mMap.addMarker(new MarkerOptions().position(current).title("Current position"));
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(current,15));
-                }else{
+        client.getLastLocation().addOnSuccessListener(location -> {
+            if(location != null){
+                Toast.makeText(MapsActivity.this, "Hello", Toast.LENGTH_SHORT).show();
+                LatLng current = new LatLng(location.getLatitude(),location.getLongitude());
+                mMap.addMarker(new MarkerOptions().position(current).title("Current position"));
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(current,15));
+            }else{
 //                    Toast.makeText(MapsActivity.this, "Something went wrong!! Enable location and restart the App :)", Toast.LENGTH_SHORT).show();
-                }
             }
         });
         // Add a marker in Sydney and move the camera
@@ -293,15 +281,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     protected void onStart() {
         super.onStart();
-        client.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
-            @Override
-            public void onSuccess(Location location) {
-                if(location != null){
-                    latitude = location.getLatitude();
-                    longitude = location.getLongitude();
-                }
-
+        client.getLastLocation().addOnSuccessListener(location -> {
+            if(location != null){
+                latitude = location.getLatitude();
+                longitude = location.getLongitude();
             }
+
         });
     }
 
@@ -337,12 +322,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }else{
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setTitle("Important").setMessage("Location is required for proper functioning of this app. Wanna provide permission?")
-                        .setPositiveButton("yes", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                checkRequiredPermission();
-                            }
-                        }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        .setPositiveButton("yes", (dialogInterface, i) -> checkRequiredPermission()).setNegativeButton("No", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         dialogInterface.dismiss();
