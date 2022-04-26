@@ -3,6 +3,7 @@ package com.consumers.fastwayadmin.NavFrags;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -48,6 +49,7 @@ public class MenuFrag extends Fragment {
     SharedPreferences sharedPreferences;
     int count = 0;
     Button appliedOffers;
+    DatabaseReference databaseReference;
     boolean pressed = false;
     int total = 0;
     @Nullable
@@ -92,21 +94,9 @@ public class MenuFrag extends Fragment {
         combo = view.findViewById(R.id.Combo);
         drinks = view.findViewById(R.id.Drinks);
         FirebaseAuth auth = FirebaseAuth.getInstance();
+        databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
+        new BackgroundWork().execute();
 
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
-        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(snapshot.hasChild("Discount")){
-                    appliedOffers.setVisibility(View.VISIBLE);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
 
 //        StrictMode.VmPolicy.Builder builders = new StrictMode.VmPolicy.Builder();
 //        StrictMode.setVmPolicy(builders.build());
@@ -189,75 +179,81 @@ public class MenuFrag extends Fragment {
             startActivity(intent);
         });
 
-        breads.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                SharedPreferences preferences = view.getContext().getSharedPreferences("DishType", Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = preferences.edit();
-                editor.putString("Type","Breads");
-                editor.putString("state",sharedPreferences.getString("state",""));
-                editor.apply();
-                Intent intent = new Intent(getActivity(),AllMenuDish.class);
-                intent.putExtra("Dish","Breads");
-                startActivity(intent);
-            }
+        breads.setOnClickListener(view16 -> {
+            SharedPreferences preferences = view16.getContext().getSharedPreferences("DishType", Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putString("Type","Breads");
+            editor.putString("state",sharedPreferences.getString("state",""));
+            editor.apply();
+            Intent intent = new Intent(getActivity(),AllMenuDish.class);
+            intent.putExtra("Dish","Breads");
+            startActivity(intent);
         });
 
-        snacks.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                SharedPreferences preferences = view.getContext().getSharedPreferences("DishType", Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = preferences.edit();
-                editor.putString("Type","Snacks");
-                editor.putString("state",sharedPreferences.getString("state",""));
-                editor.apply();
-                Intent intent = new Intent(getActivity(),AllMenuDish.class);
-                intent.putExtra("Dish","Snacks");
-                startActivity(intent);
-            }
+        snacks.setOnClickListener(view15 -> {
+            SharedPreferences preferences = view15.getContext().getSharedPreferences("DishType", Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putString("Type","Snacks");
+            editor.putString("state",sharedPreferences.getString("state",""));
+            editor.apply();
+            Intent intent = new Intent(getActivity(),AllMenuDish.class);
+            intent.putExtra("Dish","Snacks");
+            startActivity(intent);
         });
 
-        deserts.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                SharedPreferences preferences = view.getContext().getSharedPreferences("DishType", Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = preferences.edit();
-                editor.putString("Type","Deserts");
-                editor.putString("state",sharedPreferences.getString("state",""));
-                editor.apply();
-                Intent intent = new Intent(getActivity(),AllMenuDish.class);
-                intent.putExtra("Dish","Deserts");
-                startActivity(intent);
-            }
+        deserts.setOnClickListener(view14 -> {
+            SharedPreferences preferences = view14.getContext().getSharedPreferences("DishType", Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putString("Type","Deserts");
+            editor.putString("state",sharedPreferences.getString("state",""));
+            editor.apply();
+            Intent intent = new Intent(getActivity(),AllMenuDish.class);
+            intent.putExtra("Dish","Deserts");
+            startActivity(intent);
         });
 
-        combo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                SharedPreferences preferences = view.getContext().getSharedPreferences("DishType", Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = preferences.edit();
-                editor.putString("Type","Combo");
-                editor.putString("state",sharedPreferences.getString("state",""));
-                editor.apply();
-                Intent intent = new Intent(getActivity(), ComboMenuDish.class);
-                intent.putExtra("Dish","Combo");
-                intent.putExtra("state",sharedPreferences.getString("state",""));
-                startActivity(intent);
-            }
+        combo.setOnClickListener(view13 -> {
+            SharedPreferences preferences = view13.getContext().getSharedPreferences("DishType", Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putString("Type","Combo");
+            editor.putString("state",sharedPreferences.getString("state",""));
+            editor.apply();
+            Intent intent = new Intent(getActivity(), ComboMenuDish.class);
+            intent.putExtra("Dish","Combo");
+            intent.putExtra("state",sharedPreferences.getString("state",""));
+            startActivity(intent);
         });
 
-        drinks.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                SharedPreferences preferences = view.getContext().getSharedPreferences("DishType", Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = preferences.edit();
-                editor.putString("Type","Drinks");
-                editor.putString("state",sharedPreferences.getString("state",""));
-                editor.apply();
-                Intent intent = new Intent(getActivity(),AllMenuDish.class);
-                intent.putExtra("Dish","Drinks");
-                startActivity(intent);
-            }
+        drinks.setOnClickListener(view12 -> {
+            SharedPreferences preferences = view12.getContext().getSharedPreferences("DishType", Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putString("Type","Drinks");
+            editor.putString("state",sharedPreferences.getString("state",""));
+            editor.apply();
+            Intent intent = new Intent(getActivity(),AllMenuDish.class);
+            intent.putExtra("Dish","Drinks");
+            startActivity(intent);
         });
+    }
+    public class BackgroundWork extends AsyncTask<Void,Void,Void>{
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if(snapshot.hasChild("Discount")){
+                        appliedOffers.setVisibility(View.VISIBLE);
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+            return null;
+
+        }
     }
 }

@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -98,39 +99,9 @@ public class TablesFrag extends Fragment {
         tableNumber.clear();
         status.clear();
 
+        new backGroundWork().execute();
 
-        tableRef.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                updateChild();
-                called++;
-                Log.i("call",called + "");
-            }
 
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                updateChild();
-                called++;
-                Log.i("call",called + "");
-            }
-
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
-                updateChild();
-                called++;
-                Log.i("call",called + "");
-            }
-
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
 
         addTable.setOnClickListener(view1 -> startActivity(new Intent(getActivity(), AddTables.class)));
 
@@ -255,5 +226,44 @@ public class TablesFrag extends Fragment {
         });
     }
 
+    public class backGroundWork extends AsyncTask<Void,Void,Void>{
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            tableRef.addChildEventListener(new ChildEventListener() {
+                @Override
+                public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                    updateChild();
+                    called++;
+                    Log.i("call",called + "");
+                }
+
+                @Override
+                public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                    updateChild();
+                    called++;
+                    Log.i("call",called + "");
+                }
+
+                @Override
+                public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+                    updateChild();
+                    called++;
+                    Log.i("call",called + "");
+                }
+
+                @Override
+                public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+            return null;
+        }
+    }
 
 }
