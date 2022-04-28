@@ -1,6 +1,10 @@
 package com.consumers.fastwayadmin.Tables;
 
 import android.Manifest;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -16,17 +20,21 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.RemoteViews;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 
 import com.consumers.fastwayadmin.R;
 import com.google.firebase.auth.FirebaseAuth;
@@ -223,13 +231,65 @@ public class AddTables extends AppCompatActivity {
                     e.printStackTrace();
                 }
 
-                pdfDocument.close();
 
+
+                pdfDocument.close();
+                if(file.exists()){
+                    Uri selectedUri = Uri.fromFile(file);
+                    Intent intents = new Intent(Intent.ACTION_VIEW);
+                    intents.setDataAndType(FileProvider.getUriForFile(AddTables.this, AddTables.this.getApplicationContext().getPackageName() + ".provider",file), "application/pdf"); // here we set correct type for PDF
+                    intents.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    Log.i("info",selectedUri.toString());
+
+                    PendingIntent pendingIntent = PendingIntent.getActivity(AddTables.this, 698, intents, PendingIntent.FLAG_UPDATE_CURRENT
+                    );
+
+                    String channel_id = "notification_channel";
+                    NotificationCompat.Builder builder
+                            = new NotificationCompat
+                            .Builder(getApplicationContext(),
+                            channel_id)
+                            .setPriority(NotificationManager.IMPORTANCE_HIGH)
+                            .setSmallIcon(R.drawable.ic_baseline_home_24)
+                            .setAutoCancel(true)
+                            .setVibrate(new long[]{1000, 1000, 1000,
+                                    1000, 1000})
+                            .setOnlyAlertOnce(true)
+                            .setContentIntent(pendingIntent);
+                    builder = builder.setContent(
+                            getCustomDesign("Invoice", ""));
+                    NotificationManager notificationManager
+                            = (NotificationManager) getSystemService(
+                            Context.NOTIFICATION_SERVICE);
+                    // Check if the Android Version is greater than Oreo
+                    if (Build.VERSION.SDK_INT
+                            >= Build.VERSION_CODES.O) {
+                        NotificationChannel notificationChannel
+                                = new NotificationChannel(
+                                channel_id, "web_app",
+                                NotificationManager.IMPORTANCE_HIGH);
+                        notificationManager.createNotificationChannel(
+                                notificationChannel);
+                    }
+
+                    notificationManager.notify(10101, builder.build());
+                }
             } catch (WriterException e) {
                 e.printStackTrace();
             }
 
         });
+    }
+    private RemoteViews getCustomDesign(String title,
+                                        String message) {
+        RemoteViews remoteViews = new RemoteViews(
+                getApplicationContext().getPackageName(),
+                R.layout.notification);
+        remoteViews.setTextViewText(R.id.title, title);
+        remoteViews.setTextViewText(R.id.message, message);
+        remoteViews.setImageViewResource(R.id.icon,
+                R.drawable.ic_baseline_home_24);
+        return remoteViews;
     }
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
