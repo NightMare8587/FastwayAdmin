@@ -30,6 +30,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
+import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.volley.Request;
@@ -691,8 +692,9 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
                                           try{
                                               pdfDocument.writeTo(new FileOutputStream(file));
                                               Intent target = new Intent(Intent.ACTION_VIEW);
-                                              target.setDataAndType(Uri.fromFile(file),"application/pdf");
-                                              target.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                                              target.setDataAndType(FileProvider.getUriForFile(context, context.getApplicationContext().getPackageName() + ".provider",file), "application/pdf"); // here we set correct type for PDF
+
+                                              target.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                                               Intent intent = Intent.createChooser(target, "Open File");
                                               try {
                                                   v.getContext().startActivity(intent);
@@ -725,6 +727,22 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
 
             });
             alertDialog.setNeutralButton("Open PDF", (dialogInterface, i) -> {
+                String fileName = "/Table " + tables.get(position) + ".pdf";
+                File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS) + fileName);
+                if(file.exists()){
+                    Intent target = new Intent(Intent.ACTION_VIEW);
+                    target.setDataAndType(FileProvider.getUriForFile(context, context.getApplicationContext().getPackageName() + ".provider",file), "application/pdf"); // here we set correct type for PDF
+
+                    target.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    Intent intent = Intent.createChooser(target, "Open File");
+                    try {
+                        v.getContext().startActivity(intent);
+                    } catch (ActivityNotFoundException e) {
+                        // Instruct the user to install a PDF reader here, or something
+                    }
+                }else{
+                    
+                }
             });
             alertDialog.setNegativeButton("Delete Table", (dialog, which) -> {
                 if(status.get(position).equals("available")) {
