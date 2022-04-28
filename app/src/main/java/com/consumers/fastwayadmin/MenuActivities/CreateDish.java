@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -45,6 +46,8 @@ public class CreateDish extends AppCompatActivity {
     String descriptionToSubmit;
     CheckBox checkBox;
     DatabaseReference dish;
+    String dishType = "Veg";
+    RadioGroup radioGroup;
     boolean imageAddedOr = false;
     String mrp;
     FirebaseStorage storage;
@@ -69,10 +72,20 @@ public class CreateDish extends AppCompatActivity {
             floatingActionButton.setTooltipText("Search our database");
         }
 
+        radioGroup = findViewById(R.id.disgTypeRadioGroup);
         floatingActionButton.setOnClickListener(view -> {
             Intent intent = new Intent(getApplicationContext(), SearchFastwayDatabase.class);
             intent.putExtra("dish",menuType);
             startActivity(intent);
+        });
+
+        radioGroup.setOnCheckedChangeListener((radioGroup, i) -> {
+            if(i == R.id.nonVegRadioButton)
+                dishType = "NonVeg";
+            else if(i == R.id.vegRadioButton)
+                dishType = "Veg";
+            else
+                dishType = "Vegan";
         });
 
         chooseImage.setOnClickListener(view -> {
@@ -112,19 +125,16 @@ public class CreateDish extends AppCompatActivity {
                             editText.setHint("Enter Description Here");
                             linearLayout.setOrientation(LinearLayout.VERTICAL);
                             myAlert.setTitle("Description").setMessage("Do you wanna add some description to your dish like how much quantity will be provided and all!!\n")
-                                    .setPositiveButton("Submit Description", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialogInterface, int i) {
-                                            if(editText.getText().toString().equals("")){
-                                                Toast.makeText(CreateDish.this, "Field can't be empty", Toast.LENGTH_SHORT).show();
-                                            }else {
-                                                descriptionToSubmit = editText.getText().toString();
-                                                new Upload().execute();
-                                                finish();
-                                            }
+                                    .setPositiveButton("Submit Description", (dialogInterface, i) -> {
+                                        if(editText.getText().toString().equals("")){
+                                            Toast.makeText(CreateDish.this, "Field can't be empty", Toast.LENGTH_SHORT).show();
+                                        }else {
+                                            descriptionToSubmit = editText.getText().toString();
+                                            new Upload().execute();
+                                            finish();
                                         }
                                     }).setNegativeButton("Skip", (dialogInterface, i) -> {
-                                        DishInfo info = new DishInfo(name,half,full,image,mrp,"0","0","0","yes","");
+                                        DishInfo info = new DishInfo(name,half,full,image,mrp,"0","0","0","yes","",dishType);
                                         dish.child("Restaurants").child(state).child(Objects.requireNonNull(dishAuth.getUid())).child("List of Dish").child(menuType).child(name).setValue(info);
                                         Toast.makeText(CreateDish.this, "Dish Added Successfully", Toast.LENGTH_SHORT).show();
                                         imageAddedOr = false;
@@ -149,7 +159,7 @@ public class CreateDish extends AppCompatActivity {
                                             if(editText.getText().toString().equals("")){
                                                 Toast.makeText(CreateDish.this, "Field can't be empty", Toast.LENGTH_SHORT).show();
                                             }else{
-                                                DishInfo info = new DishInfo(name,half,full,image,mrp,"0","0","0","yes",editText.getText().toString());
+                                                DishInfo info = new DishInfo(name,half,full,image,mrp,"0","0","0","yes",editText.getText().toString(),dishType);
                                                 dish.child("Restaurants").child(state).child(Objects.requireNonNull(dishAuth.getUid())).child("List of Dish").child(menuType).child(name).setValue(info);
                                                 Toast.makeText(CreateDish.this, "Dish Added Successfully", Toast.LENGTH_SHORT).show();
                                                 imageAddedOr = false;
@@ -159,7 +169,7 @@ public class CreateDish extends AppCompatActivity {
                                     }).setNegativeButton("Skip", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i) {
-                                    DishInfo info = new DishInfo(name,half,full,image,mrp,"0","0","0","yes","");
+                                    DishInfo info = new DishInfo(name,half,full,image,mrp,"0","0","0","yes","",dishType);
                                     dish.child("Restaurants").child(state).child(Objects.requireNonNull(dishAuth.getUid())).child("List of Dish").child(menuType).child(name).setValue(info);
                                     Toast.makeText(CreateDish.this, "Dish Added Successfully", Toast.LENGTH_SHORT).show();
                                     imageAddedOr = false;
@@ -215,7 +225,7 @@ public class CreateDish extends AppCompatActivity {
     }
 
     private void addToDatabase(String name, String half, String full,String image,String mrp) {
-        DishInfo info = new DishInfo(name,half,full,image,mrp,"0","0","0","yes",descriptionToSubmit);
+        DishInfo info = new DishInfo(name,half,full,image,mrp,"0","0","0","yes",descriptionToSubmit,dishType);
         try {
             dish.child("Restaurants").child(state).child(Objects.requireNonNull(dishAuth.getUid())).child("List of Dish").child(menuType).child(name).setValue(info);
             StorageReference reference = storageReference.child(dishAuth.getUid() + "/" + "image" + "/"  + nameOfDish.getText().toString());

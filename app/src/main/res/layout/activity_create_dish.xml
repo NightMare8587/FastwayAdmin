@@ -10,7 +10,7 @@
         android:id="@+id/dishName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="65dp"
+        android:layout_marginTop="30dp"
         android:background="@drawable/input"
         android:ems="10"
         android:hint="Name Of Dish"
@@ -24,7 +24,7 @@
         android:id="@+id/halfPlatePrice"
         android:layout_width="185dp"
         android:layout_height="48dp"
-        android:layout_marginTop="64dp"
+        android:layout_marginTop="44dp"
         android:background="@drawable/input"
         android:ems="10"
         android:hint="Half Plate Price"
@@ -89,7 +89,7 @@
         android:id="@+id/chooseImageForFood"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="38dp"
         android:text="Choose Image"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -116,5 +116,35 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/sellOnMRPprice" />
+
+    <RadioGroup
+        android:id="@+id/disgTypeRadioGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView6">
+
+        <RadioButton
+            android:id="@+id/nonVegRadioButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Non Veg" />
+
+        <RadioButton
+            android:id="@+id/vegRadioButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="Veg" />
+
+        <RadioButton
+            android:id="@+id/veganRadioButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Vegan" />
+    </RadioGroup>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

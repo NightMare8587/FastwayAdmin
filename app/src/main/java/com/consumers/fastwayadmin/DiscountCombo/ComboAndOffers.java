@@ -11,6 +11,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -47,6 +49,7 @@ public class ComboAndOffers extends AppCompatActivity {
     List<String> dishQuantity = new ArrayList<>();
     DatabaseReference reference;
     Button createCombo;
+    String dishType = "Veg";
     SharedPreferences sharedPreferences;
     List<String> name = new ArrayList<>();
     FirebaseAuth auth;
@@ -93,137 +96,170 @@ public class ComboAndOffers extends AppCompatActivity {
                         if(dialog.getInputText().length() == 0){
                             Toast.makeText(ComboAndOffers.this, "Enter some name", Toast.LENGTH_SHORT).show();
                         }else {
-                            String comboName = dialog.getInputText();
-                            dialog.dismiss();
-                            auth = FirebaseAuth.getInstance();
-                            FastDialog priceDialog = new FastDialogBuilder(ComboAndOffers.this, Type.DIALOG)
-                                    .setTitleText("Price Of Combo")
-                                    .setText("Enter Price Of Combo below")
-                                    .setHint("Enter Price Of Combo")
-                                    .positiveText("Confirm")
-                                    .setAnimation(Animations.GROW_IN)
-                                    .cancelable(false)
-                                    .negativeText("Cancel").create();
 
-                            priceDialog.show();
+                            AlertDialog.Builder builder = new AlertDialog.Builder(ComboAndOffers.this);
+                            builder.setTitle("Dish Type").setMessage("Select Dish Type from below options");
+                            RadioGroup radioGroup = new RadioGroup(ComboAndOffers.this);
+                            radioGroup.setOrientation(LinearLayout.HORIZONTAL);
+                            LinearLayout linearLayout = new LinearLayout(ComboAndOffers.this);
+                            linearLayout.setOrientation(LinearLayout.VERTICAL);
+                            RadioButton veg = new RadioButton(ComboAndOffers.this);
+                            veg.setText("Veg");
+                            veg.setId(0);
+                            veg.setChecked(true);
+                            radioGroup.addView(veg);
+                            RadioButton vegan = new RadioButton(ComboAndOffers.this);
+                            vegan.setText("Vegan");
+                            vegan.setId(0 + 1);
+                            radioGroup.addView(vegan);
+                            RadioButton NonVeg = new RadioButton(ComboAndOffers.this);
+                            NonVeg.setText("NonVeg");
+                            NonVeg.setId(0 + 2);
+                            radioGroup.addView(NonVeg);
 
-                            priceDialog.positiveClickListener(view121 -> {
-                                if(!(priceDialog.getInputText().length() == 0)) {
-
-                                    reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(Objects.requireNonNull(auth.getUid())).child("Current combo");
-                                    reference.addListenerForSingleValueEvent(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                            if (snapshot.exists()) {
-                                                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                                                    name.add(dataSnapshot.child("name").getValue(String.class));
-                                                    dishQuantity.add(dataSnapshot.child("quantity").getValue(String.class));
-                                                }
-                                                reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(Objects.requireNonNull(auth.getUid()));
-                                                reference.child("Current combo").removeValue();
-                                                reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(Objects.requireNonNull(auth.getUid())).child("List of Dish");
-                                                for (int i = 0; i < name.size(); i++) {
-                                                    combo combo = new combo(name.get(i),dishQuantity.get(i));
-                                                    reference.child("Combo").child(comboName).child(name.get(i)).child("name").setValue(combo);
-                                                }
-                                                reference.child("Combo").child(comboName).child("price").setValue(priceDialog.getInputText());
-                                                reference.child("Combo").child(comboName).child("count").setValue("0");
-                                                reference.child("Combo").child(comboName).child("enable").setValue("yes");
-                                                reference.child("Combo").child(comboName).child("rating").setValue("0");
-                                                reference.child("Combo").child(comboName).child("totalRate").setValue("0");
-                                                Toast.makeText(ComboAndOffers.this, "You can add image to combo later", Toast.LENGTH_SHORT).show();
-
-                                                name.clear();
-                                                dishQuantity.clear();
-                                                recyclerView.setAdapter(new comboAdapter(name));
-                                                android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(ComboAndOffers.this);
-                                                builder.setTitle("New Description").setMessage("Enter new description in below field");
-                                                LinearLayout linearLayout = new LinearLayout(ComboAndOffers.this);
-                                                linearLayout.setOrientation(LinearLayout.VERTICAL);
-                                                EditText editText = new EditText(ComboAndOffers.this);
-                                                editText.setHint("Enter description here");
-                                                editText.setMaxLines(200);
-                                                editText.setInputType(InputType.TYPE_CLASS_TEXT);
-                                                builder.setPositiveButton("Add Description", (dialogInterface1, i1) -> {
-                                                    if(editText.getText().toString().equals("")){
-                                                        Toast.makeText(ComboAndOffers.this, "Invalid Input", Toast.LENGTH_SHORT).show();
-                                                        return;
-                                                    }
-                                                    SharedPreferences sharedPreferences = getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
-                                                    FirebaseAuth auth = FirebaseAuth.getInstance();
-                                                    DatabaseReference reference =  FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid())).child("List of Dish").child("Combo").child(comboName);
-                                                    reference.child("description").setValue(editText.getText().toString());
-                                                    Toast.makeText(ComboAndOffers.this, "Description Added Successfully", Toast.LENGTH_SHORT).show();
-                                                    dialogInterface1.dismiss();
-                                                    new KAlertDialog(ComboAndOffers.this, KAlertDialog.SUCCESS_TYPE)
-                                                            .setTitleText("Success")
-                                                            .setContentText("combo created successfully")
-                                                            .setConfirmText("Ok, Great")
-                                                            .setConfirmClickListener(kAlertDialog1 -> {
-                                                                AlertDialog.Builder alert = new AlertDialog.Builder(ComboAndOffers.this);
-                                                                alert.setTitle("Add Image");
-                                                                alert.setMessage("Do you wanna add image to your combo. You can skip this step for now if you want");
-                                                                alert.setPositiveButton("Skip", (dialogInterface, i) -> {
-                                                                    dialogInterface.dismiss();
-                                                                    finish();
-                                                                }).setNegativeButton("Add Image", (dialogInterface, i) -> {
-                                                                    dialogInterface.dismiss();
-                                                                    Intent intent = new Intent(ComboAndOffers.this, AddImageToDish.class);
-                                                                    intent.putExtra("type","Combo");
-                                                                    intent.putExtra("dishName",comboName);
-                                                                    startActivity(intent);
-                                                                });
-
-                                                                alert.create().show();
-                                                                kAlertDialog1.dismissWithAnimation();
-                                                                priceDialog.dismiss();
-
-                                                            }).show();
-                                                }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(DialogInterface dialogInterface, int i) {
-                                                        new KAlertDialog(ComboAndOffers.this, KAlertDialog.SUCCESS_TYPE)
-                                                                .setTitleText("Success")
-                                                                .setContentText("combo created successfully")
-                                                                .setConfirmText("Ok, Great")
-                                                                .setConfirmClickListener(kAlertDialog1 -> {
-                                                                    AlertDialog.Builder alert = new AlertDialog.Builder(ComboAndOffers.this);
-                                                                    alert.setTitle("Add Image");
-                                                                    alert.setMessage("Do you wanna add image to your combo. You can skip this step for now if you want");
-                                                                    alert.setPositiveButton("Skip", (dialogInterface12, i12) -> {
-                                                                        dialogInterface12.dismiss();
-                                                                        finish();
-                                                                    }).setNegativeButton("Add Image", (dialogInterface13, i13) -> {
-                                                                        dialogInterface13.dismiss();
-                                                                        Intent intent = new Intent(ComboAndOffers.this, AddImageToDish.class);
-                                                                        intent.putExtra("type","Combo");
-                                                                        intent.putExtra("dishName",comboName);
-                                                                        startActivity(intent);
-                                                                    });
-
-                                                                    alert.create().show();
-                                                                    kAlertDialog1.dismissWithAnimation();
-                                                                    priceDialog.dismiss();
-
-                                                                }).show();
-                                                    }
-                                                }).create();
-                                                linearLayout.addView(editText);
-                                                builder.setView(linearLayout);
-                                                builder.setCancelable(false);
-                                                builder.create().show();
-
-                                            }
-                                        }
-
-                                        @Override
-                                        public void onCancelled(@NonNull DatabaseError error) {
-
-                                        }
-                                    });
-                                }
+                            radioGroup.setOnCheckedChangeListener((radioGroup1, i) -> {
+                                if(i == 0)
+                                    dishType = "Veg";
+                                else if(i == 0 + 1)
+                                    dishType = "Vegan";
+                                else
+                                    dishType = "NonVeg";
                             });
 
+                            builder.setPositiveButton("Proceed", (dialogInterface, i) -> {
+                                dialogInterface.dismiss();
+                        String comboName = dialog.getInputText();
+                        dialog.dismiss();
+                        auth = FirebaseAuth.getInstance();
+                        FastDialog priceDialog = new FastDialogBuilder(ComboAndOffers.this, Type.DIALOG)
+                                .setTitleText("Price Of Combo")
+                                .setText("Enter Price Of Combo below")
+                                .setHint("Enter Price Of Combo")
+                                .positiveText("Confirm")
+                                .setAnimation(Animations.GROW_IN)
+                                .cancelable(false)
+                                .negativeText("Cancel").create();
+
+                        priceDialog.show();
+
+                        priceDialog.positiveClickListener(view121 -> {
+                            if(!(priceDialog.getInputText().length() == 0)) {
+
+                                reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(Objects.requireNonNull(auth.getUid())).child("Current combo");
+                                reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                        if (snapshot.exists()) {
+                                            for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                                                name.add(dataSnapshot.child("name").getValue(String.class));
+                                                dishQuantity.add(dataSnapshot.child("quantity").getValue(String.class));
+                                            }
+                                            reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(Objects.requireNonNull(auth.getUid()));
+                                            reference.child("Current combo").removeValue();
+                                            reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(Objects.requireNonNull(auth.getUid())).child("List of Dish");
+                                            for (int i = 0; i < name.size(); i++) {
+                                                combo combo = new combo(name.get(i),dishQuantity.get(i));
+                                                reference.child("Combo").child(comboName).child(name.get(i)).child("name").setValue(combo);
+                                            }
+                                            reference.child("Combo").child(comboName).child("price").setValue(priceDialog.getInputText());
+                                            reference.child("Combo").child(comboName).child("count").setValue("0");
+                                            reference.child("Combo").child(comboName).child("enable").setValue("yes");
+                                            reference.child("Combo").child(comboName).child("rating").setValue("0");
+                                            reference.child("Combo").child(comboName).child("dishType").setValue(dishType);
+                                            reference.child("Combo").child(comboName).child("totalRate").setValue("0");
+                                            Toast.makeText(ComboAndOffers.this, "You can add image to combo later", Toast.LENGTH_SHORT).show();
+
+                                            name.clear();
+                                            dishQuantity.clear();
+                                            recyclerView.setAdapter(new comboAdapter(name));
+                                            android.app.AlertDialog.Builder builder1 = new android.app.AlertDialog.Builder(ComboAndOffers.this);
+                                            builder1.setTitle("New Description").setMessage("Enter new description in below field");
+                                            LinearLayout linearLayout1 = new LinearLayout(ComboAndOffers.this);
+                                            linearLayout1.setOrientation(LinearLayout.VERTICAL);
+                                            EditText editText = new EditText(ComboAndOffers.this);
+                                            editText.setHint("Enter description here");
+                                            editText.setMaxLines(200);
+                                            editText.setInputType(InputType.TYPE_CLASS_TEXT);
+                                            builder1.setPositiveButton("Add Description", (dialogInterface1, i1) -> {
+                                                if(editText.getText().toString().equals("")){
+                                                    Toast.makeText(ComboAndOffers.this, "Invalid Input", Toast.LENGTH_SHORT).show();
+                                                    return;
+                                                }
+                                                SharedPreferences sharedPreferences = getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
+                                                FirebaseAuth auth = FirebaseAuth.getInstance();
+                                                DatabaseReference reference =  FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid())).child("List of Dish").child("Combo").child(comboName);
+                                                reference.child("description").setValue(editText.getText().toString());
+                                                Toast.makeText(ComboAndOffers.this, "Description Added Successfully", Toast.LENGTH_SHORT).show();
+                                                dialogInterface1.dismiss();
+                                                new KAlertDialog(ComboAndOffers.this, KAlertDialog.SUCCESS_TYPE)
+                                                        .setTitleText("Success")
+                                                        .setContentText("combo created successfully")
+                                                        .setConfirmText("Ok, Great")
+                                                        .setConfirmClickListener(kAlertDialog1 -> {
+                                                            AlertDialog.Builder alert = new AlertDialog.Builder(ComboAndOffers.this);
+                                                            alert.setTitle("Add Image");
+                                                            alert.setMessage("Do you wanna add image to your combo. You can skip this step for now if you want");
+                                                            alert.setPositiveButton("Skip", (dialogInterface, i) -> {
+                                                                dialogInterface.dismiss();
+                                                                finish();
+                                                            }).setNegativeButton("Add Image", (dialogInterface, i) -> {
+                                                                dialogInterface.dismiss();
+                                                                Intent intent = new Intent(ComboAndOffers.this, AddImageToDish.class);
+                                                                intent.putExtra("type","Combo");
+                                                                intent.putExtra("dishName",comboName);
+                                                                startActivity(intent);
+                                                            });
+
+                                                            alert.create().show();
+                                                            kAlertDialog1.dismissWithAnimation();
+                                                            priceDialog.dismiss();
+
+                                                        }).show();
+                                            }).setNegativeButton("Cancel", (dialogInterface, i) -> new KAlertDialog(ComboAndOffers.this, KAlertDialog.SUCCESS_TYPE)
+                                                    .setTitleText("Success")
+                                                    .setContentText("combo created successfully")
+                                                    .setConfirmText("Ok, Great")
+                                                    .setConfirmClickListener(kAlertDialog1 -> {
+                                                        AlertDialog.Builder alert = new AlertDialog.Builder(ComboAndOffers.this);
+                                                        alert.setTitle("Add Image");
+                                                        alert.setMessage("Do you wanna add image to your combo. You can skip this step for now if you want");
+                                                        alert.setPositiveButton("Skip", (dialogInterface12, i12) -> {
+                                                            dialogInterface12.dismiss();
+                                                            finish();
+                                                        }).setNegativeButton("Add Image", (dialogInterface13, i13) -> {
+                                                            dialogInterface13.dismiss();
+                                                            Intent intent = new Intent(ComboAndOffers.this, AddImageToDish.class);
+                                                            intent.putExtra("type","Combo");
+                                                            intent.putExtra("dishName",comboName);
+                                                            startActivity(intent);
+                                                        });
+
+                                                        alert.create().show();
+                                                        kAlertDialog1.dismissWithAnimation();
+                                                        priceDialog.dismiss();
+
+                                                    }).show()).create();
+                                            linearLayout1.addView(editText);
+                                            builder1.setView(linearLayout1);
+                                            builder1.setCancelable(false);
+                                            builder1.create().show();
+
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError error) {
+
+                                    }
+                                });
+                            }
+                        });
+
+
+                    });
+                            linearLayout.addView(radioGroup);
+                            builder.setView(linearLayout);
+                            builder.create().show();
 
                         }
                     });
