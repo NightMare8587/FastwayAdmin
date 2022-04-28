@@ -741,7 +741,7 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
                         // Instruct the user to install a PDF reader here, or something
                     }
                 }else{
-                    
+
                 }
             });
             alertDialog.setNegativeButton("Delete Table", (dialog, which) -> {
