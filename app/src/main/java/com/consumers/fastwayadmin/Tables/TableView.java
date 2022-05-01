@@ -724,7 +724,6 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
                                   }
                               }
                         )).addOnFailureListener(e -> Toast.makeText(context, "Failed :) " + e.getLocalizedMessage(), Toast.LENGTH_SHORT).show());
-
             });
             alertDialog.setNeutralButton("Open PDF", (dialogInterface, i) -> {
                 String fileName = "/Table " + tables.get(position) + ".pdf";
