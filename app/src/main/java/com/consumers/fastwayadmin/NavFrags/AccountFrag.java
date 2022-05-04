@@ -51,7 +51,7 @@ public class AccountFrag extends Fragment {
     String[] names = {"My Account","Blocked Users","My Transactions","Logout","Terms And Conditions","Privacy policy","Restaurant Reviews","Cash Transaction Commission"};
     GoogleSignInClient googleSignInClient;
     @SuppressLint("UseSwitchCompatOrMaterialCode")
-    Switch aSwitch;
+    Switch aSwitch,takeawaySwitch,tableSwitch;
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
     String UID;
@@ -95,12 +95,25 @@ public class AccountFrag extends Fragment {
         auth = FirebaseAuth.getInstance();
         UID = auth.getUid() + "";
         aSwitch = view.findViewById(R.id.storeImagesinPhoneSwitch);
+        takeawaySwitch = view.findViewById(R.id.takeaAwayAllowedOrNotSwitch);
+        tableSwitch = view.findViewById(R.id.tableBookAllowedOrNotSwitch);
          sharedPreferences = requireContext().getSharedPreferences("loginInfo",MODE_PRIVATE);
          editor = sharedPreferences.edit();
+
         if(sharedPreferences.getString("storeInDevice","").equals("yes"))
             aSwitch.setChecked(true);
         else
             aSwitch.setChecked(false);
+
+        if(sharedPreferences.getString("TakeAwayAllowed","").equals("yes"))
+            takeawaySwitch.setChecked(true);
+        else
+            takeawaySwitch.setChecked(false);
+
+        if(sharedPreferences.getString("TableBookAllowed","").equals("yes"))
+            tableSwitch.setChecked(true);
+        else
+            tableSwitch.setChecked(false);
         ArrayAdapter arrayAdapter = new ArrayAdapter<>(view.getContext(), R.layout.list, names);
         listView.setAdapter(arrayAdapter);
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -236,5 +249,42 @@ public class AccountFrag extends Fragment {
                 }
             }
         });
+
+        takeawaySwitch.setOnCheckedChangeListener((compoundButton, b) -> {
+            if(b){
+                takeawaySwitch.setChecked(true);
+                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(UID);
+                databaseReference.child("TakeAwayAllowed").setValue("yes");
+                editor.putString("TakeAwayAllowed","yes");
+                editor.apply();
+                Toast.makeText(requireContext(), "You will now receive TakeAway Orders", Toast.LENGTH_SHORT).show();
+            }else{
+                takeawaySwitch.setChecked(false);
+                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(UID);
+                databaseReference.child("TakeAwayAllowed").setValue("no");
+                editor.putString("TakeAwayAllowed","no");
+                editor.apply();
+                Toast.makeText(requireContext(), "You will not receive TakeAway Orders", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        tableSwitch.setOnCheckedChangeListener((compoundButton, b) -> {
+            if(b){
+                tableSwitch.setChecked(true);
+                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(UID);
+                databaseReference.child("TableBookAllowed").setValue("yes");
+                editor.putString("TableBookAllowed","yes");
+                editor.apply();
+                Toast.makeText(requireContext(), "Table Booking Enabled", Toast.LENGTH_SHORT).show();
+            }else{
+                tableSwitch.setChecked(false);
+                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(UID);
+                databaseReference.child("TableBookAllowed").setValue("no");
+                editor.putString("TableBookAllowed","no");
+                editor.apply();
+                Toast.makeText(requireContext(), "Table Booking Disabled", Toast.LENGTH_SHORT).show();
+            }
+        });
+
     }
 }

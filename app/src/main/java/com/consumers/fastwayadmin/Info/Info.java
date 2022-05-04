@@ -21,6 +21,8 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -84,6 +86,7 @@ public class Info extends AppCompatActivity {
     StorageReference storageReference;
     Uri filePath;
     FirebaseStorage storage;
+    CheckBox optForTakeaway,optForTableBook;
     OutputStream outputStream;
     File file;
     FusedLocationProviderClient clientsLocation;
@@ -119,6 +122,8 @@ public class Info extends AppCompatActivity {
         initialise();
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
+        optForTableBook = findViewById(R.id.checkBoxOptForFoodTable);
+        optForTakeaway = findViewById(R.id.checkBoxOptForTakeAway);
         checkLocationInfo = getSharedPreferences("LocationMaps",MODE_PRIVATE);
         checkPermissions();
         sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
@@ -129,6 +134,7 @@ public class Info extends AppCompatActivity {
                 .cancelable(false)
                 .create();
         fastDialog.show();
+
 
         if(sharedPreferences.contains("state")){
 
@@ -236,6 +242,23 @@ public class Info extends AppCompatActivity {
         infoRef.child("status").setValue("online");
         infoRef.child("acceptingOrders").setValue("yes");
         infoRef.child("totalReports").setValue("0");
+        if(optForTakeaway.isChecked()){
+            infoRef.child("TakeAwayAllowed").setValue("yes");
+            this.editor.putString("TakeAwayAllowed","yes");
+        }else {
+            infoRef.child("TakeAwayAllowed").setValue("no");
+            this.editor.putString("TakeAwayAllowed", "no");
+        }
+
+        if(optForTableBook.isChecked()){
+            infoRef.child("TableBookAllowed").setValue("yes");
+            this.editor.putString("TableBookAllowed","yes");
+        }else {
+            infoRef.child("TableBookAllowed").setValue("no");
+            this.editor.putString("TableBookAllowed","no");
+        }
+
+        this.editor.apply();
         clientsLocation.removeLocationUpdates(mLocationCallback);
         AlertDialog.Builder alert = new AlertDialog.Builder(Info.this);
         alert.setTitle("Images");

@@ -10,7 +10,7 @@
         android:id="@+id/nameOfRestaurant"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="15dp"
         android:background="@drawable/input"
         android:ems="10"
         android:hint="Enter Name of Restaurant"
@@ -24,7 +24,7 @@
         android:id="@+id/AddressOfRestaurant"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="11dp"
+        android:layout_marginTop="8dp"
         android:background="@drawable/input"
         android:ems="10"
         android:hint="Address Of Restaurant"
@@ -38,7 +38,7 @@
         android:id="@+id/pincodeRestaurant"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="11dp"
+        android:layout_marginTop="8dp"
         android:background="@drawable/input"
         android:ems="10"
         android:hint="Enter Pin Code"
@@ -52,7 +52,7 @@
         android:id="@+id/nearbyPlace"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="11dp"
+        android:layout_marginTop="8dp"
         android:background="@drawable/input"
         android:ems="10"
         android:gravity="start|top"
@@ -78,7 +78,7 @@
         android:id="@+id/contactNumber"
         android:layout_width="209dp"
         android:layout_height="53dp"
-        android:layout_marginTop="11dp"
+        android:layout_marginTop="8dp"
         android:background="@drawable/input"
         android:ems="10"
         android:hint="Enter Contact Number"
@@ -91,7 +91,7 @@
         android:id="@+id/proceed"
         android:layout_width="201dp"
         android:layout_height="52dp"
-        android:layout_marginTop="13dp"
+        android:layout_marginTop="6dp"
         android:background="@drawable/input"
         android:text="Proceed"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
@@ -99,7 +99,30 @@
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/checkBoxOptForFoodTable" />
+
+    <CheckBox
+        android:id="@+id/checkBoxOptForTakeAway"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Restaurant allows TakeAway Order's"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/contactNumber" />
+
+    <CheckBox
+        android:id="@+id/checkBoxOptForFoodTable"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:checked="true"
+        android:text="Restaurant Allows Table Booking"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/checkBoxOptForTakeAway" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
