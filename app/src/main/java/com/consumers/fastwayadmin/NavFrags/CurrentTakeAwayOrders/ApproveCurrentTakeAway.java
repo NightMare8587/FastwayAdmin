@@ -170,7 +170,6 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
         dishNames = findViewById(R.id.DishNamesTakeAwayListView);
         approve = findViewById(R.id.approveTakeAwayButton);
         path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
-        
         if(System.currentTimeMillis() - Long.parseLong(time) >= 600000){
             AlertDialog.Builder builder = new AlertDialog.Builder(ApproveCurrentTakeAway.this);
             RequestQueue requestQueue = Volley.newRequestQueue(ApproveCurrentTakeAway.this);
