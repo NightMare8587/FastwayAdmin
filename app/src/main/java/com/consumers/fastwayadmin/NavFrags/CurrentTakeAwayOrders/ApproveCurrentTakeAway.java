@@ -126,7 +126,6 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
     String state;
     SharedPreferences storeForDishAnalysis;
     SharedPreferences.Editor dishAnalysis;
-
     File path;
     Workbook workbook;
     @Override
