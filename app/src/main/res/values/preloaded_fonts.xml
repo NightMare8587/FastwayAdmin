@@ -2,6 +2,7 @@
 <resources>
     <array name="preloaded_fonts" translatable="false">
         <item>@font/amarante</item>
+        <item>@font/amaranth_bold</item>
         <item>@font/coming_soon</item>
         <item>@font/merriweather_sans_bold</item>
     </array>

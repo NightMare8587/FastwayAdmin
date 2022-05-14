@@ -31,6 +31,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         tools:replace="android:icon,android:allowBackup">
+
         <activity
             android:name=".NavFrags.ResDishTracker.seeAllDishAnalysis"
             android:exported="false" />
@@ -43,6 +44,8 @@
         <activity
             android:name=".ListViewActivity.ResTimingsPackage.AddRestaurantTimings"
             android:exported="false" />
+        <activity android:name=".NavFrags.FastwayPremiumActivites.FastwayPremiums"
+            android:exported="false"/>
         <activity
             android:name=".ListViewActivity.LeaveFastwayPackage.LeaveFastway"
             android:exported="false" />
@@ -248,6 +251,7 @@
                     android:scheme="https" />
             </intent-filter>
         </activity>
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="com.consumers.fastwayadmin.provider"
@@ -255,8 +259,9 @@
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths"></meta-data>
+                android:resource="@xml/file_paths" />
         </provider>
+
         <activity
             android:name=".Info.Info"
             android:exported="true" />

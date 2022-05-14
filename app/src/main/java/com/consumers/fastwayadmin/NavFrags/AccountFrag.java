@@ -31,6 +31,7 @@ import com.consumers.fastwayadmin.ListViewActivity.MyAccount;
 import com.consumers.fastwayadmin.ListViewActivity.MyOrdersTransactions;
 import com.consumers.fastwayadmin.MyService;
 import com.consumers.fastwayadmin.NavFrags.CashCommission.CashTransactionCommissionActivity;
+import com.consumers.fastwayadmin.NavFrags.FastwayPremiumActivites.FastwayPremiums;
 import com.consumers.fastwayadmin.NavFrags.Reviews.RestaurantsReviews;
 import com.consumers.fastwayadmin.R;
 import com.consumers.fastwayadmin.SplashAndIntro.SplashScreen;
@@ -48,7 +49,7 @@ import java.util.Objects;
 
 public class AccountFrag extends Fragment {
     ListView listView;
-    String[] names = {"My Account","Blocked Users","My Transactions","Logout","Terms And Conditions","Privacy policy","Restaurant Reviews","Cash Transaction Commission"};
+    String[] names = {"My Account","Blocked Users","My Transactions","Logout","Terms And Conditions","Privacy policy","Restaurant Reviews","Cash Transaction Commission","Fastway Premium"};
     GoogleSignInClient googleSignInClient;
     @SuppressLint("UseSwitchCompatOrMaterialCode")
     Switch aSwitch,takeawaySwitch,tableSwitch;
@@ -231,6 +232,9 @@ public class AccountFrag extends Fragment {
                 case 7:
                 startActivity(new Intent(requireContext(), CashTransactionCommissionActivity.class));
                 break;
+                case 8:
+                    startActivity(new Intent(requireContext(), FastwayPremiums.class));
+                    break;
             }
         });
 
