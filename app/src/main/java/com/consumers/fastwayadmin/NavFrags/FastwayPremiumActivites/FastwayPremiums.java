@@ -23,7 +23,7 @@ public class FastwayPremiums extends AppCompatActivity {
             setContentView(R.layout.subscribe_fastway_prem);
             subscribePrem = findViewById(R.id.subscribeFastwayPremButton);
             subscribePrem.setOnClickListener(click -> {
-                
+
             });
         }
     }

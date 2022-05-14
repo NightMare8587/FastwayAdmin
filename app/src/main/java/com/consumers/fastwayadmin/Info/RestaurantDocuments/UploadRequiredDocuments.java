@@ -153,15 +153,12 @@ public class UploadRequiredDocuments extends AppCompatActivity {
             }else {
                 AlertDialog.Builder alert = new AlertDialog.Builder(UploadRequiredDocuments.this);
                 alert.setTitle("Choose one option")
-                        .setPositiveButton("Upload from gallery", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                dialogInterface.dismiss();
-                                Intent intent = new Intent();
-                                intent.setType("image/*");
-                                intent.setAction("android.intent.action.PICK");
-                                startActivityForResult(Intent.createChooser(intent, "Select Picture"), 1);
-                            }
+                        .setPositiveButton("Upload from gallery", (dialogInterface, i) -> {
+                            dialogInterface.dismiss();
+                            Intent intent = new Intent();
+                            intent.setType("image/*");
+                            intent.setAction("android.intent.action.PICK");
+                            startActivityForResult(Intent.createChooser(intent, "Select Picture"), 1);
                         }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
@@ -287,7 +284,7 @@ public class UploadRequiredDocuments extends AppCompatActivity {
 
     private void checkIfAllUploaded() {
         if(adhaar && pan && gst && fssai && resProof){
-            DatabaseReference databaseReferenceCheck = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Registered Restaurants");
+            DatabaseReference databaseReferenceCheck = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Registered Restaurants").child(sharedPreferences.getString("state",""));
             databaseReferenceCheck.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
