@@ -323,7 +323,6 @@ public class UploadRequiredDocuments extends AppCompatActivity {
 
                 }
             });
-
         }
     }
 
