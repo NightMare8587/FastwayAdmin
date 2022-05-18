@@ -317,7 +317,6 @@ public class UploadRequiredDocuments extends AppCompatActivity {
                                 }).show();
                     }
                 }
-
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
                 }
