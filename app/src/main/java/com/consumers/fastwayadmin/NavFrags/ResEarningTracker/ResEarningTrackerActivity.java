@@ -2,7 +2,9 @@ package com.consumers.fastwayadmin.NavFrags.ResEarningTracker;
 
 import static java.util.stream.Collectors.toMap;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -11,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -27,10 +30,17 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.consumers.fastwayadmin.NavFrags.FastwayPremiumActivites.FastwayPremiums;
 import com.consumers.fastwayadmin.NavFrags.ResDishTracker.RecyclerClassView;
 import com.consumers.fastwayadmin.NavFrags.ResDishTracker.seeAllDishAnalysis;
 import com.consumers.fastwayadmin.R;
 import com.google.common.reflect.TypeToken;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 import com.google.protobuf.Value;
 
@@ -53,7 +63,7 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
     Calendar calendar;
     RecyclerView recyclerView,dishRecyclerView;
     TackerAdapter tackerAdapter;
-
+    SharedPreferences loginInfoShared;
     int totalAmountPerMonth = 0;
     Button seeMoreDetails;
     Gson gson;
@@ -72,6 +82,20 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_res_earning_tracker);
+        loginInfoShared = getSharedPreferences("loginInfo",MODE_PRIVATE);
+        if(!loginInfoShared.contains("FastwayAdminPrem")){
+            AlertDialog.Builder builder = new AlertDialog.Builder(ResEarningTrackerActivity.this);
+            builder.setCancelable(false);
+            builder.setTitle("Dialog").setMessage("You need to subscribe to premium plan to see analysis")
+                    .setPositiveButton("Subscribe Now", (dialogInterface, i) -> {
+                        dialogInterface.dismiss();
+                        startActivity(new Intent(ResEarningTrackerActivity.this, FastwayPremiums.class));
+                    }).setNegativeButton("Not Now", (dialogInterface, i) -> {
+                        dialogInterface.dismiss();
+                        finish();
+                    }).create().show();
+            return;
+        }
         resTrackInfo = getSharedPreferences("RestaurantTrackingDaily",MODE_PRIVATE);
         calendar = Calendar.getInstance();
         dishRecyclerView = findViewById(R.id.dishTrackerRecyclerViewAnalysis);
