@@ -145,7 +145,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-
                 if (addressList.size() > 0) {
                     Address address = addressList.get(0);
                     LatLng current = new LatLng(address.getLatitude(), address.getLongitude());
