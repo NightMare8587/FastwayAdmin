@@ -31,7 +31,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         tools:replace="android:icon,android:allowBackup">
-
+        <activity
+            android:name=".NavFrags.ReplaceOrders.DetailedReplaceOrderAct"
+            android:exported="false" />
+        <activity
+            android:name=".NavFrags.ReplaceOrders.ReplaceOrderRequests"
+            android:exported="false" />
         <activity
             android:name=".NavFrags.ResDishTracker.seeAllDishAnalysis"
             android:exported="false" />
@@ -44,8 +49,9 @@
         <activity
             android:name=".ListViewActivity.ResTimingsPackage.AddRestaurantTimings"
             android:exported="false" />
-        <activity android:name=".NavFrags.FastwayPremiumActivites.FastwayPremiums"
-            android:exported="false"/>
+        <activity
+            android:name=".NavFrags.FastwayPremiumActivites.FastwayPremiums"
+            android:exported="false" />
         <activity
             android:name=".ListViewActivity.LeaveFastwayPackage.LeaveFastway"
             android:exported="false" />

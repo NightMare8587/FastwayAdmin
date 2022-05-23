@@ -37,6 +37,7 @@ import com.consumers.fastwayadmin.NavFrags.AccountFrag;
 import com.consumers.fastwayadmin.NavFrags.CashCommission.CashTransactionCommissionActivity;
 import com.consumers.fastwayadmin.NavFrags.HomeFrag;
 import com.consumers.fastwayadmin.NavFrags.MenuFrag;
+import com.consumers.fastwayadmin.NavFrags.ReplaceOrders.ReplaceOrderRequests;
 import com.consumers.fastwayadmin.NavFrags.TablesFrag;
 import com.consumers.fastwayadmin.R;
 import com.consumers.fastwayadmin.RandomChatNoww;
@@ -308,7 +309,7 @@ public class HomeScreen extends AppCompatActivity {
         if(id == R.id.notification)
             startActivity(new Intent(HomeScreen.this, SupportActivity.class));
         else if(id == R.id.randomChatMessagesUsers){
-            startActivity(new Intent(HomeScreen.this, RandomChatWithUsers.class));
+            startActivity(new Intent(HomeScreen.this, ReplaceOrderRequests.class));
         }
         else
           startActivity(new Intent(HomeScreen.this, RandomChatNoww.class));
