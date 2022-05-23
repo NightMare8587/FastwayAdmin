@@ -28,6 +28,7 @@ import com.consumers.fastwayadmin.R;
 import com.developer.kalert.KAlertDialog;
 import com.google.firebase.auth.FirebaseAuth;
 
+import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -38,6 +39,7 @@ public class CashFreeGateway extends AppCompatActivity {
     String test = "https://intercellular-stabi.000webhostapp.com/testhash.php";
     String token;
     String amount;
+    DecimalFormat df = new DecimalFormat("0.00");
     int ran;
     String orderId;
     String universalOrderID;
@@ -89,7 +91,7 @@ public class CashFreeGateway extends AppCompatActivity {
 
                         map.put(PARAM_APP_ID, "61532dad5cd9ca634ae8ca59d23516");
                         map.put(PARAM_ORDER_ID, orderId);
-                        map.put(PARAM_ORDER_AMOUNT, "" + amount);
+                        map.put(PARAM_ORDER_AMOUNT, "" + df.format(Double.parseDouble(amount)));
                         map.put(PARAM_ORDER_CURRENCY, "INR");
                         map.put(PARAM_CUSTOMER_NAME, "Pulkit Loya");
                         map.put(PARAM_CUSTOMER_EMAIL, "maheshwariloya@gmail.com");
@@ -99,29 +101,26 @@ public class CashFreeGateway extends AppCompatActivity {
                         cfPaymentService.doPayment(CashFreeGateway.this, map, token, "TEST");
                     }
                 }
-            }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    Log.i("error", "error");
-                    KAlertDialog dialog = new KAlertDialog(CashFreeGateway.this, KAlertDialog.ERROR_TYPE)
-                            .setTitleText("Error")
-                            .setContentText("Payment can't be processed. try again later :(")
-                            .setConfirmText("Exit")
-                            .setConfirmClickListener(click -> {
-                                click.dismissWithAnimation();
-                                finish();
-                            });
+            }, error -> {
+                Log.i("error", "error");
+                KAlertDialog dialog = new KAlertDialog(CashFreeGateway.this, KAlertDialog.ERROR_TYPE)
+                        .setTitleText("Error")
+                        .setContentText("Payment can't be processed. try again later :(")
+                        .setConfirmText("Exit")
+                        .setConfirmClickListener(click -> {
+                            click.dismissWithAnimation();
+                            finish();
+                        });
 
-                    dialog.setCancelable(false);
-                    dialog.show();
-                }
+                dialog.setCancelable(false);
+                dialog.show();
             }) {
                 @NonNull
                 @Override
-                protected Map<String, String> getParams() throws AuthFailureError {
+                protected Map<String, String> getParams() {
                     Map<String, String> params = new HashMap<>();
                     params.put("orderId", orderId);
-                    params.put("orderAmount", "" + amount);
+                    params.put("orderAmount", "" + df.format(Double.parseDouble(amount)));
                     params.put("orderCurrency", "INR");
                     return params;
                 }

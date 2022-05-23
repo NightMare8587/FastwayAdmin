@@ -23,6 +23,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.DecimalFormat;
+import java.text.Format;
 import java.util.Objects;
 
 public class CashTransactionCommissionActivity extends AppCompatActivity {
@@ -30,7 +32,8 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
     FirebaseAuth auth = FirebaseAuth.getInstance();
     TextView totalCashTransaction,totalCommission;
     Button payCommissionNow;
-    int commissionAmount;
+    double commissionAmount;
+    DecimalFormat df = new DecimalFormat("0.00");
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,10 +48,10 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.hasChild("totalCashTakeAway")){
                     totalCashTransaction.setText("Total Cash Transactions " + "\u20B9" + snapshot.child("totalCashTakeAway").getValue(String.class));
-                    int totalCash = Integer.parseInt(Objects.requireNonNull(snapshot.child("totalCashTakeAway").getValue(String.class)));
+                    double totalCash = Double.parseDouble(Objects.requireNonNull(snapshot.child("totalCashTakeAway").getValue(String.class)));
                      commissionAmount = (totalCash * 7)/100;
-                    totalCommission.setText("Commission to be paid " + "\u20B9" + commissionAmount);
-                    payCommissionNow.setText("Pay \u20B9" + commissionAmount + " Now");
+                    totalCommission.setText("Commission to be paid " + "\u20B9" + df.format(commissionAmount));
+                    payCommissionNow.setText("Pay \u20B9" + df.format(commissionAmount) + " Now");
                     payCommissionNow.setOnClickListener(view -> {
                         if(commissionAmount != 0) {
                             SharedPreferences cash = getSharedPreferences("CashCommission",MODE_PRIVATE);
@@ -58,10 +61,10 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
                                 builder.setTitle("Pay Commission").setMessage("Do you sure wanna proceed to pay commission\nFine of " + fine + "% will be applied")
                                         .setNegativeButton("No", (dialogInterface, i) -> dialogInterface.dismiss()).setPositiveButton("Yes", (dialogInterface, i) -> {
                                     dialogInterface.dismiss();
-                                    int fineAmount = (commissionAmount * 10)/100;
+                                    double fineAmount = (commissionAmount * 10)/100;
                                     commissionAmount = commissionAmount + fineAmount;
                                     Intent intent = new Intent(CashTransactionCommissionActivity.this, CashFreeGateway.class);
-                                    intent.putExtra("amount", commissionAmount + "");
+                                    intent.putExtra("amount", df.format(commissionAmount) + "");
                                     startActivityForResult(intent, 2);
                                 }).create();
                                 builder.show();

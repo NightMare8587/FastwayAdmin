@@ -48,6 +48,7 @@ import org.eazegraph.lib.charts.BarChart;
 import org.eazegraph.lib.models.BarModel;
 
 import java.lang.reflect.Array;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -64,7 +65,8 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
     RecyclerView recyclerView,dishRecyclerView;
     TackerAdapter tackerAdapter;
     SharedPreferences loginInfoShared;
-    int totalAmountPerMonth = 0;
+    DecimalFormat df = new DecimalFormat("0.00");
+    double totalAmountPerMonth = 0;
     Button seeMoreDetails;
     Gson gson;
     TextView totalOrdersMade,totalTransactionsMade;
@@ -118,10 +120,10 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
             List<String> userIDText = new ArrayList<>(mainDataListText.get(2));
             List<String> orderAmountListText = new ArrayList<>(mainDataListText.get(3));
             for (int i = 0; i < orderAmountListText.size(); i++) {
-                totalAmountPerMonth += Integer.parseInt(orderAmountListText.get(i));
+                totalAmountPerMonth += Double.parseDouble(orderAmountListText.get(i));
             }
             totalOrdersMade.setText("Total Transactions Made: " + dateText.size());
-            totalTransactionsMade.setText("Total Transactions Made: \u20B9" + totalAmountPerMonth);
+            totalTransactionsMade.setText("Total Transactions Made: \u20B9" + df.format(totalAmountPerMonth));
         }else{
             totalOrdersMade.setText("Total Transactions Made: " + 0);
             totalTransactionsMade.setText("Total Transactions Made: \u20B9" + 0);
@@ -226,10 +228,10 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
                 List<String> orderAmountListText = new ArrayList<>(mainDataListText.get(3));
                 totalAmountPerMonth = 0;
                 for (int i = 0; i < orderAmountListText.size(); i++) {
-                    totalAmountPerMonth += Integer.parseInt(orderAmountListText.get(i));
+                    totalAmountPerMonth += Double.parseDouble(orderAmountListText.get(i));
                 }
                 totalOrdersMade.setText("Total Transactions Made: " + dateText.size());
-                totalTransactionsMade.setText("Total Transactions Made: \u20B9" + totalAmountPerMonth);
+                totalTransactionsMade.setText("Total Transactions Made: \u20B9" + df.format(totalAmountPerMonth));
             }else{
                 totalOrdersMade.setText("Total Transactions Made: " + 0);
                 totalTransactionsMade.setText("Total Transactions Made: \u20B9" + 0);

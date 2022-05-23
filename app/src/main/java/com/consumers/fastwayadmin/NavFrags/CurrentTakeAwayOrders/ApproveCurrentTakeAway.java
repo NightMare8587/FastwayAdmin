@@ -357,8 +357,8 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                     restaurantTrackEditor.putString("totalOrdersToday",String.valueOf(1));
                 }
                 if(restaurantDailyTrack.contains("totalTransactionsToday")){
-                    int val = Integer.parseInt(restaurantDailyTrack.getString("totalTransactionsToday",""));
-                    val = val + Integer.parseInt(orderAmount);
+                    double val = Double.parseDouble(restaurantDailyTrack.getString("totalTransactionsToday",""));
+                    val = val + Double.parseDouble(orderAmount);
                     restaurantTrackEditor.putString("totalTransactionsToday",String.valueOf(val));
                 }else{
                     restaurantTrackEditor.putString("totalTransactionsToday",String.valueOf(orderAmount));
@@ -449,8 +449,8 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                                     if(snapshot.hasChild("totalCashTakeAway")){
-                                        int prevAmount = Integer.parseInt(String.valueOf(snapshot.child("totalCashTakeAway").getValue()));
-                                        int currAmount = Integer.parseInt(orderAmount);
+                                        double prevAmount = Double.parseDouble(String.valueOf(snapshot.child("totalCashTakeAway").getValue()));
+                                        double currAmount = Double.parseDouble(orderAmount);
                                         trackTotalCash.child("totalCashTakeAway").setValue(String.valueOf(currAmount + prevAmount));
                                     }else{
                                         trackTotalCash.child("totalCashTakeAway").setValue(String.valueOf(orderAmount));
@@ -497,12 +497,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                             }
                             new Handler().postDelayed(this::finish, 1500);
                         }).setCancelText("No Wait")
-                        .setCancelClickListener(new KAlertDialog.KAlertClickListener() {
-                            @Override
-                            public void onClick(KAlertDialog kAlertDialog) {
-                                kAlertDialog.dismissWithAnimation();
-                            }
-                        }).show();
+                        .setCancelClickListener(kAlertDialog -> kAlertDialog.dismissWithAnimation()).show();
             }else {
                 FastDialog fastDialog = new FastDialogBuilder(ApproveCurrentTakeAway.this, Type.DIALOG)
                         .setTitleText("OTP Code")
@@ -528,8 +523,8 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                             restaurantTrackEditor.putString("totalOrdersToday",String.valueOf(1));
                         }
                         if(restaurantDailyTrack.contains("totalTransactionsToday")){
-                            int val = Integer.parseInt(restaurantDailyTrack.getString("totalTransactionsToday",""));
-                            val = val + Integer.parseInt(orderAmount);
+                            double val = Double.parseDouble(restaurantDailyTrack.getString("totalTransactionsToday",""));
+                            val = val + Double.parseDouble(orderAmount);
                             restaurantTrackEditor.putString("totalTransactionsToday",String.valueOf(val));
                         }else{
                             restaurantTrackEditor.putString("totalTransactionsToday",String.valueOf(orderAmount));
