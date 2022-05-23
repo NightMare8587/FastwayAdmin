@@ -50,7 +50,7 @@ public class ReplaceOrderRequests extends AppCompatActivity {
                         details.add(dataSnapshot.child("details").getValue(String.class));
                         name.add(dataSnapshot.child("name").getValue(String.class));
                         orderID.add(dataSnapshot.child("orderID").getValue(String.class));
-                        tableNum.add(dataSnapshot.child("resID").getValue(String.class));
+                        tableNum.add(dataSnapshot.child("resId").getValue(String.class));
                         userID.add(dataSnapshot.child("resName").getValue(String.class));
                         orderTime.add(dataSnapshot.child("email").getValue(String.class));
                         imageURI.add(dataSnapshot.child("imageUri").getValue(String.class));

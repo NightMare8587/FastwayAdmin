@@ -47,7 +47,7 @@ public class ReplaceRecyclerView extends RecyclerView.Adapter<ReplaceRecyclerVie
     @Override
     public void onBindViewHolder(@NonNull Holder holder, int position) {
         holder.name.setText(name.get(position));
-        holder.tableOrTake.setText(tableNum.get(position));
+        holder.tableOrTake.setText("Table Num: " + tableNum.get(position));
         holder.cardView.setOnClickListener(click -> {
             Intent intent = new Intent(click.getContext(),DetailedReplaceOrderAct.class);
             intent.putExtra("name",name.get(position));
