@@ -323,8 +323,8 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                 restaurantTrackEditor.putString("totalOrdersToday",String.valueOf(1));
             }
             if(restaurantDailyTrack.contains("totalTransactionsToday")){
-                int val = Integer.parseInt(restaurantDailyTrack.getString("totalTransactionsToday",""));
-                val = val + Integer.parseInt(orderAmount);
+                double val = Double.parseDouble(restaurantDailyTrack.getString("totalTransactionsToday",""));
+                val = val + Double.parseDouble(orderAmount);
                 restaurantTrackEditor.putString("totalTransactionsToday",String.valueOf(val));
             }else{
                 restaurantTrackEditor.putString("totalTransactionsToday",String.valueOf(orderAmount));
