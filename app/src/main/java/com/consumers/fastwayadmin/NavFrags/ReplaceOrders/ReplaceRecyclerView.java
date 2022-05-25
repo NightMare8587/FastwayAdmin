@@ -53,7 +53,7 @@ public class ReplaceRecyclerView extends RecyclerView.Adapter<ReplaceRecyclerVie
             intent.putExtra("tableNum",tableNum.get(position));
             intent.putExtra("orderId",orderID.get(position));
             intent.putExtra("orderTime",orderTime.get(position));
-            intent.putExtra("timeOrdered",orderTime.get(position));
+            intent.putExtra("reportTime",reportingTime.get(position));
             intent.putExtra("imageUri",imageURI.get(position));
             intent.putExtra("details",details.get(position));
             intent.putExtra("userID",userID.get(position));
