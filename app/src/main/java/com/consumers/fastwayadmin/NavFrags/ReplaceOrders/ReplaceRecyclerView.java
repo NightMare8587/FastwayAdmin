@@ -24,7 +24,6 @@ public class ReplaceRecyclerView extends RecyclerView.Adapter<ReplaceRecyclerVie
     List<String> imageURI = new ArrayList<>();
     List<String> orderID = new ArrayList<>();
     List<String> tableNum = new ArrayList<>();
-
     public ReplaceRecyclerView(List<String> name, List<String> details, List<String> userID, List<String> orderTime, List<String> reportingTime, List<String> imageURI, List<String> orderID, List<String> tableNum) {
         this.name = name;
         this.details = details;
