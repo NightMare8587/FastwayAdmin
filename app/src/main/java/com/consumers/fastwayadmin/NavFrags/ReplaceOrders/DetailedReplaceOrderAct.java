@@ -1,14 +1,19 @@
 package com.consumers.fastwayadmin.NavFrags.ReplaceOrders;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -71,6 +76,20 @@ public class DetailedReplaceOrderAct extends AppCompatActivity {
             }
         });
 
+        checkOrders.setOnClickListener(click -> {
+            AlertDialog.Builder builder = new AlertDialog.Builder(DetailedReplaceOrderAct.this);
+            builder.setTitle("Details").setMessage("Orders to be replaced");
+            LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            View view = inflater.inflate(R.layout.res_info_dialog_layout,null);
+            ArrayAdapter<String> arrayAdapter1 = new ArrayAdapter<>(DetailedReplaceOrderAct.this, android.R.layout.simple_list_item_1, dishName);
+            ArrayAdapter<String> arrayAdapter2 = new ArrayAdapter<>(DetailedReplaceOrderAct.this, android.R.layout.simple_list_item_1, timesOrdered);
+            ListView listView1 = view.findViewById(R.id.listDishNamesResInfo);
+            listView1.setAdapter(arrayAdapter1);
+            ListView listView2 = view.findViewById(R.id.listDishNamesQuantityInfo);
+            listView2.setAdapter(arrayAdapter2);
+            builder.setView(view);
+            builder.setPositiveButton("exit", (dialogInterface, i) -> dialogInterface.dismiss()).create().show();
+        });
 
 
     }
