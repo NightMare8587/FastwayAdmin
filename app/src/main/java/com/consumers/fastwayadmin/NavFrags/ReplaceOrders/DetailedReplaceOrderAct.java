@@ -75,7 +75,6 @@ public class DetailedReplaceOrderAct extends AppCompatActivity {
                 progressBar.setVisibility(View.INVISIBLE);
             }
         });
-
         checkOrders.setOnClickListener(click -> {
             AlertDialog.Builder builder = new AlertDialog.Builder(DetailedReplaceOrderAct.this);
             builder.setTitle("Details").setMessage("Orders to be replaced");
