@@ -5,6 +5,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.graphics.Shader;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,7 +18,13 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+import com.consumers.fastwayadmin.NavFrags.homeFrag.ApproveCurrentOrder;
 import com.consumers.fastwayadmin.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -27,20 +35,26 @@ import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
+import org.json.JSONObject;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 public class DetailedReplaceOrderAct extends AppCompatActivity {
     TextView userName,reportTime,orderTime,detailedWhatHappened,tableOrTake;
     Button acceptOrder,declineOrder,checkOrders;
     ImageView imageView;
+    String URL = "https://fcm.googleapis.com/fcm/send";
     ProgressBar progressBar;
     List<String> dishName = new ArrayList<>();
     List<String> timesOrdered = new ArrayList<>();
+    SharedPreferences sharedPreferences;
     List<String> type = new ArrayList<>();
     DateFormat simple = new SimpleDateFormat("dd MMM yyyy HH:mm:ss");
     String userID;
@@ -51,6 +65,7 @@ public class DetailedReplaceOrderAct extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detailed_replace_order);
         initialise();
+        sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
         userName.setText(getIntent().getStringExtra("name"));
         userID = getIntent().getStringExtra("userID");
         if(getIntent().getStringExtra("tableNum").equals("TakeAway"))
@@ -90,6 +105,42 @@ public class DetailedReplaceOrderAct extends AppCompatActivity {
             builder.setPositiveButton("exit", (dialogInterface, i) -> dialogInterface.dismiss()).create().show();
         });
 
+        acceptOrder.setOnClickListener(click -> {
+
+        });
+
+        declineOrder.setOnClickListener(click -> {
+            FirebaseAuth auth = FirebaseAuth.getInstance();
+            DatabaseReference admin = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(auth.getUid()).child("ReplaceOrderRequests");
+            admin.child(getIntent().getStringExtra("reportTime")).removeValue();
+            RequestQueue requestQueue = Volley.newRequestQueue(DetailedReplaceOrderAct.this);
+            JSONObject main = new JSONObject();
+            try {
+                main.put("to", "/topics/" + userID + "");
+                JSONObject notification = new JSONObject();
+                notification.put("title", "Replace Order Request Declined");
+                notification.put("click_action", "Table Frag");
+                notification.put("body", "Your Replace Order Request is declined by the restaurant owner");
+                main.put("notification", notification);
+
+                JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, main, response -> {
+
+                }, error -> Toast.makeText(DetailedReplaceOrderAct.this, error.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show()) {
+                    @Override
+                    public Map<String, String> getHeaders() {
+                        Map<String, String> header = new HashMap<>();
+                        header.put("content-type", "application/json");
+                        header.put("authorization", "key=AAAAsigSEMs:APA91bEUF9ZFwIu84Jctci56DQd0TQOepztGOIKIBhoqf7N3ueQrkClw0xBTlWZEWyvwprXZmZgW2MNywF1pNBFpq1jFBr0CmlrJ0wygbZIBOnoZ0jP1zZC6nPxqF2MAP6iF3wuBHD2R");
+                        return header;
+                    }
+                };
+                requestQueue.add(jsonObjectRequest);
+            } catch (Exception e) {
+                Toast.makeText(DetailedReplaceOrderAct.this, e.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
+            }
+
+            finish();
+        });
 
     }
 
