@@ -106,7 +106,36 @@ public class DetailedReplaceOrderAct extends AppCompatActivity {
         });
 
         acceptOrder.setOnClickListener(click -> {
+            FirebaseAuth auth = FirebaseAuth.getInstance();
+            DatabaseReference admin = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(auth.getUid()).child("ReplaceOrderRequests");
+            admin.child(getIntent().getStringExtra("reportTime")).removeValue();
+            RequestQueue requestQueue = Volley.newRequestQueue(DetailedReplaceOrderAct.this);
+            JSONObject main = new JSONObject();
+            try {
+                main.put("to", "/topics/" + userID + "");
+                JSONObject notification = new JSONObject();
+                notification.put("title", "Replace Order Request Accepted");
+                notification.put("click_action", "Table Frag");
+                notification.put("body", "Your Replace Order Request is accepted by the restaurant owner");
+                main.put("notification", notification);
 
+                JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, main, response -> {
+
+                }, error -> Toast.makeText(DetailedReplaceOrderAct.this, error.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show()) {
+                    @Override
+                    public Map<String, String> getHeaders() {
+                        Map<String, String> header = new HashMap<>();
+                        header.put("content-type", "application/json");
+                        header.put("authorization", "key=AAAAsigSEMs:APA91bEUF9ZFwIu84Jctci56DQd0TQOepztGOIKIBhoqf7N3ueQrkClw0xBTlWZEWyvwprXZmZgW2MNywF1pNBFpq1jFBr0CmlrJ0wygbZIBOnoZ0jP1zZC6nPxqF2MAP6iF3wuBHD2R");
+                        return header;
+                    }
+                };
+                requestQueue.add(jsonObjectRequest);
+            } catch (Exception e) {
+                Toast.makeText(DetailedReplaceOrderAct.this, e.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
+            }
+
+            finish();
         });
 
         declineOrder.setOnClickListener(click -> {
