@@ -265,8 +265,6 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
             alert.show();
         }
         DatabaseReference totalOrders = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
-
-
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
