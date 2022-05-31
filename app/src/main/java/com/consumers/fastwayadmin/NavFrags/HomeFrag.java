@@ -90,6 +90,10 @@ public class HomeFrag extends Fragment {
     Calendar calendar;
     int currentDay;
     Button seeMoreDetails;
+    List<String> image = new ArrayList<>();
+    List<String> type = new ArrayList<>();
+    List<String> orderAndPayment = new ArrayList<>();
+    List<String> price = new ArrayList<>();
     @SuppressLint("UseSwitchCompatOrMaterialCode")
     Switch acceptOrders;
     TextView totalOrdersToday,totalTransactionsToday;
@@ -97,6 +101,10 @@ public class HomeFrag extends Fragment {
     boolean check = false;
     List<String> time = new ArrayList<>();
     List<List<String>> finalDishNames = new ArrayList<>();
+    List<List<String>> finalImages = new ArrayList<>();
+    List<List<String>> finalTypes = new ArrayList<>();
+    List<List<String>> finalDishPrices = new ArrayList<>();
+    List<List<String>> finalOrderAndPayments = new ArrayList<>();
     List<List<String>> finalDishQuantity = new ArrayList<>();
     List<List<String>> finalHalfOr = new ArrayList<>();
     List<String> finalPayment = new ArrayList<>();
@@ -448,9 +456,13 @@ public class HomeFrag extends Fragment {
                         halfOr.clear();
                         dishQuantityCurrentTakeAway.clear();
                         finalDishQuantity.clear();
+                        image.clear();
+                        type.clear();
+                        finalImages.clear();
+                        finalTypes.clear();
                         customisationList.clear();
                         finalPayment.clear();
-
+                        orderAndPayment.clear();
                         time.clear();
                         finalUserNames.clear();
                         finalHalfOr.clear();
@@ -465,6 +477,9 @@ public class HomeFrag extends Fragment {
                                 orderId = String.valueOf(dataSnapshot1.child("orderID").getValue());
                                 paymentMode = String.valueOf(dataSnapshot1.child("paymmentMode").getValue());
                                 dishQuantityCurrentTakeAway.add(String.valueOf(dataSnapshot1.child("timesOrdered").getValue()));
+                                orderAndPayment.add(String.valueOf(dataSnapshot1.child("orderAndPayment").getValue()));
+                                image.add(String.valueOf(dataSnapshot1.child("image").getValue()));
+                                type.add(String.valueOf(dataSnapshot1.child("type").getValue()));
                                 userNameTakeAway.add(String.valueOf(dataSnapshot1.child("nameOfUser").getValue()));
                                 usernameOfTakeAway = String.valueOf(dataSnapshot1.child("nameOfUser").getValue());
                                 currentTime = String.valueOf(dataSnapshot1.child("time").getValue());
@@ -478,8 +493,15 @@ public class HomeFrag extends Fragment {
                             finalPayment.add(paymentMode);
                             finalUserNames.add(usernameOfTakeAway);
                             dishNameCurrentTakeAway.clear();
+                            finalDishPrices.add(new ArrayList<>(price));
+                            price.clear();
                             dishQuantityCurrentTakeAway.clear();
-
+                            finalTypes.add(new ArrayList<>(type));
+                            finalImages.add(new ArrayList<>(image));
+                            type.clear();
+                            image.clear();
+                            finalOrderAndPayments.add(new ArrayList<>(orderAndPayment));
+                            orderAndPayment.clear();
                             orderIDs.add(orderId);
                             orderAmounts.add(orderAmount);
                             halfOr.clear();
@@ -489,7 +511,7 @@ public class HomeFrag extends Fragment {
                         homeFragTakeAwayRecucler.setLayoutManager(anotherHori);
                         Log.i("message",finalDishNames.toString() + "\n" + finalPayment.toString() + "\n" + finalDishQuantity.toString());
 //                        homeFragTakeAwayRecucler.setAdapter(new CurrentTakeAway(currentTakeAwayAuth,dishNameCurrentTakeAway,dishQuantityCurrentTakeAway,userNameTakeAway,halfOr,paymentMode));
-                        homeFragTakeAwayRecucler.setAdapter(new CurrentTakeAway(finalDishNames,finalDishQuantity,finalHalfOr,finalUserNames,finalPayment,orderIDs,orderAmounts,currentTakeAwayAuth,time,customisationList));
+                        homeFragTakeAwayRecucler.setAdapter(new CurrentTakeAway(finalDishNames,finalDishQuantity,finalHalfOr,finalUserNames,finalPayment,orderIDs,orderAmounts,currentTakeAwayAuth,time,customisationList,finalOrderAndPayments,finalDishPrices,finalImages,finalTypes));
                     }else
                     {
                         currentTakeAwayAuth.clear();
@@ -501,13 +523,15 @@ public class HomeFrag extends Fragment {
                         finalPayment.clear();
                         finalUserNames.clear();
                         orderIDs.clear();
+                        finalOrderAndPayments.add(new ArrayList<>(orderAndPayment));
+                        orderAndPayment.clear();
                         orderAmounts.clear();
                         customisationList.clear();
                         time.clear();
                         finalHalfOr.clear();
                         dishQuantityCurrentTakeAway.clear();
                         homeFragTakeAwayRecucler.setLayoutManager(anotherHori);
-                        homeFragTakeAwayRecucler.setAdapter(new CurrentTakeAway(finalDishNames,finalDishQuantity,finalHalfOr,finalUserNames,finalPayment,orderIDs,orderAmounts,currentTakeAwayAuth,time,customisationList));
+                        homeFragTakeAwayRecucler.setAdapter(new CurrentTakeAway(finalDishNames,finalDishQuantity,finalHalfOr,finalUserNames,finalPayment,orderIDs,orderAmounts,currentTakeAwayAuth,time,customisationList,finalOrderAndPayments,finalDishPrices,finalImages,finalTypes));
 
                     }
                 }
@@ -1006,10 +1030,16 @@ public class HomeFrag extends Fragment {
                         dishNameCurrentTakeAway.clear();
                         userNameTakeAway.clear();
                         halfOr.clear();
+                        orderAndPayment.clear();
                         dishQuantityCurrentTakeAway.clear();
                         finalDishQuantity.clear();
+                        image.clear();
+                        type.clear();
+                        finalImages.clear();
+                        finalTypes.clear();
                         customisationList.clear();
                         finalPayment.clear();
+                        price.clear();
                         time.clear();
                         finalUserNames.clear();
                         finalHalfOr.clear();
@@ -1023,7 +1053,11 @@ public class HomeFrag extends Fragment {
                                 orderId = String.valueOf(dataSnapshot1.child("orderID").getValue());
                                 paymentMode = String.valueOf(dataSnapshot1.child("paymmentMode").getValue());
                                 dishQuantityCurrentTakeAway.add(String.valueOf(dataSnapshot1.child("timesOrdered").getValue()));
+                                image.add(String.valueOf(dataSnapshot1.child("image").getValue()));
+                                type.add(String.valueOf(dataSnapshot1.child("type").getValue()));
+                                price.add(String.valueOf(dataSnapshot1.child("price").getValue()));
                                 userNameTakeAway.add(String.valueOf(dataSnapshot1.child("nameOfUser").getValue()));
+                                orderAndPayment.add(String.valueOf(dataSnapshot1.child("orderAndPayment").getValue()));
                                 usernameOfTakeAway = String.valueOf(dataSnapshot1.child("nameOfUser").getValue());
                                 currentTime = String.valueOf(dataSnapshot1.child("time").getValue());
                                 cus = String.valueOf(dataSnapshot1.child("customisation").getValue());
@@ -1035,6 +1069,15 @@ public class HomeFrag extends Fragment {
                             finalHalfOr.add(new ArrayList<>(halfOr));
                             finalPayment.add(paymentMode);
                             finalUserNames.add(usernameOfTakeAway);
+                            finalImages.add(new ArrayList<>(image));
+                            finalTypes.add(new ArrayList<>(type));
+                            image.clear();
+                            type.clear();
+                            finalOrderAndPayments.add(new ArrayList<>(orderAndPayment));
+                            finalDishPrices.add(new ArrayList<>(price));
+                            price.clear();
+                            orderAndPayment.clear();
+
                             dishNameCurrentTakeAway.clear();
                             dishQuantityCurrentTakeAway.clear();
                             orderIDs.add(orderId);
@@ -1046,7 +1089,7 @@ public class HomeFrag extends Fragment {
                         homeFragTakeAwayRecucler.setLayoutManager(anotherHori);
                         Log.i("message",finalDishNames.toString() + "\n" + finalPayment.toString() + "\n" + finalDishQuantity.toString());
 //                        homeFragTakeAwayRecucler.setAdapter(new CurrentTakeAway(currentTakeAwayAuth,dishNameCurrentTakeAway,dishQuantityCurrentTakeAway,userNameTakeAway,halfOr,paymentMode));
-                            homeFragTakeAwayRecucler.setAdapter(new CurrentTakeAway(finalDishNames,finalDishQuantity,finalHalfOr,finalUserNames,finalPayment,orderIDs,orderAmounts,currentTakeAwayAuth,time,customisationList));
+                            homeFragTakeAwayRecucler.setAdapter(new CurrentTakeAway(finalDishNames,finalDishQuantity,finalHalfOr,finalUserNames,finalPayment,orderIDs,orderAmounts,currentTakeAwayAuth,time,customisationList,finalOrderAndPayments,finalDishPrices,finalImages,finalTypes));
                     }else
                     {
                         currentTakeAwayAuth.clear();
@@ -1056,15 +1099,19 @@ public class HomeFrag extends Fragment {
                         halfOr.clear();
                         finalDishQuantity.clear();
                         customisationList.clear();
+                        finalDishPrices.clear();
                         finalPayment.clear();
                         finalUserNames.clear();
                         orderIDs.clear();
+                        finalImages.clear();
+                        finalTypes.clear();
                         orderAmounts.clear();
+                        finalOrderAndPayments.clear();
                         time.clear();
                         finalHalfOr.clear();
                         dishQuantityCurrentTakeAway.clear();
                         homeFragTakeAwayRecucler.setLayoutManager(anotherHori);
-                        homeFragTakeAwayRecucler.setAdapter(new CurrentTakeAway(finalDishNames,finalDishQuantity,finalHalfOr,finalUserNames,finalPayment,orderIDs,orderAmounts,currentTakeAwayAuth,time,customisationList));
+                        homeFragTakeAwayRecucler.setAdapter(new CurrentTakeAway(finalDishNames,finalDishQuantity,finalHalfOr,finalUserNames,finalPayment,orderIDs,orderAmounts,currentTakeAwayAuth,time,customisationList,finalOrderAndPayments,finalDishPrices,finalImages,finalTypes));
 
                     }
                 }

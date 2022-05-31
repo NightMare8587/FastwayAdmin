@@ -83,6 +83,10 @@ import karpuzoglu.enes.com.fastdialog.Type;
 public class ApproveCurrentTakeAway extends AppCompatActivity {
     List<String> quantity;
     List<String> dishName;
+    List<String> image;
+    List<String> type;
+    List<String> dishPrice;
+    List<String> orderAndPayment;
     String transactionIdForExcel;
     FirebaseStorage storage;
     Gson gson;
@@ -162,6 +166,11 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
         dishName = new ArrayList<>(getIntent().getStringArrayListExtra("dishName"));
         quantity = new ArrayList<>(getIntent().getStringArrayListExtra("DishQ"));
         halfOr = new ArrayList<>(getIntent().getStringArrayListExtra("halfOr"));
+        dishPrice = new ArrayList<>(getIntent().getStringArrayListExtra("dishPrice"));
+        Log.i("info",dishPrice.toString());
+        image = new ArrayList<>(getIntent().getStringArrayListExtra("image"));
+        type = new ArrayList<>(getIntent().getStringArrayListExtra("type"));
+        orderAndPayment = new ArrayList<>(getIntent().getStringArrayListExtra("orderAndPayment"));
         Log.i("name",dishName.toString());
         decline = findViewById(R.id.declineTakeAwayButton);
         listView = findViewById(R.id.quantityTakeAwayListView);
@@ -460,6 +469,23 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
 
                                 }
                             });
+
+
+                            String approveTime = String.valueOf(System.currentTimeMillis());
+                            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(id).child("Recent Orders").child(time);
+                            for(int i=0;i<dishName.size();i++){
+                                MyClass myClass = new MyClass(dishName.get(i),dishPrice.get(i),image.get(i),type.get(i),""+approveTime,quantity.get(i),halfOr.get(i),state,String.valueOf(orderAmount),orderId,"TakeAway,Cash","Order Approved");
+                                databaseReference.child(auth.getUid()).child(dishName.get(i)).setValue(myClass);
+                            }
+
+
+                            databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(auth.getUid());
+                            for(int i=0;i<dishName.size();i++){
+                                MyClass myClass = new MyClass(dishName.get(i),dishPrice.get(i),image.get(i),type.get(i),""+approveTime,quantity.get(i),halfOr.get(i),state,String.valueOf(orderAmount),orderId,"TakeAway,Cash","Order Approved");
+                                databaseReference.child("Recent Orders").child("" + time).child(auth.getUid()).child(dishName.get(i)).setValue(myClass);
+                            }
+
+
                             Toast.makeText(ApproveCurrentTakeAway.this, "Order Confirmed", Toast.LENGTH_SHORT).show();
                             RequestQueue requestQueue = Volley.newRequestQueue(ApproveCurrentTakeAway.this);
                             JSONObject main = new JSONObject();
@@ -546,6 +572,20 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                             }
                         });
 
+                        String approveTime = String.valueOf(System.currentTimeMillis());
+                        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(id).child("Recent Orders").child(time);
+                        for(int i=0;i<dishName.size();i++){
+                            MyClass myClass = new MyClass(dishName.get(i),dishPrice.get(i),image.get(i),type.get(i),""+approveTime,quantity.get(i),halfOr.get(i),state,String.valueOf(orderAmount),orderId,"TakeAway,Online","Order Approved");
+                            databaseReference.child(auth.getUid()).child(dishName.get(i)).setValue(myClass);
+                        }
+
+
+                        databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(auth.getUid());
+                        for(int i=0;i<dishName.size();i++){
+                            MyClass myClass = new MyClass(dishName.get(i),dishPrice.get(i),image.get(i),type.get(i),""+approveTime,quantity.get(i),halfOr.get(i),state,String.valueOf(orderAmount),orderId,"TakeAway,Online","Order Approved");
+                            databaseReference.child("Recent Orders").child("" + time).child(auth.getUid()).child(dishName.get(i)).setValue(myClass);
+                        }
+
                         Toast.makeText(ApproveCurrentTakeAway.this, "Order Confirmed", Toast.LENGTH_SHORT).show();
                         new MakePayout().execute();
                         RequestQueue requestQueue = Volley.newRequestQueue(ApproveCurrentTakeAway.this);
@@ -601,6 +641,20 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
             linearLayout.setOrientation(LinearLayout.VERTICAL);
             linearLayout.addView(editText);
             alert.setView(linearLayout);
+
+            String approveTime = String.valueOf(System.currentTimeMillis());
+            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(id).child("Recent Orders").child(time);
+            for(int i=0;i<dishName.size();i++){
+                MyClass myClass = new MyClass(dishName.get(i),"\u20B9"+dishPrice.get(i),image.get(i),type.get(i),""+approveTime,quantity.get(i),halfOr.get(i),state,String.valueOf(orderAmount),orderId,"TakeAway,Online","Order Declined");
+                databaseReference.child(auth.getUid()).child(dishName.get(i)).setValue(myClass);
+            }
+
+
+            databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(auth.getUid());
+            for(int i=0;i<dishName.size();i++){
+                MyClass myClass = new MyClass(dishName.get(i),"\u20B9"+dishPrice.get(i),image.get(i),type.get(i),""+approveTime,quantity.get(i),halfOr.get(i),state,String.valueOf(orderAmount),orderId,"TakeAway,Online","Order Declined");
+                databaseReference.child("Recent Orders").child("" + time).child(auth.getUid()).child(dishName.get(i)).setValue(myClass);
+            }
 
             alert.setPositiveButton("submit", new DialogInterface.OnClickListener() {
                 @Override
@@ -1047,6 +1101,16 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
 
         @Override
         protected Void doInBackground(Void... voids) {
+
+            return null;
+        }
+    }
+
+    public class UpdateTakeAwayOrders extends AsyncTask<Void,Void,Void>{
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+
 
             return null;
         }

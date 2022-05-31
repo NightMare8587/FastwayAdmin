@@ -21,7 +21,11 @@ import java.util.List;
 
 public class CurrentTakeAway extends RecyclerView.Adapter<CurrentTakeAway.Holder> {
     List<List<String>> finalDishNames = new ArrayList<>();
+    List<List<String>> finalOrderAndPayments = new ArrayList<>();
     List<List<String>> finalDishQuantity = new ArrayList<>();
+    List<List<String>> finalImages = new ArrayList<>();
+    List<List<String>> finalTypes = new ArrayList<>();
+    List<List<String>> finalDishPrices = new ArrayList<>();
     List<List<String>> finalHalfOr = new ArrayList<>();
     List<String> currentTakeAwayAuth = new ArrayList<>();
     List<String> finalUserNames = new ArrayList<>();
@@ -30,10 +34,16 @@ public class CurrentTakeAway extends RecyclerView.Adapter<CurrentTakeAway.Holder
     List<String> orderAmount = new ArrayList<>();
     List<String> time;
 
-    public CurrentTakeAway(List<List<String>> finalDishNames, List<List<String>> finalDishQuantity, List<List<String>> finalHalfOr, List<String> finalUserNames, List<String> finalPayment,List<String> orderId,List<String> orderAmount,List<String> currentTakeAwayAuth,List<String> time,List<String> customisationList) {
+    public CurrentTakeAway(List<List<String>> finalDishNames, List<List<String>> finalDishQuantity, List<List<String>> finalHalfOr, List<String> finalUserNames,
+                           List<String> finalPayment,List<String> orderId,List<String> orderAmount,List<String> currentTakeAwayAuth,List<String> time,List<String> customisationList,
+                           List<List<String>> finalOrderAndPayments,List<List<String>> finalDishPrices,List<List<String>> finalImages,List<List<String>> finalTypes) {
         this.finalDishNames = finalDishNames;
         this.finalDishQuantity = finalDishQuantity;
         this.finalHalfOr = finalHalfOr;
+        this.finalDishPrices = finalDishPrices;
+        this.finalImages = finalImages;
+        this.finalTypes = finalTypes;
+        this.finalOrderAndPayments = finalOrderAndPayments;
         this.customisationList = customisationList;
         this.time = time;
         this.finalUserNames = finalUserNames;
@@ -72,12 +82,20 @@ public class CurrentTakeAway extends RecyclerView.Adapter<CurrentTakeAway.Holder
         holder.checkOrder.setOnClickListener(view -> {
             Intent intent = new Intent(view.getContext(),ApproveCurrentTakeAway.class);
             List<String> dishQuantityCurrentTakeAway = new ArrayList<>(finalDishQuantity.get(position));
+            List<String> dishPrice = new ArrayList<>(finalDishPrices.get(position));
+            List<String> image = new ArrayList<>(finalImages.get(position));
+            List<String> type = new ArrayList<>(finalTypes.get(position));
             intent.putExtra("id",currentTakeAwayAuth.get(position));
             List<String> dishNameCurrentTakeAway = new ArrayList<>(finalDishNames.get(position));
+            List<String> orderAndPayments = new ArrayList<>(finalOrderAndPayments.get(position));
             List<String> halfOr = new ArrayList<>(finalHalfOr.get(position));
             intent.putStringArrayListExtra("dishName", (ArrayList<String>) dishNameCurrentTakeAway);
+            intent.putStringArrayListExtra("dishPrice", (ArrayList<String>) dishPrice);
             intent.putStringArrayListExtra("DishQ",(ArrayList<String>) dishQuantityCurrentTakeAway);
             intent.putStringArrayListExtra("halfOr",(ArrayList<String>) halfOr);
+            intent.putStringArrayListExtra("orderAndPayment",(ArrayList<String>) orderAndPayments);
+            intent.putStringArrayListExtra("image",(ArrayList<String>) image);
+            intent.putStringArrayListExtra("type",(ArrayList<String>) type);
             intent.putExtra("orderID",orderId.get(position));
             intent.putExtra("payment",finalPayment.get(position));
             intent.putExtra("time",time.get(position));
