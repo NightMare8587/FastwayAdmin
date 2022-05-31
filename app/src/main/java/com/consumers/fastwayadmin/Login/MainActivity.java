@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -19,6 +20,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -104,6 +106,7 @@ public class MainActivity extends AppCompatActivity {
     Button startVerification;
     DatabaseReference reference;
     String name,email,number;
+    TextView readTAndC;
     PhoneAuthCredential credential;
     FirebaseUser currentUser;
     GMailSender sender;
@@ -116,6 +119,11 @@ public class MainActivity extends AppCompatActivity {
         initialise();
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
         checkPermissions();
+        readTAndC = findViewById(R.id.textClicktoReadTermsAndCOnditions);
+        readTAndC.setOnClickListener(click -> {
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.websitepolicies.com/policies/view/CpwDZziF"));
+            startActivity(browserIntent);
+        });
         SharedPreferences stopServices = getSharedPreferences("Stop Services", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor5 = stopServices.edit();
         editor5.putString("online","true");

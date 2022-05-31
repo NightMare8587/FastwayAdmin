@@ -60,6 +60,10 @@ public class IntroActivity extends AppCompatActivity {
                 next.setText("NEXT");
 
             if(count > 4){
+                startActivity(new Intent(IntroActivity.this, MainActivity.class));
+                editor.putString("done","yes");
+                editor.apply();
+                finish();
                 AlertDialog.Builder alertDialog = new AlertDialog.Builder(IntroActivity.this);
                 View myView = getLayoutInflater().inflate(R.layout.terms_condition_layout,null);
                 alertDialog.setCancelable(false);
@@ -67,13 +71,11 @@ public class IntroActivity extends AppCompatActivity {
                 AlertDialog alertDialog1;
                 alertDialog.setView(myView);
                 alertDialog1 = alertDialog.create();
-                alertDialog1.show();
+//                alertDialog1.show();
                 accept.setOnClickListener(v1 -> {
-                    startActivity(new Intent(IntroActivity.this, MainActivity.class));
-                    editor.putString("done","yes");
-                    editor.apply();
+
                     alertDialog1.dismiss();
-                    finish();
+
                 });
             }
 

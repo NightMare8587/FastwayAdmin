@@ -11,7 +11,7 @@
         android:id="@+id/nameLogin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="25dp"
         android:background="@drawable/input"
         android:ems="10"
         android:hint="Enter Full Name"
@@ -84,6 +84,21 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:srcCompat="@drawable/google" />
+
+    <TextView
+        android:id="@+id/textClicktoReadTermsAndCOnditions"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="25dp"
+        android:layout_marginTop="13dp"
+        android:layout_marginEnd="25dp"
+        android:text="Click here to read Terms And Conditions And Privacy Policy"
+        android:textColor="#194A71"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/startVerification" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
