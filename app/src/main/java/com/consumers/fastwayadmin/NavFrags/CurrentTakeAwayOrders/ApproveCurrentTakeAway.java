@@ -642,23 +642,11 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
             linearLayout.addView(editText);
             alert.setView(linearLayout);
 
-            String approveTime = String.valueOf(System.currentTimeMillis());
-            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(id).child("Recent Orders").child(time);
-            for(int i=0;i<dishName.size();i++){
-                MyClass myClass = new MyClass(dishName.get(i),"\u20B9"+dishPrice.get(i),image.get(i),type.get(i),""+approveTime,quantity.get(i),halfOr.get(i),state,String.valueOf(orderAmount),orderId,"TakeAway,Online","Order Declined");
-                databaseReference.child(auth.getUid()).child(dishName.get(i)).setValue(myClass);
-            }
 
-
-            databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(auth.getUid());
-            for(int i=0;i<dishName.size();i++){
-                MyClass myClass = new MyClass(dishName.get(i),"\u20B9"+dishPrice.get(i),image.get(i),type.get(i),""+approveTime,quantity.get(i),halfOr.get(i),state,String.valueOf(orderAmount),orderId,"TakeAway,Online","Order Declined");
-                databaseReference.child("Recent Orders").child("" + time).child(auth.getUid()).child(dishName.get(i)).setValue(myClass);
-            }
 
             alert.setPositiveButton("submit", new DialogInterface.OnClickListener() {
                 @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
+                public void onClick(DialogInterface dialogInterface, int ij) {
                     if(!editText.getText().toString().equals("")) {
                         RequestQueue requestQueue = Volley.newRequestQueue(ApproveCurrentTakeAway.this);
                         JSONObject main = new JSONObject();
@@ -666,6 +654,19 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                         FirebaseAuth auth = FirebaseAuth.getInstance();
                         DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(Objects.requireNonNull(auth.getUid())).child("Current TakeAway").child(id);
                         if (paymentMode.equals("online")) {
+                            String approveTime = String.valueOf(System.currentTimeMillis());
+                            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(id).child("Recent Orders").child(time);
+                            for(int i=0;i<dishName.size();i++){
+                                MyClass myClass = new MyClass(dishName.get(i),dishPrice.get(i),image.get(i),type.get(i),""+approveTime,quantity.get(i),halfOr.get(i),state,String.valueOf(orderAmount),orderId,"TakeAway,Online","Order Declined");
+                                databaseReference.child(auth.getUid()).child(dishName.get(i)).setValue(myClass);
+                            }
+
+
+                            databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(auth.getUid());
+                            for(int i=0;i<dishName.size();i++){
+                                MyClass myClass = new MyClass(dishName.get(i),dishPrice.get(i),image.get(i),type.get(i),""+approveTime,quantity.get(i),halfOr.get(i),state,String.valueOf(orderAmount),orderId,"TakeAway,Online","Order Declined");
+                                databaseReference.child("Recent Orders").child("" + time).child(auth.getUid()).child(dishName.get(i)).setValue(myClass);
+                            }
                             new InitiateRefund().execute();
                             try {
                                 main.put("to", "/topics/" + id + "");
@@ -694,6 +695,19 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                             }
                         } else {
                             try {
+                                String approveTime = String.valueOf(System.currentTimeMillis());
+                                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(id).child("Recent Orders").child(time);
+                                for(int i=0;i<dishName.size();i++){
+                                    MyClass myClass = new MyClass(dishName.get(i),dishPrice.get(i),image.get(i),type.get(i),""+approveTime,quantity.get(i),halfOr.get(i),state,String.valueOf(orderAmount),orderId,"TakeAway,Cash","Order Declined");
+                                    databaseReference.child(auth.getUid()).child(dishName.get(i)).setValue(myClass);
+                                }
+
+
+                                databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(auth.getUid());
+                                for(int i=0;i<dishName.size();i++){
+                                    MyClass myClass = new MyClass(dishName.get(i),dishPrice.get(i),image.get(i),type.get(i),""+approveTime,quantity.get(i),halfOr.get(i),state,String.valueOf(orderAmount),orderId,"TakeAway,Cash","Order Declined");
+                                    databaseReference.child("Recent Orders").child("" + time).child(auth.getUid()).child(dishName.get(i)).setValue(myClass);
+                                }
                                 main.put("to", "/topics/" + id + "");
                                 JSONObject notification = new JSONObject();
                                 notification.put("title", "Order Declined");
