@@ -126,15 +126,13 @@ public class AllMenuDish extends AppCompatActivity {
 
             }
         });
-        search.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(),CreateDish.class);
-                intent.putExtra("Dish",getIntent().getStringExtra("Dish"));
-                intent.putExtra("state",sharedPreferences.getString("state",""));
-                startActivity(intent);
+        search.setOnClickListener(view -> {
+            Intent intent = new Intent(getApplicationContext(),CreateDish.class);
+            intent.putExtra("Dish",getIntent().getStringExtra("Dish"));
+            intent.putExtra("state",sharedPreferences.getString("state",""));
+            intent.putExtra("locality",sharedPreferences.getString("locality",""));
+            startActivity(intent);
 
-            }
         });
 
         Toast.makeText(this, "Swipe down to refresh if new dish added", Toast.LENGTH_SHORT).show();
@@ -197,7 +195,7 @@ public class AllMenuDish extends AppCompatActivity {
         search = (FloatingActionButton)findViewById(R.id.floatingActionButton2);
         loading = findViewById(R.id.loading);
         menuAuth = FirebaseAuth.getInstance();
-        menuRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state",""));
+        menuRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality",""));
         recyclerView = findViewById(R.id.dishRecycler);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         dish = getIntent().getStringExtra("Dish");

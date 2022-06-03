@@ -163,7 +163,7 @@ public class AccountFrag extends Fragment {
                             .setMessage("Do you wanna logout?")
                             .setPositiveButton("Yes", (dialogInterface, i1) -> {
                                 SharedPreferences settings = view1.getContext().getSharedPreferences("loginInfo", MODE_PRIVATE);
-                                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(settings.getString("state","")).child(UID);
+                                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(settings.getString("state","")).child(settings.getString("locality","")).child(UID);
                                 databaseReference.child("status").setValue("offline");
                                 databaseReference.child("acceptingOrders").setValue("no");
                                 FirebaseMessaging.getInstance().unsubscribeFromTopic(Objects.requireNonNull(UID));

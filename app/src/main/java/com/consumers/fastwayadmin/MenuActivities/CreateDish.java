@@ -47,6 +47,7 @@ public class CreateDish extends AppCompatActivity {
     CheckBox checkBox;
     DatabaseReference dish;
     String dishType = "Veg";
+    String locality;
     RadioGroup radioGroup;
     boolean imageAddedOr = false;
     String mrp;
@@ -135,7 +136,7 @@ public class CreateDish extends AppCompatActivity {
                                         }
                                     }).setNegativeButton("Skip", (dialogInterface, i) -> {
                                         DishInfo info = new DishInfo(name,half,full,image,mrp,"0","0","0","yes","",dishType);
-                                        dish.child("Restaurants").child(state).child(Objects.requireNonNull(dishAuth.getUid())).child("List of Dish").child(menuType).child(name).setValue(info);
+                                        dish.child("Restaurants").child(state).child(locality).child(Objects.requireNonNull(dishAuth.getUid())).child("List of Dish").child(menuType).child(name).setValue(info);
                                         Toast.makeText(CreateDish.this, "Dish Added Successfully", Toast.LENGTH_SHORT).show();
                                         imageAddedOr = false;
                                         finish();
@@ -160,7 +161,7 @@ public class CreateDish extends AppCompatActivity {
                                                 Toast.makeText(CreateDish.this, "Field can't be empty", Toast.LENGTH_SHORT).show();
                                             }else{
                                                 DishInfo info = new DishInfo(name,half,full,image,mrp,"0","0","0","yes",editText.getText().toString(),dishType);
-                                                dish.child("Restaurants").child(state).child(Objects.requireNonNull(dishAuth.getUid())).child("List of Dish").child(menuType).child(name).setValue(info);
+                                                dish.child("Restaurants").child(state).child(locality).child(Objects.requireNonNull(dishAuth.getUid())).child("List of Dish").child(menuType).child(name).setValue(info);
                                                 Toast.makeText(CreateDish.this, "Dish Added Successfully", Toast.LENGTH_SHORT).show();
                                                 imageAddedOr = false;
                                                 finish();
@@ -170,7 +171,7 @@ public class CreateDish extends AppCompatActivity {
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i) {
                                     DishInfo info = new DishInfo(name,half,full,image,mrp,"0","0","0","yes","",dishType);
-                                    dish.child("Restaurants").child(state).child(Objects.requireNonNull(dishAuth.getUid())).child("List of Dish").child(menuType).child(name).setValue(info);
+                                    dish.child("Restaurants").child(state).child(locality).child(Objects.requireNonNull(dishAuth.getUid())).child("List of Dish").child(menuType).child(name).setValue(info);
                                     Toast.makeText(CreateDish.this, "Dish Added Successfully", Toast.LENGTH_SHORT).show();
                                     imageAddedOr = false;
                                     finish();
@@ -227,7 +228,7 @@ public class CreateDish extends AppCompatActivity {
     private void addToDatabase(String name, String half, String full,String image,String mrp) {
         DishInfo info = new DishInfo(name,half,full,image,mrp,"0","0","0","yes",descriptionToSubmit,dishType);
         try {
-            dish.child("Restaurants").child(state).child(Objects.requireNonNull(dishAuth.getUid())).child("List of Dish").child(menuType).child(name).setValue(info);
+            dish.child("Restaurants").child(state).child(locality).child(Objects.requireNonNull(dishAuth.getUid())).child("List of Dish").child(menuType).child(name).setValue(info);
             StorageReference reference = storageReference.child(dishAuth.getUid() + "/" + "image" + "/"  + nameOfDish.getText().toString());
             reference.getDownloadUrl().addOnSuccessListener(uri -> {
                 DatabaseReference dish = FirebaseDatabase.getInstance().getReference().getRoot();
@@ -235,7 +236,7 @@ public class CreateDish extends AppCompatActivity {
                 SharedPreferences.Editor imageEdit = storeImages.edit();
                 imageEdit.putString(name,uri + "");
                 imageEdit.apply();
-                dish.child("Restaurants").child(state).child(Objects.requireNonNull(dishAuth.getUid())).child("List of Dish").child(menuType).child(name).child("image").setValue(uri + "");
+                dish.child("Restaurants").child(state).child(locality).child(Objects.requireNonNull(dishAuth.getUid())).child("List of Dish").child(menuType).child(name).child("image").setValue(uri + "");
             });
             Toast.makeText(this, "Dish Added Successfully", Toast.LENGTH_SHORT).show();
         }catch (Exception e){
@@ -270,6 +271,7 @@ public class CreateDish extends AppCompatActivity {
         halfPlate = findViewById(R.id.halfPlatePrice);
         floatingActionButton = findViewById(R.id.searchOurDatabase);
         state = getIntent().getStringExtra("state");
+        locality = getIntent().getStringExtra("locality");
         fullPlate = findViewById(R.id.fullPlatePrice);
         createDish = findViewById(R.id.saveDishInfo);
         dishAuth = FirebaseAuth.getInstance();

@@ -85,6 +85,7 @@ public class Info extends AppCompatActivity {
     Bitmap bitmap;
     StorageReference storageReference;
     Uri filePath;
+    boolean subLocal = false;
     FirebaseStorage storage;
     CheckBox optForTakeaway,optForTableBook;
     OutputStream outputStream;
@@ -127,55 +128,70 @@ public class Info extends AppCompatActivity {
         checkLocationInfo = getSharedPreferences("LocationMaps",MODE_PRIVATE);
         checkPermissions();
         sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
-        editor = sharedPreferences.edit();
-        fastDialog = new FastDialogBuilder(Info.this, Type.PROGRESS)
-                .progressText("Checking Database...")
-                .setAnimation(Animations.SLIDE_TOP)
-                .cancelable(false)
-                .create();
-        fastDialog.show();
-
-
-        if(sharedPreferences.contains("state")){
-
-            SharedPreferences location = getSharedPreferences("LocationMaps",MODE_PRIVATE);
-            checkRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state",""));
-            checkRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    if(snapshot.hasChild(Objects.requireNonNull(infoAuth.getUid()))){
-                        SharedPreferences resInfoShared = getSharedPreferences("RestaurantInfo",MODE_PRIVATE);
-                        SharedPreferences.Editor editor = resInfoShared.edit();
-                        editor.putString("hotelName",snapshot.child(infoAuth.getUid()).child("name").getValue(String.class));
-                        editor.putString("hotelAddress",snapshot.child(infoAuth.getUid()).child("address").getValue(String.class));
-                        editor.putString("hotelNumber",snapshot.child(infoAuth.getUid()).child("number").getValue(String.class));
-                        editor.apply();
-
-
-                        if(location.contains("location")){
-                            clientsLocation.removeLocationUpdates(mLocationCallback);
-                            startActivity(new Intent(Info.this,HomeScreen.class));
-                        }else {
-                            clientsLocation.removeLocationUpdates(mLocationCallback);
-                            startActivity(new Intent(Info.this, UploadRequiredDocuments.class));
-                        }
-
-                        fastDialog.dismiss();
-                        finish();
-                        overridePendingTransition(R.anim.slide_in, R.anim.fade_out);
-                    }else
-                        fastDialog.dismiss();
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-
-                }
-            });
-        }else {
-            createLocationRequest();
-            fastDialog.dismiss();
+        SharedPreferences location = getSharedPreferences("LocationMaps",MODE_PRIVATE);
+        if(location.contains("location")){
+            startActivity(new Intent(Info.this, HomeScreen.class));
+            finish();
+        }else if(sharedPreferences.contains("restaurantCreated"))
+        {
+            startActivity(new Intent(Info.this,UploadRequiredDocuments.class));
+            finish();
         }
+        if(!sharedPreferences.getString("locality","").equals(""))
+            subLocal = true;
+        if(!sharedPreferences.getString("postalCode","").equals(""))
+            pinCode.setText(sharedPreferences.getString("postalCode",""));
+        editor = sharedPreferences.edit();
+//        fastDialog = new FastDialogBuilder(Info.this, Type.PROGRESS)
+//                .progressText("Checking Database...")
+//                .setAnimation(Animations.SLIDE_TOP)
+//                .cancelable(false)
+//                .create();
+//        fastDialog.show();
+
+
+//        if(sharedPreferences.contains("state")){
+//
+//            SharedPreferences location = getSharedPreferences("LocationMaps",MODE_PRIVATE);
+//            if(!sharedPreferences.getString("locality","").equals("")) {
+//                checkRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state", "")).child(sharedPreferences.getString("locality",""));
+//                checkRef.addListenerForSingleValueEvent(new ValueEventListener() {
+//                    @Override
+//                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                        if (snapshot.hasChild(Objects.requireNonNull(infoAuth.getUid()))) {
+//                            SharedPreferences resInfoShared = getSharedPreferences("RestaurantInfo", MODE_PRIVATE);
+//                            SharedPreferences.Editor editor = resInfoShared.edit();
+//                            editor.putString("hotelName", snapshot.child(infoAuth.getUid()).child("name").getValue(String.class));
+//                            editor.putString("hotelAddress", snapshot.child(infoAuth.getUid()).child("address").getValue(String.class));
+//                            editor.putString("hotelNumber", snapshot.child(infoAuth.getUid()).child("number").getValue(String.class));
+//                            editor.apply();
+//
+//
+//                            if (location.contains("location")) {
+//                                clientsLocation.removeLocationUpdates(mLocationCallback);
+//                                startActivity(new Intent(Info.this, HomeScreen.class));
+//                            } else {
+//                                clientsLocation.removeLocationUpdates(mLocationCallback);
+//                                startActivity(new Intent(Info.this, UploadRequiredDocuments.class));
+//                            }
+//
+//                            fastDialog.dismiss();
+//                            finish();
+//                            overridePendingTransition(R.anim.slide_in, R.anim.fade_out);
+//                        } else
+//                            fastDialog.dismiss();
+//                    }
+//
+//                    @Override
+//                    public void onCancelled(@NonNull DatabaseError error) {
+//
+//                    }
+//                });
+//            }
+//        }else {
+//            createLocationRequest();
+//            fastDialog.dismiss();
+//        }
 
         proceed.setOnClickListener(view -> {
             if(nameOfRestaurant.length() == 0){
@@ -218,65 +234,68 @@ public class Info extends AppCompatActivity {
                 != PackageManager.PERMISSION_GRANTED){
 //            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},1);
             requestPermissions(new String[]{Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.ACCESS_FINE_LOCATION},1);
-        }else
-            createLocationRequest();
+        }
+//            createLocationRequest();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     private void createChildForRestaurant() {
-        SharedPreferences sharedPreferences = getSharedPreferences("RestaurantInfo",MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString("hotelName",name);
-        editor.putString("hotelAddress",address);
-        editor.putString("hotelNumber",number);
-        editor.apply();
-        infoRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(this.sharedPreferences.getString("state","")).child(Objects.requireNonNull(infoAuth.getUid()));
-        infoRef.child("name").setValue(name);
-        infoRef.child("address").setValue(address);
-        infoRef.child("number").setValue(number);
-        infoRef.child("nearby").setValue(nearby);
-        infoRef.child("pin").setValue(pin);
-        infoRef.child("rating").setValue("0");
-        infoRef.child("totalRate").setValue("0");
-        infoRef.child("count").setValue("0");
-        infoRef.child("status").setValue("online");
-        infoRef.child("acceptingOrders").setValue("yes");
-        infoRef.child("totalReports").setValue("0");
-        if(optForTakeaway.isChecked()){
-            infoRef.child("TakeAwayAllowed").setValue("yes");
-            this.editor.putString("TakeAwayAllowed","yes");
-        }else {
-            infoRef.child("TakeAwayAllowed").setValue("no");
-            this.editor.putString("TakeAwayAllowed", "no");
+        if(subLocal) {
+            SharedPreferences sharedPreferences = getSharedPreferences("RestaurantInfo", MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString("hotelName", name);
+            editor.putString("hotelAddress", address);
+            editor.putString("hotelNumber", number);
+            this.editor.putString("restaurantCreated", "yes");
+            editor.apply();
+            infoRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(this.sharedPreferences.getString("state", "")).child(this.sharedPreferences.getString("locality","")).child(Objects.requireNonNull(infoAuth.getUid()));
+            infoRef.child("name").setValue(name);
+            infoRef.child("address").setValue(address);
+            infoRef.child("number").setValue(number);
+            infoRef.child("nearby").setValue(nearby);
+            infoRef.child("pin").setValue(pin);
+            infoRef.child("rating").setValue("0");
+            infoRef.child("totalRate").setValue("0");
+            infoRef.child("count").setValue("0");
+            infoRef.child("status").setValue("online");
+            infoRef.child("acceptingOrders").setValue("yes");
+            infoRef.child("totalReports").setValue("0");
+            if (optForTakeaway.isChecked()) {
+                infoRef.child("TakeAwayAllowed").setValue("yes");
+                this.editor.putString("TakeAwayAllowed", "yes");
+            } else {
+                infoRef.child("TakeAwayAllowed").setValue("no");
+                this.editor.putString("TakeAwayAllowed", "no");
+            }
+
+            if (optForTableBook.isChecked()) {
+                infoRef.child("TableBookAllowed").setValue("yes");
+                this.editor.putString("TableBookAllowed", "yes");
+            } else {
+                infoRef.child("TableBookAllowed").setValue("no");
+                this.editor.putString("TableBookAllowed", "no");
+            }
+
+            this.editor.apply();
+//            clientsLocation.removeLocationUpdates(mLocationCallback);
+            AlertDialog.Builder alert = new AlertDialog.Builder(Info.this);
+            alert.setTitle("Images");
+            alert.setMessage("Do you wanna add images of your restaurant\n(This image will be visible to user)!!\nYou can skip this step and add image later");
+            alert.setPositiveButton("Add Image", (dialogInterface, i) -> {
+                Intent intent = new Intent(Info.this, AddRestaurantImages.class);
+                intent.putExtra("state", sharedPreferences.getString("state", ""));
+                startActivity(intent);
+            }).setNegativeButton("Skip", (dialogInterface, i) -> {
+                dialogInterface.dismiss();
+                infoRef.child("DisplayImage").setValue("");
+                startActivity(new Intent(Info.this, UploadRequiredDocuments.class));
+                finish();
+            }).create();
+
+            alert.setCancelable(false);
+            alert.show();
+
         }
-
-        if(optForTableBook.isChecked()){
-            infoRef.child("TableBookAllowed").setValue("yes");
-            this.editor.putString("TableBookAllowed","yes");
-        }else {
-            infoRef.child("TableBookAllowed").setValue("no");
-            this.editor.putString("TableBookAllowed","no");
-        }
-
-        this.editor.apply();
-        clientsLocation.removeLocationUpdates(mLocationCallback);
-        AlertDialog.Builder alert = new AlertDialog.Builder(Info.this);
-        alert.setTitle("Images");
-        alert.setMessage("Do you wanna add images of your restaurant\n(This image will be visible to user)!!\nYou can skip this step and add image later");
-        alert.setPositiveButton("Add Image", (dialogInterface, i) -> {
-               Intent intent = new Intent(Info.this,AddRestaurantImages.class);
-               intent.putExtra("state",sharedPreferences.getString("state",""));
-               startActivity(intent);
-        }).setNegativeButton("Skip", (dialogInterface, i) -> {
-            dialogInterface.dismiss();
-            infoRef.child("DisplayImage").setValue("");
-            startActivity(new Intent(Info.this, UploadRequiredDocuments.class));
-            finish();
-        }).create();
-
-        alert.setCancelable(false);
-        alert.show();
-
     }
 
     private void initialise() {
@@ -292,104 +311,104 @@ public class Info extends AppCompatActivity {
 
     }
 
-    private void createLocationRequest() {
-        locationRequest = LocationRequest.create();
-        locationRequest.setInterval(1000);
-        locationRequest.setFastestInterval(1000);
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-
-        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
-                .addLocationRequest(locationRequest);
-
-        clientsLocation = LocationServices.getFusedLocationProviderClient(Info.this);
-        clientsLocation.requestLocationUpdates(locationRequest,mLocationCallback, Looper.myLooper());
-        SettingsClient client = LocationServices.getSettingsClient(this);
-        Task<LocationSettingsResponse> task = client.checkLocationSettings(builder.build());
-
-        task.addOnCompleteListener(task1 -> {
-            try {
-                LocationSettingsResponse response = task1.getResult(ApiException.class);
-                // All location settings are satisfied. The client can initialize location
-                // requests here.
-
-            } catch (ApiException exception) {
-                switch (exception.getStatusCode()) {
-                    case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
-                        // Location settings are not satisfied. But could be fixed by showing the
-                        // user a dialog.
-                        try {
-                            // Cast to a resolvable exception.
-                            ResolvableApiException resolvable = (ResolvableApiException) exception;
-                            // Show the dialog by calling startResolutionForResult(),
-                            // and check the result in onActivityResult().
-                            resolvable.startResolutionForResult(
-                                    Info.this,
-                                    101);
-                        } catch (IntentSender.SendIntentException e) {
-                            // Ignore the error.
-                        } catch (ClassCastException e) {
-                            // Ignore, should be an impossible error.
-                        }
-                        break;
-                    case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
-                        // Location settings are not satisfied. However, we have no way to fix the
-                        // settings so we won't show the dialog.
-                        break;
-                }
-            }
-        });
-    }
-
-    private final LocationCallback mLocationCallback = new LocationCallback() {
-
-        @Override
-        public void onLocationResult(LocationResult locationResult) {
-            Location mLastLocation = locationResult.getLastLocation();
-            longi = mLastLocation.getLongitude();
-            lati = mLastLocation.getLatitude();
-            editor.putString("longi",String.valueOf(longi));
-            editor.putString("lati",String.valueOf(lati));
-            Geocoder geocoder = new Geocoder(Info.this, Locale.getDefault());
-            List<Address> addresses = null;
-            String cityName;
-            try {
-                addresses = geocoder.getFromLocation(lati, longi, 1);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            cityName = addresses.get(0).getLocality();
-
-            editor.putString("state",cityName);
-            editor.apply();
-            Log.i("infoses", cityName + " " );
-            Log.i("locationes",longi + " " + lati);
-
-            SharedPreferences location = getSharedPreferences("LocationMaps",MODE_PRIVATE);
-            checkRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state",""));
-            checkRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    if(snapshot.hasChild(Objects.requireNonNull(infoAuth.getUid()))){
-                        if(location.contains("location")){
-                            startActivity(new Intent(Info.this,HomeScreen.class));
-                        }else
-                            startActivity(new Intent(Info.this,UploadRequiredDocuments.class));
-
-                        clientsLocation.removeLocationUpdates(mLocationCallback);
-                        finish();
-
-                        overridePendingTransition(R.anim.slide_in, R.anim.fade_out);
-                    }else
-                        fastDialog.dismiss();
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-
-                }
-            });
-        }
-    };
+//    private void createLocationRequest() {
+//        locationRequest = LocationRequest.create();
+//        locationRequest.setInterval(1000);
+//        locationRequest.setFastestInterval(1000);
+//        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+//
+//        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
+//                .addLocationRequest(locationRequest);
+//
+//        clientsLocation = LocationServices.getFusedLocationProviderClient(Info.this);
+//        clientsLocation.requestLocationUpdates(locationRequest,mLocationCallback, Looper.myLooper());
+//        SettingsClient client = LocationServices.getSettingsClient(this);
+//        Task<LocationSettingsResponse> task = client.checkLocationSettings(builder.build());
+//
+//        task.addOnCompleteListener(task1 -> {
+//            try {
+//                LocationSettingsResponse response = task1.getResult(ApiException.class);
+//                // All location settings are satisfied. The client can initialize location
+//                // requests here.
+//
+//            } catch (ApiException exception) {
+//                switch (exception.getStatusCode()) {
+//                    case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+//                        // Location settings are not satisfied. But could be fixed by showing the
+//                        // user a dialog.
+//                        try {
+//                            // Cast to a resolvable exception.
+//                            ResolvableApiException resolvable = (ResolvableApiException) exception;
+//                            // Show the dialog by calling startResolutionForResult(),
+//                            // and check the result in onActivityResult().
+//                            resolvable.startResolutionForResult(
+//                                    Info.this,
+//                                    101);
+//                        } catch (IntentSender.SendIntentException e) {
+//                            // Ignore the error.
+//                        } catch (ClassCastException e) {
+//                            // Ignore, should be an impossible error.
+//                        }
+//                        break;
+//                    case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
+//                        // Location settings are not satisfied. However, we have no way to fix the
+//                        // settings so we won't show the dialog.
+//                        break;
+//                }
+//            }
+//        });
+//    }
+//
+//    private final LocationCallback mLocationCallback = new LocationCallback() {
+//
+//        @Override
+//        public void onLocationResult(LocationResult locationResult) {
+//            Location mLastLocation = locationResult.getLastLocation();
+//            longi = mLastLocation.getLongitude();
+//            lati = mLastLocation.getLatitude();
+//            editor.putString("longi",String.valueOf(longi));
+//            editor.putString("lati",String.valueOf(lati));
+//            Geocoder geocoder = new Geocoder(Info.this, Locale.getDefault());
+//            List<Address> addresses = null;
+//            String cityName;
+//            try {
+//                addresses = geocoder.getFromLocation(lati, longi, 1);
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//            cityName = addresses.get(0).getLocality();
+//
+//            editor.putString("state",cityName);
+//            editor.apply();
+//            Log.i("infoses", cityName + " " );
+//            Log.i("locationes",longi + " " + lati);
+//
+//            SharedPreferences location = getSharedPreferences("LocationMaps",MODE_PRIVATE);
+//            checkRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state",""));
+//            checkRef.addListenerForSingleValueEvent(new ValueEventListener() {
+//                @Override
+//                public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                    if(snapshot.hasChild(Objects.requireNonNull(infoAuth.getUid()))){
+//                        if(location.contains("location")){
+//                            startActivity(new Intent(Info.this,HomeScreen.class));
+//                        }else
+//                            startActivity(new Intent(Info.this,UploadRequiredDocuments.class));
+//
+//                        clientsLocation.removeLocationUpdates(mLocationCallback);
+//                        finish();
+//
+//                        overridePendingTransition(R.anim.slide_in, R.anim.fade_out);
+//                    }else
+//                        fastDialog.dismiss();
+//                }
+//
+//                @Override
+//                public void onCancelled(@NonNull DatabaseError error) {
+//
+//                }
+//            });
+//        }
+//    };
     @RequiresApi(api = Build.VERSION_CODES.M)
     private void CheckPermission() {
         if(ContextCompat.checkSelfPermission(Info.this, Manifest.permission.CAMERA) + ContextCompat.checkSelfPermission(Info.this

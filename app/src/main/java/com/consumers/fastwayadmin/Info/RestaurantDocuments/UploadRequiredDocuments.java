@@ -321,6 +321,10 @@ public class UploadRequiredDocuments extends AppCompatActivity {
                 public void onCancelled(@NonNull DatabaseError databaseError) {
                 }
             });
+            SharedPreferences sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString("documentsUploadedAll","yes");
+            editor.apply();
         }
     }
 

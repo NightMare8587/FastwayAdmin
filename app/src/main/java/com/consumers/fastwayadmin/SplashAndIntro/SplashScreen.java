@@ -190,18 +190,29 @@ public class SplashScreen extends AppCompatActivity {
             Geocoder geocoder = new Geocoder(SplashScreen.this, Locale.getDefault());
             List<Address> addresses = null;
             String cityName;
-            String stateName;
-            String countryName;
+            String subAdmin;
+            String postalCode;
+
             try {
                 addresses = geocoder.getFromLocation(lati, longi, 1);
             } catch (IOException e) {
                 e.printStackTrace();
             }
             cityName = Objects.requireNonNull(addresses).get(0).getLocality();
+            if(addresses.get(0).getSubAdminArea() != null)
+                subAdmin = addresses.get(0).getSubAdminArea();
+            else
+                subAdmin = "";
 
+            if(addresses.get(0).getPostalCode() != null)
+                postalCode = addresses.get(0).getPostalCode();
+            else
+                postalCode = "";
             loginEditor.putString("state",cityName);
+            loginEditor.putString("locality",subAdmin);
+            loginEditor.putString("postalCode",postalCode);
             loginEditor.apply();
-            Log.i("info", cityName + " " );
+            Log.i("info", cityName + " " + subAdmin);
             Log.i("location",longi + " " + lati);
             clientsLocation.removeLocationUpdates(mLocationCallback);
         }

@@ -94,7 +94,7 @@ public class MenuFrag extends Fragment {
         combo = view.findViewById(R.id.Combo);
         drinks = view.findViewById(R.id.Drinks);
         FirebaseAuth auth = FirebaseAuth.getInstance();
-        databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
+        databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid()));
         new BackgroundWork().execute();
 
 
@@ -133,7 +133,7 @@ public class MenuFrag extends Fragment {
                                 .create();
 
                         fastDialog.show();
-                        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(auth.getUid()).child("List of Dish");
+                        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(auth.getUid()).child("List of Dish");
                         reference.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -176,6 +176,8 @@ public class MenuFrag extends Fragment {
             editor.apply();
             Intent intent = new Intent(getActivity(), AllMenuDish.class);
             intent.putExtra("Dish","Main Course");
+            intent.putExtra("state",sharedPreferences.getString("state",""));
+            intent.putExtra("locality",sharedPreferences.getString("locality",""));
             startActivity(intent);
         });
 
@@ -187,6 +189,8 @@ public class MenuFrag extends Fragment {
             editor.apply();
             Intent intent = new Intent(getActivity(),AllMenuDish.class);
             intent.putExtra("Dish","Breads");
+            intent.putExtra("state",sharedPreferences.getString("state",""));
+            intent.putExtra("locality",sharedPreferences.getString("locality",""));
             startActivity(intent);
         });
 
@@ -198,6 +202,8 @@ public class MenuFrag extends Fragment {
             editor.apply();
             Intent intent = new Intent(getActivity(),AllMenuDish.class);
             intent.putExtra("Dish","Snacks");
+            intent.putExtra("state",sharedPreferences.getString("state",""));
+            intent.putExtra("locality",sharedPreferences.getString("locality",""));
             startActivity(intent);
         });
 
@@ -209,6 +215,8 @@ public class MenuFrag extends Fragment {
             editor.apply();
             Intent intent = new Intent(getActivity(),AllMenuDish.class);
             intent.putExtra("Dish","Deserts");
+            intent.putExtra("state",sharedPreferences.getString("state",""));
+            intent.putExtra("locality",sharedPreferences.getString("locality",""));
             startActivity(intent);
         });
 
@@ -217,6 +225,7 @@ public class MenuFrag extends Fragment {
             SharedPreferences.Editor editor = preferences.edit();
             editor.putString("Type","Combo");
             editor.putString("state",sharedPreferences.getString("state",""));
+            editor.putString("locality",sharedPreferences.getString("locality",""));
             editor.apply();
             Intent intent = new Intent(getActivity(), ComboMenuDish.class);
             intent.putExtra("Dish","Combo");
@@ -229,9 +238,12 @@ public class MenuFrag extends Fragment {
             SharedPreferences.Editor editor = preferences.edit();
             editor.putString("Type","Drinks");
             editor.putString("state",sharedPreferences.getString("state",""));
+            editor.putString("locality",sharedPreferences.getString("locality",""));
             editor.apply();
             Intent intent = new Intent(getActivity(),AllMenuDish.class);
             intent.putExtra("Dish","Drinks");
+            intent.putExtra("state",sharedPreferences.getString("state",""));
+            intent.putExtra("locality",sharedPreferences.getString("locality",""));
             startActivity(intent);
         });
     }

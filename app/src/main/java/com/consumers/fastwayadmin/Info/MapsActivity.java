@@ -117,7 +117,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         proceed.setOnClickListener(view -> {
             SharedPreferences locationShared = getSharedPreferences("LocationMaps",MODE_PRIVATE);
             SharedPreferences.Editor editor = locationShared.edit();
-            ref = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
+            ref = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid()));
             RestLocation restLocation = new RestLocation(String.valueOf(latitude),String.valueOf(longitude));
             ref.child("location").setValue(restLocation);
             startActivity(new Intent(getApplicationContext(), HomeScreen.class));
@@ -127,35 +127,32 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             finish();
         });
 
-        imageButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                List<Address> addressList = null;
-                if (editText.length() == 0) {
-                    editText.requestFocus();
-                    editText.setError("Field can't be Empty");
-                    return;
-                }
+        imageButton.setOnClickListener(view -> {
+            List<Address> addressList = null;
+            if (editText.length() == 0) {
+                editText.requestFocus();
+                editText.setError("Field can't be Empty");
+                return;
+            }
 
-                String location = editText.getText().toString();
-                Geocoder geocoder = new Geocoder(getApplicationContext());
-                try {
-                    addressList = geocoder.getFromLocationName(location, 1);
+            String location = editText.getText().toString();
+            Geocoder geocoder = new Geocoder(getApplicationContext());
+            try {
+                addressList = geocoder.getFromLocationName(location, 1);
 
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                if (addressList.size() > 0) {
-                    Address address = addressList.get(0);
-                    LatLng current = new LatLng(address.getLatitude(), address.getLongitude());
-                    mMap.clear();
-                    latitude = address.getLatitude();
-                    longitude = address.getLongitude();
-                    mMap.addMarker(new MarkerOptions().position(current).title("Current Location"));
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(current, 15));
-                }else{
-                    Toast.makeText(MapsActivity.this, "Invalid location. Try something popular location", Toast.LENGTH_SHORT).show();
-                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            if (addressList.size() > 0) {
+                Address address = addressList.get(0);
+                LatLng current = new LatLng(address.getLatitude(), address.getLongitude());
+                mMap.clear();
+                latitude = address.getLatitude();
+                longitude = address.getLongitude();
+                mMap.addMarker(new MarkerOptions().position(current).title("Current Location"));
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(current, 15));
+            }else{
+                Toast.makeText(MapsActivity.this, "Invalid location. Try something popular location", Toast.LENGTH_SHORT).show();
             }
         });
     }

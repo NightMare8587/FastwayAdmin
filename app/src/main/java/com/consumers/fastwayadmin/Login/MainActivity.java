@@ -266,16 +266,29 @@ public class MainActivity extends AppCompatActivity {
             Geocoder geocoder = new Geocoder(MainActivity.this, Locale.getDefault());
             List<Address> addresses = null;
             String cityName;
+            String subAdmin;
+            String postalCode;
+
             try {
                 addresses = geocoder.getFromLocation(lati, longi, 1);
             } catch (IOException e) {
                 e.printStackTrace();
             }
             cityName = addresses.get(0).getLocality();
+            if(addresses.get(0).getSubAdminArea() != null)
+                subAdmin = addresses.get(0).getSubAdminArea();
+            else
+                subAdmin = "";
 
+            if(addresses.get(0).getPostalCode() != null)
+                postalCode = addresses.get(0).getPostalCode();
+            else
+                postalCode = "";
             editor.putString("state",cityName);
+            editor.putString("locality",subAdmin);
+            editor.putString("postalCode",postalCode);
             editor.apply();
-            Log.i("info", cityName + " " );
+            Log.i("info", cityName + " " + subAdmin);
             Log.i("location",longi + " " + lati);
 
         }

@@ -95,7 +95,7 @@ public class TablesFrag extends Fragment {
         table = view.findViewById(R.id.tableRecyclerView);
         table.setLayoutManager(new LinearLayoutManager(view.getContext()));
         tableAuth = FirebaseAuth.getInstance();
-        tableRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(tableAuth.getUid())).child("Tables");
+        tableRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(tableAuth.getUid())).child("Tables");
         tableNumber.clear();
         status.clear();
 

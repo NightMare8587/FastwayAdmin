@@ -96,7 +96,7 @@ public class RestaurantsReviews extends AppCompatActivity {
     private void initialise() {
         recyclerView = findViewById(R.id.restaurantsReviewRecyclerView);
         SharedPreferences sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
-        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid())).child("Reviews");
+        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid())).child("Reviews");
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         progressBar = findViewById(R.id.restaurantReviewProgressBar);
         resStaffReview = findViewById(R.id.restaurantStaffReciewButton);
