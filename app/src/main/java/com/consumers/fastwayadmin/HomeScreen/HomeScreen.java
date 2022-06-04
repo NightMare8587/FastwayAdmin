@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.StrictMode;
@@ -17,6 +18,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
@@ -25,7 +27,6 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
-import com.aspose.cells.Cell;
 import com.aspose.cells.Cells;
 import com.aspose.cells.SaveFormat;
 import com.aspose.cells.Workbook;
@@ -53,9 +54,17 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
 
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.DataFormatter;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -80,6 +89,7 @@ public class HomeScreen extends AppCompatActivity {
     DatabaseReference resRef;
     String UID;
     DatabaseReference reference;
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @SuppressLint("CommitPrefEdits")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -155,7 +165,7 @@ public class HomeScreen extends AppCompatActivity {
         });
         StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
         StrictMode.setVmPolicy(builder.build());
-        File path = getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
+        File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
         Workbook workbook;
 //        workbook.getWorksheets().get(0).getCells().get("A1").putValue("Date");
 //        try {
@@ -167,6 +177,28 @@ public class HomeScreen extends AppCompatActivity {
 //            Toast.makeText(this, "File Not Saved", Toast.LENGTH_SHORT).show();
 //            e.printStackTrace();
 //        }
+
+        try {
+            XSSFWorkbook workbook1 = new XSSFWorkbook();
+            Sheet sheet = workbook1.createSheet("MySheet");
+            for(int i=0;i<5;i++){
+                Row row = sheet.createRow(i);
+                for(int c = 0; c < 5; c++){
+                    Cell cell = row.createCell(c);
+                    cell.setCellValue("Cell Num: " + i + " " + c);
+                }
+            }
+            File file = new File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS),"MyFileN.xlsx");
+            FileOutputStream fileOutputStream =  new FileOutputStream(file);
+            workbook1.write(fileOutputStream);
+            fileOutputStream.flush();
+            fileOutputStream.close();
+            Toast.makeText(this, "Finished", Toast.LENGTH_SHORT).show();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Noob", Toast.LENGTH_SHORT).show();
+        }
 
         if(!sharedPreferences.contains("workbookCreated")) {
             try {
