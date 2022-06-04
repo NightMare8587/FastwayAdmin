@@ -73,16 +73,13 @@ public class ComboRecyclerView extends RecyclerView.Adapter<ComboRecyclerView.Ho
             AlertDialog.Builder alert = new AlertDialog.Builder(click.getContext());
             alert.setTitle("Image");
             alert.setMessage("Choose one option from below");
-            alert.setPositiveButton("Add/Upload New Image", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    dialogInterface.dismiss();
-                    Intent intent = new Intent(click.getContext(), AddImageToDish.class);
-                    intent.putExtra("type","Combo");
-                    intent.putExtra("dishName",comboName.get(position));
-                    click.getContext().startActivity(intent);
+            alert.setPositiveButton("Add/Upload New Image", (dialogInterface, i) -> {
+                dialogInterface.dismiss();
+                Intent intent = new Intent(click.getContext(), AddImageToDish.class);
+                intent.putExtra("type","Combo");
+                intent.putExtra("dishName",comboName.get(position));
+                click.getContext().startActivity(intent);
 
-                }
             }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
@@ -113,7 +110,7 @@ dialogInterface.dismiss();
                 }
                 SharedPreferences sharedPreferences = v.getContext().getSharedPreferences("loginInfo",Context.MODE_PRIVATE);
                 FirebaseAuth auth = FirebaseAuth.getInstance();
-                DatabaseReference reference =  FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid())).child("List of Dish").child("Combo").child(comboName.get(position));
+                DatabaseReference reference =  FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid())).child("List of Dish").child("Combo").child(comboName.get(position));
                 reference.child("description").setValue(editText.getText().toString());
                 Toast.makeText(v.getContext(), "Description Changed Successfully", Toast.LENGTH_SHORT).show();
                 dialogInterface1.dismiss();
@@ -153,7 +150,7 @@ dialogInterface.dismiss();
                     }
                     SharedPreferences sharedPreferences = v.getContext().getSharedPreferences("loginInfo",Context.MODE_PRIVATE);
                     FirebaseAuth auth = FirebaseAuth.getInstance();
-                    DatabaseReference reference =  FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid())).child("List of Dish").child("Combo").child(comboName.get(position));
+                    DatabaseReference reference =  FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid())).child("List of Dish").child("Combo").child(comboName.get(position));
                     reference.child("price").setValue(editText.getText().toString());
                     Toast.makeText(v.getContext(), "Price Changed Successfully", Toast.LENGTH_SHORT).show();
                     dialogInterface1.dismiss();
@@ -173,7 +170,7 @@ dialogInterface.dismiss();
         holder.checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
             FirebaseAuth auth = FirebaseAuth.getInstance();
             SharedPreferences sharedPreferences = buttonView.getContext().getSharedPreferences("loginInfo",Context.MODE_PRIVATE);
-            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid())).child("List of Dish").child("Combo");
+            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid())).child("List of Dish").child("Combo");
             if(isChecked){
                 databaseReference.child(comboName.get(position)).child("enable").setValue("yes");
                 holder.checkBox.setText("Enabled");

@@ -122,7 +122,7 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
             });
             holder.cancel.setOnClickListener(view -> {
                 SharedPreferences sharedPreferences = view.getContext().getSharedPreferences("loginInfo",Context.MODE_PRIVATE);
-                reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid())).child("Tables");
+                reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid())).child("Tables");
                         new KAlertDialog(view.getContext(),KAlertDialog.WARNING_TYPE)
                         .setTitleText("Warning!!!")
                         .setContentText("Do you sure wanna remove this reserved table??")
@@ -211,7 +211,7 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
 
         holder.checkBox.setOnCheckedChangeListener((compoundButton, b) -> {
             SharedPreferences sharedPreferences = compoundButton.getContext().getSharedPreferences("loginInfo",Context.MODE_PRIVATE);
-            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid())).child("Tables").child(tables.get(position));
+            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid())).child("Tables").child(tables.get(position));
             if(b){
                 databaseReference.child("status").setValue("available");
                 holder.checkBox.setText("Enabled");
@@ -236,7 +236,7 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
                         long time = Long.parseLong(timeInMillis.get(position));
                         time = time + 600000;
                         SharedPreferences sharedPreferences = click.getContext().getSharedPreferences("loginInfo",Context.MODE_PRIVATE);
-                        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid())).child("Tables").child(tables.get(position));
+                        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid())).child("Tables").child(tables.get(position));
                         databaseReference.child("timeInMillis").setValue(time + "");
 
                         databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(myList.get(0)).child("Reserve Tables").child(auth.getUid()).child(tables.get(position));
@@ -264,7 +264,7 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
 
             holder.cancel.setOnClickListener(view -> {
                 SharedPreferences sharedPreferences = view.getContext().getSharedPreferences("loginInfo",Context.MODE_PRIVATE);
-                reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid())).child("Tables");
+                reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid())).child("Tables");
                 new KAlertDialog(view.getContext(),KAlertDialog.WARNING_TYPE)
                         .setTitleText("Warning!!!")
                         .setContentText("Do you sure wanna remove this reserved table??")
@@ -291,7 +291,7 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
                                     if(currentTime - bookingTime >= 3600000){
 
                                         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(myList.get(0));
-                                        databaseReference.child("CompensationCoupon").child("value").setValue("70");
+                                        databaseReference.child("CompensationCoupon").child("value").setValue("50");
 
                                         try {
                                             main.put("to", "/topics/" + myList.get(0) + "");
@@ -409,7 +409,7 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
             });
             holder.cancel.setOnClickListener(view -> {
                 SharedPreferences sharedPreferences = view.getContext().getSharedPreferences("loginInfo",Context.MODE_PRIVATE);
-                reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid())).child("Tables");
+                reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid())).child("Tables");
                 new KAlertDialog(view.getContext(),KAlertDialog.WARNING_TYPE)
                         .setTitleText("Warning!!!")
                         .setContentText("Do you sure wanna remove this Multiple reserved table??")
@@ -463,7 +463,7 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
 
                                     FirebaseAuth auth = FirebaseAuth.getInstance();
 
-                                        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid())).child("Tables");
+                                        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid())).child("Tables");
                                         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                                             @Override
                                             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -539,7 +539,7 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
 
             holder.cancel.setOnClickListener(view -> {
                 SharedPreferences sharedPreferences = view.getContext().getSharedPreferences("loginInfo",Context.MODE_PRIVATE);
-                reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid())).child("Tables");
+                reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid())).child("Tables");
                 new KAlertDialog(view.getContext(),KAlertDialog.WARNING_TYPE)
                         .setTitleText("Warning!!!")
                         .setContentText("Do you sure wanna remove this reserved table??")
@@ -592,7 +592,7 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
 
                                     FirebaseAuth auth = FirebaseAuth.getInstance();
 
-                                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(auth.getUid()).child("Tables");
+                                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(auth.getUid()).child("Tables");
                                     databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                                         @Override
                                         public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -746,7 +746,7 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
             alertDialog.setNegativeButton("Delete Table", (dialog, which) -> {
                 if(status.get(position).equals("available")) {
                     SharedPreferences sharedPreferences1 = v.getContext().getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
-                    reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences1.getString("state", "")).child(Objects.requireNonNull(auth.getUid())).child("Tables");
+                    reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences1.getString("state", "")).child(sharedPreferences1.getString("locality","")).child(Objects.requireNonNull(auth.getUid())).child("Tables");
                     reference.child(tables.get(position)).removeValue();
                     new KAlertDialog(v.getContext(),KAlertDialog.SUCCESS_TYPE)
                             .setTitleText("Success")
@@ -831,7 +831,7 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
                             alert.setPositiveButton("Exit", (dialogInterface12, i12) -> dialogInterface12.dismiss());
 
                             alert.setNegativeButton("Report & Ban", (dialogInterface1, i1) -> {
-                                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
+                                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid()));
                                 databaseReference.child("Blocked List").child(myList.get(0)).child("authId").setValue(myList.get(0));
                                 updateReportValue(myList.get(0));
                                 dialogInterface1.dismiss();

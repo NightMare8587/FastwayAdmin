@@ -40,11 +40,13 @@ public class SelectDishAdapter extends RecyclerView.Adapter<SelectDishAdapter.ho
     List<String> name = new ArrayList<>();
     List<String> image = new ArrayList<>();
     String state;
+    String locality;
     Context context;
 
-    public SelectDishAdapter(List<String> name, List<String> image,Context context,String state) {
+    public SelectDishAdapter(List<String> name, List<String> image,Context context,String state,String locality) {
         this.name = name;
         this.image = image;
+        this.locality = locality;
         this.context = context;
         this.state = state;
     }
@@ -60,7 +62,7 @@ public class SelectDishAdapter extends RecyclerView.Adapter<SelectDishAdapter.ho
     @Override
     public void onBindViewHolder(@NonNull holder holder, @SuppressLint("RecyclerView") int position) {
         FirebaseAuth auth = FirebaseAuth.getInstance();
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(Objects.requireNonNull(auth.getUid()));
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(locality).child(Objects.requireNonNull(auth.getUid()));
         holder.nameOfDish.setText(name.get(position));
         if(!image.get(position).equals("")){
             Picasso.get().load(image.get(position)).centerCrop().resize(100,100).into(holder.imageView);

@@ -64,7 +64,7 @@ public class AddRemoveItemCombo extends AppCompatActivity {
 
     private void initialise() {
         auth = FirebaseAuth.getInstance();
-        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid())).child("List of Dish").child("Combo").child(comboName);
+        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid())).child("List of Dish").child("Combo").child(comboName);
         listView = findViewById(R.id.comboAddRemoveListView);
         floatingActionButton = findViewById(R.id.addDishComboButton);
     }

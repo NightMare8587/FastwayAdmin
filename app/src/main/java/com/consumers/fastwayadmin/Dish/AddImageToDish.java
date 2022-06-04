@@ -157,7 +157,7 @@ public class AddImageToDish extends AppCompatActivity {
             ref.putFile(filepath).addOnSuccessListener(taskSnapshot -> {
 //                    Toast.makeText(AddImageToDish.this, "File Uploaded", Toast.LENGTH_SHORT).show();
                 SharedPreferences sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
-                reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(dishAuth.getUid()))
+                reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(dishAuth.getUid()))
                 .child("List of Dish").child(type).child(dishName);
 
         StorageReference ref1 = storageReference.child(dishAuth.getUid() + "/" + "image" + "/"  + dishName);
@@ -197,7 +197,7 @@ public class AddImageToDish extends AppCompatActivity {
         @Override
         protected Void doInBackground(Void... voids) {
             SharedPreferences sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
-            reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(dishAuth.getUid()))
+            reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(dishAuth.getUid()))
                     .child("List of Dish").child(type).child(dishName);
 
             StorageReference ref = storageReference.child(dishAuth.getUid() + "/" + "image" + "/"  + dishName);

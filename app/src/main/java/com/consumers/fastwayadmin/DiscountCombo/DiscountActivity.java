@@ -265,7 +265,7 @@ public class DiscountActivity extends AppCompatActivity {
             Toast.makeText(DiscountActivity.this, e.getLocalizedMessage()+"null", Toast.LENGTH_SHORT).show();
         }
         auth = FirebaseAuth.getInstance();
-        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
+        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid()));
         reference.child("List of Dish").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -359,7 +359,7 @@ public class DiscountActivity extends AppCompatActivity {
             Toast.makeText(DiscountActivity.this, e.getLocalizedMessage()+"null", Toast.LENGTH_SHORT).show();
         }
         auth = FirebaseAuth.getInstance();
-        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
+        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid()));
 
         reference.child("List of Dish").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -425,7 +425,7 @@ public class DiscountActivity extends AppCompatActivity {
 
     private void addToDiscountDatabase(String discount) {
         auth = FirebaseAuth.getInstance();
-        addToDB = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
+        addToDB = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid()));
         addToDB.child("Discount").child("available").setValue("yes");
         addToDB.child("Discount").child("dis").setValue(discount);
     }
@@ -437,7 +437,7 @@ public class DiscountActivity extends AppCompatActivity {
         else
             disInfo = new DisInfo(String.valueOf(price),String.valueOf(after),String.valueOf(discount),""+ halfPrice);
 
-        dis = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
+        dis = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid()));
         dis.child("List of Dish").child(type).child(name).child("Discount").child(name).setValue(disInfo);
     }
 
@@ -471,7 +471,7 @@ public class DiscountActivity extends AppCompatActivity {
             Toast.makeText(DiscountActivity.this, e.getLocalizedMessage()+"null", Toast.LENGTH_SHORT).show();
         }
         auth = FirebaseAuth.getInstance();
-        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
+        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid()));
         reference.child("List of Dish").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -538,7 +538,7 @@ public class DiscountActivity extends AppCompatActivity {
     private void initialise() {
         recyclerView = findViewById(R.id.discountActivityRecyclerView);
         auth = FirebaseAuth.getInstance();
-        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
+        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid()));
         dis = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
         dishName = findViewById(R.id.searchDishNameForSingleDiscount);
         search = findViewById(R.id.searchEnteredDishNameInDatabase);

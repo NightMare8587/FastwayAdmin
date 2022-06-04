@@ -84,7 +84,7 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
         if(resInfoSharedPref.contains("hotelName")) {
             resNameText.setText(resInfoSharedPref.getString("hotelName", ""));
         }else{
-            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(UID));
+            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(UID));
             databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -239,7 +239,7 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
                     throw new IllegalStateException("Unexpected value: " + id);
             }
         }else if(tag.equals("restaurant")){
-            reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(UID));
+            reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(UID));
             int id = item.getId();
             switch (id){
                 case R.id.changeNameBottomSheetRestaurant:
@@ -429,7 +429,7 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
         @Override
         protected Void doInBackground(Void... voids) {
             auth = FirebaseAuth.getInstance();
-            reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(UID);
+            reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(UID);
             reference.removeValue();
             reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(UID);
             reference.removeValue();

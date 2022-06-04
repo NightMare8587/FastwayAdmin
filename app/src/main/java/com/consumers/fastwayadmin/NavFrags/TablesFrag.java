@@ -101,8 +101,6 @@ public class TablesFrag extends Fragment {
 
         new backGroundWork().execute();
 
-
-
         addTable.setOnClickListener(view1 -> startActivity(new Intent(getActivity(), AddTables.class)));
 
         layout.setOnRefreshListener(() -> {

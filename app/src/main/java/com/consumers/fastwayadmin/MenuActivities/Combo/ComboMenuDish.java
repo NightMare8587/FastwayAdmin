@@ -38,6 +38,7 @@ public class ComboMenuDish extends AppCompatActivity {
     List<String> descriptionOfCombo = new ArrayList<>();
     List<String> price = new ArrayList<>();
     DatabaseReference reference;
+    String locality;
     List<List<String>> dishNames = new ArrayList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,8 +47,9 @@ public class ComboMenuDish extends AppCompatActivity {
         auth = FirebaseAuth.getInstance();
         add = findViewById(R.id.addNewComboButton);
         state = getIntent().getStringExtra("state");
+        locality = getIntent().getStringExtra("locality");
         recyclerView = findViewById(R.id.comboAdapterRecyclerView);
-        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(Objects.requireNonNull(auth.getUid())).child("List of Dish");
+        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(locality).child(Objects.requireNonNull(auth.getUid())).child("List of Dish");
         reference.child("Combo").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -111,12 +113,7 @@ public class ComboMenuDish extends AppCompatActivity {
             }
         });
 
-        add.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(ComboMenuDish.this, ComboAndOffers.class));
-            }
-        });
+        add.setOnClickListener(v -> startActivity(new Intent(ComboMenuDish.this, ComboAndOffers.class)));
     }
 
     private void updateChild() {

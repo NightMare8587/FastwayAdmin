@@ -100,7 +100,7 @@ public class AddTables extends AppCompatActivity {
                 return;
             }
             tableClass tableClass = new tableClass(numberOfSeats.getText().toString(),tableNumber.getText().toString());
-            tableRef.child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(Objects.requireNonNull(tableAuth.getCurrentUser()).getUid())).child("Tables").child(tableNumber.getText().toString())
+            tableRef.child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(Objects.requireNonNull(tableAuth.getCurrentUser()).getUid())).child("Tables").child(tableNumber.getText().toString())
                     .setValue(tableClass)
                     .addOnCompleteListener(task -> {
                         if(task.isSuccessful()){

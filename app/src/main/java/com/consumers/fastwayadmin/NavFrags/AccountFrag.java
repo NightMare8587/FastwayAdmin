@@ -257,14 +257,14 @@ public class AccountFrag extends Fragment {
         takeawaySwitch.setOnCheckedChangeListener((compoundButton, b) -> {
             if(b){
                 takeawaySwitch.setChecked(true);
-                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(UID);
+                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(UID);
                 databaseReference.child("TakeAwayAllowed").setValue("yes");
                 editor.putString("TakeAwayAllowed","yes");
                 editor.apply();
                 Toast.makeText(requireContext(), "You will now receive TakeAway Orders", Toast.LENGTH_SHORT).show();
             }else{
                 takeawaySwitch.setChecked(false);
-                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(UID);
+                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(UID);
                 databaseReference.child("TakeAwayAllowed").setValue("no");
                 editor.putString("TakeAwayAllowed","no");
                 editor.apply();
@@ -275,14 +275,14 @@ public class AccountFrag extends Fragment {
         tableSwitch.setOnCheckedChangeListener((compoundButton, b) -> {
             if(b){
                 tableSwitch.setChecked(true);
-                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(UID);
+                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(UID);
                 databaseReference.child("TableBookAllowed").setValue("yes");
                 editor.putString("TableBookAllowed","yes");
                 editor.apply();
                 Toast.makeText(requireContext(), "Table Booking Enabled", Toast.LENGTH_SHORT).show();
             }else{
                 tableSwitch.setChecked(false);
-                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(UID);
+                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(UID);
                 databaseReference.child("TableBookAllowed").setValue("no");
                 editor.putString("TableBookAllowed","no");
                 editor.apply();

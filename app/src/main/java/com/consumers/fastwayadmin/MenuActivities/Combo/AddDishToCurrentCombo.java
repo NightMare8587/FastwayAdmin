@@ -38,7 +38,7 @@ public class AddDishToCurrentCombo extends AppCompatActivity {
         comboName = getIntent().getStringExtra("name");
         auth = FirebaseAuth.getInstance();
         sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
-        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
+        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid()));
         mainCourse = findViewById(R.id.comboMainCourse);
         breads = findViewById(R.id.comboBreads);
         snacks = findViewById(R.id.comboSnacks);
@@ -54,6 +54,7 @@ public class AddDishToCurrentCombo extends AppCompatActivity {
                     intent.putExtra("dishType","Main Course");
                     intent.putExtra("comboName",comboName);
                     intent.putExtra("state",sharedPreferences.getString("state",""));
+                    intent.putExtra("locality",sharedPreferences.getString("locality",""));
                     startActivity(intent);
                 }).show());
         breads.setOnClickListener(view -> new KAlertDialog(AddDishToCurrentCombo.this,KAlertDialog.NORMAL_TYPE)
@@ -66,6 +67,7 @@ public class AddDishToCurrentCombo extends AppCompatActivity {
                     intent.putExtra("dishType","Breads");
                     intent.putExtra("comboName",comboName);
                     intent.putExtra("state",sharedPreferences.getString("state",""));
+                    intent.putExtra("locality",sharedPreferences.getString("locality",""));
                     startActivity(intent);
 
 //                                kAlertDialog.dismissWithAnimation();
@@ -80,6 +82,7 @@ public class AddDishToCurrentCombo extends AppCompatActivity {
                     intent.putExtra("dishType","Deserts");
                     intent.putExtra("comboName",comboName);
                     intent.putExtra("state",sharedPreferences.getString("state",""));
+                    intent.putExtra("locality",sharedPreferences.getString("locality",""));
                     startActivity(intent);
 //                                kAlertDialog.dismissWithAnimation();
                 }).show());
@@ -93,6 +96,7 @@ public class AddDishToCurrentCombo extends AppCompatActivity {
                     intent.putExtra("dishType","Snacks");
                     intent.putExtra("comboName",comboName);
                     intent.putExtra("state",sharedPreferences.getString("state",""));
+                    intent.putExtra("locality",sharedPreferences.getString("locality",""));
                     startActivity(intent);
 //                                kAlertDialog.dismissWithAnimation();
                 }).show());
@@ -106,6 +110,7 @@ public class AddDishToCurrentCombo extends AppCompatActivity {
                     intent.putExtra("dishType","Drinks");
                     intent.putExtra("comboName",comboName);
                     intent.putExtra("state",sharedPreferences.getString("state",""));
+                    intent.putExtra("locality",sharedPreferences.getString("locality",""));
                     startActivity(intent);
 //                                kAlertDialog.dismissWithAnimation();
                 }).show());

@@ -32,6 +32,7 @@ public class SelectDishForCurrentCombo extends AppCompatActivity {
     String comboName;
     DatabaseReference reference;
     String type;
+    String locality;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,7 +44,8 @@ public class SelectDishForCurrentCombo extends AppCompatActivity {
         auth = FirebaseAuth.getInstance();
         type = getIntent().getStringExtra("dishType");
         state = getIntent().getStringExtra("state");
-        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(Objects.requireNonNull(auth.getUid())).child("List of Dish");
+        locality = getIntent().getStringExtra("locality");
+        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(locality).child(Objects.requireNonNull(auth.getUid())).child("List of Dish");
         reference.child(type).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -53,7 +55,7 @@ public class SelectDishForCurrentCombo extends AppCompatActivity {
                         image.add(String.valueOf(dataSnapshot.child("image").getValue()));
                     }
                     recyclerView.setLayoutManager(new LinearLayoutManager(SelectDishForCurrentCombo.this));
-                    recyclerView.setAdapter(new selectCurrentDishAdapter(name,image,SelectDishForCurrentCombo.this,comboName,state));
+                    recyclerView.setAdapter(new selectCurrentDishAdapter(name,image,SelectDishForCurrentCombo.this,comboName,state,locality));
                 }
             }
 

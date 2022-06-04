@@ -61,7 +61,7 @@ public class SearchFastwayClass extends RecyclerView.Adapter<SearchFastwayClass.
 
             FirebaseAuth auth = FirebaseAuth.getInstance();
             SharedPreferences sharedPreferences = v.getContext().getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
-            DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid())).child("List of Dish").child(dish);
+            DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid())).child("List of Dish").child(dish);
             AlertDialog.Builder alertDialog = new AlertDialog.Builder(v.getContext());
             alertDialog.setTitle("Important");
             alertDialog.setMessage("Enter Amount of half and full\nIf half not available leave empty");
