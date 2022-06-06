@@ -63,6 +63,8 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -178,50 +180,36 @@ public class HomeScreen extends AppCompatActivity {
 //            e.printStackTrace();
 //        }
 
-        try {
-            XSSFWorkbook workbook1 = new XSSFWorkbook();
-            Sheet sheet = workbook1.createSheet("MySheet");
-            for(int i=0;i<5;i++){
-                Row row = sheet.createRow(i);
-                for(int c = 0; c < 5; c++){
-                    Cell cell = row.createCell(c);
-                    cell.setCellValue("Cell Num: " + i + " " + c);
-                }
-            }
-            File file = new File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS),"MyFileN.xlsx");
-            FileOutputStream fileOutputStream =  new FileOutputStream(file);
-            workbook1.write(fileOutputStream);
-            fileOutputStream.flush();
-            fileOutputStream.close();
-            Toast.makeText(this, "Finished", Toast.LENGTH_SHORT).show();
 
-        } catch (IOException e) {
-            e.printStackTrace();
-            Toast.makeText(this, "Noob", Toast.LENGTH_SHORT).show();
-        }
 
-        if(!sharedPreferences.contains("workbookCreated")) {
+        if(sharedPreferences.contains("FileGeneratedExcel")) {
             try {
-                workbook = new Workbook();
-                workbook.getWorksheets().get(0).getCells().get("A1").putValue("Date");
-                workbook.getWorksheets().get(0).getCells().get("B1").putValue("Transaction ID");
-                workbook.getWorksheets().get(0).getCells().get("C1").putValue("User ID");
-                workbook.getWorksheets().get(0).getCells().get("D1").putValue("Order Amount");
-//                Toast.makeText(this, "" + workbook.getWorksheets().get(0).getCells().getMaxRow(), Toast.LENGTH_SHORT).show();
-//               Log.i("info","" + workbook.getWorksheets().get(0).getCells().getMaxRow());
-                try {
-                    workbook.save(path + "/ResTransactions.xlsx", SaveFormat.XLSX);
-                    Log.i("info","FILE SAVED");
-                    Toast.makeText(this, "File saved successfully", Toast.LENGTH_SHORT).show();
-                    myEditor.putString("workbookCreated","yes");
-                    myEditor.apply();
-                } catch (Exception e) {
-                    Log.i("info",e.getLocalizedMessage());
-                }
-            } catch (Exception e) {
+                File file = new File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "RestaurantEarningTracker.xlsx");
+                XSSFWorkbook workbook1 = new XSSFWorkbook();
+                Sheet sheet = workbook1.createSheet("MyEarnings");
+                Row row = sheet.createRow(0);
+                Cell cell = row.createCell(0);
+                cell.setCellValue("Date");
+                cell = row.createCell(1);
+                cell.setCellValue("Transaction ID");
+                cell = row.createCell(2);
+                cell.setCellValue("Payment Mode");
+                cell = row.createCell(3);
+                cell.setCellValue("Amount");
+                FileOutputStream fileOutputStream = new FileOutputStream(file);
+                workbook1.write(fileOutputStream);
+                fileOutputStream.flush();
+                fileOutputStream.close();
+                myEditor.putString("FileGeneratedExcel","f");
+                myEditor.apply();
+                Toast.makeText(this, "Finished", Toast.LENGTH_SHORT).show();
+
+            } catch (IOException e) {
                 e.printStackTrace();
+                Toast.makeText(this, "Noob", Toast.LENGTH_SHORT).show();
             }
         }
+
         DatabaseReference myRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(UID).child("Restaurant Documents");
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(UID)).child("Tables");
         myRef.addListenerForSingleValueEvent(new ValueEventListener() {
