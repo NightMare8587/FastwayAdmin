@@ -1,7 +1,6 @@
 package com.consumers.fastwayadmin.NavFrags.CurrentTakeAwayOrders;
 
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -38,9 +37,7 @@ import com.android.volley.Response;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.aspose.cells.SaveFormat;
 import com.aspose.cells.Workbook;
-import com.aspose.cells.Worksheet;
 import com.consumers.fastwayadmin.CancelClass;
 import com.consumers.fastwayadmin.PaymentClass;
 import com.consumers.fastwayadmin.R;
@@ -60,9 +57,14 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.google.gson.Gson;
 
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.DateFormat;
@@ -131,7 +133,6 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
     SharedPreferences storeForDishAnalysis;
     SharedPreferences.Editor dishAnalysis;
     File path;
-    Workbook workbook;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -184,7 +185,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
             JSONObject main = new JSONObject();
             new GenratePDF().execute();
             FirebaseAuth auth = FirebaseAuth.getInstance();
-            DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(Objects.requireNonNull(auth.getUid())).child("Current TakeAway").child(id);
+            DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid())).child("Current TakeAway").child(id);
             if (paymentMode.equals("online")) {
                 new InitiateRefund().execute();
                 try {
@@ -221,11 +222,8 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                     notification.put("body", "Your order is declined by the owner. If you paid cash already then ask owner to refund it");
                     main.put("notification", notification);
 
-                    JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, main, new Response.Listener<JSONObject>() {
-                        @Override
-                        public void onResponse(JSONObject response) {
+                    JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, main, response -> {
 
-                        }
                     }, error -> Toast.makeText(ApproveCurrentTakeAway.this, error.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show()) {
                         @Override
                         public Map<String, String> getHeaders() throws AuthFailureError {
@@ -273,7 +271,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
 
             alert.show();
         }
-        DatabaseReference totalOrders = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
+        DatabaseReference totalOrders = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid()));
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -425,26 +423,32 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                                 storeEditor.apply();
                                 Log.i("myInfo",mainDataList.toString());
                             }
-                            File path = getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
+                            File file = new File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "RestaurantEarningTracker.xlsx");
                                 try {
-                                    workbook = new Workbook(path + "/ResTransactions.xlsx");
-                                    Worksheet ws = workbook.getWorksheets().get(0);
-                                    int max = workbook.getWorksheets().get(0).getCells().getMaxDataRow();
-                                    max = max + 2;
+                                    Cell cell;
+                                    FileInputStream fileInputStream = new FileInputStream(file);
+                                    XSSFWorkbook workbook = new XSSFWorkbook(fileInputStream);
+                                    Sheet sheet = workbook.getSheetAt(0);
+                                    int max = sheet.getLastRowNum();
+                                    max = max + 1;
+                                    Row row = sheet.createRow(max);
                                     DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
                                     Date date = new Date(Long.parseLong(time));
-                                    workbook.getWorksheets().get(0).getCells().get("A" + max).putValue("" + dateFormat.format(date));
-                                    workbook.getWorksheets().get(0).getCells().get("B" + max).putValue("Cash");
-                                    workbook.getWorksheets().get(0).getCells().get("C" + max).putValue("" + id);
-                                    workbook.getWorksheets().get(0).getCells().get("D" + max).putValue("\u20B9" + orderAmount);
+                                    cell = row.createCell(0);
+                                    cell.setCellValue(dateFormat.format(date));
+                                    cell = row.createCell(1);
+                                    cell.setCellValue(transactionIdForExcel);
+                                    cell = row.createCell(2);
+                                    cell.setCellValue("Cash");
+                                    cell = row.createCell(3);
+                                    cell.setCellValue("\u20B9" + orderAmount);
                                     Log.i("info",max + "");
-                                    try {
-                                        workbook.save(path + "/ResTransactions.xlsx", SaveFormat.XLSX);
-                                        Log.i("info","FILE SAVED");
-                                        Toast.makeText(this, "" + max, Toast.LENGTH_SHORT).show();
-                                    } catch (Exception e) {
-                                        Log.i("info",e.getLocalizedMessage());
-                                    }
+                                    FileOutputStream fileOutputStream = new FileOutputStream(file);
+                                    workbook.write(fileOutputStream);
+                                    fileOutputStream.flush();
+                                    fileOutputStream.close();
+                                    Toast.makeText(ApproveCurrentTakeAway.this, "Completed", Toast.LENGTH_SHORT).show();
+                                    workbook.close();
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }
@@ -479,7 +483,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                             }
 
 
-                            databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(auth.getUid());
+                            databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(sharedPreferences.getString("locality","")).child(auth.getUid());
                             for(int i=0;i<dishName.size();i++){
                                 MyClass myClass = new MyClass(dishName.get(i),dishPrice.get(i),image.get(i),type.get(i),""+approveTime,quantity.get(i),halfOr.get(i),state,String.valueOf(orderAmount),orderId,"TakeAway,Cash","Order Approved");
                                 databaseReference.child("Recent Orders").child("" + time).child(auth.getUid()).child(dishName.get(i)).setValue(myClass);
@@ -493,7 +497,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                             CashTransactionClass cashTransactionClass = new CashTransactionClass(orderId,orderAmount,time,id);
                             DatabaseReference saveOrderInfo = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
                             saveOrderInfo.child("Cash Transactions").child(time).setValue(cashTransactionClass);
-                            DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(Objects.requireNonNull(auth.getUid())).child("Current TakeAway").child(id);
+                            DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid())).child("Current TakeAway").child(id);
 
                             try {
                                 main.put("to", "/topics/" + id + "");
@@ -580,7 +584,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                         }
 
 
-                        databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(auth.getUid());
+                        databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(sharedPreferences.getString("locality","")).child(auth.getUid());
                         for(int i=0;i<dishName.size();i++){
                             MyClass myClass = new MyClass(dishName.get(i),dishPrice.get(i),image.get(i),type.get(i),""+approveTime,quantity.get(i),halfOr.get(i),state,String.valueOf(orderAmount),orderId,"TakeAway,Online","Order Approved");
                             databaseReference.child("Recent Orders").child("" + time).child(auth.getUid()).child(dishName.get(i)).setValue(myClass);
@@ -592,7 +596,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                         fastDialog.dismiss();
                         JSONObject main = new JSONObject();
                         FirebaseAuth auth = FirebaseAuth.getInstance();
-                        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(Objects.requireNonNull(auth.getUid())).child("Current TakeAway").child(id);
+                        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid())).child("Current TakeAway").child(id);
 
                         try {
                             main.put("to", "/topics/" + id + "");
@@ -652,7 +656,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                         JSONObject main = new JSONObject();
                         new GenratePDF().execute();
                         FirebaseAuth auth = FirebaseAuth.getInstance();
-                        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(Objects.requireNonNull(auth.getUid())).child("Current TakeAway").child(id);
+                        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid())).child("Current TakeAway").child(id);
                         if (paymentMode.equals("online")) {
                             String approveTime = String.valueOf(System.currentTimeMillis());
                             DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(id).child("Recent Orders").child(time);
@@ -662,7 +666,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                             }
 
 
-                            databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(auth.getUid());
+                            databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(sharedPreferences.getString("locality","")).child(auth.getUid());
                             for(int i=0;i<dishName.size();i++){
                                 MyClass myClass = new MyClass(dishName.get(i),dishPrice.get(i),image.get(i),type.get(i),""+approveTime,quantity.get(i),halfOr.get(i),state,String.valueOf(orderAmount),orderId,"TakeAway,Online","Order Declined");
                                 databaseReference.child("Recent Orders").child("" + time).child(auth.getUid()).child(dishName.get(i)).setValue(myClass);
@@ -703,7 +707,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                                 }
 
 
-                                databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(auth.getUid());
+                                databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(sharedPreferences.getString("locality","")).child(auth.getUid());
                                 for(int i=0;i<dishName.size();i++){
                                     MyClass myClass = new MyClass(dishName.get(i),dishPrice.get(i),image.get(i),type.get(i),""+approveTime,quantity.get(i),halfOr.get(i),state,String.valueOf(orderAmount),orderId,"TakeAway,Cash","Order Declined");
                                     databaseReference.child("Recent Orders").child("" + time).child(auth.getUid()).child(dishName.get(i)).setValue(myClass);
@@ -920,24 +924,32 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                     storeEditor.apply();
                     Log.i("myInfo",mainDataList.toString());
                 }
-                File path = getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
+                File file = new File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "RestaurantEarningTracker.xlsx");
                 try {
-                    workbook = new Workbook(path + "/ResTransactions.xlsx");
-                    int max = workbook.getWorksheets().get(0).getCells().getMaxDataRow();
-                    max = max + 2;
+                    Cell cell;
+                    FileInputStream fileInputStream = new FileInputStream(file);
+                    XSSFWorkbook workbook = new XSSFWorkbook(fileInputStream);
+                    Sheet sheet = workbook.getSheetAt(0);
+                    int max = sheet.getLastRowNum();
+                    max = max + 1;
+                    Row row = sheet.createRow(max);
                     DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
                     Date date = new Date(Long.parseLong(time));
-                    workbook.getWorksheets().get(0).getCells().get("A" + max).putValue("" + dateFormat.format(date));
-                    workbook.getWorksheets().get(0).getCells().get("B" + max).putValue("" + transactionIdForExcel);
-                    workbook.getWorksheets().get(0).getCells().get("C" + max).putValue("" + id);
-                    workbook.getWorksheets().get(0).getCells().get("D" + max).putValue("\u20B9" + orderAmount);
-                    try {
-                        workbook.save(path + "/ResTransactions.xlsx", SaveFormat.XLSX);
-                        Log.i("info","FILE SAVED");
-                        Toast.makeText(ApproveCurrentTakeAway.this, "File saved successfully", Toast.LENGTH_SHORT).show();
-                    } catch (Exception e) {
-                        Log.i("info",e.getLocalizedMessage());
-                    }
+                    cell = row.createCell(0);
+                    cell.setCellValue(dateFormat.format(date));
+                    cell = row.createCell(1);
+                    cell.setCellValue(transactionIdForExcel);
+                    cell = row.createCell(2);
+                    cell.setCellValue("Online");
+                    cell = row.createCell(3);
+                    cell.setCellValue("\u20B9" + orderAmount);
+                    Log.i("info",max + "");
+                    FileOutputStream fileOutputStream = new FileOutputStream(file);
+                    workbook.write(fileOutputStream);
+                    fileOutputStream.flush();
+                    fileOutputStream.close();
+                    Toast.makeText(ApproveCurrentTakeAway.this, "Completed", Toast.LENGTH_SHORT).show();
+                    workbook.close();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

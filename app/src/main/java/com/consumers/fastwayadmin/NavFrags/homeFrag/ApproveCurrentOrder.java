@@ -152,7 +152,7 @@ public class ApproveCurrentOrder extends AppCompatActivity {
         textView.setText("Table Number: " + table);
         path = getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
         saveRefundInfo = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(id);
-        totalOrders = FirebaseDatabase.getInstance().getReference().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
+        totalOrders = FirebaseDatabase.getInstance().getReference().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid()));
         saveRefundInfo.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
