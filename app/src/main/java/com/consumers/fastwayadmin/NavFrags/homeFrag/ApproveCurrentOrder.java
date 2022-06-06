@@ -35,14 +35,11 @@ import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.aspose.cells.SaveFormat;
 import com.aspose.cells.Workbook;
 import com.consumers.fastwayadmin.CancelClass;
-import com.consumers.fastwayadmin.NavFrags.CurrentTakeAwayOrders.ApproveCurrentTakeAway;
 import com.consumers.fastwayadmin.PaymentClass;
 import com.consumers.fastwayadmin.R;
 import com.google.common.reflect.TypeToken;
@@ -56,9 +53,14 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.gson.Gson;
 
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -201,7 +203,7 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                     JSONObject main = new JSONObject();
                     new GenratePDF().execute();
                     FirebaseAuth auth = FirebaseAuth.getInstance();
-                    DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(Objects.requireNonNull(auth.getUid())).child("Tables").child(table);
+                    DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid())).child("Tables").child(table);
                     new InitiateRefund().execute();
                     try {
                         main.put("to", "/topics/" + id + "");
@@ -248,6 +250,8 @@ public class ApproveCurrentOrder extends AppCompatActivity {
         });
 
         approve.setOnClickListener(v -> {
+            
+            new addOrderToTableCurrent().execute();
 
                 String month = monthName[calendar.get(Calendar.MONTH)];
                 if(storeForDishAnalysis.contains("DishAnalysisMonthBasis")){
@@ -292,6 +296,8 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                 }
 
 
+
+
             RequestQueue requestQueue = Volley.newRequestQueue(ApproveCurrentOrder.this);
             JSONObject main = new JSONObject();
             FirebaseAuth auth = FirebaseAuth.getInstance();
@@ -330,7 +336,7 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                 restaurantTrackEditor.putString("totalTransactionsToday",String.valueOf(orderAmount));
             }
             restaurantTrackEditor.apply();
-            DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(Objects.requireNonNull(auth.getUid())).child("Tables").child(table);
+            DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid())).child("Tables").child(table);
             new MakePayout().execute();
             try{
                 main.put("to","/topics/"+id+"");
@@ -381,7 +387,7 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                     new GenratePDF().execute();
                     FirebaseAuth auth = FirebaseAuth.getInstance();
 
-                    DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(Objects.requireNonNull(auth.getUid())).child("Tables").child(table);
+                    DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid())).child("Tables").child(table);
                     new InitiateRefund().execute();
                     try {
                         main.put("to", "/topics/" + id + "");
@@ -433,8 +439,9 @@ public class ApproveCurrentOrder extends AppCompatActivity {
     }
 
     private void initialise() {
+        SharedPreferences sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
         auth = FirebaseAuth.getInstance();
-        databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(Objects.requireNonNull(auth.getUid())).child("Tables").child(table).child("Current Order");
+        databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid())).child("Tables").child(table).child("Current Order");
         listView = findViewById(R.id.currentOrderListView);
         approve = findViewById(R.id.approveCurrentOrderButton);
         dishQ = findViewById(R.id.quantityCurrentOrder);
@@ -578,23 +585,32 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                     storeEditor.apply();
                     Log.i("myInfo",mainDataList.toString());
                 }
+                File file = new File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "RestaurantEarningTracker.xlsx");
                 try {
-                    workbook = new Workbook(path + "/ResTransactions.xlsx");
-                    int max = workbook.getWorksheets().get(0).getCells().getMaxDataRow();
-                    max = max + 2;
+                    Cell cell;
+                    FileInputStream fileInputStream = new FileInputStream(file);
+                    XSSFWorkbook workbook = new XSSFWorkbook(fileInputStream);
+                    Sheet sheet = workbook.getSheetAt(0);
+                    int max = sheet.getLastRowNum();
+                    max = max + 1;
+                    Row row = sheet.createRow(max);
                     DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
                     Date date = new Date(Long.parseLong(time));
-                    workbook.getWorksheets().get(0).getCells().get("A" + max).putValue("" + dateFormat.format(date));
-                    workbook.getWorksheets().get(0).getCells().get("B" + max).putValue("" + transactionIdForExcel);
-                    workbook.getWorksheets().get(0).getCells().get("C" + max).putValue("" + id);
-                    workbook.getWorksheets().get(0).getCells().get("D" + max).putValue("\u20B9" + orderAmount);
-                    try {
-                        workbook.save(path + "/ResTransactions.xlsx", SaveFormat.XLSX);
-                        Log.i("info","FILE SAVED");
-//                            Toast.makeText(ApproveCurrentOrder.this, "File saved successfully", Toast.LENGTH_SHORT).show();
-                    } catch (Exception e) {
-                        Log.i("info",e.getLocalizedMessage());
-                    }
+                    cell = row.createCell(0);
+                    cell.setCellValue(dateFormat.format(date));
+                    cell = row.createCell(1);
+                    cell.setCellValue(transactionIdForExcel);
+                    cell = row.createCell(2);
+                    cell.setCellValue("Online");
+                    cell = row.createCell(3);
+                    cell.setCellValue("\u20B9" + orderAmount);
+                    Log.i("info",max + "");
+                    FileOutputStream fileOutputStream = new FileOutputStream(file);
+                    workbook.write(fileOutputStream);
+                    fileOutputStream.flush();
+                    fileOutputStream.close();
+                    Toast.makeText(ApproveCurrentOrder.this, "Completed", Toast.LENGTH_SHORT).show();
+                    workbook.close();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -762,6 +778,21 @@ public class ApproveCurrentOrder extends AppCompatActivity {
         @Override
         protected Void doInBackground(Void... voids) {
 
+            return null;
+        }
+    }
+
+    public class addOrderToTableCurrent extends AsyncTask<Void,Void,Void>{
+        
+        @Override
+        protected Void doInBackground(Void... voids) {
+            SharedPreferences sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
+            FirebaseAuth auth = FirebaseAuth.getInstance();
+            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid())).child("Tables").child(table);
+            for(int i=0;i<dishNames.size();i++){
+                databaseReference.child("CurrentOrdersMade").child(time).child("quantity").setValue(dishQuantity.get(i));
+                databaseReference.child("CurrentOrdersMade").child(time).child("name").setValue(dishNames.get(i));
+            }
             return null;
         }
     }

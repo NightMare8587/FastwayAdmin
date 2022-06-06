@@ -189,7 +189,7 @@ public class HomeScreen extends AppCompatActivity {
                 XSSFWorkbook workbook1 = new XSSFWorkbook(fileInputStream);
                 Sheet sheet = workbook1.getSheetAt(0);
                 int row = sheet.getLastRowNum();
-                Toast.makeText(this, "" + row, Toast.LENGTH_SHORT).show();
+//                Toast.makeText(this, "" + row, Toast.LENGTH_SHORT).show();
 //                Sheet sheet = workbook1.createSheet("MyEarnings");
 //                Row row = sheet.createRow(0);
 //                Cell cell = row.createCell(0);
@@ -206,7 +206,7 @@ public class HomeScreen extends AppCompatActivity {
 //                fileOutputStream.close();
                 myEditor.putString("FileGeneratedExcel","f");
                 myEditor.apply();
-                Toast.makeText(this, "Finished", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(this, "Finished", Toast.LENGTH_SHORT).show();
 
             } catch (IOException e) {
                 e.printStackTrace();
