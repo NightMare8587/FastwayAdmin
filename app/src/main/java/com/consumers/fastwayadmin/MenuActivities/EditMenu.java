@@ -84,7 +84,7 @@ public class EditMenu extends AppCompatActivity {
         type = getIntent().getStringExtra("type");
         newDescription = findViewById(R.id.newDescriptionToAddToDish);
         dish = getIntent().getStringExtra("dish");
-        editRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(editAuth.getUid())).child("List of Dish")
+        editRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(editAuth.getUid())).child("List of Dish")
                                 .child(type).child(dish);
     }
 }

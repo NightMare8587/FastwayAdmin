@@ -89,7 +89,7 @@ public class DishView extends RecyclerView.Adapter<DishView.DishAdapter> {
         holder.removeOffers.setOnClickListener(v -> {
             FirebaseAuth auth = FirebaseAuth.getInstance();
             SharedPreferences sharedPreferences = v.getContext().getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
-            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid())).child("List of Dish").child(type).child(names.get(position));
+            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid())).child("List of Dish").child(type).child(names.get(position));
             databaseReference.child("Discount").addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -147,7 +147,7 @@ public class DishView extends RecyclerView.Adapter<DishView.DishAdapter> {
         holder.checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
             sharedPreferences = buttonView.getContext().getSharedPreferences("loginInfo",Context.MODE_PRIVATE);
             FirebaseAuth auth = FirebaseAuth.getInstance();
-            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid())).child("List of Dish").child(type);
+            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid())).child("List of Dish").child(type);
             if(isChecked){
                 databaseReference.child(names.get(position)).child("enable").setValue("yes");
                 holder.checkBox.setText("Enabled");
@@ -165,7 +165,7 @@ public class DishView extends RecyclerView.Adapter<DishView.DishAdapter> {
             if(!half.get(position).isEmpty()){
                 builder.setNeutralButton("Remove Half Plate", (dialogInterface, i) -> {
                     FirebaseAuth auth = FirebaseAuth.getInstance();
-                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid())).child("List of Dish").child(type).child(names.get(position));
+                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid())).child("List of Dish").child(type).child(names.get(position));
                     databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                         @SuppressLint("SetTextI18n")
                         @Override

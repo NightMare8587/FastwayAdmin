@@ -790,8 +790,8 @@ public class ApproveCurrentOrder extends AppCompatActivity {
             FirebaseAuth auth = FirebaseAuth.getInstance();
             DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid())).child("Tables").child(table);
             for(int i=0;i<dishNames.size();i++){
-                databaseReference.child("CurrentOrdersMade").child(time).child("quantity").setValue(dishQuantity.get(i));
-                databaseReference.child("CurrentOrdersMade").child(time).child("name").setValue(dishNames.get(i));
+                databaseReference.child("CurrentOrdersMade").child(time).child(dishNames.get(i)).child("quantity").setValue(dishQuantity.get(i));
+                databaseReference.child("CurrentOrdersMade").child(time).child(dishNames.get(i)).child("name").setValue(dishNames.get(i));
             }
             return null;
         }
