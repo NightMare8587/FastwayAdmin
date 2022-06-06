@@ -303,6 +303,7 @@ public class UploadRequiredDocuments extends AppCompatActivity {
                         databaseReference.child(auth.getUid()).child("ResNumber").setValue(sharedPreferences.getString("hotelNumber",""));
                         SharedPreferences loginShared = getSharedPreferences("loginInfo",MODE_PRIVATE);
                         databaseReference.child(auth.getUid()).child("state").setValue(loginShared.getString("state",""));
+                        databaseReference.child(auth.getUid()).child("locality").setValue(loginShared.getString("locality",""));
 
                         databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid()).child("Restaurant Documents");
                         databaseReference.child("verified").setValue("no");

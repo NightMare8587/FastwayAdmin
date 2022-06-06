@@ -184,7 +184,7 @@ public class ReportCustomer extends AppCompatActivity {
     private void initialise() {
         auth = FirebaseAuth.getInstance();
         sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
-        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
+        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid()));
         recyclerView = findViewById(R.id.myOrderRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
     }

@@ -49,7 +49,7 @@ public class ReportOptionsActivity extends AppCompatActivity {
         initialise();
         resLocation = getSharedPreferences("loginInfo",MODE_PRIVATE);
         state = resLocation.getString("state","");
-        checkIfReportedAlready = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(Objects.requireNonNull(auth.getUid())).child("Reported Users");
+        checkIfReportedAlready = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(resLocation.getString("locality","")).child(Objects.requireNonNull(auth.getUid())).child("Reported Users");
         checkIfReportedAlready.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -127,7 +127,7 @@ public class ReportOptionsActivity extends AppCompatActivity {
                                                     issueDetail = editText.getText().toString();
                                                     break;
                                             }
-                                            DatabaseReference reportUsers = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(auth.getUid());
+                                            DatabaseReference reportUsers = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(resLocation.getString("locality","")).child(auth.getUid());
                                             reportUsers.child("Reported Users").child(userID).child("authId").setValue(userID);
                                             SharedPreferences sharedPreferences = getSharedPreferences("RestaurantInfo",MODE_PRIVATE);
                                             addToBlockList.child("authId").setValue(userID);
@@ -159,7 +159,7 @@ public class ReportOptionsActivity extends AppCompatActivity {
                                             OtherReportClass otherReportClass = new OtherReportClass(issueName,issueDetail,userName,userEmail,userID,sharedPreferences.getString("hotelName",""),state);
                                             reportRef.child(Objects.requireNonNull(auth.getUid())).setValue(otherReportClass);
                                             updateReportValue(userID);
-                                            DatabaseReference reportUsers = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(auth.getUid());
+                                            DatabaseReference reportUsers = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(resLocation.getString("locality","")).child(auth.getUid());
                                             reportUsers.child("Reported Users").child(userID).child("authId").setValue(userID);
                                             generateNotification();
                                             DatabaseReference storeReports = FirebaseDatabase.getInstance().getReference().child("Complaints").child("AllReports").child("Users").child(userID).child(String.valueOf(System.currentTimeMillis()));
@@ -247,7 +247,7 @@ public class ReportOptionsActivity extends AppCompatActivity {
         userID = getIntent().getStringExtra("ID");
         Log.i("id",userID);
         SharedPreferences sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
-        addToBlockList = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid())).child("Blocked List").child(userID);
+        addToBlockList = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid())).child("Blocked List").child(userID);
         reportRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Admin");
     }
 }
