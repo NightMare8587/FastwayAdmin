@@ -132,6 +132,20 @@ public class Info extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.hasChild(Objects.requireNonNull(infoAuth.getUid()))){
+                    if(snapshot.child(infoAuth.getUid()).child("TableBookAllowed").getValue(String.class).equals("yes")){
+                        editor.putString("TableBookAllowed", "yes");
+                    }
+                    else
+                        editor.putString("TableBookAllowed", "no");
+
+                    if(snapshot.child(infoAuth.getUid()).child("TakeAwayAllowed").getValue(String.class).equals("yes")){
+                        editor.putString("TakeAwayAllowed", "yes");
+                    }
+                    else
+                        editor.putString("TakeAwayAllowed", "no");
+
+                    editor.apply();
+
                     SharedPreferences resInfoShared = getSharedPreferences("RestaurantInfo", MODE_PRIVATE);
                             SharedPreferences.Editor editor = resInfoShared.edit();
                             editor.putString("hotelName", snapshot.child(infoAuth.getUid()).child("name").getValue(String.class));
@@ -158,7 +172,8 @@ public class Info extends AppCompatActivity {
 
                     alert.setCancelable(false);
                     alert.show();
-                }
+                }else
+                    alertDialog.dismiss();
             }
 
             @Override
