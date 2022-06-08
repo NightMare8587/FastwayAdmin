@@ -1,4 +1,11 @@
-package com.consumers.fastwayadmin.Info.RestaurantImages;
+package com.consumers.fastwayadmin.NavFrags.ReUploadResImages;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -8,15 +15,9 @@ import android.util.Log;
 import android.widget.Button;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
-import com.consumers.fastwayadmin.Info.MapsActivity;
 import com.consumers.fastwayadmin.Info.RestaurantDocuments.UploadRequiredDocuments;
+import com.consumers.fastwayadmin.Info.RestaurantImages.AddImagesAdapter;
+import com.consumers.fastwayadmin.Info.RestaurantImages.AddRestaurantImages;
 import com.consumers.fastwayadmin.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
@@ -37,7 +38,7 @@ import karpuzoglu.enes.com.fastdialog.FastDialog;
 import karpuzoglu.enes.com.fastdialog.FastDialogBuilder;
 import karpuzoglu.enes.com.fastdialog.Type;
 
-public class AddRestaurantImages extends AppCompatActivity {
+public class ReUploadRestaurantImages extends AppCompatActivity {
     Button addImages,proceed;
     FirebaseStorage storage;
     List<String> resImages = new ArrayList<>();
@@ -52,27 +53,26 @@ public class AddRestaurantImages extends AppCompatActivity {
     FirebaseAuth auth;
     RecyclerView recyclerView;
     StorageReference storageReference;
-    String currentImageName;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_restaurant_images);
-        fastDialog = new FastDialogBuilder(AddRestaurantImages.this, Type.PROGRESS)
+        setContentView(R.layout.activity_re_upload_restaurant_images);
+        fastDialog = new FastDialogBuilder(ReUploadRestaurantImages.this, Type.PROGRESS)
                 .progressText("Uploading Image...")
                 .setAnimation(Animations.FADE_IN)
                 .cancelable(false)
                 .create();
-        addImages = findViewById(R.id.addImagesToDBButton);
-        proceed = findViewById(R.id.proceedButtonAdmin);
+        addImages = findViewById(R.id.addImagesToDBButtonReUpload);
+        proceed = findViewById(R.id.proceedButtonAdminReUpload);
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
-        recyclerView = findViewById(R.id.showImagesAddedToResRecyclerView);
-        recyclerView.setLayoutManager(new GridLayoutManager(AddRestaurantImages.this,3));
+        recyclerView = findViewById(R.id.showImagesAddedToResRecyclerViewReUpload);
+        recyclerView.setLayoutManager(new GridLayoutManager(ReUploadRestaurantImages.this,3));
         state = getIntent().getStringExtra("state");
         locality = getIntent().getStringExtra("locality");
         Toast.makeText(this, "Click on particular image to delete that image", Toast.LENGTH_SHORT).show();
         auth = FirebaseAuth.getInstance();
-        linearLayoutManager = new LinearLayoutManager(AddRestaurantImages.this,LinearLayoutManager.HORIZONTAL,false);
+        linearLayoutManager = new LinearLayoutManager(ReUploadRestaurantImages.this,LinearLayoutManager.HORIZONTAL,false);
         databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(locality).child(Objects.requireNonNull(auth.getUid())).child("RestaurantImages");
         databaseReference.addChildEventListener(new ChildEventListener() {
             @Override
@@ -107,11 +107,9 @@ public class AddRestaurantImages extends AppCompatActivity {
             startActivityForResult(Intent.createChooser(intent, "Select Picture Using"), 1);
         });
         proceed.setOnClickListener(click -> {
-            startActivity(new Intent(AddRestaurantImages.this, UploadRequiredDocuments.class));
             finish();
         });
     }
-
     private void updateChild() {
 
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -140,10 +138,7 @@ public class AddRestaurantImages extends AppCompatActivity {
 
             }
         });
-
-
     }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -159,7 +154,7 @@ public class AddRestaurantImages extends AppCompatActivity {
 
                 StorageReference ref1 = storageReference.child(dishAuth.getUid() + "/" + "resImages" + "/" + time);
                 ref1.getDownloadUrl().addOnSuccessListener(uri -> {
-                    Toast.makeText(AddRestaurantImages.this, "New Image Uploaded", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ReUploadRestaurantImages.this, "New Image Uploaded", Toast.LENGTH_SHORT).show();
 
                     reference.child(time).child("imageUri").setValue(uri + "");
                     updateChild();

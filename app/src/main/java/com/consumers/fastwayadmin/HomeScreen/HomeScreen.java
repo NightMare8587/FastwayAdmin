@@ -477,7 +477,6 @@ public class HomeScreen extends AppCompatActivity {
                                 alert.show();
                             }
                            else if(currentTime - registerTime >= 2592000000L){
-
                                 AlertDialog.Builder alert = new AlertDialog.Builder(HomeScreen.this);
                                 alert.setTitle("Cash Transaction").setMessage("It's time for payment of cash transaction commission, today is last day for else fine of 10% will be applied\nDo you wanna pay now or you can pay later!")
                                         .setPositiveButton("Pay Now", (dialogInterface, i) -> {

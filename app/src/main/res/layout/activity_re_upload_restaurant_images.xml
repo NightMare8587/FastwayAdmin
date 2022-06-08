@@ -4,10 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Info.RestaurantImages.AddRestaurantImages">
-
+    tools:context=".NavFrags.ReUploadResImages.ReUploadRestaurantImages">
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/showImagesAddedToResRecyclerView"
+        android:id="@+id/showImagesAddedToResRecyclerViewReUpload"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="1dp"
@@ -18,17 +17,17 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/addImagesToDBButton"
+        android:id="@+id/addImagesToDBButtonReUpload"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:text="Add Images"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/showImagesAddedToResRecyclerView" />
+        app:layout_constraintTop_toBottomOf="@+id/showImagesAddedToResRecyclerViewReUpload" />
 
     <Button
-        android:id="@+id/proceedButtonAdmin"
+        android:id="@+id/proceedButtonAdminReUpload"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="15dp"
@@ -36,5 +35,5 @@
         android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/addImagesToDBButton" />
+        app:layout_constraintTop_toBottomOf="@+id/addImagesToDBButtonReUpload" />
 </androidx.constraintlayout.widget.ConstraintLayout>

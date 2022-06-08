@@ -3,26 +3,21 @@ package com.consumers.fastwayadmin.Info;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.location.Address;
-import android.location.Geocoder;
-import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Looper;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -37,17 +32,8 @@ import com.consumers.fastwayadmin.HomeScreen.HomeScreen;
 import com.consumers.fastwayadmin.Info.RestaurantDocuments.UploadRequiredDocuments;
 import com.consumers.fastwayadmin.Info.RestaurantImages.AddRestaurantImages;
 import com.consumers.fastwayadmin.R;
-import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationResult;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.LocationSettingsRequest;
-import com.google.android.gms.location.LocationSettingsResponse;
-import com.google.android.gms.location.LocationSettingsStatusCodes;
-import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -68,8 +54,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 
 import karpuzoglu.enes.com.fastdialog.Animations;
@@ -81,21 +65,23 @@ public class Info extends AppCompatActivity {
     EditText nameOfRestaurant,AddressOfRestaurant,nearbyPlace,pinCode,contactNumber;
     Button proceed;
     FastDialog loading;
-    LocationRequest locationRequest;
+//    LocationRequest locationRequest;
     Bitmap bitmap;
     StorageReference storageReference;
+    AlertDialog.Builder builder;
+    AlertDialog alertDialog;
     Uri filePath;
     boolean subLocal = false;
     FirebaseStorage storage;
     CheckBox optForTakeaway,optForTableBook;
     OutputStream outputStream;
     File file;
-    FusedLocationProviderClient clientsLocation;
+//    FusedLocationProviderClient clientsLocation;
     double longi,lati;
     CountryCodePicker codePicker;
     FirebaseAuth infoAuth = FirebaseAuth.getInstance();
     DatabaseReference infoRef;
-    FastDialog fastDialog;
+//    FastDialog fastDialog;
     SharedPreferences sharedPreferences;
     DatabaseReference checkRef;
     SharedPreferences.Editor editor;
@@ -129,14 +115,59 @@ public class Info extends AppCompatActivity {
         checkPermissions();
         sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
         SharedPreferences location = getSharedPreferences("LocationMaps",MODE_PRIVATE);
+
         if(location.contains("location")){
             startActivity(new Intent(Info.this, HomeScreen.class));
             finish();
+            return;
         }else if(sharedPreferences.contains("restaurantCreated"))
         {
             startActivity(new Intent(Info.this,UploadRequiredDocuments.class));
             finish();
+            return;
         }
+        alertDialog.show();
+        checkRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state", "")).child(sharedPreferences.getString("locality",""));
+        checkRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.hasChild(Objects.requireNonNull(infoAuth.getUid()))){
+                    SharedPreferences resInfoShared = getSharedPreferences("RestaurantInfo", MODE_PRIVATE);
+                            SharedPreferences.Editor editor = resInfoShared.edit();
+                            editor.putString("hotelName", snapshot.child(infoAuth.getUid()).child("name").getValue(String.class));
+                            editor.putString("hotelAddress", snapshot.child(infoAuth.getUid()).child("address").getValue(String.class));
+                            editor.putString("hotelNumber", snapshot.child(infoAuth.getUid()).child("number").getValue(String.class));
+                            editor.apply();
+                    AlertDialog.Builder alert = new AlertDialog.Builder(Info.this);
+                    alert.setTitle("Images");
+                    alert.setMessage("Do you wanna add images of your restaurant!!\nYou can skip this step and add image later");
+                    alert.setPositiveButton("Add Image", (dialogInterface, i) -> {
+                        Intent intent = new Intent(Info.this, AddRestaurantImages.class);
+                        intent.putExtra("state", sharedPreferences.getString("state", ""));
+                        intent.putExtra("locality", sharedPreferences.getString("locality", ""));
+                        alertDialog.dismiss();
+                        startActivity(intent);
+                        finish();
+                    }).setNegativeButton("Skip", (dialogInterface, i) -> {
+                        dialogInterface.dismiss();
+                        infoRef.child("DisplayImage").setValue("");
+                        startActivity(new Intent(Info.this, UploadRequiredDocuments.class));
+                        alertDialog.dismiss();
+                        finish();
+                    }).create();
+
+                    alert.setCancelable(false);
+                    alert.show();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+
         if(!sharedPreferences.getString("locality","").equals(""))
             subLocal = true;
         if(!sharedPreferences.getString("postalCode","").equals(""))
@@ -284,6 +315,7 @@ public class Info extends AppCompatActivity {
             alert.setPositiveButton("Add Image", (dialogInterface, i) -> {
                 Intent intent = new Intent(Info.this, AddRestaurantImages.class);
                 intent.putExtra("state", sharedPreferences.getString("state", ""));
+                intent.putExtra("locality", sharedPreferences.getString("locality", ""));
                 startActivity(intent);
             }).setNegativeButton("Skip", (dialogInterface, i) -> {
                 dialogInterface.dismiss();
@@ -307,6 +339,11 @@ public class Info extends AppCompatActivity {
         proceed = findViewById(R.id.proceed);
         codePicker = findViewById(R.id.codePicker);
         contactNumber = findViewById(R.id.contactNumber);
+        builder = new AlertDialog.Builder(Info.this);
+        LayoutInflater layoutInflater = LayoutInflater.from(this);
+        View view = layoutInflater.inflate(R.layout.fastway_custom_loading_dialog,null);
+        builder.setView(view);
+        alertDialog = builder.create();
 //        progressBar = findViewById(R.id.progressBar);
 
     }

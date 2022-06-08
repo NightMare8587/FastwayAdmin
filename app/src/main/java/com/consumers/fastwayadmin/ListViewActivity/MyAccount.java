@@ -28,6 +28,7 @@ import com.consumers.fastwayadmin.ListViewActivity.LeaveFastwayPackage.LeaveFast
 import com.consumers.fastwayadmin.ListViewActivity.ResTimingsPackage.AddRestaurantTimings;
 import com.consumers.fastwayadmin.ListViewActivity.StaffDetails.RestaurantStaff;
 import com.consumers.fastwayadmin.NavFrags.EditVendorDetails;
+import com.consumers.fastwayadmin.NavFrags.ReUploadResImages.ReUploadRestaurantImages;
 import com.consumers.fastwayadmin.R;
 import com.consumers.fastwayadmin.SplashAndIntro.SplashScreen;
 import com.developer.kalert.KAlertDialog;
@@ -67,7 +68,7 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
     ModalBottomSheetDialog modalBottomSheetDialog;
     SharedPreferences.Editor editor;
     TextView textView;
-    String[] names = {"Change Credentials (Admin)","Change Credentials (Restaurants)","Delete Account","Change Bank Credentials","Restaurant Documents","Restaurant Staff Details","Add Restaurant Timings","Leave Fastway"};
+    String[] names = {"Change Credentials (Admin)","Change Credentials (Restaurants)","Restaurant Images","Delete Account","Change Bank Credentials","Restaurant Documents","Restaurant Staff Details","Add Restaurant Timings","Leave Fastway"};
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -124,6 +125,14 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
                     break;
 
                 case 2:
+                    Intent intents = new Intent(MyAccount.this, ReUploadRestaurantImages.class);
+                    SharedPreferences sharedPreferences1 = getSharedPreferences("loginInfo",MODE_PRIVATE);
+                    intents.putExtra("state",sharedPreferences1.getString("state",""));
+                    intents.putExtra("locality",sharedPreferences1.getString("locality",""));
+                    startActivity(intents);
+                    break;
+
+                case 3:
                     new KAlertDialog(MyAccount.this,KAlertDialog.WARNING_TYPE)
                             .setTitleText("Delete Account")
                             .setContentText("Do you sure wanna delete your account!!! All of your data will be removed\n"+"This action can't be revert")
@@ -139,20 +148,20 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
                             }).setCancelText("No, Wait")
                             .setCancelClickListener(KAlertDialog::dismissWithAnimation).show();
                     break;
-                case 3:
+                case 4:
                     Intent intent = new Intent(MyAccount.this, EditVendorDetails.class);
                     startActivityForResult(intent,2);
                     break;
-                case 4:
+                case 5:
                     startActivity(new Intent(MyAccount.this, ViewAndReuploadDocuments.class));
                     break;
-                case 5:
+                case 6:
                     startActivity(new Intent(MyAccount.this, RestaurantStaff.class));
                     break;
-                case 6:
+                case 7:
                     startActivity(new Intent(MyAccount.this, AddRestaurantTimings.class));
                     break;
-                case 7:
+                case 8:
                     startActivity(new Intent(MyAccount.this, LeaveFastway.class));
                     break;
 
