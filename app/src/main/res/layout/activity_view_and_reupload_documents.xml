@@ -6,79 +6,85 @@
     android:layout_height="match_parent"
     tools:context=".Info.RestaurantDocuments.ReUploadDocuments.ViewAndReuploadDocuments">
 
-    <androidx.gridlayout.widget.GridLayout
-        android:id="@+id/gridLayout3"
-        android:layout_width="0dp"
+    <LinearLayout
+        android:id="@+id/linearLayoutReUPloadDocs"
+        android:layout_width="match_parent"
+        android:orientation="vertical"
         android:layout_height="wrap_content"
-        android:layout_marginStart="1dp"
-        android:layout_marginTop="1dp"
-        android:layout_marginEnd="1dp"
-        app:columnCount="3"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:rowCount="2">
+        app:layout_constraintTop_toTopOf="parent">
 
-        <Button
-            android:id="@+id/gstGridViewButton"
-            android:layout_height="92dp"
-            android:layout_margin="10dp"
-            android:backgroundTint="@color/teal_200"
-            android:text="GST"
-            android:textSize="25sp"
-            app:layout_column="0"
-            app:layout_columnWeight="1"
-            app:layout_row="0"
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:orientation="horizontal"
+            android:layout_height="wrap_content">
+            <Button
+                android:id="@+id/gstGridViewButton"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:backgroundTint="@color/teal_200"
+                android:text="GST"
+                android:textSize="16sp"
+                android:layout_width="0dp"
+                android:layout_weight="1"
 
-            />
+                />
 
-        <Button
-            android:id="@+id/adhaarGridViewButton"
-            android:layout_height="92dp"
-            android:layout_margin="10dp"
-            android:backgroundTint="@color/quantum_cyan"
-            android:text="ADHAAR"
-            android:textSize="25sp"
-            app:layout_column="1"
-            app:layout_columnWeight="1"
-            app:layout_row="0" />
+            <Button
+                android:id="@+id/adhaarGridViewButton"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:backgroundTint="@color/quantum_cyan"
+                android:text="ADHAAR"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:textSize="16sp" />
 
-        <Button
-            android:id="@+id/fssaiGridViewButton"
-            android:layout_height="92dp"
-            android:layout_margin="10dp"
-            android:backgroundTint="@color/quantum_googred50"
-            android:text="FSSAI"
-            android:textSize="25sp"
-            app:layout_column="0"
-            app:layout_columnWeight="1"
-            app:layout_row="1" />
 
-        <Button
-            android:id="@+id/panGridViewButton"
-            android:layout_height="92dp"
-            android:layout_margin="10dp"
-            android:backgroundTint="@color/blue_btn_bg_color"
-            android:text="PAN"
-            android:textSize="25sp"
-            app:layout_column="1"
-            app:layout_columnWeight="1"
-            app:layout_row="1" />
+            <Button
+                android:id="@+id/fssaiGridViewButton"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:backgroundTint="@color/quantum_googred50"
+                android:text="FSSAI"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:textSize="16sp"/>
+        </LinearLayout>
 
-        <Button
-            android:id="@+id/resProofGridViewButton"
-            android:layout_height="92dp"
-            android:layout_margin="10dp"
-            android:backgroundTint="@color/cfdialog_neutral_button_color"
-            android:text="RES\nPROOF"
-            android:textSize="25sp"
-            app:layout_column="2"
-            app:layout_columnWeight="2"
-            app:layout_row="1"
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <Button
+                android:id="@+id/panGridViewButton"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:backgroundTint="@color/blue_btn_bg_color"
+                android:text="PAN"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:textSize="16sp"/>
 
-            />
+            <Button
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:id="@+id/resProofGridViewButton"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:backgroundTint="@color/purple_200"
+                android:text="RES PROOF"
+                android:textSize="16sp"
 
-    </androidx.gridlayout.widget.GridLayout>
+                />
+        </LinearLayout>
+
+
+
+
+
+    </LinearLayout>
 
     <ImageView
         android:id="@+id/imageViewViewAndReuploadDocuments"
@@ -87,7 +93,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/gridLayout3"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayoutReUPloadDocs"
         tools:srcCompat="@tools:sample/avatars" />
 
     <ProgressBar
@@ -98,5 +104,5 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/imageViewViewAndReuploadDocuments"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/gridLayout3" />
+        app:layout_constraintTop_toBottomOf="@+id/linearLayoutReUPloadDocs" />
 </androidx.constraintlayout.widget.ConstraintLayout>
