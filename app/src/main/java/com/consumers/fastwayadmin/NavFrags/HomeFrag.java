@@ -74,6 +74,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -90,6 +91,7 @@ public class HomeFrag extends Fragment {
     Calendar calendar;
     int currentDay;
     Button seeMoreDetails;
+    DecimalFormat decimalFormat = new DecimalFormat("0.00");
     List<String> image = new ArrayList<>();
     List<String> type = new ArrayList<>();
     List<String> orderAndPayment = new ArrayList<>();
@@ -1105,7 +1107,7 @@ public class HomeFrag extends Fragment {
                         totalOrdersToday.setText(restaurantDailyTrack.getString("totalOrdersToday",""));
 
                     if(restaurantDailyTrack.contains("totalTransactionsToday"))
-                        totalTransactionsToday.setText("\u20B9" + restaurantDailyTrack.getString("totalTransactionsToday",""));
+                        totalTransactionsToday.setText("\u20B9" + decimalFormat.format(Double.parseDouble(restaurantDailyTrack.getString("totalTransactionsToday",""))));
                 }else{
                     restaurantTrackEditor.putString("currentDate", String.valueOf(currentDay));
                     restaurantTrackEditor.putString("totalOrdersToday","0");

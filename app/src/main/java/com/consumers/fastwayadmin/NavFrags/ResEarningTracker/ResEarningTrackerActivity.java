@@ -33,6 +33,7 @@ import android.widget.Toast;
 import com.consumers.fastwayadmin.NavFrags.FastwayPremiumActivites.FastwayPremiums;
 import com.consumers.fastwayadmin.NavFrags.ResDishTracker.RecyclerClassView;
 import com.consumers.fastwayadmin.NavFrags.ResDishTracker.seeAllDishAnalysis;
+import com.consumers.fastwayadmin.NavFrags.ResEarningTracker.RestaurantAnalysis.RestaurantEarningAnalysis;
 import com.consumers.fastwayadmin.R;
 import com.google.common.reflect.TypeToken;
 import com.google.firebase.auth.FirebaseAuth;
@@ -67,11 +68,12 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
     SharedPreferences loginInfoShared;
     DecimalFormat df = new DecimalFormat("0.00");
     double totalAmountPerMonth = 0;
-    Button seeMoreDetails;
+    Button seeMoreDetails,seeAnalysis;
     Gson gson;
     TextView totalOrdersMade,totalTransactionsMade;
     String json;
     SharedPreferences dish;
+    SharedPreferences.Editor editor;
     String[] monthName = {"January", "February",
             "March", "April", "May", "June", "July",
             "August", "September", "October", "November",
@@ -85,19 +87,27 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_res_earning_tracker);
         loginInfoShared = getSharedPreferences("loginInfo",MODE_PRIVATE);
+        editor = loginInfoShared.edit();
+        seeAnalysis = findViewById(R.id.seeRestaurantAnalysisButtonTracker);
         if(!loginInfoShared.contains("FastwayAdminPrem")){
             AlertDialog.Builder builder = new AlertDialog.Builder(ResEarningTrackerActivity.this);
             builder.setCancelable(false);
             builder.setTitle("Dialog").setMessage("You need to subscribe to premium plan to see analysis")
                     .setPositiveButton("Subscribe Now", (dialogInterface, i) -> {
                         dialogInterface.dismiss();
-                        startActivity(new Intent(ResEarningTrackerActivity.this, FastwayPremiums.class));
+                        editor.putString("FastwayAdminPrem","h");
+                        editor.apply();
+//                        startActivity(new Intent(ResEarningTrackerActivity.this, FastwayPremiums.class));
                     }).setNegativeButton("Not Now", (dialogInterface, i) -> {
                         dialogInterface.dismiss();
                         finish();
                     }).create().show();
             return;
         }
+
+        seeAnalysis.setOnClickListener(click -> {
+            startActivity(new Intent(click.getContext(), RestaurantEarningAnalysis.class));
+        });
         resTrackInfo = getSharedPreferences("RestaurantTrackingDaily",MODE_PRIVATE);
         calendar = Calendar.getInstance();
         dishRecyclerView = findViewById(R.id.dishTrackerRecyclerViewAnalysis);

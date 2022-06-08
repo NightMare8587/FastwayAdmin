@@ -14,10 +14,10 @@
     <org.eazegraph.lib.charts.BarChart
         android:id="@+id/barchart"
         android:layout_width="match_parent"
-        android:layout_height="300dp"
+        android:layout_height="250dp"
+        android:orientation="vertical"
         android:padding="10dp"
         app:egBarWidth="20dp"
-        android:orientation="vertical"
         app:egFixedBarWidth="true"
         app:egLegendHeight="40dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -40,7 +40,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="15dp"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="7dp"
         android:fontFamily="@font/merriweather_sans_bold"
         android:text="Total Orders Made: "
         android:textSize="18sp"
@@ -53,7 +53,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="7dp"
         android:fontFamily="@font/merriweather_sans_bold"
         android:text="Total Transaction Amount:"
         android:textSize="18sp"
@@ -68,6 +68,21 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         tools:layout_editor_absoluteY="415dp">
+
+        <Button
+            android:id="@+id/seeRestaurantAnalysisButtonTracker"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text="See Restaurant Analysis"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:padding="10dp"
+            android:textColor="#000000"
+            android:background="@drawable/edittext_back"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/seeMoreDishAnalysisDetails" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/dishTrackerRecyclerViewAnalysis"
