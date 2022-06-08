@@ -32,6 +32,7 @@ public class EditVendorDetails extends AppCompatActivity {
     EditText nameEdit,emailEdit,phoneEdit,accountNumber,accountName,IFSCcode;
     String mauthId;
     FirebaseAuth mAuth;
+    String acAddress;
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
     String url = "https://intercellular-stabi.000webhostapp.com/editBankDetaills.php";
@@ -121,7 +122,7 @@ public class EditVendorDetails extends AppCompatActivity {
 //                                }
 //                            };
 //                            requestQueue.add(stringRequest);
-                            VendorBankClass vendorBankClass = new VendorBankClass(name,email,acNumber,acName,acIFSC,phone,mauthId);
+                            VendorBankClass vendorBankClass = new VendorBankClass(name,email,acNumber,acName,acIFSC,phone,mauthId,acAddress);
                             editor.putString("vendorDetails","yes");
                             editor.putString("accountNumber",acNumber);
                             editor.putString("accountName",acName);

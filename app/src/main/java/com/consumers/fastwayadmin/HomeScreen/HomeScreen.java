@@ -40,6 +40,7 @@ import com.consumers.fastwayadmin.NavFrags.HomeFrag;
 import com.consumers.fastwayadmin.NavFrags.MenuFrag;
 import com.consumers.fastwayadmin.NavFrags.ReplaceOrders.ReplaceOrderRequests;
 import com.consumers.fastwayadmin.NavFrags.TablesFrag;
+import com.consumers.fastwayadmin.NavFrags.VendorDetailsActivity;
 import com.consumers.fastwayadmin.R;
 import com.consumers.fastwayadmin.RandomChatNoww;
 import com.gauravk.bubblenavigation.BubbleNavigationConstraintView;
@@ -84,6 +85,7 @@ public class HomeScreen extends AppCompatActivity {
     SharedPreferences sharedPreferences;
     String json;
     Gson gson;
+    DatabaseReference checkForBank;
     SharedPreferences.Editor myEditor;
     FirebaseAuth auth = FirebaseAuth.getInstance();
     long currentTime = System.currentTimeMillis();
@@ -165,6 +167,7 @@ public class HomeScreen extends AppCompatActivity {
                     break;
             }
         });
+        new checkBank().execute();
         StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
         StrictMode.setVmPolicy(builder.build());
         File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
@@ -182,28 +185,27 @@ public class HomeScreen extends AppCompatActivity {
 
 
 
-        if(sharedPreferences.contains("FileGeneratedExcel")) {
+        if(!sharedPreferences.contains("FileGeneratedExcel")) {
             try {
                 File file = new File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "RestaurantEarningTracker.xlsx");
-                FileInputStream fileInputStream = new FileInputStream(file);
-                XSSFWorkbook workbook1 = new XSSFWorkbook(fileInputStream);
-                Sheet sheet = workbook1.getSheetAt(0);
-                int row = sheet.getLastRowNum();
+                XSSFWorkbook workbook1 = new XSSFWorkbook();
+//                Sheet sheet = workbook1.getSheetAt(0);
+//                int row = sheet.getLastRowNum();
 //                Toast.makeText(this, "" + row, Toast.LENGTH_SHORT).show();
-//                Sheet sheet = workbook1.createSheet("MyEarnings");
-//                Row row = sheet.createRow(0);
-//                Cell cell = row.createCell(0);
-//                cell.setCellValue("Date");
-//                cell = row.createCell(1);
-//                cell.setCellValue("Transaction ID");
-//                cell = row.createCell(2);
-//                cell.setCellValue("Payment Mode");
-//                cell = row.createCell(3);
-//                cell.setCellValue("Amount");
-//                FileOutputStream fileOutputStream = new FileOutputStream(file);
-//                workbook1.write(fileOutputStream);
-//                fileOutputStream.flush();
-//                fileOutputStream.close();
+                Sheet sheet = workbook1.createSheet("MyEarnings");
+                Row row = sheet.createRow(0);
+                Cell cell = row.createCell(0);
+                cell.setCellValue("Date");
+                cell = row.createCell(1);
+                cell.setCellValue("Transaction ID");
+                cell = row.createCell(2);
+                cell.setCellValue("Payment Mode");
+                cell = row.createCell(3);
+                cell.setCellValue("Amount");
+                FileOutputStream fileOutputStream = new FileOutputStream(file);
+                workbook1.write(fileOutputStream);
+                fileOutputStream.flush();
+                fileOutputStream.close();
                 myEditor.putString("FileGeneratedExcel","f");
                 myEditor.apply();
 //                Toast.makeText(this, "Finished", Toast.LENGTH_SHORT).show();
@@ -517,6 +519,39 @@ public class HomeScreen extends AppCompatActivity {
 
                 }
             });
+            return null;
+        }
+    }
+    public class checkBank extends AsyncTask<Void,Void,Void>{
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            checkForBank = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(UID));
+            checkForBank.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if(!snapshot.hasChild("Bank Details")){
+                        AlertDialog.Builder alertDialog = new AlertDialog.Builder(HomeScreen.this);
+                        alertDialog.setTitle("Important");
+                        alertDialog.setMessage("You need to add bank details to accept payments");
+                        alertDialog.setPositiveButton("Add", (dialogInterface, i) -> {
+                           SharedPreferences accountInfo = getSharedPreferences("AccountInfo",Context.MODE_PRIVATE);
+                            Intent intent = new Intent(HomeScreen.this, VendorDetailsActivity.class);
+                            intent.putExtra("name",accountInfo.getString("name",""));
+                            intent.putExtra("email",accountInfo.getString("email",""));
+                            startActivity(intent);
+                        }).create();
+
+                        alertDialog.show();
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+
             return null;
         }
     }

@@ -125,7 +125,7 @@ public class HomeFrag extends Fragment {
     String paymentMode;
     LinearLayout linearLayout,secondLinearLayout;
     List<String> halfOr = new ArrayList<>();
-    DatabaseReference checkForBank;
+
     DatabaseReference onlineOrOfflineRestaurant;
     SharedPreferences accountInfo;
     SharedPreferences restaurantStatus;
@@ -214,7 +214,7 @@ public class HomeFrag extends Fragment {
         secondLinearLayout = view.findViewById(R.id.secondFragLinearLayout);
         vendorIdCreated = view.getContext().getSharedPreferences("VendorID",Context.MODE_PRIVATE);
         vendorIdEditor = vendorIdCreated.edit();
-        new checkBank().execute();
+
         seeMoreDetails = view.findViewById(R.id.seeMoreDetailsHomeFragButton);
         seeMoreDetails.setOnClickListener(click -> {
             view.getContext().startActivity(new Intent(requireContext(), ResEarningTrackerActivity.class));
@@ -980,39 +980,7 @@ public class HomeFrag extends Fragment {
         });
     }
 
-    public class checkBank extends AsyncTask<Void,Void,Void>{
 
-        @Override
-        protected Void doInBackground(Void... voids) {
-            checkForBank = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(UID));
-            checkForBank.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    if(!snapshot.hasChild("Bank Details")){
-                        AlertDialog.Builder alertDialog = new AlertDialog.Builder(requireContext());
-                        alertDialog.setTitle("Important");
-                        alertDialog.setMessage("You need to add bank details to accept payments");
-                        alertDialog.setPositiveButton("Add", (dialogInterface, i) -> {
-                            accountInfo = requireContext().getSharedPreferences("AccountInfo",Context.MODE_PRIVATE);
-                            Intent intent = new Intent(requireContext(),VendorDetailsActivity.class);
-                            intent.putExtra("name",accountInfo.getString("name",""));
-                            intent.putExtra("email",accountInfo.getString("email",""));
-                            startActivity(intent);
-                        }).create();
-
-                        alertDialog.show();
-                    }
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-
-                }
-            });
-
-            return null;
-        }
-    }
 
     public class TakeAwayClass extends AsyncTask<Void,Void,Void>{
 
