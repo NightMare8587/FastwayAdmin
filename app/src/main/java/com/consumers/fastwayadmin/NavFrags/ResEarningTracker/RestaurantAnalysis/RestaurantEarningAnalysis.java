@@ -46,6 +46,5 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
         Log.i("info",transID.toString());
         Log.i("info",userID.toString());
         Log.i("info",orderAmountList.toString());
-
     }
 }
