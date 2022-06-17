@@ -42,6 +42,8 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
         List<String> userID = new ArrayList<>(mainDataList.get(2));
         List<String> orderAmountList = new ArrayList<>(mainDataList.get(3));
 
+
+        
         Log.i("info",date.toString());
         Log.i("info",transID.toString());
         Log.i("info",userID.toString());
