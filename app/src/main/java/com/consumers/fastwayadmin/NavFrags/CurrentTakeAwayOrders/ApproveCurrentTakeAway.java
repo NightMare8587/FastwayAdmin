@@ -473,8 +473,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
 
                                 }
                             });
-
-
+                            
                             String approveTime = String.valueOf(System.currentTimeMillis());
                             DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(id).child("Recent Orders").child(time);
                             for(int i=0;i<dishName.size();i++){
