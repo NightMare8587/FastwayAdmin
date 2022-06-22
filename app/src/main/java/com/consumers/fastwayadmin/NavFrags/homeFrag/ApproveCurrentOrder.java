@@ -124,6 +124,9 @@ public class ApproveCurrentOrder extends AppCompatActivity {
     ListView dishQ;
     List<String> dishNames = new ArrayList<>();
     List<String> dishQuantity = new ArrayList<>();
+    List<String> image = new ArrayList<>();
+    List<String> dishPrices = new ArrayList<>();
+    List<String> orderAndPayment = new ArrayList<>();
     Calendar calendar = Calendar.getInstance();
     List<String> dishHalfOr = new ArrayList<>();
     Button approve,decline,showCustomisation;
@@ -180,6 +183,9 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                     dishQuantity.add(String.valueOf(dataSnapshot.child("timesOrdered").getValue()));
                     dishHalfOr.add(String.valueOf(dataSnapshot.child("halfOr").getValue()));
                     orderID = String.valueOf(dataSnapshot.child("orderID").getValue());
+                    image.add(String.valueOf(dataSnapshot.child("image").getValue()));
+                    dishPrices.add(String.valueOf(dataSnapshot.child("price").getValue()));
+                    orderAndPayment.add(String.valueOf(dataSnapshot.child("orderAndPayment").getValue()));
                     orderAmount = String.valueOf(dataSnapshot.child("orderAmount").getValue());
                     time = String.valueOf(dataSnapshot.child("time").getValue());
                     totalPrice = totalPrice + Integer.parseInt(String.valueOf(dataSnapshot.child("price").getValue()));
@@ -343,14 +349,14 @@ public class ApproveCurrentOrder extends AppCompatActivity {
             String approveTime = String.valueOf(System.currentTimeMillis());
             DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(id).child("Recent Orders").child(time);
             for(int i=0;i<dishNames.size();i++){
-                MyClass myClass = new MyClass(dishNames.get(i),dishP.get(i),image.get(i),type.get(i),""+approveTime,dishQuantity.get(i),dishHalfOr.get(i),state,String.valueOf(orderAmount),orderId,"TakeAway,Cash","Order Declined",sharedPreferences.getString("locality",""));
-                databaseReference.child(auth.getUid()).child(dishName.get(i)).setValue(myClass);
+                MyClass myClass = new MyClass(dishNames.get(i),dishPrices.get(i),image.get(i),type.get(i),""+approveTime,dishQuantity.get(i),dishHalfOr.get(i),state,String.valueOf(orderAmount),orderID,orderAndPayment.get(i),"Order Approved",sharedPreferences.getString("locality",""));
+                databaseReference.child(auth.getUid()).child(dishNames.get(i)).setValue(myClass);
             }
 
 
             databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(sharedPreferences.getString("locality","")).child(auth.getUid());
             for(int i=0;i<dishNames.size();i++){
-                MyClass myClass = new MyClass(dishNames.get(i),dishPrice.get(i),image.get(i),type.get(i),""+approveTime,dishQuantity.get(i),dishHalfOr.get(i),state,String.valueOf(orderAmount),orderId,"TakeAway,Cash","Order Declined",sharedPreferences.getString("locality",""));
+                MyClass myClass = new MyClass(dishNames.get(i),dishPrices.get(i),image.get(i),type.get(i),""+approveTime,dishQuantity.get(i),dishHalfOr.get(i),state,String.valueOf(orderAmount),orderID,orderAndPayment.get(i),"Order Approved",sharedPreferences.getString("locality",""));
                 databaseReference.child("Recent Orders").child("" + time).child(auth.getUid()).child(dishNames.get(i)).setValue(myClass);
             }
             restaurantTrackEditor.apply();
@@ -397,14 +403,26 @@ public class ApproveCurrentOrder extends AppCompatActivity {
             linearLayout.addView(editText);
             alert.setView(linearLayout);
 
-            alert.setPositiveButton("submit", (dialogInterface, i) -> {
+            alert.setPositiveButton("submit", (dialogInterface, ii) -> {
                 if(!editText.getText().toString().equals("")) {
                     dialogInterface.dismiss();
                     RequestQueue requestQueue = Volley.newRequestQueue(ApproveCurrentOrder.this);
                     JSONObject main = new JSONObject();
                     new GenratePDF().execute();
                     FirebaseAuth auth = FirebaseAuth.getInstance();
+                    String approveTime = String.valueOf(System.currentTimeMillis());
+                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(id).child("Recent Orders").child(time);
+                    for(int i=0;i<dishNames.size();i++){
+                        MyClass myClass = new MyClass(dishNames.get(i),dishPrices.get(i),image.get(i),type.get(i),""+approveTime,dishQuantity.get(i),dishHalfOr.get(i),state,String.valueOf(orderAmount),orderID,orderAndPayment.get(i),"Order Declined",sharedPreferences.getString("locality",""));
+                        databaseReference.child(auth.getUid()).child(dishNames.get(i)).setValue(myClass);
+                    }
 
+
+                    databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(sharedPreferences.getString("locality","")).child(auth.getUid());
+                    for(int i=0;i<dishNames.size();i++){
+                        MyClass myClass = new MyClass(dishNames.get(i),dishPrices.get(i),image.get(i),type.get(i),""+approveTime,dishQuantity.get(i),dishHalfOr.get(i),state,String.valueOf(orderAmount),orderID,orderAndPayment.get(i),"Order Declined",sharedPreferences.getString("locality",""));
+                        databaseReference.child("Recent Orders").child("" + time).child(auth.getUid()).child(dishNames.get(i)).setValue(myClass);
+                    }
                     DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid())).child("Tables").child(table);
                     new InitiateRefund().execute();
                     try {
