@@ -1,12 +1,13 @@
 package com.consumers.fastwayadmin.NavFrags.CurrentTakeAwayOrders;
 
 public class MyClass {
-    public String name,price,image,type,time,timesOrdered,halfOr,state,totalAmountPaid,orderID,orderAndPayment,orderStatus;
+    public String name,price,image,type,time,timesOrdered,halfOr,state,totalAmountPaid,orderID,orderAndPayment,orderStatus,locality;
 
-    public MyClass(String name, String price, String image, String type, String time, String timesOrdered, String halfOr, String state, String totalAmountPaid, String orderID, String orderAndPayment, String orderStatus) {
+    public MyClass(String name, String price, String image, String type, String time, String timesOrdered, String halfOr, String state, String totalAmountPaid, String orderID, String orderAndPayment, String orderStatus,String locality) {
         this.name = name;
         this.orderStatus = orderStatus;
         this.orderAndPayment = orderAndPayment;
+        this.locality = locality;
         this.price = price;
         this.timesOrdered = timesOrdered;
         this.orderID = orderID;

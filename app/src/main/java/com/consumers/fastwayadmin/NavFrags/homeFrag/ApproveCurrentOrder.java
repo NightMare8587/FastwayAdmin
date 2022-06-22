@@ -40,6 +40,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.aspose.cells.Workbook;
 import com.consumers.fastwayadmin.CancelClass;
+import com.consumers.fastwayadmin.NavFrags.CurrentTakeAwayOrders.MyClass;
 import com.consumers.fastwayadmin.PaymentClass;
 import com.consumers.fastwayadmin.R;
 import com.google.common.reflect.TypeToken;
@@ -338,6 +339,19 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                 restaurantTrackEditor.putString("totalTransactionsToday",String.valueOf(val));
             }else{
                 restaurantTrackEditor.putString("totalTransactionsToday",String.valueOf(orderAmount));
+            }
+            String approveTime = String.valueOf(System.currentTimeMillis());
+            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(id).child("Recent Orders").child(time);
+            for(int i=0;i<dishNames.size();i++){
+                MyClass myClass = new MyClass(dishNames.get(i),dishP.get(i),image.get(i),type.get(i),""+approveTime,dishQuantity.get(i),dishHalfOr.get(i),state,String.valueOf(orderAmount),orderId,"TakeAway,Cash","Order Declined",sharedPreferences.getString("locality",""));
+                databaseReference.child(auth.getUid()).child(dishName.get(i)).setValue(myClass);
+            }
+
+
+            databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(sharedPreferences.getString("locality","")).child(auth.getUid());
+            for(int i=0;i<dishNames.size();i++){
+                MyClass myClass = new MyClass(dishNames.get(i),dishPrice.get(i),image.get(i),type.get(i),""+approveTime,dishQuantity.get(i),dishHalfOr.get(i),state,String.valueOf(orderAmount),orderId,"TakeAway,Cash","Order Declined",sharedPreferences.getString("locality",""));
+                databaseReference.child("Recent Orders").child("" + time).child(auth.getUid()).child(dishNames.get(i)).setValue(myClass);
             }
             restaurantTrackEditor.apply();
             DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid())).child("Tables").child(table);
