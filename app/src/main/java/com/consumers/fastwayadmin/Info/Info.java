@@ -115,7 +115,7 @@ public class Info extends AppCompatActivity {
         checkPermissions();
         sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
         SharedPreferences location = getSharedPreferences("LocationMaps",MODE_PRIVATE);
-
+        infoRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(this.sharedPreferences.getString("state", "")).child(this.sharedPreferences.getString("locality","")).child(Objects.requireNonNull(infoAuth.getUid()));
         if(location.contains("location")){
             startActivity(new Intent(Info.this, HomeScreen.class));
             finish();
@@ -294,7 +294,7 @@ public class Info extends AppCompatActivity {
             editor.putString("hotelNumber", number);
             this.editor.putString("restaurantCreated", "yes");
             editor.apply();
-            infoRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(this.sharedPreferences.getString("state", "")).child(this.sharedPreferences.getString("locality","")).child(Objects.requireNonNull(infoAuth.getUid()));
+
             infoRef.child("name").setValue(name);
             infoRef.child("address").setValue(address);
             infoRef.child("number").setValue(number);

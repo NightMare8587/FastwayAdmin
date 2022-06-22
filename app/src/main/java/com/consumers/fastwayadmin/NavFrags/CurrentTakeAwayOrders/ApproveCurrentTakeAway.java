@@ -835,6 +835,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                 String month = monthName[calendar.get(Calendar.MONTH)];
                 if(storeForDishAnalysis.contains("DishAnalysisMonthBasis")){
                     gson = new Gson();
+                    Log.i("here","first");
                     java.lang.reflect.Type type = new TypeToken<HashMap<String,HashMap<String,String>>>(){}.getType();
                     String storedHash = storeForDishAnalysis.getString("DishAnalysisMonthBasis","");
                     HashMap<String,HashMap<String,String>> myMap = gson.fromJson(storedHash,type);
@@ -879,6 +880,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                     java.lang.reflect.Type type = new TypeToken<List<List<String>>>() {
                     }.getType();
                     gson = new Gson();
+                    Log.i("here","second");
                     json = storeOrdersForAdminInfo.getString(month,"");
                     List<List<String>> mainDataList = gson.fromJson(json, type);
                     List<String> date = new ArrayList<>(mainDataList.get(0));
@@ -923,6 +925,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                     storeEditor.apply();
                     Log.i("myInfo",mainDataList.toString());
                 }
+                Log.i("here","4444");
                 File file = new File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "RestaurantEarningTracker.xlsx");
                 try {
                     Cell cell;
@@ -931,6 +934,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                     Sheet sheet = workbook.getSheetAt(0);
                     int max = sheet.getLastRowNum();
                     max = max + 1;
+                    Log.i("here","third");
                     Row row = sheet.createRow(max);
                     DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
                     Date date = new Date(Long.parseLong(time));

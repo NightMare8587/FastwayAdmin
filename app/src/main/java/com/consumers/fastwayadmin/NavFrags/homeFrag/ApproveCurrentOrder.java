@@ -81,6 +81,8 @@ public class ApproveCurrentOrder extends AppCompatActivity {
     Gson gson;
     String json;
     SharedPreferences storeOrdersForAdminInfo;
+    SharedPreferences storeDailyTotalOrdersMade;
+    SharedPreferences.Editor storeDailyEditor;
     SharedPreferences.Editor storeEditor;
     String[] monthName = {"January", "February",
             "March", "April", "May", "June", "July",
@@ -136,6 +138,8 @@ public class ApproveCurrentOrder extends AppCompatActivity {
         state = getIntent().getStringExtra("state");
         restaurantDailyTrack = getSharedPreferences("RestaurantTrackingDaily", Context.MODE_PRIVATE);
         restaurantTrackRecords = getSharedPreferences("RestaurantTrackRecords",Context.MODE_PRIVATE);
+        storeDailyTotalOrdersMade = getSharedPreferences("RestaurantDailyStoreForAnalysis",MODE_PRIVATE);
+        storeDailyEditor = storeDailyTotalOrdersMade.edit();
         storeForDishAnalysis = getSharedPreferences("DishAnalysis",MODE_PRIVATE);
         dishAnalysis = storeForDishAnalysis.edit();
         restaurantTrackRecordsEditor = restaurantTrackRecords.edit();
@@ -562,14 +566,47 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                     json = gson.toJson(storeNewList);
                     storeEditor.putString( month,json);
                     storeEditor.apply();
+                    int day = calendar.get(Calendar.DAY_OF_MONTH);
+                    type = new TypeToken<List<List<String>>>() {
+                    }.getType();
+                    gson = new Gson();
+                    json = storeDailyTotalOrdersMade.getString(month,"");
+                    List<List<String>> mainList = gson.fromJson(json,type);
+                    List<String> days = new ArrayList<>(mainList.get(0));
+                    List<String> totalAmounts = new ArrayList<>(mainList.get(1));
+                    List<String> totalOrdersPlaced = new ArrayList<>(mainList.get(2));
+
+                    if(Integer.parseInt(days.get(days.size()-1)) == day){
+                        Double totalAmount = Double.parseDouble(totalAmounts.get(totalAmounts.size()-1));
+                        totalAmount += Double.parseDouble(orderAmount);
+                        totalAmounts.set(totalAmounts.size()-1,String.valueOf(totalAmount));
+
+                        int totalOrder = Integer.parseInt(totalOrdersPlaced.get(totalOrdersPlaced.size() - 1));
+                        totalOrder += 1;
+                        totalOrdersPlaced.set(totalOrdersPlaced.size()-1,String.valueOf(totalOrder));
+                    }else{
+                        days.add(String.valueOf(day));
+                        totalOrdersPlaced.add("1");
+                        totalAmounts.add(String.valueOf(orderAmount));
+                    }
+
+                    List<List<String>> newList = new ArrayList<>();
+                    newList.add(days);
+                    newList.add(totalAmounts);
+                    newList.add(totalOrdersPlaced);
+                    json = gson.toJson(newList);
+                    storeDailyEditor.putString( month,json);
+                    storeDailyEditor.apply();
+
                     Log.i("myInfo",storeNewList.toString());
+                    Log.i("myInfo",newList.toString());
                 }else{
                     List<List<String>> mainDataList = new ArrayList<>();
                     List<String> date = new ArrayList<>();
                     List<String> transID = new ArrayList<>();
                     List<String> userID = new ArrayList<>();
                     List<String> orderAmountList = new ArrayList<>();
-
+                    int day = calendar.get(Calendar.DAY_OF_MONTH);
                     date.add(time);
                     transID.add(transactionIdForExcel);
                     userID.add(id);
@@ -583,7 +620,26 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                     json = gson.toJson(mainDataList);
                     storeEditor.putString( month,json);
                     storeEditor.apply();
+
+                    List<List<String>> mainList = new ArrayList<>();
+                    List<String> days = new ArrayList<>();
+                    List<String> totalAmounts = new ArrayList<>();
+                    List<String> totalOrdersPlaced = new ArrayList<>();
+
+                    days.add(String.valueOf(day));
+                    totalAmounts.add(String.valueOf(orderAmount));
+                    totalOrdersPlaced.add(String.valueOf(1));
+
+                    mainList.add(days);
+                    mainList.add(totalAmounts);
+                    mainList.add(totalOrdersPlaced);
+
+                    gson = new Gson();
+                    json = gson.toJson(mainList);
+                    storeDailyEditor.putString( month,json);
+                    storeDailyEditor.apply();
                     Log.i("myInfo",mainDataList.toString());
+                    Log.i("myInfo",mainList.toString());
                 }
                 File file = new File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "RestaurantEarningTracker.xlsx");
                 try {
