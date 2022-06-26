@@ -212,8 +212,21 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                     AlertDialog.Builder builder = new AlertDialog.Builder(ApproveCurrentOrder.this);
                     RequestQueue requestQueue = Volley.newRequestQueue(ApproveCurrentOrder.this);
                     JSONObject main = new JSONObject();
-                    new GenratePDF().execute();
+//                    new GenratePDF().execute();
                     FirebaseAuth auth = FirebaseAuth.getInstance();
+                    String approveTime = String.valueOf(System.currentTimeMillis());
+                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(id).child("Recent Orders").child(time);
+                    for(int i=0;i<dishNames.size();i++){
+                        MyClass myClass = new MyClass(dishNames.get(i),dishPrices.get(i),image.get(i),type.get(i),""+approveTime,dishQuantity.get(i),dishHalfOr.get(i),state,String.valueOf(orderAmount),orderID,orderAndPayment.get(i),"Order Declined",sharedPreferences.getString("locality",""));
+                        databaseReference.child(auth.getUid()).child(dishNames.get(i)).setValue(myClass);
+                    }
+
+
+                    databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(sharedPreferences.getString("locality","")).child(auth.getUid());
+                    for(int i=0;i<dishNames.size();i++){
+                        MyClass myClass = new MyClass(dishNames.get(i),dishPrices.get(i),image.get(i),type.get(i),""+approveTime,dishQuantity.get(i),dishHalfOr.get(i),state,String.valueOf(orderAmount),orderID,orderAndPayment.get(i),"Order Declined",sharedPreferences.getString("locality",""));
+                        databaseReference.child("Recent Orders").child("" + time).child(auth.getUid()).child(dishNames.get(i)).setValue(myClass);
+                    }
                     DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid())).child("Tables").child(table);
                     new InitiateRefund().execute();
                     try {
@@ -408,7 +421,7 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                     dialogInterface.dismiss();
                     RequestQueue requestQueue = Volley.newRequestQueue(ApproveCurrentOrder.this);
                     JSONObject main = new JSONObject();
-                    new GenratePDF().execute();
+//                    new GenratePDF().execute();
                     FirebaseAuth auth = FirebaseAuth.getInstance();
                     String approveTime = String.valueOf(System.currentTimeMillis());
                     DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(id).child("Recent Orders").child(time);
