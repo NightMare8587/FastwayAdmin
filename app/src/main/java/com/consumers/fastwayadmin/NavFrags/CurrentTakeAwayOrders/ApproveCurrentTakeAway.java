@@ -33,11 +33,9 @@ import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.aspose.cells.Workbook;
 import com.consumers.fastwayadmin.CancelClass;
 import com.consumers.fastwayadmin.PaymentClass;
 import com.consumers.fastwayadmin.R;
@@ -90,6 +88,8 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
     List<String> dishPrice;
     List<String> orderAndPayment;
     String transactionIdForExcel;
+    SharedPreferences storeDailyTotalOrdersMade;
+    SharedPreferences.Editor storeDailyEditor;
     FirebaseStorage storage;
     Gson gson;
     String json;
@@ -157,6 +157,8 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
         editor = sharedPreferences.edit();
         state = sharedPreferences.getString("state","");
         storeOrdersForAdminInfo = getSharedPreferences("StoreOrders",MODE_PRIVATE);
+        storeDailyTotalOrdersMade = getSharedPreferences("RestaurantDailyStoreForAnalysis",MODE_PRIVATE);
+        storeDailyEditor = storeDailyTotalOrdersMade.edit();
         storeEditor = storeOrdersForAdminInfo.edit();
         saveRefundInfo = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(id);
         orderAmount = getIntent().getStringExtra("orderAmount");
@@ -328,8 +330,9 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                     java.lang.reflect.Type type = new TypeToken<HashMap<String,HashMap<String,String>>>(){}.getType();
                     String storedHash = storeForDishAnalysis.getString("DishAnalysisMonthBasis","");
                     HashMap<String,HashMap<String,String>> myMap = gson.fromJson(storedHash,type);
+                    HashMap<String, String> map;
                     if(myMap.containsKey(month)){
-                        HashMap<String,String> map = new HashMap<>(myMap.get(month));
+                        map = new HashMap<>(myMap.get(month));
                         Log.i("checking",map.toString());
                         for(int k=0;k<dishName.size();k++){
                             if(map.containsKey(dishName.get(k))){
@@ -340,18 +343,15 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                                 map.put(dishName.get(k),"1");
                             }
                         }
-                        myMap.put(month,map);
-                        dishAnalysis.putString("DishAnalysisMonthBasis",gson.toJson(myMap));
-                        dishAnalysis.apply();
                     }else{
-                        HashMap<String,String> map = new HashMap<>();
+                        map = new HashMap<>();
                         for(int i=0;i<dishName.size();i++){
                             map.put(dishName.get(i),"1");
                         }
-                        myMap.put(month,map);
-                        dishAnalysis.putString("DishAnalysisMonthBasis",gson.toJson(myMap));
-                        dishAnalysis.apply();
                     }
+                    myMap.put(month,map);
+                    dishAnalysis.putString("DishAnalysisMonthBasis",gson.toJson(myMap));
+                    dishAnalysis.apply();
                 }else{
                     HashMap<String,HashMap<String,String>> map = new HashMap<>();
                     HashMap<String,String> myMap = new HashMap<>();
@@ -426,7 +426,40 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                                 json = gson.toJson(storeNewList);
                                 storeEditor.putString( month,json);
                                 storeEditor.apply();
+                                int day = calendar.get(Calendar.DAY_OF_MONTH);
+                                type = new TypeToken<List<List<String>>>() {
+                                }.getType();
+                                gson = new Gson();
+                                json = storeDailyTotalOrdersMade.getString(month,"");
+                                List<List<String>> mainList = gson.fromJson(json,type);
+                                List<String> days = new ArrayList<>(mainList.get(0));
+                                List<String> totalAmounts = new ArrayList<>(mainList.get(1));
+                                List<String> totalOrdersPlaced = new ArrayList<>(mainList.get(2));
+
+                                if(Integer.parseInt(days.get(days.size()-1)) == day){
+                                    Double totalAmount = Double.parseDouble(totalAmounts.get(totalAmounts.size()-1));
+                                    totalAmount += Double.parseDouble(orderAmount);
+                                    totalAmounts.set(totalAmounts.size()-1,String.valueOf(totalAmount));
+
+                                    int totalOrder = Integer.parseInt(totalOrdersPlaced.get(totalOrdersPlaced.size() - 1));
+                                    totalOrder += 1;
+                                    totalOrdersPlaced.set(totalOrdersPlaced.size()-1,String.valueOf(totalOrder));
+                                }else{
+                                    days.add(String.valueOf(day));
+                                    totalOrdersPlaced.add("1");
+                                    totalAmounts.add(String.valueOf(orderAmount));
+                                }
+
+                                List<List<String>> newList = new ArrayList<>();
+                                newList.add(days);
+                                newList.add(totalAmounts);
+                                newList.add(totalOrdersPlaced);
+                                json = gson.toJson(newList);
+                                storeDailyEditor.putString( month,json);
+                                storeDailyEditor.apply();
+
                                 Log.i("myInfo",storeNewList.toString());
+                                Log.i("myInfo",newList.toString());
                             }else{
                                 List<List<String>> mainDataList = new ArrayList<>();
                                 List<String> date = new ArrayList<>();
@@ -447,7 +480,25 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                                 json = gson.toJson(mainDataList);
                                 storeEditor.putString( month,json);
                                 storeEditor.apply();
+                                List<List<String>> mainList = new ArrayList<>();
+                                List<String> days = new ArrayList<>();
+                                List<String> totalAmounts = new ArrayList<>();
+                                List<String> totalOrdersPlaced = new ArrayList<>();
+                                int day = calendar.get(Calendar.DAY_OF_MONTH);
+                                days.add(String.valueOf(day));
+                                totalAmounts.add(String.valueOf(orderAmount));
+                                totalOrdersPlaced.add(String.valueOf(1));
+
+                                mainList.add(days);
+                                mainList.add(totalAmounts);
+                                mainList.add(totalOrdersPlaced);
+
+                                gson = new Gson();
+                                json = gson.toJson(mainList);
+                                storeDailyEditor.putString( month,json);
+                                storeDailyEditor.apply();
                                 Log.i("myInfo",mainDataList.toString());
+                                Log.i("myInfo",mainList.toString());
                             }
                             File file = new File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "RestaurantEarningTracker.xlsx");
                                 try {
@@ -550,7 +601,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                             }
                             new Handler().postDelayed(this::finish, 1500);
                         }).setCancelText("No Wait")
-                        .setCancelClickListener(kAlertDialog -> kAlertDialog.dismissWithAnimation()).show();
+                        .setCancelClickListener(KAlertDialog::dismissWithAnimation).show();
             }else {
                 FastDialog fastDialog = new FastDialogBuilder(ApproveCurrentTakeAway.this, Type.DIALOG)
                         .setTitleText("OTP Code")
@@ -635,7 +686,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
 
                             }, error -> Toast.makeText(ApproveCurrentTakeAway.this, error.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show()) {
                                 @Override
-                                public Map<String, String> getHeaders() throws AuthFailureError {
+                                public Map<String, String> getHeaders() {
                                     Map<String, String> header = new HashMap<>();
                                     header.put("content-type", "application/json");
                                     header.put("authorization", "key=AAAAsigSEMs:APA91bEUF9ZFwIu84Jctci56DQd0TQOepztGOIKIBhoqf7N3ueQrkClw0xBTlWZEWyvwprXZmZgW2MNywF1pNBFpq1jFBr0CmlrJ0wygbZIBOnoZ0jP1zZC6nPxqF2MAP6iF3wuBHD2R");
@@ -928,6 +979,40 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                     json = gson.toJson(storeNewList);
                     storeEditor.putString( month,json);
                     storeEditor.apply();
+                    int day = calendar.get(Calendar.DAY_OF_MONTH);
+                    type = new TypeToken<List<List<String>>>() {
+                    }.getType();
+                    gson = new Gson();
+                    json = storeDailyTotalOrdersMade.getString(month,"");
+                    List<List<String>> mainList = gson.fromJson(json,type);
+                    List<String> days = new ArrayList<>(mainList.get(0));
+                    List<String> totalAmounts = new ArrayList<>(mainList.get(1));
+                    List<String> totalOrdersPlaced = new ArrayList<>(mainList.get(2));
+
+                    if(Integer.parseInt(days.get(days.size()-1)) == day){
+                        Double totalAmount = Double.parseDouble(totalAmounts.get(totalAmounts.size()-1));
+                        totalAmount += Double.parseDouble(orderAmount);
+                        totalAmounts.set(totalAmounts.size()-1,String.valueOf(totalAmount));
+
+                        int totalOrder = Integer.parseInt(totalOrdersPlaced.get(totalOrdersPlaced.size() - 1));
+                        totalOrder += 1;
+                        totalOrdersPlaced.set(totalOrdersPlaced.size()-1,String.valueOf(totalOrder));
+                    }else{
+                        days.add(String.valueOf(day));
+                        totalOrdersPlaced.add("1");
+                        totalAmounts.add(String.valueOf(orderAmount));
+                    }
+
+                    List<List<String>> newList = new ArrayList<>();
+                    newList.add(days);
+                    newList.add(totalAmounts);
+                    newList.add(totalOrdersPlaced);
+                    json = gson.toJson(newList);
+                    storeDailyEditor.putString( month,json);
+                    storeDailyEditor.apply();
+
+                    Log.i("myInfo",storeNewList.toString());
+                    Log.i("myInfo",newList.toString());
                     Log.i("myInfo",storeNewList.toString());
                 }else{
                     List<List<String>> mainDataList = new ArrayList<>();
@@ -949,7 +1034,24 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                     json = gson.toJson(mainDataList);
                     storeEditor.putString( month,json);
                     storeEditor.apply();
-                    Log.i("myInfo",mainDataList.toString());
+                    List<List<String>> mainList = new ArrayList<>();
+                    List<String> days = new ArrayList<>();
+                    List<String> totalAmounts = new ArrayList<>();
+                    List<String> totalOrdersPlaced = new ArrayList<>();
+                    int day = calendar.get(Calendar.DAY_OF_MONTH);
+                    days.add(String.valueOf(day));
+                    totalAmounts.add(String.valueOf(orderAmount));
+                    totalOrdersPlaced.add(String.valueOf(1));
+
+                    mainList.add(days);
+                    mainList.add(totalAmounts);
+                    mainList.add(totalOrdersPlaced);
+
+                    gson = new Gson();
+                    json = gson.toJson(mainList);
+                    storeDailyEditor.putString( month,json);
+                    storeDailyEditor.apply();
+                    Log.i("myInfo",mainDataList.toString() + " " + mainList.toString());
                 }
                 Log.i("here","4444");
                 File file = new File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "RestaurantEarningTracker.xlsx");
@@ -1121,30 +1223,19 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-//            FastDialog fastDialog = new FastDialogBuilder(ApproveCurrentTakeAway.this, Type.PROGRESS)
-//                    .progressText("Uploading invoice....")
-//                    .cancelable(false)
-//                    .setAnimation(Animations.FADE_IN)
-//                    .create();
             storage = FirebaseStorage.getInstance();
             storageReference = storage.getReference();
             FirebaseAuth auth = FirebaseAuth.getInstance();
 //            fastDialog.show();
             try {
                 StorageReference reference = storageReference.child(id + "/" + "invoice" + "/"  + fileName);
-                reference.putFile(Uri.fromFile(file)).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-                        Toast.makeText(ApproveCurrentTakeAway.this, "Order cancelled successfully", Toast.LENGTH_SHORT).show();
-                        String newString = fileName.replace("/","");
-                        deleteFile(newString);
-                        file.delete();
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
+                reference.putFile(Uri.fromFile(file)).addOnCompleteListener(task -> {
+                    Toast.makeText(ApproveCurrentTakeAway.this, "Order cancelled successfully", Toast.LENGTH_SHORT).show();
+                    String newString = fileName.replace("/","");
+                    deleteFile(newString);
+                    file.delete();
+                }).addOnFailureListener(e -> {
 
-                    }
                 });
             }catch (Exception e){
                 Toast.makeText(ApproveCurrentTakeAway.this, ""+e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
@@ -1161,7 +1252,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
         }
     }
 
-    public class UpdateTakeAwayOrders extends AsyncTask<Void,Void,Void>{
+    public static class UpdateTakeAwayOrders extends AsyncTask<Void,Void,Void>{
 
         @Override
         protected Void doInBackground(Void... voids) {
