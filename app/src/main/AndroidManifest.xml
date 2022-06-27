@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.consumers.fastwayadmin">
+    package="com.consumers.fastwayadmin" >
 
     <uses-sdk tools:overrideLibrary="com.google.zxing.client.android" />
 
@@ -30,7 +30,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar"
-        tools:replace="android:icon,android:allowBackup">
+        tools:replace="android:icon,android:allowBackup" >
+        <activity
+            android:name=".Info.ChangeResLocation.NewLocationRestaurant"
+            android:exported="false" />
         <activity
             android:name=".NavFrags.ResEarningTracker.RestaurantAnalysis.RestaurantEarningAnalysis"
             android:exported="false" />
@@ -173,7 +176,7 @@
             android:value="@string/google_maps_key" />
 
         <activity
-            android:name=".Info.MapsActivity2"
+            android:name=".Info.ChangeResLocation.MapsActivity2"
             android:exported="true"
             android:label="@string/title_activity_maps2" />
         <activity
@@ -229,7 +232,7 @@
 
         <service
             android:name=".FirebaseNotification"
-            android:exported="false">
+            android:exported="false" >
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
@@ -251,7 +254,7 @@
 
         <activity
             android:name=".HomeScreen.HomeScreen"
-            android:exported="true">
+            android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -268,7 +271,7 @@
             android:name="androidx.core.content.FileProvider"
             android:authorities="com.consumers.fastwayadmin.provider"
             android:exported="false"
-            android:grantUriPermissions="true">
+            android:grantUriPermissions="true" >
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
@@ -279,7 +282,7 @@
             android:exported="true" />
         <activity
             android:name=".SplashAndIntro.SplashScreen"
-            android:exported="true">
+            android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -288,7 +291,7 @@
         </activity>
         <activity
             android:name=".Login.MainActivity"
-            android:exported="true">
+            android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

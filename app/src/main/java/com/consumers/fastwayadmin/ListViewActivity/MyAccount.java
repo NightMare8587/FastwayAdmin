@@ -1,7 +1,6 @@
 package com.consumers.fastwayadmin.ListViewActivity;
 
 import android.annotation.SuppressLint;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -22,7 +21,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.consumers.fastwayadmin.Info.MapsActivity2;
+import com.consumers.fastwayadmin.Info.ChangeResLocation.MapsActivity2;
+import com.consumers.fastwayadmin.Info.ChangeResLocation.NewLocationRestaurant;
 import com.consumers.fastwayadmin.Info.RestaurantDocuments.ReUploadDocuments.ViewAndReuploadDocuments;
 import com.consumers.fastwayadmin.ListViewActivity.LeaveFastwayPackage.LeaveFastway;
 import com.consumers.fastwayadmin.ListViewActivity.ResTimingsPackage.AddRestaurantTimings;
@@ -36,8 +36,6 @@ import com.example.flatdialoglibrary.dialog.FlatDialog;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -375,36 +373,37 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
                     modalBottomSheetDialog.dismiss();
                     break;
                 case R.id.changeAddressBottomSheetRestaurant:
-                    AlertDialog.Builder alert = new AlertDialog.Builder(MyAccount.this);
-                    alert.setTitle("Change Info");
-                    LinearLayout layout = new LinearLayout(MyAccount.this);
-                    layout.setOrientation(LinearLayout.VERTICAL);
-                    EditText resAddress = new EditText(MyAccount.this);
-                    EditText resNearby = new EditText(MyAccount.this);
-                    EditText resPIN = new EditText(MyAccount.this);
-                    resPIN.setInputType(InputType.TYPE_CLASS_NUMBER);
-                    resAddress.setHint("Enter new address");
-                    resNearby.setHint("Enter new nearby");
-                    resPIN.setHint("Enter new pin");
-                    layout.addView(resAddress);
-                    layout.addView(resNearby);
-                    layout.addView(resPIN);
-                    alert.setPositiveButton("Make Changes", (dialogInterface, i) -> {
-                        if(!resPIN.getText().toString().equals("") && !resAddress.getText().toString().equals("") && !resNearby.getText().toString().equals("")) {
-                            reference.child("address").setValue(resAddress.getText().toString());
-                            reference.child("nearby").setValue(resNearby.getText().toString());
-                            reference.child("pin").setValue(resPIN.getText().toString());
-                            dialogInterface.dismiss();
-                            Toast.makeText(MyAccount.this, "Address And Nearby Changed Successfully", Toast.LENGTH_SHORT).show();
-                                    startActivityForResult(new Intent(MyAccount.this, MapsActivity2.class),69);
-
-                        }else
-                            Toast.makeText(MyAccount.this, "Field can't be empty", Toast.LENGTH_SHORT).show();
-
-                    }).setNegativeButton("No, Wait", (dialogInterface, i) -> dialogInterface.dismiss());
-                    alert.setView(layout);
-                    alert.create().show();
-                    modalBottomSheetDialog.dismiss();
+                    startActivity(new Intent(MyAccount.this, NewLocationRestaurant.class));
+//                    AlertDialog.Builder alert = new AlertDialog.Builder(MyAccount.this);
+//                    alert.setTitle("Change Info");
+//                    LinearLayout layout = new LinearLayout(MyAccount.this);
+//                    layout.setOrientation(LinearLayout.VERTICAL);
+//                    EditText resAddress = new EditText(MyAccount.this);
+//                    EditText resNearby = new EditText(MyAccount.this);
+//                    EditText resPIN = new EditText(MyAccount.this);
+//                    resPIN.setInputType(InputType.TYPE_CLASS_NUMBER);
+//                    resAddress.setHint("Enter new address");
+//                    resNearby.setHint("Enter new nearby");
+//                    resPIN.setHint("Enter new pin");
+//                    layout.addView(resAddress);
+//                    layout.addView(resNearby);
+//                    layout.addView(resPIN);
+//                    alert.setPositiveButton("Make Changes", (dialogInterface, i) -> {
+//                        if(!resPIN.getText().toString().equals("") && !resAddress.getText().toString().equals("") && !resNearby.getText().toString().equals("")) {
+//                            reference.child("address").setValue(resAddress.getText().toString());
+//                            reference.child("nearby").setValue(resNearby.getText().toString());
+//                            reference.child("pin").setValue(resPIN.getText().toString());
+//                            dialogInterface.dismiss();
+//                            Toast.makeText(MyAccount.this, "Address And Nearby Changed Successfully", Toast.LENGTH_SHORT).show();
+//                                    startActivityForResult(new Intent(MyAccount.this, MapsActivity2.class),69);
+//
+//                        }else
+//                            Toast.makeText(MyAccount.this, "Field can't be empty", Toast.LENGTH_SHORT).show();
+//
+//                    }).setNegativeButton("No, Wait", (dialogInterface, i) -> dialogInterface.dismiss());
+//                    alert.setView(layout);
+//                    alert.create().show();
+//                    modalBottomSheetDialog.dismiss();
                     break;
             }
         }

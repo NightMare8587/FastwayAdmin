@@ -1,4 +1,4 @@
-package com.consumers.fastwayadmin.Info;
+package com.consumers.fastwayadmin.Info.ChangeResLocation;
 
 import android.Manifest;
 import android.app.Activity;
@@ -25,6 +25,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
+import com.consumers.fastwayadmin.Info.RestLocation;
 import com.consumers.fastwayadmin.R;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.ResolvableApiException;
