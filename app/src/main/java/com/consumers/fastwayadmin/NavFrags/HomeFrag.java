@@ -1059,7 +1059,6 @@ public class HomeFrag extends Fragment {
                         homeFragTakeAwayRecucler.setLayoutManager(anotherHori);
                         Log.i("message",finalDishNames.toString() + "\n" + finalPayment.toString() + "\n" + finalDishQuantity.toString());
 //                        homeFragTakeAwayRecucler.setAdapter(new CurrentTakeAway(currentTakeAwayAuth,dishNameCurrentTakeAway,dishQuantityCurrentTakeAway,userNameTakeAway,halfOr,paymentMode));
-                            homeFragTakeAwayRecucler.setAdapter(new CurrentTakeAway(finalDishNames,finalDishQuantity,finalHalfOr,finalUserNames,finalPayment,orderIDs,orderAmounts,currentTakeAwayAuth,time,customisationList,finalOrderAndPayments,finalDishPrices,finalImages,finalTypes));
                     }else
                     {
                         currentTakeAwayAuth.clear();
@@ -1081,9 +1080,9 @@ public class HomeFrag extends Fragment {
                         finalHalfOr.clear();
                         dishQuantityCurrentTakeAway.clear();
                         homeFragTakeAwayRecucler.setLayoutManager(anotherHori);
-                        homeFragTakeAwayRecucler.setAdapter(new CurrentTakeAway(finalDishNames,finalDishQuantity,finalHalfOr,finalUserNames,finalPayment,orderIDs,orderAmounts,currentTakeAwayAuth,time,customisationList,finalOrderAndPayments,finalDishPrices,finalImages,finalTypes));
 
                     }
+                    homeFragTakeAwayRecucler.setAdapter(new CurrentTakeAway(finalDishNames,finalDishQuantity,finalHalfOr,finalUserNames,finalPayment,orderIDs,orderAmounts,currentTakeAwayAuth,time,customisationList,finalOrderAndPayments,finalDishPrices,finalImages,finalTypes));
                 }
 
                 @Override
