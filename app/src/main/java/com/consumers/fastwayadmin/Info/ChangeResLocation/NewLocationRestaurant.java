@@ -1,5 +1,7 @@
 package com.consumers.fastwayadmin.Info.ChangeResLocation;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -15,6 +17,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.consumers.fastwayadmin.R;
 import com.google.android.gms.common.api.ApiException;
@@ -29,19 +32,27 @@ import com.google.android.gms.location.LocationSettingsResponse;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 public class NewLocationRestaurant extends AppCompatActivity {
     LocationRequest locationRequest;
     FusedLocationProviderClient clientsLocation;
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
-    String cityName;
+    DatabaseReference toPath;
+    boolean pin = false;
+    boolean local = false;
+    String cityName,pinCode;
     EditText newAddress,newLocality,newState,newPinCode;
     String subAdminArea;
     AlertDialog dialog;
@@ -50,6 +61,10 @@ public class NewLocationRestaurant extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_location_restaurant);
+        newAddress = findViewById(R.id.newAddressNewLocationRequest);
+        newLocality = findViewById(R.id.localityNameNewLocationRequest);
+        newState = findViewById(R.id.stateNameNewLocationRequest);
+        newPinCode = findViewById(R.id.newPinCodeNewLocationRequest);
         sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
         editor = sharedPreferences.edit();
         AlertDialog.Builder builder = new AlertDialog.Builder(NewLocationRestaurant.this);
@@ -139,13 +154,41 @@ public class NewLocationRestaurant extends AppCompatActivity {
                 e.printStackTrace();
             }
             cityName = addresses.get(0).getLocality();
-            subAdminArea = addresses.get(0).getSubAdminArea();
+            if(addresses.get(0).getSubAdminArea() != null) {
+                subAdminArea = addresses.get(0).getSubAdminArea();
+                newLocality.setText(subAdminArea);
+                newLocality.setEnabled(false);
+                local = true;
+            }
+            if(addresses.get(0).getSubAdminArea() != null) {
+                pinCode = addresses.get(0).getPostalCode();
+                newPinCode.setText(pinCode);
+                newPinCode.setEnabled(false);
+                pin = true;
+            }
             Log.i("info",cityName);
+
+            if(local){
+                FirebaseAuth auth = FirebaseAuth.getInstance();
+                String key = auth.getUid();
+                FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(auth.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(cityName).child("North Delhi").child(auth.getUid()).setValue(snapshot.getValue());
+                        Toast.makeText(NewLocationRestaurant.this, "Completed", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+            }
 
             clientsLocation.removeLocationUpdates(mLocationCallback);
             dialog.dismiss();
 
-            checkIfResLocationAreSimilar(cityName,subAdminArea);
+//            checkIfResLocationAreSimilar(cityName,subAdminArea);
 
 
         }
@@ -153,12 +196,29 @@ public class NewLocationRestaurant extends AppCompatActivity {
 
     private void checkIfResLocationAreSimilar(String cityName, String subAdminArea) {
         if(cityName.equals(sharedPreferences.getString("state",""))){
-
             if(subAdminArea.equals(sharedPreferences.getString("locality",""))){
 
             }
         }else{
-
+//            FirebaseAuth auth = FirebaseAuth.getInstance();
+//
+//            DatabaseReference fromPath = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child("North Delhi").child(Objects.requireNonNull(auth.getUid()));
+//            fromPath.addListenerForSingleValueEvent(new ValueEventListener() {
+//                @Override
+//                public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                    toPath.setValue(snapshot.getValue(), new DatabaseReference.CompletionListener() {
+//                        @Override
+//                        public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
+//                            Toast.makeText(NewLocationRestaurant.this, "Completed", Toast.LENGTH_SHORT).show();
+//                        }
+//                    });
+//                }
+//
+//                @Override
+//                public void onCancelled(@NonNull DatabaseError error) {
+//
+//                }
+//            });
         }
     }
 }
