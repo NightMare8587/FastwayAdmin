@@ -6,16 +6,20 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -31,6 +35,8 @@ import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResponse;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.location.SettingsClient;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -38,6 +44,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.io.IOException;
 import java.util.List;
@@ -46,6 +55,17 @@ import java.util.Objects;
 
 public class NewLocationRestaurant extends AppCompatActivity {
     LocationRequest locationRequest;
+    boolean imageUploaded = false;
+    boolean stateChange = false;
+    boolean localChange = false;
+
+    Uri filePath;
+    FirebaseAuth auth = FirebaseAuth.getInstance();
+    boolean imageTaken = false;
+    boolean allSameAsBefore = false;
+    FirebaseStorage storage;
+    StorageReference storageReference;
+    String oldState,oldLocal;
     FusedLocationProviderClient clientsLocation;
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
@@ -55,6 +75,8 @@ public class NewLocationRestaurant extends AppCompatActivity {
     String cityName,pinCode;
     EditText newAddress,newLocality,newState,newPinCode;
     String subAdminArea;
+    Button uploadResProof;
+    Button change;
     AlertDialog dialog;
     double longi,lati;
     @Override
@@ -65,8 +87,15 @@ public class NewLocationRestaurant extends AppCompatActivity {
         newLocality = findViewById(R.id.localityNameNewLocationRequest);
         newState = findViewById(R.id.stateNameNewLocationRequest);
         newPinCode = findViewById(R.id.newPinCodeNewLocationRequest);
+        uploadResProof = findViewById(R.id.uploadRestaurantProofDocuments);
+        storage = FirebaseStorage.getInstance();
+        storageReference = storage.getReference();
+        change = findViewById(R.id.uploadAndChangeNewLocation);
         sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
+        oldState = sharedPreferences.getString("state","");
+        oldLocal = sharedPreferences.getString("locality","");
         editor = sharedPreferences.edit();
+
         AlertDialog.Builder builder = new AlertDialog.Builder(NewLocationRestaurant.this);
         builder.setTitle("Important").setMessage("Are you currently present at new restaurant location?")
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
@@ -82,10 +111,170 @@ public class NewLocationRestaurant extends AppCompatActivity {
                         dialog.show();
                     }
                 }).setNegativeButton("No", (dialogInterface, i) -> {
+                    AlertDialog.Builder builder1 = new AlertDialog.Builder(NewLocationRestaurant.this);
+                    builder1.setTitle("Important").setMessage("We need you to be present at required restaurant location for better accuracy\nDo you wanna proceed now or wait")
+                            .setPositiveButton("Proceed", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
 
+                                }
+                            }).setNegativeButton("Wait", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    finish();
+                                }
+                            }).create().show();
                 }).create();
         builder.setCancelable(false);
         builder.show();
+
+
+        uploadResProof.setOnClickListener(click -> {
+            Intent intent = new Intent();
+            intent.setType("image/*");
+            intent.setAction("android.intent.action.PICK");
+            startActivityForResult(Intent.createChooser(intent, "Select Picture"), 1);
+        });
+
+
+        change.setOnClickListener(click -> {
+            if(imageUploaded) {
+                if (allSameAsBefore) {
+                    if (newAddress.getText().toString().equals("")) {
+                        newAddress.requestFocus();
+                        Toast.makeText(this, "Enter new address", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    FirebaseAuth auth = FirebaseAuth.getInstance();
+                    StorageReference ref = storageReference.child(auth.getUid() + "/" + "Documents" + "/" + "resProof");
+                    ref.putFile(filePath).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                            if(task.isSuccessful()){
+                                StorageReference reference = storageReference.child(auth.getUid() + "/" + "Documents" + "/" + "resProof");
+                                reference.getDownloadUrl().addOnSuccessListener(uri -> {
+                                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid()).child("Restaurant Documents");
+                                    databaseReference.child("resProof").setValue(uri + "");
+                                });
+                            }
+                        }
+                    });
+                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(cityName).child(subAdminArea).child(auth.getUid());
+                    databaseReference.child("address").setValue(newAddress.getText().toString());
+                    databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(cityName).child(subAdminArea).child(auth.getUid()).child("location");
+                    databaseReference.child("lat").setValue(String.valueOf(lati));
+                    databaseReference.child("lon").setValue(String.valueOf(longi));
+
+                    Toast.makeText(this, "Location Changed Successfully", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "New Location will be verified by Fastway...", Toast.LENGTH_SHORT).show();
+                    new Handler().postDelayed(this::finish, 550);
+
+                }else if(stateChange){
+                    if (newAddress.getText().toString().equals("")) {
+                        newAddress.requestFocus();
+                        Toast.makeText(this, "Enter new address", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    FirebaseAuth auth = FirebaseAuth.getInstance();
+                    StorageReference ref = storageReference.child(auth.getUid() + "/" + "Documents" + "/" + "resProof");
+                    ref.putFile(filePath).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                            if(task.isSuccessful()){
+                                StorageReference reference = storageReference.child(auth.getUid() + "/" + "Documents" + "/" + "resProof");
+                                reference.getDownloadUrl().addOnSuccessListener(uri -> {
+                                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid()).child("Restaurant Documents");
+                                    databaseReference.child("resProof").setValue(uri + "");
+                                });
+                            }
+                        }
+                    });
+
+                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(oldState).child(oldLocal).child(auth.getUid());
+                    DatabaseReference newPath = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(cityName).child(subAdminArea).child(auth.getUid());
+                    databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            newPath.setValue(snapshot.getValue(), (error, ref1) -> {
+
+                            });
+
+                            databaseReference.setValue(null);
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
+                        }
+                    });
+
+                    DatabaseReference changeFastwayDB = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Registered Restaurants").child(oldState).child(auth.getUid());
+                    changeFastwayDB.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Registered Restaurants").child(cityName).child(auth.getUid()).setValue(snapshot.getValue(), (error, ref12) -> {
+
+                            });
+
+                            changeFastwayDB.setValue(null);
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
+                        }
+                    });
+
+                    Toast.makeText(this, "Location Changed Successfully", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "New Location will be verified by Fastway...", Toast.LENGTH_SHORT).show();
+                    new Handler().postDelayed(this::finish, 550);
+                }else if(localChange){
+                    if (newAddress.getText().toString().equals("")) {
+                        newAddress.requestFocus();
+                        Toast.makeText(this, "Enter new address", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    FirebaseAuth auth = FirebaseAuth.getInstance();
+                    StorageReference ref = storageReference.child(auth.getUid() + "/" + "Documents" + "/" + "resProof");
+                    ref.putFile(filePath).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                            if(task.isSuccessful()){
+                                StorageReference reference = storageReference.child(auth.getUid() + "/" + "Documents" + "/" + "resProof");
+                                reference.getDownloadUrl().addOnSuccessListener(uri -> {
+                                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid()).child("Restaurant Documents");
+                                    databaseReference.child("resProof").setValue(uri + "");
+                                });
+                            }
+                        }
+                    });
+                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(oldState).child(oldLocal).child(auth.getUid());
+                    DatabaseReference newPath = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(oldState).child(subAdminArea).child(auth.getUid());
+                    databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            newPath.setValue(snapshot.getValue(), (error, ref1) -> {
+
+                            });
+
+                            databaseReference.setValue(null);
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
+                        }
+                    });
+
+                    Toast.makeText(this, "Location Changed Successfully", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "New Location will be verified by Fastway...", Toast.LENGTH_SHORT).show();
+                    new Handler().postDelayed(this::finish, 550);
+
+                }
+            }else{
+                Toast.makeText(this, "You need to upload new restaurant property proof", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
         private void createLocationRequest() {
@@ -154,6 +343,8 @@ public class NewLocationRestaurant extends AppCompatActivity {
                 e.printStackTrace();
             }
             cityName = addresses.get(0).getLocality();
+            newState.setText(cityName);
+            newState.setEnabled(false);
             if(addresses.get(0).getSubAdminArea() != null) {
                 subAdminArea = addresses.get(0).getSubAdminArea();
                 newLocality.setText(subAdminArea);
@@ -168,27 +359,30 @@ public class NewLocationRestaurant extends AppCompatActivity {
             }
             Log.i("info",cityName);
 
-            if(local){
-                FirebaseAuth auth = FirebaseAuth.getInstance();
-                String key = auth.getUid();
-                FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(auth.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(cityName).child("North Delhi").child(auth.getUid()).setValue(snapshot.getValue());
-                        Toast.makeText(NewLocationRestaurant.this, "Completed", Toast.LENGTH_SHORT).show();
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-
-                    }
-                });
-            }
+//            if(local){
+//                FirebaseAuth auth = FirebaseAuth.getInstance();
+//                String key = auth.getUid();
+//
+//                FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(auth.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+//                    @Override
+//                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                        FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(cityName).child("North Delhi").child(auth.getUid()).setValue(snapshot.getValue());
+//                        Toast.makeText(NewLocationRestaurant.this, "Completed", Toast.LENGTH_SHORT).show();
+//
+//                        FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(auth.getUid()).setValue(null);
+//                    }
+//
+//                    @Override
+//                    public void onCancelled(@NonNull DatabaseError error) {
+//
+//                    }
+//                });
+//            }
 
             clientsLocation.removeLocationUpdates(mLocationCallback);
             dialog.dismiss();
 
-//            checkIfResLocationAreSimilar(cityName,subAdminArea);
+            checkIfResLocationAreSimilar(cityName,subAdminArea);
 
 
         }
@@ -197,9 +391,12 @@ public class NewLocationRestaurant extends AppCompatActivity {
     private void checkIfResLocationAreSimilar(String cityName, String subAdminArea) {
         if(cityName.equals(sharedPreferences.getString("state",""))){
             if(subAdminArea.equals(sharedPreferences.getString("locality",""))){
-
+                allSameAsBefore = true;
+            }else{
+                localChange = true;
             }
         }else{
+            stateChange = true;
 //            FirebaseAuth auth = FirebaseAuth.getInstance();
 //
 //            DatabaseReference fromPath = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child("North Delhi").child(Objects.requireNonNull(auth.getUid()));
@@ -219,6 +416,15 @@ public class NewLocationRestaurant extends AppCompatActivity {
 //
 //                }
 //            });
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == 1 && resultCode ==  RESULT_OK && data != null){
+            imageTaken = true;
+            filePath = data.getData();
         }
     }
 }
