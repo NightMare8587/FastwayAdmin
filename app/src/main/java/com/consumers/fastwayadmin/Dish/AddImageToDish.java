@@ -32,6 +32,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -153,30 +154,42 @@ public class AddImageToDish extends AppCompatActivity {
         }else if(requestCode == 1 && resultCode == RESULT_OK && data != null){
             fastDialog.show();
             Uri filepath = data.getData();
-            StorageReference ref = storageReference.child(Objects.requireNonNull(dishAuth.getUid()) + "/" + "image" + "/"  + dishName);
-            ref.putFile(filepath).addOnSuccessListener(taskSnapshot -> {
-//                    Toast.makeText(AddImageToDish.this, "File Uploaded", Toast.LENGTH_SHORT).show();
-                SharedPreferences sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
-                reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(dishAuth.getUid()))
-                .child("List of Dish").child(type).child(dishName);
+            Uri selectedImageUri = data.getData();
 
-        StorageReference ref1 = storageReference.child(dishAuth.getUid() + "/" + "image" + "/"  + dishName);
-        ref1.getDownloadUrl().addOnSuccessListener(uri -> {
-            Toast.makeText(AddImageToDish.this, "New Image Uploaded", Toast.LENGTH_SHORT).show();
-            reference.child("image").setValue(uri + "");
-            SharedPreferences storeImages = getSharedPreferences("storeImages",MODE_PRIVATE);
-            SharedPreferences.Editor imageEdit = storeImages.edit();
-            imageEdit.putString(dishName,uri + "");
-            imageEdit.apply();
-            fastDialog.dismiss();
-            finish();
-        });
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-            fastDialog.dismiss();
-                }
-            });
+            Bitmap bmp = null;
+            try {
+                bmp = MediaStore.Images.Media.getBitmap(getContentResolver(), selectedImageUri);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+            //here you can choose quality factor in third parameter(ex. i choosen 25)
+            bmp.compress(Bitmap.CompressFormat.JPEG, 25, baos);
+            byte[] fileInBytes = baos.toByteArray();
+            StorageReference ref = storageReference.child(Objects.requireNonNull(dishAuth.getUid()) + "/" + "image" + "/"  + dishName);
+            UploadTask uploadTask = ref.putBytes(fileInBytes);
+           uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+               @Override
+               public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                   Toast.makeText(AddImageToDish.this, "File Uploaded", Toast.LENGTH_SHORT).show();
+                   SharedPreferences sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
+                   reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(dishAuth.getUid()))
+                           .child("List of Dish").child(type).child(dishName);
+
+                   StorageReference ref1 = storageReference.child(dishAuth.getUid() + "/" + "image" + "/"  + dishName);
+                   ref1.getDownloadUrl().addOnSuccessListener(uri -> {
+                       Toast.makeText(AddImageToDish.this, "New Image Uploaded", Toast.LENGTH_SHORT).show();
+                       reference.child("image").setValue(uri + "");
+                       SharedPreferences storeImages = getSharedPreferences("storeImages",MODE_PRIVATE);
+                       SharedPreferences.Editor imageEdit = storeImages.edit();
+                       imageEdit.putString(dishName,uri + "");
+                       imageEdit.apply();
+                       fastDialog.dismiss();
+                       finish();
+                   });
+               }
+           });
 
 //            SharedPreferences sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
 //            reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(dishAuth.getUid()))
