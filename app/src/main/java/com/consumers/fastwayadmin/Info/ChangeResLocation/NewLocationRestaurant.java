@@ -266,6 +266,8 @@ public class NewLocationRestaurant extends AppCompatActivity {
                         }
                     });
 
+                    DatabaseReference changeFastwayDB = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Registered Restaurants").child(oldState).child(auth.getUid());
+                    changeFastwayDB.child("locality").setValue(subAdminArea);
                     Toast.makeText(this, "Location Changed Successfully", Toast.LENGTH_SHORT).show();
                     Toast.makeText(this, "New Location will be verified by Fastway...", Toast.LENGTH_SHORT).show();
                     new Handler().postDelayed(this::finish, 550);
