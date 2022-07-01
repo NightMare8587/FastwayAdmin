@@ -45,6 +45,10 @@ import com.consumers.fastwayadmin.NavFrags.CurrentTakeAwayOrders.CurrentTakeAway
 import com.consumers.fastwayadmin.NavFrags.ResEarningTracker.ResEarningTrackerActivity;
 import com.consumers.fastwayadmin.NavFrags.homeFrag.homeFragClass;
 import com.consumers.fastwayadmin.R;
+import com.elconfidencial.bubbleshowcase.BubbleShowCase;
+import com.elconfidencial.bubbleshowcase.BubbleShowCaseBuilder;
+import com.elconfidencial.bubbleshowcase.BubbleShowCaseListener;
+import com.elconfidencial.bubbleshowcase.BubbleShowCaseSequence;
 import com.example.flatdialoglibrary.dialog.FlatDialog;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.ResolvableApiException;
@@ -96,8 +100,14 @@ public class HomeFrag extends Fragment {
     List<String> type = new ArrayList<>();
     List<String> orderAndPayment = new ArrayList<>();
     List<String> price = new ArrayList<>();
+    SharedPreferences.Editor resInfoSharedEdit;
     @SuppressLint("UseSwitchCompatOrMaterialCode")
     Switch acceptOrders;
+    BubbleShowCaseBuilder bubbleShowCaseBuilder1;
+    BubbleShowCaseBuilder bubbleShowCaseBuilder2;
+    BubbleShowCaseBuilder bubbleShowCaseBuilder3;
+    BubbleShowCaseBuilder bubbleShowCaseBuilder4;
+    BubbleShowCaseBuilder bubbleShowCaseBuilder5;
     TextView totalOrdersToday,totalTransactionsToday;
     List<String> customisationList = new ArrayList<>();
     boolean check = false;
@@ -208,6 +218,7 @@ public class HomeFrag extends Fragment {
          editor = stopServices.edit();
          acceptOrders = view.findViewById(R.id.acceptingOrdersSwitchHomeFrag);
         resInfoShared = view.getContext().getSharedPreferences("loginInfo",Context.MODE_PRIVATE);
+        resInfoSharedEdit = resInfoShared.edit();
         restaurantStatus = view.getContext().getSharedPreferences("RestaurantStatus",Context.MODE_PRIVATE);
         statusEditor = restaurantStatus.edit();
         onlineOrOffline = view.findViewById(R.id.restaurantOnOff);
@@ -242,6 +253,9 @@ public class HomeFrag extends Fragment {
         sharedPreferences = requireActivity().getSharedPreferences("locations current", Context.MODE_PRIVATE);
         reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(resInfoShared.getString("state","")).child(resInfoShared.getString("locality","")).child(Objects.requireNonNull(UID));
         FirebaseMessaging.getInstance().subscribeToTopic(Objects.requireNonNull(UID));
+
+        if(!resInfoShared.contains("homeFragShow"))
+            initialise();
         if(restaurantStatus.contains("status")){
             if(restaurantStatus.getString("status","").equals("offline")){
                 comboImage.setVisibility(View.INVISIBLE);
@@ -585,6 +599,136 @@ public class HomeFrag extends Fragment {
             });
         });
 
+    }
+
+    private void initialise() {
+        bubbleShowCaseBuilder5 = new BubbleShowCaseBuilder(requireActivity());
+        bubbleShowCaseBuilder5.title("Welcome to Fastway").titleTextSize(20).listener(new BubbleShowCaseListener() {
+            @Override
+            public void onTargetClick(BubbleShowCase bubbleShowCase) {
+
+            }
+
+            @Override
+            public void onCloseActionImageClick(BubbleShowCase bubbleShowCase) {
+
+            }
+
+            @Override
+            public void onBackgroundDimClick(BubbleShowCase bubbleShowCase) {
+                bubbleShowCase.dismiss();
+            }
+
+            @Override
+            public void onBubbleClick(BubbleShowCase bubbleShowCase) {
+                bubbleShowCase.dismiss();
+            }
+        });
+        bubbleShowCaseBuilder1 = new BubbleShowCaseBuilder(requireActivity());
+        bubbleShowCaseBuilder1.title("Accept Order & Online")
+                .description("You choose weather restaurant is online or taking order's right now")
+                .targetView(acceptOrders).listener(new BubbleShowCaseListener() {
+                    @Override
+                    public void onTargetClick(BubbleShowCase bubbleShowCase) {
+
+                    }
+
+                    @Override
+                    public void onCloseActionImageClick(BubbleShowCase bubbleShowCase) {
+
+                    }
+
+                    @Override
+                    public void onBackgroundDimClick(BubbleShowCase bubbleShowCase) {
+                        bubbleShowCase.dismiss();
+                    }
+
+                    @Override
+                    public void onBubbleClick(BubbleShowCase bubbleShowCase) {
+                        bubbleShowCase.dismiss();
+                    }
+                });
+        bubbleShowCaseBuilder2 = new BubbleShowCaseBuilder(requireActivity());
+        bubbleShowCaseBuilder2.title("Create Combo And Offer's")
+                .description("Here you can create different offer's and combo's")
+                .targetView(comboImage).listener(new BubbleShowCaseListener() {
+                    @Override
+                    public void onTargetClick(BubbleShowCase bubbleShowCase) {
+
+                    }
+
+                    @Override
+                    public void onCloseActionImageClick(BubbleShowCase bubbleShowCase) {
+
+                    }
+
+                    @Override
+                    public void onBackgroundDimClick(BubbleShowCase bubbleShowCase) {
+                        bubbleShowCase.dismiss();
+                    }
+
+                    @Override
+                    public void onBubbleClick(BubbleShowCase bubbleShowCase) {
+                        bubbleShowCase.dismiss();
+                    }
+                });
+
+        bubbleShowCaseBuilder3 = new BubbleShowCaseBuilder(requireActivity());
+        bubbleShowCaseBuilder3.title("Total Order's And Transactions")
+                .description("Here all of your current day transactions and order's made will be shown")
+                .targetView(totalOrdersToday).listener(new BubbleShowCaseListener() {
+                    @Override
+                    public void onTargetClick(BubbleShowCase bubbleShowCase) {
+
+                    }
+
+                    @Override
+                    public void onCloseActionImageClick(BubbleShowCase bubbleShowCase) {
+
+                    }
+
+                    @Override
+                    public void onBackgroundDimClick(BubbleShowCase bubbleShowCase) {
+                        bubbleShowCase.dismiss();
+                    }
+
+                    @Override
+                    public void onBubbleClick(BubbleShowCase bubbleShowCase) {
+                        bubbleShowCase.dismiss();
+                    }
+                });
+
+        bubbleShowCaseBuilder4 = new BubbleShowCaseBuilder(requireActivity());
+        bubbleShowCaseBuilder4.title("Restaurant Analysis")
+                .description("Here you can see restaurant all time analysis of order's and dishes")
+                .targetView(seeMoreDetails).listener(new BubbleShowCaseListener() {
+                    @Override
+                    public void onTargetClick(BubbleShowCase bubbleShowCase) {
+
+                    }
+
+                    @Override
+                    public void onCloseActionImageClick(BubbleShowCase bubbleShowCase) {
+
+                    }
+
+                    @Override
+                    public void onBackgroundDimClick(BubbleShowCase bubbleShowCase) {
+                        bubbleShowCase.dismiss();
+                    }
+
+                    @Override
+                    public void onBubbleClick(BubbleShowCase bubbleShowCase) {
+                        bubbleShowCase.dismiss();
+                    }
+                });
+
+        BubbleShowCaseSequence bubbleShowCaseSequence = new BubbleShowCaseSequence();
+        bubbleShowCaseSequence.addShowCase(bubbleShowCaseBuilder5).addShowCase(bubbleShowCaseBuilder1).addShowCase(bubbleShowCaseBuilder2).addShowCase(bubbleShowCaseBuilder3).addShowCase(bubbleShowCaseBuilder4);
+        bubbleShowCaseSequence.show();
+
+        resInfoSharedEdit.putString("homeFragShow","yes");
+        resInfoSharedEdit.apply();
     }
 
     private void checkCurrentInfo() {

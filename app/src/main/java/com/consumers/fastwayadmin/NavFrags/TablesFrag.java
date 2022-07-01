@@ -25,6 +25,9 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.consumers.fastwayadmin.R;
 import com.consumers.fastwayadmin.Tables.AddTables;
 import com.consumers.fastwayadmin.Tables.TableView;
+import com.elconfidencial.bubbleshowcase.BubbleShowCase;
+import com.elconfidencial.bubbleshowcase.BubbleShowCaseBuilder;
+import com.elconfidencial.bubbleshowcase.BubbleShowCaseListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
@@ -45,6 +48,7 @@ public class TablesFrag extends Fragment {
     int called = 0;
     TableView tableView;
     FirebaseAuth tableAuth;
+    BubbleShowCaseBuilder bubbleShowCaseBuilder;
     SharedPreferences sharedPreferences;
     SwipeRefreshLayout layout;
     DatabaseReference tableRef;
@@ -55,6 +59,7 @@ public class TablesFrag extends Fragment {
     List<String> timeOfBooking  = new ArrayList<>();
     List<String> timeOfUnavailability  = new ArrayList<>();
     RecyclerView table;
+    SharedPreferences.Editor editor;
     int count = 0;
     boolean pressed = false;
     @Nullable
@@ -90,6 +95,7 @@ public class TablesFrag extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         tableBar = view.findViewById(R.id.tableBar);
         sharedPreferences = view.getContext().getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
+        editor = sharedPreferences.edit();
         addTable = view.findViewById(R.id.addTables);
         layout = view.findViewById(R.id.tableRefreshLayout);
         table = view.findViewById(R.id.tableRecyclerView);
@@ -98,6 +104,10 @@ public class TablesFrag extends Fragment {
         tableRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(tableAuth.getUid())).child("Tables");
         tableNumber.clear();
         status.clear();
+
+        if(!sharedPreferences.contains("tableFragShow")){
+            initialise();
+        }
 
         new backGroundWork().execute();
 
@@ -164,6 +174,37 @@ public class TablesFrag extends Fragment {
             layout.setRefreshing(false);
 
         });
+    }
+
+    private void initialise() {
+        bubbleShowCaseBuilder = new BubbleShowCaseBuilder(requireActivity());
+        bubbleShowCaseBuilder.title("Add Tables")
+                .description("You can add tables and provide number of seats and table number")
+                .targetView(addTable)
+                .listener(new BubbleShowCaseListener() {
+                    @Override
+                    public void onTargetClick(BubbleShowCase bubbleShowCase) {
+
+                    }
+
+                    @Override
+                    public void onCloseActionImageClick(BubbleShowCase bubbleShowCase) {
+
+                    }
+
+                    @Override
+                    public void onBackgroundDimClick(BubbleShowCase bubbleShowCase) {
+                        bubbleShowCase.dismiss();
+                    }
+
+                    @Override
+                    public void onBubbleClick(BubbleShowCase bubbleShowCase) {
+                        bubbleShowCase.dismiss();
+                    }
+                }).show();
+
+        editor.putString("tableFragShow","yes");
+        editor.apply();
     }
 
     private void updateChild() {
