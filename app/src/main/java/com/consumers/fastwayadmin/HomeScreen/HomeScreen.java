@@ -36,6 +36,7 @@ import com.consumers.fastwayadmin.Chat.RandomChatFolder.RandomChatWithUsers;
 import com.consumers.fastwayadmin.Info.RestaurantDocuments.ReUploadDocumentsAgain;
 import com.consumers.fastwayadmin.NavFrags.AccountFrag;
 import com.consumers.fastwayadmin.NavFrags.CashCommission.CashTransactionCommissionActivity;
+import com.consumers.fastwayadmin.NavFrags.CurrentTakeAwayOrders.ApproveCurrentTakeAway;
 import com.consumers.fastwayadmin.NavFrags.HomeFrag;
 import com.consumers.fastwayadmin.NavFrags.MenuFrag;
 import com.consumers.fastwayadmin.NavFrags.ReplaceOrders.ReplaceOrderRequests;
@@ -69,7 +70,11 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -83,6 +88,13 @@ public class HomeScreen extends AppCompatActivity {
     String URL = "https://fcm.googleapis.com/fcm/send";
     FragmentManager manager;
     SharedPreferences sharedPreferences;
+    SharedPreferences calenderForExcel;
+    SharedPreferences.Editor editor;
+    Calendar calendar = Calendar.getInstance();
+    String[] monthName = {"January", "February",
+            "March", "April", "May", "June", "July",
+            "August", "September", "October", "November",
+            "December"};
     String json;
     Gson gson;
     DatabaseReference checkForBank;
@@ -103,6 +115,8 @@ public class HomeScreen extends AppCompatActivity {
         sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
         myEditor = sharedPreferences.edit();
         manager.beginTransaction().replace(R.id.homescreen,new HomeFrag()).commit();
+        calenderForExcel = getSharedPreferences("CalenderForExcel",MODE_PRIVATE);
+        editor = calenderForExcel.edit();
         ConnectivityManager cm =
                 (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
 
@@ -187,16 +201,18 @@ public class HomeScreen extends AppCompatActivity {
 
         if(!sharedPreferences.contains("FileGeneratedExcel")) {
             try {
+                String month = monthName[calendar.get(Calendar.MONTH)];
                 File file = new File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "RestaurantEarningTracker.xlsx");
                 XSSFWorkbook workbook1 = new XSSFWorkbook();
 //                Sheet sheet = workbook1.getSheetAt(0);
 //                int row = sheet.getLastRowNum();
 //                Toast.makeText(this, "" + row, Toast.LENGTH_SHORT).show();
-                Sheet sheet = workbook1.createSheet("MyEarnings");
+                Sheet sheet = workbook1.createSheet("" + month + "_Earnings");
                 Row row = sheet.createRow(0);
                 Cell cell = row.createCell(0);
                 cell.setCellValue("Date");
                 cell = row.createCell(1);
+
                 cell.setCellValue("Transaction ID");
                 cell = row.createCell(2);
                 cell.setCellValue("Payment Mode");
@@ -207,12 +223,46 @@ public class HomeScreen extends AppCompatActivity {
                 fileOutputStream.flush();
                 fileOutputStream.close();
                 myEditor.putString("FileGeneratedExcel","f");
+                editor.putString("currentMonth",month);
+                editor.apply();
                 myEditor.apply();
 //                Toast.makeText(this, "Finished", Toast.LENGTH_SHORT).show();
 
             } catch (IOException e) {
                 e.printStackTrace();
                 Toast.makeText(this, "Noob", Toast.LENGTH_SHORT).show();
+            }
+        }else{
+            String month = monthName[calendar.get(Calendar.MONTH)];
+            if(month.equals(calenderForExcel.getString("currentString",""))){
+
+            }else{
+                File file = new File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "RestaurantEarningTracker.xlsx");
+                try {
+                    FileInputStream fileInputStream = new FileInputStream(file);
+                    XSSFWorkbook workbooks = new XSSFWorkbook(fileInputStream);
+                    Sheet sheet = workbooks.createSheet("" + month + "_Earnings");
+                    workbooks.setSheetOrder("" + month + "_Earnings",0);
+                    workbooks.setActiveSheet(0);
+                    Row row = sheet.createRow(0);
+                    Cell cell = row.createCell(0);
+                    cell.setCellValue("Date");
+                    cell = row.createCell(1);
+
+                    cell.setCellValue("Transaction ID");
+                    cell = row.createCell(2);
+                    cell.setCellValue("Payment Mode");
+                    cell = row.createCell(3);
+                    cell.setCellValue("Amount");
+
+                    FileOutputStream fileOutputStream = new FileOutputStream(file);
+                    workbooks.write(fileOutputStream);
+                    fileOutputStream.flush();
+                    fileOutputStream.close();
+                    workbooks.close();
+                }catch (Exception ignored){
+
+                }
             }
         }
 

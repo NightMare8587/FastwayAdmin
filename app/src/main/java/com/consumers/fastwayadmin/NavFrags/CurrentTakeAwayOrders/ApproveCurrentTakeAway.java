@@ -500,7 +500,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                                 Log.i("myInfo",mainDataList.toString());
                                 Log.i("myInfo",mainList.toString());
                             }
-                            File file = new File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "RestaurantEarningTracker.xlsx");
+                                File file = new File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "RestaurantEarningTracker.xlsx");
                                 try {
                                     Cell cell;
                                     FileInputStream fileInputStream = new FileInputStream(file);
@@ -519,7 +519,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                                     cell.setCellValue("Cash");
                                     cell = row.createCell(3);
                                     cell.setCellValue("\u20B9" + orderAmount);
-                                    Log.i("info",max + "");
+                                    Log.i("info", max + "");
                                     FileOutputStream fileOutputStream = new FileOutputStream(file);
                                     workbook.write(fileOutputStream);
                                     fileOutputStream.flush();
