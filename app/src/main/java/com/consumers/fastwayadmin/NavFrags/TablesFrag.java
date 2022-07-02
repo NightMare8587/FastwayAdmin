@@ -172,7 +172,6 @@ public class TablesFrag extends Fragment {
             });
 
             layout.setRefreshing(false);
-
         });
     }
 
