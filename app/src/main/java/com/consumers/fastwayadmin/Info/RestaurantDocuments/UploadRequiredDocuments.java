@@ -770,6 +770,7 @@ public class UploadRequiredDocuments extends AppCompatActivity {
                     }
                     Toast.makeText(UploadRequiredDocuments.this, "Upload Complete and image saved in phone successfully", Toast.LENGTH_SHORT).show();
                     loading.dismiss();
+                    proceedFurther.setVisibility(View.VISIBLE);
                     DatabaseReference dish = FirebaseDatabase.getInstance().getReference().getRoot();
                     dish.child("Admin").child(Objects.requireNonNull(auth.getUid())).child("Restaurant Documents").child(value).setValue(uri + "");
                    checkIfAllUploaded();
