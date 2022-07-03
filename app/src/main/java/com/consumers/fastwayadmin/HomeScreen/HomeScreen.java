@@ -545,6 +545,8 @@ public class HomeScreen extends AppCompatActivity {
                                 alert.setCancelable(false);
                                 alert.show();
                             }
+                        }else{
+
                         }
                     }
                 }
