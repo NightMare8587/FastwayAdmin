@@ -30,8 +30,10 @@ import java.util.Objects;
 public class CashTransactionCommissionActivity extends AppCompatActivity {
     DatabaseReference databaseReference;
     FirebaseAuth auth = FirebaseAuth.getInstance();
-    TextView totalCashTransaction,totalCommission;
+    TextView totalCashTransaction,totalCommission,platformFee;
     Button payCommissionNow;
+    boolean platformFeeBool = false;
+    Double platformFeeAmount;
     double commissionAmount;
     DecimalFormat df = new DecimalFormat("0.00");
     @Override
@@ -40,6 +42,7 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
         setContentView(R.layout.activity_cash_transaction_commission);
         totalCashTransaction = findViewById(R.id.totalCashTakeAwayCommission);
         totalCommission = findViewById(R.id.totalCommissionToBePaidByAdmin);
+        platformFee = findViewById(R.id.platformFeeToBePaid);
         payCommissionNow = findViewById(R.id.PayCommissionNowButton);
         databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -47,11 +50,31 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.hasChild("totalCashTakeAway")){
+
                     totalCashTransaction.setText("Total Cash Transactions " + "\u20B9" + snapshot.child("totalCashTakeAway").getValue(String.class));
                     double totalCash = Double.parseDouble(Objects.requireNonNull(snapshot.child("totalCashTakeAway").getValue(String.class)));
                      commissionAmount = (totalCash * 7)/100;
+                     if(snapshot.hasChild("totalMonthAmount")){
+                         platformFeeAmount = Double.parseDouble(Objects.requireNonNull(snapshot.child("totalMonthAmount").getValue(String.class)));
+                         if(platformFeeAmount == 0D){
+                             platformFeeAmount = 0D;
+                         }else if(platformFeeAmount >= 500000L){
+                             platformFeeAmount = 5000D;
+                         }else if(platformFeeAmount >= 350000L){
+                             platformFeeAmount = 3500D;
+                         }else if(platformFeeAmount >= 100000){
+                             platformFeeAmount = 2000D;
+                         }else{
+                             platformFeeAmount = 1000D;
+                         }
+                         platformFee.setText("Platform Fee: " + "\u20B9" + df.format(platformFeeAmount));
+                         platformFeeBool = true;
+                     }else{
+                         platformFeeAmount = 1000D;
+                         platformFee.setText("Platform Fee: " + "\u20B91000");
+                     }
                     totalCommission.setText("Commission to be paid " + "\u20B9" + df.format(commissionAmount));
-                    payCommissionNow.setText("Pay \u20B9" + df.format(commissionAmount) + " Now");
+                    payCommissionNow.setText("Pay \u20B9" + df.format(commissionAmount + platformFeeAmount) + " Now");
                     payCommissionNow.setOnClickListener(view -> {
                         if(commissionAmount != 0) {
                             SharedPreferences cash = getSharedPreferences("CashCommission",MODE_PRIVATE);
@@ -64,7 +87,7 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
                                     double fineAmount = (commissionAmount * 10)/100;
                                     commissionAmount = commissionAmount + fineAmount;
                                     Intent intent = new Intent(CashTransactionCommissionActivity.this, CashFreeGateway.class);
-                                    intent.putExtra("amount", df.format(commissionAmount) + "");
+                                    intent.putExtra("amount", df.format(commissionAmount + platformFeeAmount) + "");
                                     startActivityForResult(intent, 2);
                                 }).create();
                                 builder.show();
@@ -74,7 +97,8 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
                                         .setNegativeButton("No", (dialogInterface, i) -> dialogInterface.dismiss()).setPositiveButton("Yes", (dialogInterface, i) -> {
                                     dialogInterface.dismiss();
                                     Intent intent = new Intent(CashTransactionCommissionActivity.this, CashFreeGateway.class);
-                                    intent.putExtra("amount", commissionAmount + "");
+
+                                    intent.putExtra("amount", (commissionAmount + platformFeeAmount) + "");
                                     startActivityForResult(intent, 2);
                                 }).create();
                                 builder.show();
@@ -122,6 +146,7 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
             editor.apply();
             DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
             databaseReference.child("totalCashTakeAway").setValue("0");
+            databaseReference.child("totalMonthAmount").setValue("0");
             databaseReference.child("lastCommissionPaid").setValue(String.valueOf(System.currentTimeMillis()));
             kAlertDialog.setCancelable(false);
             kAlertDialog.show();

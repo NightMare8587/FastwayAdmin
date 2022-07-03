@@ -81,6 +81,7 @@ public class ApproveCurrentOrder extends AppCompatActivity {
     List<String> type = new ArrayList<>();
     Gson gson;
     String json;
+    DatabaseReference storeTotalAmountMonth;
     SharedPreferences storeOrdersForAdminInfo;
     SharedPreferences storeDailyTotalOrdersMade;
     SharedPreferences.Editor storeDailyEditor;
@@ -153,6 +154,7 @@ public class ApproveCurrentOrder extends AppCompatActivity {
         storeOrdersForAdminInfo = getSharedPreferences("StoreOrders",MODE_PRIVATE);
         storeEditor = storeOrdersForAdminInfo.edit();
         showCustomisation = findViewById(R.id.showCustomisationButton);
+        storeTotalAmountMonth = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid());
         SharedPreferences sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
         bmp = BitmapFactory.decodeResource(getResources(), R.drawable.logo);
         scaled = Bitmap.createScaledBitmap(bmp,500,500,false);
@@ -321,7 +323,7 @@ public class ApproveCurrentOrder extends AppCompatActivity {
 
 
 
-
+            updateTotalAmount(orderAmount);
             RequestQueue requestQueue = Volley.newRequestQueue(ApproveCurrentOrder.this);
             JSONObject main = new JSONObject();
             FirebaseAuth auth = FirebaseAuth.getInstance();
@@ -474,6 +476,26 @@ public class ApproveCurrentOrder extends AppCompatActivity {
         });
 
 
+    }
+
+    private void updateTotalAmount(String valueOf) {
+        storeTotalAmountMonth.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.hasChild("totalMonthAmount")){
+                    Double current = Double.parseDouble(valueOf);
+                    Double existingVal = Double.parseDouble(String.valueOf(snapshot.child("totalMonthAmount").getValue()));
+                    Double finalVal = current + existingVal;
+                    storeTotalAmountMonth.child("totalMonthAmount").setValue(String.valueOf(finalVal));
+                }else
+                    storeTotalAmountMonth.child("totalMonthAmount").setValue(valueOf);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
     private void uploadToArrayAdapter(List<String> dishNames,List<String> dishQuantity,List<String> dishHalfOr) {

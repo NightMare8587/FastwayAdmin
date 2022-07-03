@@ -93,6 +93,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
     FirebaseStorage storage;
     Gson gson;
     String json;
+    DatabaseReference storeTotalAmountOfMonth;
     Calendar calendar = Calendar.getInstance();
     String[] monthName = {"January", "February",
             "March", "April", "May", "June", "July",
@@ -147,6 +148,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
         restaurantTrackRecordsEditor = restaurantTrackRecords.edit();
         restaurantTrackEditor = restaurantDailyTrack.edit();
         StrictMode.VmPolicy.Builder builders = new StrictMode.VmPolicy.Builder();
+        storeTotalAmountOfMonth = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid());
         StrictMode.setVmPolicy(builders.build());
         scaled = Bitmap.createScaledBitmap(bmp,500,500,false);
         storeForDishAnalysis = getSharedPreferences("DishAnalysis",MODE_PRIVATE);
@@ -325,6 +327,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
         approve.setOnClickListener(view -> {
             if(paymentMode.equals("cash")){
                 String month = monthName[calendar.get(Calendar.MONTH)];
+
                 if(storeForDishAnalysis.contains("DishAnalysisMonthBasis")){
                     gson = new Gson();
                     java.lang.reflect.Type type = new TypeToken<HashMap<String,HashMap<String,String>>>(){}.getType();
@@ -394,6 +397,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                 }else{
                     restaurantTrackEditor.putString("totalTransactionsToday",String.valueOf(orderAmount));
                 }
+                updateTotalAmountValueDB(String.valueOf(orderAmount));
                 restaurantTrackEditor.apply();
                 new KAlertDialog(ApproveCurrentTakeAway.this,KAlertDialog.WARNING_TYPE)
                         .setTitleText("Warning")
@@ -651,7 +655,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
 
                             }
                         });
-
+                        updateTotalAmountValueDB(orderAmount);
                         String approveTime = String.valueOf(System.currentTimeMillis());
                         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(id).child("Recent Orders").child(time);
                         for(int i=0;i<dishName.size();i++){
@@ -824,6 +828,27 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
 
         });
     }
+
+    private void updateTotalAmountValueDB(String valueOf) {
+        storeTotalAmountOfMonth.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.hasChild("totalMonthAmount")){
+                    Double current = Double.parseDouble(valueOf);
+                    Double existingVal = Double.parseDouble(String.valueOf(snapshot.child("totalMonthAmount").getValue()));
+                    Double finalVal = current + existingVal;
+                    storeTotalAmountOfMonth.child("totalMonthAmount").setValue(String.valueOf(finalVal));
+                }else
+                    storeTotalAmountOfMonth.child("totalMonthAmount").setValue(valueOf);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
     public class InitiateRefund extends AsyncTask<Void,Void,Void> {
 
         @Override

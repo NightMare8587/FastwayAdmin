@@ -39,6 +39,7 @@ public class CashFreeGateway extends AppCompatActivity {
     String test = "https://intercellular-stabi.000webhostapp.com/testhash.php";
     String token;
     String amount;
+    String platformFee;
     DecimalFormat df = new DecimalFormat("0.00");
     int ran;
     String orderId;
@@ -56,6 +57,12 @@ public class CashFreeGateway extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cash_free_gateway);
         amount = getIntent().getStringExtra("amount");
+//        Double am = Double.parseDouble(amount);
+//        platformFee = getIntent().getStringExtra("platformFee");
+//        if(!platformFee.equals("0")){
+//            Double pf = Double.parseDouble(platformFee);
+//            amount = String.valueOf(am + pf);
+//        }
         makePaymentRequest();
     }
 
