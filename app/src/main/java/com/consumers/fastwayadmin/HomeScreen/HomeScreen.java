@@ -2,6 +2,7 @@ package com.consumers.fastwayadmin.HomeScreen;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
@@ -28,6 +29,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.aspose.cells.Workbook;
 import com.consumers.fastwayadmin.Info.RestaurantDocuments.ReUploadDocumentsAgain;
+import com.consumers.fastwayadmin.Info.RestaurantDocuments.UploadRemainingDocs;
 import com.consumers.fastwayadmin.NavFrags.AccountFrag;
 import com.consumers.fastwayadmin.NavFrags.CashCommission.CashTransactionCommissionActivity;
 import com.consumers.fastwayadmin.NavFrags.HomeFrag;
@@ -64,6 +66,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 
 public class HomeScreen extends AppCompatActivity {
 
@@ -575,6 +578,27 @@ public class HomeScreen extends AppCompatActivity {
                         }).create();
 
                         alertDialog.show();
+                    }
+
+                    if(snapshot.child("Restaurant Documents").hasChild("timeToUploadDocs")){
+                        long remainingTime = Long.parseLong(Objects.requireNonNull(snapshot.child("Restaurant Documents").child("timeToUploadDocs").getValue(String.class)));
+                        if(remainingTime > System.currentTimeMillis()) {
+                            long daysLeft = remainingTime - System.currentTimeMillis();
+                            AlertDialog.Builder alertDialog = new AlertDialog.Builder(HomeScreen.this);
+                            alertDialog.setTitle("Important");
+
+                            alertDialog.setMessage("You need to upload required documents within " + TimeUnit.MILLISECONDS.toDays(daysLeft) + " days");
+                            alertDialog.setPositiveButton("Upload Now", (dialogInterface, i) -> {
+                                startActivity(new Intent(HomeScreen.this, UploadRemainingDocs.class));
+                            }).setNegativeButton("Later", (dialogInterface, i) -> dialogInterface.dismiss()).create();
+
+                            alertDialog.show();
+                        }else{
+                            AlertDialog.Builder builder = new AlertDialog.Builder(HomeScreen.this);
+                            builder.setTitle("Time Exceeded").setMessage("Your 2 weeks period to submit documents is over\nYour restaurant is now suspended from Fastway")
+                                    .setPositiveButton("Exit", (dialogInterface, i) -> dialogInterface.dismiss()).create().show();
+
+                        }
                     }
                 }
 

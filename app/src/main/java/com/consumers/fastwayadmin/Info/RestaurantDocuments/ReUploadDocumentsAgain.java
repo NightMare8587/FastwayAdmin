@@ -564,6 +564,7 @@ public class ReUploadDocumentsAgain extends AppCompatActivity {
 
     private void checkIfAllUploaded() {
         if(adhaar && pan && gst && fssai && resProof){
+
             ResDocuments resDocuments = new ResDocuments(panUrl,adhaarUrl,fssaiUrl,gstUrl,resUrl);
             DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Restaurant Registration");
             databaseReference.child(Objects.requireNonNull(auth.getUid())).setValue(resDocuments);

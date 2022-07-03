@@ -32,6 +32,9 @@
         android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         tools:replace="android:icon,android:allowBackup">
         <activity
+            android:name=".Info.RestaurantDocuments.UploadRemainingDocs"
+            android:exported="false" />
+        <activity
             android:name=".ListViewActivity.ViewExcelSheets"
             android:exported="false" />
         <activity

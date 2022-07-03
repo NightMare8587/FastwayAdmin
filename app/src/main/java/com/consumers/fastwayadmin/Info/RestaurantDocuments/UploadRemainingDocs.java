@@ -17,6 +17,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.os.StrictMode;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -42,6 +43,8 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import org.apache.commons.collections4.map.ReferenceMap;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -54,7 +57,7 @@ import karpuzoglu.enes.com.fastdialog.FastDialog;
 import karpuzoglu.enes.com.fastdialog.FastDialogBuilder;
 import karpuzoglu.enes.com.fastdialog.Type;
 
-public class UploadRequiredDocuments extends AppCompatActivity {
+public class UploadRemainingDocs extends AppCompatActivity {
     DatabaseReference databaseReference;
     String panUrl,adhaarUrl,gstUrl,fssaiUrl,residentialProofSubmitUrl;
     FirebaseAuth auth = FirebaseAuth.getInstance();
@@ -79,21 +82,20 @@ public class UploadRequiredDocuments extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_upload_required_documents);
+        setContentView(R.layout.activity_upload_remaining_docs);
         initialise();
         StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
         StrictMode.setVmPolicy(builder.build());
-        fastDialog = new FastDialogBuilder(UploadRequiredDocuments.this, Type.PROGRESS)
+        fastDialog = new FastDialogBuilder(UploadRemainingDocs.this, Type.PROGRESS)
                 .progressText("Checking Database....")
                 .setAnimation(Animations.FADE_IN)
                 .create();
-        proceedFurther = findViewById(R.id.proceedFurther);
-        gstText = findViewById(R.id.uploadGstText);
-        panText = findViewById(R.id.panTextUploaded);
-        adhaarText = findViewById(R.id.uploadAdhaarCardText);
-        FssaiText = findViewById(R.id.uploadFssaiText);
-        resProofText = findViewById(R.id.uploadResidentialText);
-        checkPermissions();
+
+        gstText = findViewById(R.id.uploadGstTextRemaining);
+        panText = findViewById(R.id.panTextUploadedRemaining);
+        adhaarText = findViewById(R.id.uploadAdhaarCardTextRemaining);
+        FssaiText = findViewById(R.id.uploadFssaiTextRemaining);
+        resProofText = findViewById(R.id.uploadResidentialTextRemaining);
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
         sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
@@ -145,74 +147,14 @@ public class UploadRequiredDocuments extends AppCompatActivity {
             }
         });
 
-        proceedFurther.setOnClickListener(click -> {
-            AlertDialog.Builder builder1 = new AlertDialog.Builder(UploadRequiredDocuments.this);
-            builder1.setTitle("Important").setMessage("Looks like you have not uploaded all required documents for verification\nYou can proceed further and can re-upload required documents within 2 weeks")
-                    .setPositiveButton("Proceed", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            DatabaseReference databaseReferenceCheck = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Registered Restaurants").child(sharedPreferences.getString("state",""));
-                            databaseReferenceCheck.addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                    if(dataSnapshot.hasChild(Objects.requireNonNull(auth.getUid()))){
-                                        databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid()).child("Restaurant Documents");
-                                        databaseReference.child("verified").setValue("yes");
-                                        databaseReference.child("bankVerified").setValue("yes");
-                                        startActivity(new Intent(getApplicationContext(), MapsActivity.class));
-                                    }else{
-                                        ResDocuments resDocuments = new ResDocuments(panUrl,adhaarUrl,fssaiUrl,gstUrl,residentialProofSubmitUrl);
-                                        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Restaurant Registration");
-                                        databaseReference.child(Objects.requireNonNull(auth.getUid())).setValue(resDocuments);
-                                        databaseReference.child(auth.getUid()).child("allDocumentsNotUploaded").setValue("no");
-                                        SharedPreferences sharedPreferences = getSharedPreferences("RestaurantInfo",MODE_PRIVATE);
-                                        databaseReference.child(auth.getUid()).child("ResName").setValue(sharedPreferences.getString("hotelName",""));
-                                        databaseReference.child(auth.getUid()).child("ResAddress").setValue(sharedPreferences.getString("hotelAddress",""));
-                                        databaseReference.child(auth.getUid()).child("ResNumber").setValue(sharedPreferences.getString("hotelNumber",""));
-                                        SharedPreferences loginShared = getSharedPreferences("loginInfo",MODE_PRIVATE);
-                                        databaseReference.child(auth.getUid()).child("state").setValue(loginShared.getString("state",""));
-                                        databaseReference.child(auth.getUid()).child("locality").setValue(loginShared.getString("locality",""));
-
-                                        databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid()).child("Restaurant Documents");
-                                        databaseReference.child("verified").setValue("no");
-                                        databaseReference.child("bankVerified").setValue("no");
-                                        new KAlertDialog(UploadRequiredDocuments.this,KAlertDialog.SUCCESS_TYPE)
-                                                .setTitleText("Documents Uploaded")
-                                                .setContentText("Documents uploaded and will be verified by our fastway staff with an on-site verification")
-                                                .setConfirmText("Exit")
-                                                .setConfirmClickListener(click -> {
-                                                    click.dismissWithAnimation();
-                                                    startActivity(new Intent(getApplicationContext(), MapsActivity.class));
-                                                }).show();
-                                    }
-                                }
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError databaseError) {
-                                }
-                            });
-                            SharedPreferences sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
-                            SharedPreferences.Editor editor = sharedPreferences.edit();
-                            editor.putString("documentsUploadedAll","yes");
-                            editor.apply();
-                        }
-                    }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            dialogInterface.dismiss();
-                        }
-                    }).create();
-            builder1.setCancelable(false);
-            builder1.show();
-        });
-
         panCard.setOnClickListener(click -> {
-            if(ContextCompat.checkSelfPermission(UploadRequiredDocuments.this, Manifest.permission.ACCESS_FINE_LOCATION) + ContextCompat.checkSelfPermission(UploadRequiredDocuments.this , Manifest.permission.CAMERA)
-                    + ContextCompat.checkSelfPermission(UploadRequiredDocuments.this, Manifest.permission.WRITE_EXTERNAL_STORAGE )
+            if(ContextCompat.checkSelfPermission(UploadRemainingDocs.this, Manifest.permission.ACCESS_FINE_LOCATION) + ContextCompat.checkSelfPermission(UploadRemainingDocs.this , Manifest.permission.CAMERA)
+                    + ContextCompat.checkSelfPermission(UploadRemainingDocs.this, Manifest.permission.WRITE_EXTERNAL_STORAGE )
                     != PackageManager.PERMISSION_GRANTED){
 //            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},1);
                 requestPermissions(new String[]{Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.ACCESS_FINE_LOCATION},88);
             }else {
-                AlertDialog.Builder alert = new AlertDialog.Builder(UploadRequiredDocuments.this);
+                AlertDialog.Builder alert = new AlertDialog.Builder(UploadRemainingDocs.this);
                 alert.setTitle("Choose one option")
                         .setPositiveButton("Upload from gallery", (dialogInterface, i) -> {
                             dialogInterface.dismiss();
@@ -221,24 +163,24 @@ public class UploadRequiredDocuments extends AppCompatActivity {
                             intent.setAction("android.intent.action.PICK");
                             startActivityForResult(Intent.createChooser(intent, "Select Picture"), 1);
                         }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                    }
-                }).create();
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialogInterface.dismiss();
+                            }
+                        }).create();
 
                 alert.show();
             }
         });
 
         fssaiCard.setOnClickListener(click -> {
-            if(ContextCompat.checkSelfPermission(UploadRequiredDocuments.this, Manifest.permission.ACCESS_FINE_LOCATION) + ContextCompat.checkSelfPermission(UploadRequiredDocuments.this , Manifest.permission.CAMERA)
-                    + ContextCompat.checkSelfPermission(UploadRequiredDocuments.this, Manifest.permission.WRITE_EXTERNAL_STORAGE )
+            if(ContextCompat.checkSelfPermission(UploadRemainingDocs.this, Manifest.permission.ACCESS_FINE_LOCATION) + ContextCompat.checkSelfPermission(UploadRemainingDocs.this , Manifest.permission.CAMERA)
+                    + ContextCompat.checkSelfPermission(UploadRemainingDocs.this, Manifest.permission.WRITE_EXTERNAL_STORAGE )
                     != PackageManager.PERMISSION_GRANTED){
 //            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},1);
                 requestPermissions(new String[]{Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.ACCESS_FINE_LOCATION},88);
             }else {
-                AlertDialog.Builder alert = new AlertDialog.Builder(UploadRequiredDocuments.this);
+                AlertDialog.Builder alert = new AlertDialog.Builder(UploadRemainingDocs.this);
                 alert.setTitle("Choose one option")
                         .setPositiveButton("Upload from gallery", new DialogInterface.OnClickListener() {
                             @Override
@@ -250,24 +192,24 @@ public class UploadRequiredDocuments extends AppCompatActivity {
                                 startActivityForResult(Intent.createChooser(intent, "Select Picture"), 2);
                             }
                         }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                    }
-                }).create();
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialogInterface.dismiss();
+                            }
+                        }).create();
 
                 alert.show();
             }
         });
 
         adhaarCard.setOnClickListener(click -> {
-            if(ContextCompat.checkSelfPermission(UploadRequiredDocuments.this, Manifest.permission.ACCESS_FINE_LOCATION) + ContextCompat.checkSelfPermission(UploadRequiredDocuments.this , Manifest.permission.CAMERA)
-                    + ContextCompat.checkSelfPermission(UploadRequiredDocuments.this, Manifest.permission.WRITE_EXTERNAL_STORAGE )
+            if(ContextCompat.checkSelfPermission(UploadRemainingDocs.this, Manifest.permission.ACCESS_FINE_LOCATION) + ContextCompat.checkSelfPermission(UploadRemainingDocs.this , Manifest.permission.CAMERA)
+                    + ContextCompat.checkSelfPermission(UploadRemainingDocs.this, Manifest.permission.WRITE_EXTERNAL_STORAGE )
                     != PackageManager.PERMISSION_GRANTED){
 //            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},1);
                 requestPermissions(new String[]{Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.ACCESS_FINE_LOCATION},88);
             }else {
-                AlertDialog.Builder alert = new AlertDialog.Builder(UploadRequiredDocuments.this);
+                AlertDialog.Builder alert = new AlertDialog.Builder(UploadRemainingDocs.this);
                 alert.setTitle("Choose one option")
                         .setPositiveButton("Upload from gallery", new DialogInterface.OnClickListener() {
                             @Override
@@ -279,24 +221,24 @@ public class UploadRequiredDocuments extends AppCompatActivity {
                                 startActivityForResult(Intent.createChooser(intent, "Select Picture"), 3);
                             }
                         }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                    }
-                }).create();
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialogInterface.dismiss();
+                            }
+                        }).create();
 
                 alert.show();
             }
         });
 
         residentialProof.setOnClickListener(click -> {
-            if(ContextCompat.checkSelfPermission(UploadRequiredDocuments.this, Manifest.permission.ACCESS_FINE_LOCATION) + ContextCompat.checkSelfPermission(UploadRequiredDocuments.this , Manifest.permission.CAMERA)
-                    + ContextCompat.checkSelfPermission(UploadRequiredDocuments.this, Manifest.permission.WRITE_EXTERNAL_STORAGE )
+            if(ContextCompat.checkSelfPermission(UploadRemainingDocs.this, Manifest.permission.ACCESS_FINE_LOCATION) + ContextCompat.checkSelfPermission(UploadRemainingDocs.this , Manifest.permission.CAMERA)
+                    + ContextCompat.checkSelfPermission(UploadRemainingDocs.this, Manifest.permission.WRITE_EXTERNAL_STORAGE )
                     != PackageManager.PERMISSION_GRANTED){
 //            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},1);
                 requestPermissions(new String[]{Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.ACCESS_FINE_LOCATION},88);
             }else {
-                AlertDialog.Builder alert = new AlertDialog.Builder(UploadRequiredDocuments.this);
+                AlertDialog.Builder alert = new AlertDialog.Builder(UploadRemainingDocs.this);
                 alert.setTitle("Choose one option").setMessage("Residential Proof includes: Electricity Bill, Water Bill, Telephone Bill or Any other bill which proves the restaurant residential address")
                         .setPositiveButton("Upload from gallery", (dialogInterface, i) -> {
                             dialogInterface.dismiss();
@@ -311,13 +253,13 @@ public class UploadRequiredDocuments extends AppCompatActivity {
         });
 
         gstCard.setOnClickListener(click -> {
-            if(ContextCompat.checkSelfPermission(UploadRequiredDocuments.this, Manifest.permission.ACCESS_FINE_LOCATION) + ContextCompat.checkSelfPermission(UploadRequiredDocuments.this , Manifest.permission.CAMERA)
-                    + ContextCompat.checkSelfPermission(UploadRequiredDocuments.this, Manifest.permission.WRITE_EXTERNAL_STORAGE )
+            if(ContextCompat.checkSelfPermission(UploadRemainingDocs.this, Manifest.permission.ACCESS_FINE_LOCATION) + ContextCompat.checkSelfPermission(UploadRemainingDocs.this , Manifest.permission.CAMERA)
+                    + ContextCompat.checkSelfPermission(UploadRemainingDocs.this, Manifest.permission.WRITE_EXTERNAL_STORAGE )
                     != PackageManager.PERMISSION_GRANTED){
 //            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},1);
                 requestPermissions(new String[]{Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.ACCESS_FINE_LOCATION},88);
             }else {
-                AlertDialog.Builder alert = new AlertDialog.Builder(UploadRequiredDocuments.this);
+                AlertDialog.Builder alert = new AlertDialog.Builder(UploadRemainingDocs.this);
                 alert.setTitle("Choose one option")
                         .setPositiveButton("Upload from gallery", (dialogInterface, i) -> {
                             dialogInterface.dismiss();
@@ -331,20 +273,18 @@ public class UploadRequiredDocuments extends AppCompatActivity {
             }
         });
     }
-
     private void initialise() {
-        panCard = findViewById(R.id.uploadPANcard);
-        adhaarCard = findViewById(R.id.uploadAdhaarCard);
-        fssaiCard = findViewById(R.id.uploadFSSAIcard);
-        gstCard= findViewById(R.id.uploadGSTcard);
-        residentialProof = findViewById(R.id.uploadResidentialProof);
+        panCard = findViewById(R.id.uploadPANcardRemaining);
+        adhaarCard = findViewById(R.id.uploadAdhaarCardRemaining);
+        fssaiCard = findViewById(R.id.uploadFSSAIcardRemaining);
+        gstCard= findViewById(R.id.uploadGSTcardRemaining);
+        residentialProof = findViewById(R.id.uploadResidentialProofRemaining);
         panUrl = "";
         adhaarUrl = "";
         gstUrl = "";
         residentialProofSubmitUrl = "";
         fssaiUrl = "";
     }
-
     private void checkIfAllUploaded() {
         if(adhaar && pan && gst && fssai && resProof){
             DatabaseReference databaseReferenceCheck = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Registered Restaurants").child(sharedPreferences.getString("state",""));
@@ -355,7 +295,14 @@ public class UploadRequiredDocuments extends AppCompatActivity {
                         databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid()).child("Restaurant Documents");
                         databaseReference.child("verified").setValue("yes");
                         databaseReference.child("bankVerified").setValue("yes");
-                        startActivity(new Intent(getApplicationContext(), MapsActivity.class));
+                        databaseReference.child("timeToUploadDocs").removeValue();
+                        Toast.makeText(UploadRemainingDocs.this, "All Docs Uploaded Successfully", Toast.LENGTH_SHORT).show();
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                finish();
+                            }
+                        },600);
                     }else{
                         ResDocuments resDocuments = new ResDocuments(panUrl,adhaarUrl,fssaiUrl,gstUrl,residentialProofSubmitUrl);
                         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Restaurant Registration");
@@ -371,7 +318,7 @@ public class UploadRequiredDocuments extends AppCompatActivity {
                         databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid()).child("Restaurant Documents");
                         databaseReference.child("verified").setValue("no");
                         databaseReference.child("bankVerified").setValue("no");
-                        new KAlertDialog(UploadRequiredDocuments.this,KAlertDialog.SUCCESS_TYPE)
+                        new KAlertDialog(UploadRemainingDocs.this,KAlertDialog.SUCCESS_TYPE)
                                 .setTitleText("Documents Uploaded")
                                 .setContentText("Documents uploaded and will be verified by our fastway staff with an on-site verification")
                                 .setConfirmText("Exit")
@@ -391,33 +338,11 @@ public class UploadRequiredDocuments extends AppCompatActivity {
             editor.apply();
         }
     }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if(requestCode == 88){
-            if(grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                Toast.makeText(UploadRequiredDocuments.this, "Permission Granted", Toast.LENGTH_SHORT).show();
-            }else
-                Toast.makeText(UploadRequiredDocuments.this, "Permission Denied", Toast.LENGTH_SHORT).show();
-        }
-    }
-    @RequiresApi(api = Build.VERSION_CODES.M)
-    private void checkPermissions() {
-        if(ContextCompat.checkSelfPermission(UploadRequiredDocuments.this, Manifest.permission.ACCESS_FINE_LOCATION) + ContextCompat.checkSelfPermission(UploadRequiredDocuments.this , Manifest.permission.CAMERA)
-                + ContextCompat.checkSelfPermission(UploadRequiredDocuments.this, Manifest.permission.WRITE_EXTERNAL_STORAGE )
-                != PackageManager.PERMISSION_GRANTED){
-//            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},1);
-            requestPermissions(new String[]{Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.ACCESS_FINE_LOCATION},88);
-        }
-
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == 20){
-            loading = new FastDialogBuilder(UploadRequiredDocuments.this,Type.PROGRESS)
+            loading = new FastDialogBuilder(UploadRemainingDocs.this,Type.PROGRESS)
                     .setAnimation(Animations.SLIDE_BOTTOM)
                     .progressText("Uploading Image.....")
                     .create();
@@ -453,7 +378,7 @@ public class UploadRequiredDocuments extends AppCompatActivity {
                             @Override
                             public void onSuccess(@NonNull Uri uri) {
                                 pan = true;
-                                Toast.makeText(UploadRequiredDocuments.this, "Upload Complete and image saved in phone successfully", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(UploadRemainingDocs.this, "Upload Complete and image saved in phone successfully", Toast.LENGTH_SHORT).show();
                                 loading.dismiss();
                                 panText.setVisibility(View.VISIBLE);
                                 DatabaseReference dish = FirebaseDatabase.getInstance().getReference().getRoot();
@@ -467,18 +392,18 @@ public class UploadRequiredDocuments extends AppCompatActivity {
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(UploadRequiredDocuments.this,
+                        Toast.makeText(UploadRemainingDocs.this,
                                 "Something went wrong", Toast.LENGTH_SHORT).show();
                         loading.dismiss();
                     }
                 });
             }catch (Exception e){
-                Toast.makeText(UploadRequiredDocuments.this, ""+e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(UploadRemainingDocs.this, ""+e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                 loading.dismiss();
             }
 
         }else if(requestCode == 21){
-            loading = new FastDialogBuilder(UploadRequiredDocuments.this,Type.PROGRESS)
+            loading = new FastDialogBuilder(UploadRemainingDocs.this,Type.PROGRESS)
                     .setAnimation(Animations.SLIDE_BOTTOM)
                     .progressText("Uploading Image.....")
                     .create();
@@ -513,7 +438,7 @@ public class UploadRequiredDocuments extends AppCompatActivity {
                         reference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                             @Override
                             public void onSuccess(@NonNull Uri uri) {
-                                Toast.makeText(UploadRequiredDocuments.this, "Upload Complete and image saved in phone successfully", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(UploadRemainingDocs.this, "Upload Complete and image saved in phone successfully", Toast.LENGTH_SHORT).show();
                                 loading.dismiss();
                                 fssai = true;
                                 FssaiText.setVisibility(View.VISIBLE);
@@ -528,18 +453,18 @@ public class UploadRequiredDocuments extends AppCompatActivity {
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(UploadRequiredDocuments.this,
+                        Toast.makeText(UploadRemainingDocs.this,
                                 "Something went wrong", Toast.LENGTH_SHORT).show();
                         loading.dismiss();
                     }
                 });
             }catch (Exception e){
-                Toast.makeText(UploadRequiredDocuments.this, ""+e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(UploadRemainingDocs.this, ""+e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                 loading.dismiss();
             }
 
         }else if(requestCode == 22){
-            loading = new FastDialogBuilder(UploadRequiredDocuments.this,Type.PROGRESS)
+            loading = new FastDialogBuilder(UploadRemainingDocs.this,Type.PROGRESS)
                     .setAnimation(Animations.SLIDE_BOTTOM)
                     .progressText("Uploading Image.....")
                     .create();
@@ -574,7 +499,7 @@ public class UploadRequiredDocuments extends AppCompatActivity {
                         reference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                             @Override
                             public void onSuccess(@NonNull Uri uri) {
-                                Toast.makeText(UploadRequiredDocuments.this, "Upload Complete and image saved in phone successfully", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(UploadRemainingDocs.this, "Upload Complete and image saved in phone successfully", Toast.LENGTH_SHORT).show();
                                 loading.dismiss();
                                 adhaar = true;
                                 adhaarUrl = uri + "";
@@ -589,18 +514,18 @@ public class UploadRequiredDocuments extends AppCompatActivity {
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(UploadRequiredDocuments.this,
+                        Toast.makeText(UploadRemainingDocs.this,
                                 "Something went wrong", Toast.LENGTH_SHORT).show();
                         loading.dismiss();
                     }
                 });
             }catch (Exception e){
-                Toast.makeText(UploadRequiredDocuments.this, ""+e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(UploadRemainingDocs.this, ""+e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                 loading.dismiss();
             }
 
         }else if(requestCode == 23){
-            loading = new FastDialogBuilder(UploadRequiredDocuments.this,Type.PROGRESS)
+            loading = new FastDialogBuilder(UploadRemainingDocs.this,Type.PROGRESS)
                     .setAnimation(Animations.SLIDE_BOTTOM)
                     .progressText("Uploading Image.....")
                     .create();
@@ -635,7 +560,7 @@ public class UploadRequiredDocuments extends AppCompatActivity {
                         reference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                             @Override
                             public void onSuccess(@NonNull Uri uri) {
-                                Toast.makeText(UploadRequiredDocuments.this, "Upload Complete and image saved in phone successfully", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(UploadRemainingDocs.this, "Upload Complete and image saved in phone successfully", Toast.LENGTH_SHORT).show();
                                 loading.dismiss();
                                 gst = true;
                                 gstText.setVisibility(View.VISIBLE);
@@ -650,18 +575,18 @@ public class UploadRequiredDocuments extends AppCompatActivity {
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(UploadRequiredDocuments.this,
+                        Toast.makeText(UploadRemainingDocs.this,
                                 "Something went wrong", Toast.LENGTH_SHORT).show();
                         loading.dismiss();
                     }
                 });
             }catch (Exception e){
-                Toast.makeText(UploadRequiredDocuments.this, ""+e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(UploadRemainingDocs.this, ""+e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                 loading.dismiss();
             }
 
         }else if(requestCode == 1 && resultCode == RESULT_OK && data != null){
-            loading = new FastDialogBuilder(UploadRequiredDocuments.this,Type.PROGRESS)
+            loading = new FastDialogBuilder(UploadRemainingDocs.this,Type.PROGRESS)
                     .setAnimation(Animations.SLIDE_BOTTOM)
                     .progressText("Uploading Image.....")
                     .create();
@@ -676,7 +601,7 @@ public class UploadRequiredDocuments extends AppCompatActivity {
                 loading.dismiss();
             }
         }else if(requestCode == 2 && resultCode == RESULT_OK && data != null){
-            loading = new FastDialogBuilder(UploadRequiredDocuments.this,Type.PROGRESS)
+            loading = new FastDialogBuilder(UploadRemainingDocs.this,Type.PROGRESS)
                     .setAnimation(Animations.SLIDE_BOTTOM)
                     .progressText("Uploading Image.....")
                     .create();
@@ -691,7 +616,7 @@ public class UploadRequiredDocuments extends AppCompatActivity {
                 loading.dismiss();
             }
         }else if(requestCode == 3 && resultCode == RESULT_OK && data != null){
-            loading = new FastDialogBuilder(UploadRequiredDocuments.this,Type.PROGRESS)
+            loading = new FastDialogBuilder(UploadRemainingDocs.this,Type.PROGRESS)
                     .setAnimation(Animations.SLIDE_BOTTOM)
                     .progressText("Uploading Image.....")
                     .create();
@@ -706,7 +631,7 @@ public class UploadRequiredDocuments extends AppCompatActivity {
                 loading.dismiss();
             }
         }else if(requestCode == 4 && resultCode == RESULT_OK && data != null){
-            loading = new FastDialogBuilder(UploadRequiredDocuments.this,Type.PROGRESS)
+            loading = new FastDialogBuilder(UploadRemainingDocs.this,Type.PROGRESS)
                     .setAnimation(Animations.SLIDE_BOTTOM)
                     .progressText("Uploading Image.....")
                     .create();
@@ -721,7 +646,7 @@ public class UploadRequiredDocuments extends AppCompatActivity {
                 loading.dismiss();
             }
         }else if(requestCode == 5 && resultCode == RESULT_OK && data != null){
-            loading = new FastDialogBuilder(UploadRequiredDocuments.this,Type.PROGRESS)
+            loading = new FastDialogBuilder(UploadRemainingDocs.this,Type.PROGRESS)
                     .setAnimation(Animations.SLIDE_BOTTOM)
                     .progressText("Uploading Image.....")
                     .create();
@@ -768,11 +693,11 @@ public class UploadRequiredDocuments extends AppCompatActivity {
                         residentialProofSubmitUrl = uri + "";
                         resProofText.setVisibility(View.VISIBLE);
                     }
-                    Toast.makeText(UploadRequiredDocuments.this, "Upload Complete and image saved in phone successfully", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(UploadRemainingDocs.this, "Upload Complete and image saved in phone successfully", Toast.LENGTH_SHORT).show();
                     loading.dismiss();
                     DatabaseReference dish = FirebaseDatabase.getInstance().getReference().getRoot();
                     dish.child("Admin").child(Objects.requireNonNull(auth.getUid())).child("Restaurant Documents").child(value).setValue(uri + "");
-                   checkIfAllUploaded();
+                    checkIfAllUploaded();
                 });
             }).addOnFailureListener(e -> loading.dismiss());
         }else
