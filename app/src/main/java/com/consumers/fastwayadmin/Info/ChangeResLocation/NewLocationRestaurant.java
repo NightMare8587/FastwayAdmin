@@ -165,6 +165,9 @@ public class NewLocationRestaurant extends AppCompatActivity {
                     databaseReference.child("lat").setValue(String.valueOf(lati));
                     databaseReference.child("lon").setValue(String.valueOf(longi));
 
+                    databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Registered Restaurants").child(cityName).child(subAdminArea).child(auth.getUid());
+                    databaseReference.child("locationChange").setValue("yes");
+
                     Toast.makeText(this, "Location Changed Successfully", Toast.LENGTH_SHORT).show();
                     Toast.makeText(this, "New Location will be verified by Fastway...", Toast.LENGTH_SHORT).show();
                     new Handler().postDelayed(this::finish, 550);
@@ -217,6 +220,8 @@ public class NewLocationRestaurant extends AppCompatActivity {
                             });
 
                             changeFastwayDB.setValue(null);
+                            DatabaseReference databaseReference1 = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Registered Restaurants").child(cityName).child(auth.getUid());
+                            databaseReference1.child("locationChanges").setValue("yes");
                         }
 
                         @Override
@@ -268,6 +273,7 @@ public class NewLocationRestaurant extends AppCompatActivity {
 
                     DatabaseReference changeFastwayDB = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Registered Restaurants").child(oldState).child(auth.getUid());
                     changeFastwayDB.child("locality").setValue(subAdminArea);
+                    changeFastwayDB.child("locationChange").setValue("yes");
                     Toast.makeText(this, "Location Changed Successfully", Toast.LENGTH_SHORT).show();
                     Toast.makeText(this, "New Location will be verified by Fastway...", Toast.LENGTH_SHORT).show();
                     new Handler().postDelayed(this::finish, 550);
