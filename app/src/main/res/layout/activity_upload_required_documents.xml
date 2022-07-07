@@ -7,92 +7,48 @@
     tools:context=".Info.RestaurantDocuments.UploadRequiredDocuments">
 
     <Button
-        android:id="@+id/uploadPANcard"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
-        android:text="UPLOAD PAN"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
         android:id="@+id/uploadFSSAIcard"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="30dp"
         android:text="Upload FSSAI"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/uploadPANcard" />
-
-    <Button
-        android:id="@+id/uploadGSTcard"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="22dp"
-        android:text="Upload GST"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/uploadFSSAIcard" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/uploadAdhaarCard"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="21dp"
+        android:layout_marginTop="20dp"
         android:text="Upload Adhaar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/uploadGSTcard" />
-
-    <TextView
-        android:id="@+id/panTextUploaded"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="54dp"
-        android:text="uploaded"
-        android:textColor="@color/cfdialog_positive_button_color"
-        android:visibility="invisible"
-        app:layout_constraintStart_toEndOf="@+id/uploadPANcard"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/uploadFSSAIcard" />
 
     <TextView
         android:id="@+id/uploadFssaiText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
-        android:layout_marginTop="53dp"
+        android:layout_marginTop="45dp"
         android:text="uploaded"
         android:textColor="@color/cfdialog_positive_button_color"
         android:visibility="invisible"
         app:layout_constraintStart_toEndOf="@+id/uploadFSSAIcard"
-        app:layout_constraintTop_toBottomOf="@+id/panTextUploaded" />
-
-    <TextView
-        android:id="@+id/uploadGstText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="51dp"
-        android:text="uploaded"
-        android:textColor="@color/cfdialog_positive_button_color"
-        android:visibility="invisible"
-        app:layout_constraintStart_toEndOf="@+id/uploadGSTcard"
-        app:layout_constraintTop_toBottomOf="@+id/uploadFssaiText" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/uploadAdhaarCardText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
-        android:layout_marginTop="52dp"
+        android:layout_marginTop="44dp"
         android:text="uploaded"
         android:textColor="@color/cfdialog_positive_button_color"
         android:visibility="invisible"
         app:layout_constraintStart_toEndOf="@+id/uploadAdhaarCard"
-        app:layout_constraintTop_toBottomOf="@+id/uploadGstText" />
+        app:layout_constraintTop_toBottomOf="@+id/uploadFssaiText" />
 
     <Button
         android:id="@+id/uploadResidentialProof"
@@ -109,7 +65,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
-        android:layout_marginTop="48dp"
+        android:layout_marginTop="55dp"
         android:text="uploaded"
         android:textColor="@color/cfdialog_positive_button_color"
         android:visibility="invisible"
@@ -120,7 +76,7 @@
         android:id="@+id/proceedFurther"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="60dp"
+        android:layout_marginTop="45dp"
         android:text="Proceed"
         android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
