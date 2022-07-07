@@ -2,6 +2,7 @@ package com.consumers.fastwayadmin.Info;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -12,6 +13,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -29,6 +31,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import com.consumers.fastwayadmin.HomeScreen.HomeScreen;
+import com.consumers.fastwayadmin.Info.ChangeResLocation.MapsActivity2;
 import com.consumers.fastwayadmin.Info.RestaurantDocuments.UploadRequiredDocuments;
 import com.consumers.fastwayadmin.Info.RestaurantImages.AddRestaurantImages;
 import com.consumers.fastwayadmin.R;
@@ -69,7 +72,10 @@ public class Info extends AppCompatActivity {
     Bitmap bitmap;
     StorageReference storageReference;
     AlertDialog.Builder builder;
+    boolean mapLocations = false;
+    String cityName,subAdminArea;
     AlertDialog alertDialog;
+    String lon,lat;
     Uri filePath;
     boolean subLocal = false;
     FirebaseStorage storage;
@@ -172,8 +178,8 @@ public class Info extends AppCompatActivity {
 
                     alert.setCancelable(false);
                     alert.show();
-                }else
-                    alertDialog.dismiss();
+                    return;
+                }
             }
 
             @Override
@@ -188,6 +194,38 @@ public class Info extends AppCompatActivity {
         if(!sharedPreferences.getString("postalCode","").equals(""))
             pinCode.setText(sharedPreferences.getString("postalCode",""));
         editor = sharedPreferences.edit();
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(Info.this);
+        builder.setTitle("Important").setMessage("Are you currently present at restaurant location").setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+            }
+        }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                AlertDialog.Builder info = new AlertDialog.Builder(Info.this);
+                info.setTitle("Location").setMessage("For better accuracy you need to be at restaurant location to proceed further\nDo you wanna manually input data??")
+                        .setPositiveButton("Ok", (dialogInterface1, i1) -> startActivityForResult(new Intent(Info.this, MapsActivity2.class),510)).setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                Toast.makeText(Info.this, "Try again when present at restaurant", Toast.LENGTH_SHORT).show();
+                                new Handler().postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        dialogInterface.dismiss();
+                                       finish();
+                                    }
+                                },600);
+                            }
+                        }).create();
+                info.setCancelable(false);
+                info.show();
+            }
+        }).create();
+        builder.setCancelable(false);
+        builder.show();
+        alertDialog.dismiss();
 //        fastDialog = new FastDialogBuilder(Info.this, Type.PROGRESS)
 //                .progressText("Checking Database...")
 //                .setAnimation(Animations.SLIDE_TOP)
@@ -287,6 +325,7 @@ public class Info extends AppCompatActivity {
     @RequiresApi(api = Build.VERSION_CODES.M)
     private void createChildForRestaurant() {
         if(subLocal) {
+
             SharedPreferences sharedPreferences = getSharedPreferences("RestaurantInfo", MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putString("hotelName", name);
@@ -321,6 +360,17 @@ public class Info extends AppCompatActivity {
                 infoRef.child("TableBookAllowed").setValue("no");
                 this.editor.putString("TableBookAllowed", "no");
             }
+            if(mapLocations){
+                this.editor.putString("state",cityName);
+                this.editor.putString("locality",subAdminArea);
+                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(cityName).child(subAdminArea).child(infoAuth.getUid());
+                RestLocation restLocation = new RestLocation(String.valueOf(lon),String.valueOf(lat));
+                databaseReference.child("location").setValue(restLocation);
+                SharedPreferences sharedPreferences1 = getSharedPreferences("LocationMaps",MODE_PRIVATE);
+                SharedPreferences.Editor editor1 = sharedPreferences1.edit();
+                editor1.putString("location","yes");
+                editor1.apply();
+            }
 
             this.editor.apply();
 //            clientsLocation.removeLocationUpdates(mLocationCallback);
@@ -342,7 +392,8 @@ public class Info extends AppCompatActivity {
             alert.setCancelable(false);
             alert.show();
 
-        }
+        }else
+            Toast.makeText(this, "Something went wrong we can't find location", Toast.LENGTH_SHORT).show();
     }
 
     private void initialise() {
@@ -585,6 +636,24 @@ public class Info extends AppCompatActivity {
             }
 
 
+        }
+
+        if(requestCode == 510 && resultCode == RESULT_OK){
+            if(!data.getStringExtra("locality").equals("")) {
+                pinCode.setText(data.getStringExtra("pin"));
+                subLocal = true;
+                lon = data.getStringExtra("lon");
+                lat = data.getStringExtra("lat");
+                mapLocations = true;
+                cityName = data.getStringExtra("state");
+                subAdminArea = data.getStringExtra("locality");
+                infoRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(data.getStringExtra("state")).child(data.getStringExtra("locality")).child(Objects.requireNonNull(infoAuth.getUid()));
+            }
+        }
+
+        if(requestCode == 510 && resultCode == RESULT_CANCELED){
+            Toast.makeText(this, "Try again later", Toast.LENGTH_SHORT).show();
+            finish();
         }
     }
 

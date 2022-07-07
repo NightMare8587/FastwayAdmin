@@ -25,6 +25,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.consumers.fastwayadmin.HomeScreen.HomeScreen;
 import com.consumers.fastwayadmin.Info.MapsActivity;
 import com.consumers.fastwayadmin.R;
 import com.developer.kalert.KAlertDialog;
@@ -347,6 +348,7 @@ public class UploadRequiredDocuments extends AppCompatActivity {
 
     private void checkIfAllUploaded() {
         if(adhaar && pan && gst && fssai && resProof){
+            SharedPreferences location = getSharedPreferences("LocationMaps",MODE_PRIVATE);
             DatabaseReference databaseReferenceCheck = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Registered Restaurants").child(sharedPreferences.getString("state",""));
             databaseReferenceCheck.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
@@ -355,7 +357,12 @@ public class UploadRequiredDocuments extends AppCompatActivity {
                         databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid()).child("Restaurant Documents");
                         databaseReference.child("verified").setValue("yes");
                         databaseReference.child("bankVerified").setValue("yes");
+                        if(!location.contains("location"))
                         startActivity(new Intent(getApplicationContext(), MapsActivity.class));
+                        else
+                            startActivity(new Intent(getApplicationContext(), HomeScreen.class));
+
+                        finish();
                     }else{
                         ResDocuments resDocuments = new ResDocuments(panUrl,adhaarUrl,fssaiUrl,gstUrl,residentialProofSubmitUrl);
                         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Restaurant Registration");
@@ -377,7 +384,12 @@ public class UploadRequiredDocuments extends AppCompatActivity {
                                 .setConfirmText("Exit")
                                 .setConfirmClickListener(click -> {
                                     click.dismissWithAnimation();
+                                    if(!location.contains("location"))
                                     startActivity(new Intent(getApplicationContext(), MapsActivity.class));
+                                    else
+                                        startActivity(new Intent(getApplicationContext(), HomeScreen.class));
+
+                                    finish();
                                 }).show();
                     }
                 }

@@ -183,6 +183,7 @@ public class SplashScreen extends AppCompatActivity {
         @Override
         public void onLocationResult(LocationResult locationResult) {
             Location mLastLocation = locationResult.getLastLocation();
+
             longi = mLastLocation.getLongitude();
             lati = mLastLocation.getLatitude();
             loginEditor.putString("longi",String.valueOf(longi));
