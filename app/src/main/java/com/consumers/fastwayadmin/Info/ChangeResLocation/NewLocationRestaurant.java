@@ -23,6 +23,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.consumers.fastwayadmin.Info.MapsActivity;
 import com.consumers.fastwayadmin.R;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.ResolvableApiException;
@@ -116,7 +117,8 @@ public class NewLocationRestaurant extends AppCompatActivity {
                             .setPositiveButton("Proceed", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i) {
-
+                                    Intent intent = new Intent(NewLocationRestaurant.this, MapsActivity2.class);
+                                    startActivityForResult(intent,500);
                                 }
                             }).setNegativeButton("Wait", new DialogInterface.OnClickListener() {
                                 @Override
@@ -178,6 +180,11 @@ public class NewLocationRestaurant extends AppCompatActivity {
                         Toast.makeText(this, "Enter new address", Toast.LENGTH_SHORT).show();
                         return;
                     }
+                    SharedPreferences sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString("state",cityName);
+                    editor.putString("locality",subAdminArea);
+                    editor.apply();
                     FirebaseAuth auth = FirebaseAuth.getInstance();
                     StorageReference ref = storageReference.child(auth.getUid() + "/" + "Documents" + "/" + "resProof");
                     ref.putFile(filePath).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
@@ -214,7 +221,7 @@ public class NewLocationRestaurant extends AppCompatActivity {
 
                     newPath = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(cityName).child(subAdminArea).child(auth.getUid());
                     newPath.child("address").setValue(newAddress.getText().toString());
-                    newPath = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(oldState).child(subAdminArea).child(auth.getUid()).child("location");
+                    newPath = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(cityName).child(subAdminArea).child(auth.getUid()).child("location");
                     newPath.child("lat").setValue(lati + "");
                     newPath.child("lon").setValue(longi + "");
                     DatabaseReference changeFastwayDB = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Registered Restaurants").child(oldState).child(auth.getUid());
@@ -260,6 +267,10 @@ public class NewLocationRestaurant extends AppCompatActivity {
                             }
                         }
                     });
+                    SharedPreferences sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString("locality",subAdminArea);
+                    editor.apply();
                     DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(oldState).child(oldLocal).child(Objects.requireNonNull(auth.getUid()));
                     DatabaseReference newPath = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(oldState).child(subAdminArea).child(auth.getUid());
                     DatabaseReference finalNewPath = newPath;
@@ -445,6 +456,26 @@ public class NewLocationRestaurant extends AppCompatActivity {
         if(requestCode == 1 && resultCode ==  RESULT_OK && data != null){
             imageTaken = true;
             filePath = data.getData();
+        }
+
+        if(requestCode == 500 && resultCode == RESULT_OK){
+            longi = Double.parseDouble(data.getStringExtra("lon"));
+            lati = Double.parseDouble(data.getStringExtra("lat"));
+            cityName = data.getStringExtra("state");
+            subAdminArea = data.getStringExtra("locality");
+                newLocality.setText(subAdminArea);
+                newLocality.setEnabled(false);
+                local = true;
+            pinCode = data.getStringExtra("pin");
+            newPinCode.setText(pinCode);
+            newPinCode.setEnabled(false);
+            pin = true;
+            newState.setText(cityName);
+            newState.setEnabled(false);
+            checkIfResLocationAreSimilar(cityName,subAdminArea);
+        }else if(requestCode == 500 && resultCode == RESULT_CANCELED){
+            Toast.makeText(this, "Try Again Later", Toast.LENGTH_SHORT).show();
+            finish();
         }
     }
 }

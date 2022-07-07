@@ -71,6 +71,8 @@ public class MapsActivity2 extends FragmentActivity implements OnMapReadyCallbac
     SharedPreferences.Editor locationEditor;
     ImageButton imageButton;
     FirebaseAuth auth;
+    String cityName,subAdminArea,pinCode;
+    Double lon,lat;
     DatabaseReference ref;
     Button proceed;
     Double latitude,longitude;
@@ -103,19 +105,16 @@ public class MapsActivity2 extends FragmentActivity implements OnMapReadyCallbac
             @Override
             public void onClick(View view) {
                 createLocationRequest();
-                client.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
-                    @Override
-                    public void onSuccess(Location location) {
-                        if (location != null) {
-                            Toast.makeText(MapsActivity2.this, "Yes", Toast.LENGTH_SHORT).show();
-                            mMap.clear();
-                            LatLng current = new LatLng(location.getLatitude(), location.getLongitude());
-                            mMap.addMarker(new MarkerOptions().position(current).title("Current Location"));
+                client.getLastLocation().addOnSuccessListener(location -> {
+                    if (location != null) {
+                        Toast.makeText(MapsActivity2.this, "Yes", Toast.LENGTH_SHORT).show();
+                        mMap.clear();
+                        LatLng current = new LatLng(location.getLatitude(), location.getLongitude());
+                        mMap.addMarker(new MarkerOptions().position(current).title("Current Location"));
 //                            mMap.animateCamera(CameraUpdateFactory.zoomIn());
-                            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(current, 15));
-                        }else
-                            createLocationRequest();
-                    }
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(current, 15));
+                    }else
+                        createLocationRequest();
                 });
             }
         });
@@ -124,10 +123,17 @@ public class MapsActivity2 extends FragmentActivity implements OnMapReadyCallbac
         proceed.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ref = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(resLocationInfo.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
-                RestLocation restLocation = new RestLocation(String.valueOf(latitude),String.valueOf(longitude));
-                ref.child("location").setValue(restLocation);
-                setResult(69);
+//                ref = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(resLocationInfo.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
+//                RestLocation restLocation = new RestLocation(String.valueOf(latitude),String.valueOf(longitude));
+//                ref.child("location").setValue(restLocation);
+//                setResult(69);
+                Intent intent = new Intent();
+                intent.putExtra("lon",String.valueOf(lon));
+                intent.putExtra("lat",String.valueOf(lat));
+                intent.putExtra("state",String.valueOf(cityName));
+                intent.putExtra("pin",String.valueOf(pinCode));
+                intent.putExtra("locality",String.valueOf(subAdminArea));
+                setResult(Activity.RESULT_OK,intent);
                 finish();
             }
         });
@@ -158,6 +164,12 @@ public class MapsActivity2 extends FragmentActivity implements OnMapReadyCallbac
                     mMap.clear();
                     latitude = address.getLatitude();
                     longitude = address.getLongitude();
+                    lon = address.getLongitude();
+                    lat = address.getLatitude();
+                    cityName = address.getLocality();
+                    subAdminArea = address.getSubAdminArea();
+                    pinCode = address.getPostalCode();
+                    Toast.makeText(MapsActivity2.this, "" + subAdminArea, Toast.LENGTH_SHORT).show();
                     mMap.addMarker(new MarkerOptions().position(current).title("Current Location"));
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(current, 15));
                 }
@@ -229,12 +241,13 @@ public class MapsActivity2 extends FragmentActivity implements OnMapReadyCallbac
                 mMap.clear();
                 latitude = mLastLocation.getLatitude();
                 longitude = mLastLocation.getLongitude();
+                lon = mLastLocation.getLongitude();
+                lat = mLastLocation.getLatitude();
                 editor.putString("longi",String.valueOf(latitude));
                 editor.putString("lati",String.valueOf(longitude));
-                editor.apply();
                 Geocoder geocoder = new Geocoder(MapsActivity2.this, Locale.getDefault());
                 List<Address> addresses = null;
-                String cityName;
+
                 String stateName;
                 String countryName;
                 try {
@@ -243,9 +256,9 @@ public class MapsActivity2 extends FragmentActivity implements OnMapReadyCallbac
                     e.printStackTrace();
                 }
                 cityName = addresses.get(0).getLocality();
-
-                locationEditor.putString("state",cityName);
-                locationEditor.apply();
+                subAdminArea = addresses.get(0).getSubAdminArea();
+                pinCode = addresses.get(0).getPostalCode();
+                Toast.makeText(MapsActivity2.this, "" + subAdminArea, Toast.LENGTH_SHORT).show();
 //               RestLocation restLocation = new RestLocation(String.valueOf(latitude),String.valueOf(longitude));
 //               ref = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants");
 //               ref.child("Locations").child(auth.getUid()).setValue(restLocation);
@@ -276,13 +289,28 @@ public class MapsActivity2 extends FragmentActivity implements OnMapReadyCallbac
                 mMap.clear();
                 latitude = latLng.latitude;
                 longitude = latLng.longitude;
+                lon = latLng.longitude;
+                lat = latLng.latitude;
                 editor.putString("longi",String.valueOf(latitude));
                 editor.putString("lati",String.valueOf(longitude));
-                editor.apply();
                 mMap.addMarker(new MarkerOptions().title("Current Position").position(latLng));
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng,15));
+                Geocoder geocoder = new Geocoder(MapsActivity2.this, Locale.getDefault());
+                List<Address> addresses = null;
+
+                try {
+                    addresses = geocoder.getFromLocation(latitude, longitude, 1);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                cityName = addresses.get(0).getLocality();
+                subAdminArea = addresses.get(0).getSubAdminArea();
+                pinCode = addresses.get(0).getPostalCode();
+                Toast.makeText(MapsActivity2.this, "" + subAdminArea, Toast.LENGTH_SHORT).show();
             }
         });
+
+
 
         client.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
             @Override
@@ -337,6 +365,14 @@ public class MapsActivity2 extends FragmentActivity implements OnMapReadyCallbac
                 }
                 break;
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent intent = new Intent();
+        setResult(Activity.RESULT_CANCELED,intent);
+        finish();
     }
 
     @Override
