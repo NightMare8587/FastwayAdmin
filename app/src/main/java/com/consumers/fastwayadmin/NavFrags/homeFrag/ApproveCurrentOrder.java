@@ -361,11 +361,12 @@ public class ApproveCurrentOrder extends AppCompatActivity {
             }else{
                 restaurantTrackEditor.putString("totalTransactionsToday",String.valueOf(orderAmount));
             }
+
             String approveTime = String.valueOf(System.currentTimeMillis());
             DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(id).child("Recent Orders").child(time);
             for(int i=0;i<dishNames.size();i++){
                 MyClass myClass = new MyClass(dishNames.get(i),dishPrices.get(i),image.get(i),type.get(i),""+approveTime,dishQuantity.get(i),dishHalfOr.get(i),state,String.valueOf(orderAmount),orderID,orderAndPayment.get(i),"Order Approved",sharedPreferences.getString("locality",""));
-                databaseReference.child(auth.getUid()).child(dishNames.get(i)).setValue(myClass);
+                databaseReference.child(Objects.requireNonNull(auth.getUid())).child(dishNames.get(i)).setValue(myClass);
             }
 
 

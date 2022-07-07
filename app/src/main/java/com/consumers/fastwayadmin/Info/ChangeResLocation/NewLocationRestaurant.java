@@ -138,7 +138,7 @@ public class NewLocationRestaurant extends AppCompatActivity {
 
 
         change.setOnClickListener(click -> {
-            if(imageUploaded) {
+            if(imageTaken) {
                 if (allSameAsBefore) {
                     if (newAddress.getText().toString().equals("")) {
                         newAddress.requestFocus();
@@ -165,7 +165,7 @@ public class NewLocationRestaurant extends AppCompatActivity {
                     databaseReference.child("lat").setValue(String.valueOf(lati));
                     databaseReference.child("lon").setValue(String.valueOf(longi));
 
-                    databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Registered Restaurants").child(cityName).child(subAdminArea).child(auth.getUid());
+                    databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Registered Restaurants").child(cityName).child(auth.getUid());
                     databaseReference.child("locationChange").setValue("yes");
 
                     Toast.makeText(this, "Location Changed Successfully", Toast.LENGTH_SHORT).show();
@@ -195,10 +195,11 @@ public class NewLocationRestaurant extends AppCompatActivity {
 
                     DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(oldState).child(oldLocal).child(auth.getUid());
                     DatabaseReference newPath = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(cityName).child(subAdminArea).child(auth.getUid());
+                    DatabaseReference finalNewPath = newPath;
                     databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            newPath.setValue(snapshot.getValue(), (error, ref1) -> {
+                            finalNewPath.setValue(snapshot.getValue(), (error, ref1) -> {
 
                             });
 
@@ -211,6 +212,11 @@ public class NewLocationRestaurant extends AppCompatActivity {
                         }
                     });
 
+                    newPath = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(cityName).child(subAdminArea).child(auth.getUid());
+                    newPath.child("address").setValue(newAddress.getText().toString());
+                    newPath = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(oldState).child(subAdminArea).child(auth.getUid()).child("location");
+                    newPath.child("lat").setValue(lati + "");
+                    newPath.child("lon").setValue(longi + "");
                     DatabaseReference changeFastwayDB = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Registered Restaurants").child(oldState).child(auth.getUid());
                     changeFastwayDB.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
@@ -222,6 +228,7 @@ public class NewLocationRestaurant extends AppCompatActivity {
                             changeFastwayDB.setValue(null);
                             DatabaseReference databaseReference1 = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Registered Restaurants").child(cityName).child(auth.getUid());
                             databaseReference1.child("locationChanges").setValue("yes");
+                            databaseReference1.child("locality").setValue(subAdminArea);
                         }
 
                         @Override
@@ -253,12 +260,13 @@ public class NewLocationRestaurant extends AppCompatActivity {
                             }
                         }
                     });
-                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(oldState).child(oldLocal).child(auth.getUid());
+                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(oldState).child(oldLocal).child(Objects.requireNonNull(auth.getUid()));
                     DatabaseReference newPath = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(oldState).child(subAdminArea).child(auth.getUid());
+                    DatabaseReference finalNewPath = newPath;
                     databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            newPath.setValue(snapshot.getValue(), (error, ref1) -> {
+                            finalNewPath.setValue(snapshot.getValue(), (error, ref1) -> {
 
                             });
 
@@ -270,8 +278,12 @@ public class NewLocationRestaurant extends AppCompatActivity {
 
                         }
                     });
-
+                    newPath = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(oldState).child(subAdminArea).child(auth.getUid());
+                    newPath.child("address").setValue(newAddress.getText().toString());
+                    newPath = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(oldState).child(subAdminArea).child(auth.getUid()).child("location");
                     DatabaseReference changeFastwayDB = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Registered Restaurants").child(oldState).child(auth.getUid());
+                    newPath.child("lat").setValue(lati + "");
+                    newPath.child("lon").setValue(longi + "");
                     changeFastwayDB.child("locality").setValue(subAdminArea);
                     changeFastwayDB.child("locationChange").setValue("yes");
                     Toast.makeText(this, "Location Changed Successfully", Toast.LENGTH_SHORT).show();
