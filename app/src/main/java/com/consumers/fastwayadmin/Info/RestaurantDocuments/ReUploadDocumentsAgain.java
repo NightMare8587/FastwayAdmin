@@ -80,8 +80,8 @@ public class ReUploadDocumentsAgain extends AppCompatActivity {
                 .setAnimation(Animations.FADE_IN)
                 .create();
 
-        gstText = findViewById(R.id.ReuploadGstText);
-        panText = findViewById(R.id.RepanTextUploaded);
+//        gstText = findViewById(R.id.ReuploadGstText);
+//        panText = findViewById(R.id.RepanTextUploaded);
         adhaarText = findViewById(R.id.ReuploadAdhaarCardText);
         FssaiText = findViewById(R.id.ReuploadFssaiText);
         resText = findViewById(R.id.ReuploadResProofCardText);
@@ -91,26 +91,26 @@ public class ReUploadDocumentsAgain extends AppCompatActivity {
         sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
 
 
-        panCard.setOnClickListener(click -> {
-            if(ContextCompat.checkSelfPermission(ReUploadDocumentsAgain.this, Manifest.permission.ACCESS_FINE_LOCATION) + ContextCompat.checkSelfPermission(ReUploadDocumentsAgain.this , Manifest.permission.CAMERA)
-                    + ContextCompat.checkSelfPermission(ReUploadDocumentsAgain.this, Manifest.permission.WRITE_EXTERNAL_STORAGE )
-                    != PackageManager.PERMISSION_GRANTED){
-//            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},1);
-                requestPermissions(new String[]{Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.ACCESS_FINE_LOCATION},88);
-            }else {
-                AlertDialog.Builder alert = new AlertDialog.Builder(ReUploadDocumentsAgain.this);
-                alert.setTitle("Choose one option")
-                        .setPositiveButton("Upload from gallery", (dialogInterface, i) -> {
-                            dialogInterface.dismiss();
-                            Intent intent = new Intent();
-                            intent.setType("image/*");
-                            intent.setAction("android.intent.action.PICK");
-                            startActivityForResult(Intent.createChooser(intent, "Select Picture"), 1);
-                        }).setNegativeButton("Cancel", (dialogInterface, i) -> dialogInterface.dismiss()).create();
-
-                alert.show();
-            }
-        });
+//        panCard.setOnClickListener(click -> {
+//            if(ContextCompat.checkSelfPermission(ReUploadDocumentsAgain.this, Manifest.permission.ACCESS_FINE_LOCATION) + ContextCompat.checkSelfPermission(ReUploadDocumentsAgain.this , Manifest.permission.CAMERA)
+//                    + ContextCompat.checkSelfPermission(ReUploadDocumentsAgain.this, Manifest.permission.WRITE_EXTERNAL_STORAGE )
+//                    != PackageManager.PERMISSION_GRANTED){
+////            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},1);
+//                requestPermissions(new String[]{Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.ACCESS_FINE_LOCATION},88);
+//            }else {
+//                AlertDialog.Builder alert = new AlertDialog.Builder(ReUploadDocumentsAgain.this);
+//                alert.setTitle("Choose one option")
+//                        .setPositiveButton("Upload from gallery", (dialogInterface, i) -> {
+//                            dialogInterface.dismiss();
+//                            Intent intent = new Intent();
+//                            intent.setType("image/*");
+//                            intent.setAction("android.intent.action.PICK");
+//                            startActivityForResult(Intent.createChooser(intent, "Select Picture"), 1);
+//                        }).setNegativeButton("Cancel", (dialogInterface, i) -> dialogInterface.dismiss()).create();
+//
+//                alert.show();
+//            }
+//        });
 
         fssaiCard.setOnClickListener(click -> {
             if(ContextCompat.checkSelfPermission(ReUploadDocumentsAgain.this, Manifest.permission.ACCESS_FINE_LOCATION) + ContextCompat.checkSelfPermission(ReUploadDocumentsAgain.this , Manifest.permission.CAMERA)
@@ -154,26 +154,26 @@ public class ReUploadDocumentsAgain extends AppCompatActivity {
             }
         });
 
-        gstCard.setOnClickListener(click -> {
-            if(ContextCompat.checkSelfPermission(ReUploadDocumentsAgain.this, Manifest.permission.ACCESS_FINE_LOCATION) + ContextCompat.checkSelfPermission(ReUploadDocumentsAgain.this , Manifest.permission.CAMERA)
-                    + ContextCompat.checkSelfPermission(ReUploadDocumentsAgain.this, Manifest.permission.WRITE_EXTERNAL_STORAGE )
-                    != PackageManager.PERMISSION_GRANTED){
-//            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},1);
-                requestPermissions(new String[]{Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.ACCESS_FINE_LOCATION},88);
-            }else {
-                AlertDialog.Builder alert = new AlertDialog.Builder(ReUploadDocumentsAgain.this);
-                alert.setTitle("Choose one option")
-                        .setPositiveButton("Upload from gallery", (dialogInterface, i) -> {
-                            dialogInterface.dismiss();
-                            Intent intent = new Intent();
-                            intent.setType("image/*");
-                            intent.setAction(Intent.ACTION_GET_CONTENT);
-                            startActivityForResult(Intent.createChooser(intent, "Select Picture"), 4);
-                        }).setNegativeButton("Cancel", (dialogInterface, i) -> dialogInterface.dismiss()).create();
-
-                alert.show();
-            }
-        });
+//        gstCard.setOnClickListener(click -> {
+//            if(ContextCompat.checkSelfPermission(ReUploadDocumentsAgain.this, Manifest.permission.ACCESS_FINE_LOCATION) + ContextCompat.checkSelfPermission(ReUploadDocumentsAgain.this , Manifest.permission.CAMERA)
+//                    + ContextCompat.checkSelfPermission(ReUploadDocumentsAgain.this, Manifest.permission.WRITE_EXTERNAL_STORAGE )
+//                    != PackageManager.PERMISSION_GRANTED){
+////            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},1);
+//                requestPermissions(new String[]{Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.ACCESS_FINE_LOCATION},88);
+//            }else {
+//                AlertDialog.Builder alert = new AlertDialog.Builder(ReUploadDocumentsAgain.this);
+//                alert.setTitle("Choose one option")
+//                        .setPositiveButton("Upload from gallery", (dialogInterface, i) -> {
+//                            dialogInterface.dismiss();
+//                            Intent intent = new Intent();
+//                            intent.setType("image/*");
+//                            intent.setAction(Intent.ACTION_GET_CONTENT);
+//                            startActivityForResult(Intent.createChooser(intent, "Select Picture"), 4);
+//                        }).setNegativeButton("Cancel", (dialogInterface, i) -> dialogInterface.dismiss()).create();
+//
+//                alert.show();
+//            }
+//        });
 
         resProofCard.setOnClickListener(click -> {
             if(ContextCompat.checkSelfPermission(ReUploadDocumentsAgain.this, Manifest.permission.ACCESS_FINE_LOCATION) + ContextCompat.checkSelfPermission(ReUploadDocumentsAgain.this , Manifest.permission.CAMERA)
@@ -563,7 +563,7 @@ public class ReUploadDocumentsAgain extends AppCompatActivity {
     }
 
     private void checkIfAllUploaded() {
-        if(adhaar && pan && gst && fssai && resProof){
+        if(adhaar && fssai && resProof){
 
             ResDocuments resDocuments = new ResDocuments(panUrl,adhaarUrl,fssaiUrl,gstUrl,resUrl);
             DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Restaurant Registration");
@@ -591,10 +591,10 @@ public class ReUploadDocumentsAgain extends AppCompatActivity {
     }
 
     private void initialise() {
-        panCard = findViewById(R.id.ReuploadPANcard);
+//        panCard = findViewById(R.id.ReuploadPANcard);
         adhaarCard = findViewById(R.id.ReuploadAdhaarCard);
         fssaiCard = findViewById(R.id.ReuploadFSSAIcard);
-        gstCard= findViewById(R.id.ReuploadGSTcard);
+//        gstCard= findViewById(R.id.ReuploadGSTcard);
         resProofCard= findViewById(R.id.ReuploadResProofCard);
     }
 }

@@ -19,17 +19,6 @@
             android:layout_width="match_parent"
             android:orientation="horizontal"
             android:layout_height="wrap_content">
-            <Button
-                android:id="@+id/gstGridViewButton"
-                android:layout_height="wrap_content"
-                android:layout_margin="5dp"
-                android:backgroundTint="@color/teal_200"
-                android:text="GST"
-                android:textSize="16sp"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-
-                />
 
             <Button
                 android:id="@+id/adhaarGridViewButton"
@@ -57,15 +46,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
-            <Button
-                android:id="@+id/panGridViewButton"
-                android:layout_height="wrap_content"
-                android:layout_margin="5dp"
-                android:backgroundTint="@color/blue_btn_bg_color"
-                android:text="PAN CARD"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:textSize="16sp"/>
 
             <Button
                 android:layout_width="0dp"

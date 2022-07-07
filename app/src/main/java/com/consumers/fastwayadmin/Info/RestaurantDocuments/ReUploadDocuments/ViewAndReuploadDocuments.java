@@ -80,8 +80,8 @@ public class ViewAndReuploadDocuments extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 adhaar = String.valueOf(dataSnapshot.child("adhaar").getValue());
-                gst = String.valueOf(dataSnapshot.child("gst").getValue());
-                pan = String.valueOf(dataSnapshot.child("pan").getValue());
+//                gst = String.valueOf(dataSnapshot.child("gst").getValue());
+//                pan = String.valueOf(dataSnapshot.child("pan").getValue());
                 fssai = String.valueOf(dataSnapshot.child("fssai").getValue());
                 resProof = String.valueOf(dataSnapshot.child("resProof").getValue());
             }
@@ -92,13 +92,13 @@ public class ViewAndReuploadDocuments extends AppCompatActivity {
             }
         });
 
-        gstButton.setOnClickListener(view -> {
-            if(!gst.isEmpty() && !gst.equals("null"))
-            showAlertDialog(gst,"gst");
-            else{
-                reuploadImageOrNotUploaded("gst");
-            }
-        });
+//        gstButton.setOnClickListener(view -> {
+//            if(!gst.isEmpty() && !gst.equals("null"))
+//            showAlertDialog(gst,"gst");
+//            else{
+//                reuploadImageOrNotUploaded("gst");
+//            }
+//        });
         fssaiButton.setOnClickListener(view -> {
             if(!fssai.isEmpty() && !fssai.equals("null"))
             showAlertDialog(fssai,"fssai");
@@ -106,13 +106,13 @@ public class ViewAndReuploadDocuments extends AppCompatActivity {
                 reuploadImageOrNotUploaded("fssai");
             }
         });
-        panButton.setOnClickListener(view -> {
-            if(!pan.isEmpty() && !pan.equals("null"))
-            showAlertDialog(pan,"pan");
-            else{
-                reuploadImageOrNotUploaded("pan");
-            }
-        });
+//        panButton.setOnClickListener(view -> {
+//            if(!pan.isEmpty() && !pan.equals("null"))
+//            showAlertDialog(pan,"pan");
+//            else{
+//                reuploadImageOrNotUploaded("pan");
+//            }
+//        });
         adhaarButton.setOnClickListener(view -> {
             if(!adhaar.isEmpty() && !adhaar.equals("null"))
             showAlertDialog(adhaar,"adhaar");
@@ -191,10 +191,10 @@ public class ViewAndReuploadDocuments extends AppCompatActivity {
     }
 
     private void initialise() {
-        gstButton = findViewById(R.id.gstGridViewButton);
+//        gstButton = findViewById(R.id.gstGridViewButton);
         fssaiButton = findViewById(R.id.fssaiGridViewButton);
         adhaarButton = findViewById(R.id.adhaarGridViewButton);
-        panButton = findViewById(R.id.panGridViewButton);
+//        panButton = findViewById(R.id.panGridViewButton);
         resProofButton = findViewById(R.id.resProofGridViewButton);
         imageView = findViewById(R.id.imageViewViewAndReuploadDocuments);
         storage = FirebaseStorage.getInstance();

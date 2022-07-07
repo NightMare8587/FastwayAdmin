@@ -7,44 +7,24 @@
     tools:context=".Info.RestaurantDocuments.ReUploadDocumentsAgain">
 
     <Button
-        android:id="@+id/ReuploadPANcard"
+        android:id="@+id/ReuploadFSSAIcard"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
-        android:text="UPLOAD PAN"
+        android:layout_marginTop="35dp"
+        android:text="Upload FSSAI"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/ReuploadFSSAIcard"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:text="Upload FSSAI"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ReuploadPANcard" />
-
-    <Button
-        android:id="@+id/ReuploadGSTcard"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="22dp"
-        android:text="Upload GST"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ReuploadFSSAIcard" />
-
-    <Button
         android:id="@+id/ReuploadAdhaarCard"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="21dp"
+        android:layout_marginTop="20dp"
         android:text="Upload Adhaar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ReuploadGSTcard" />
+        app:layout_constraintTop_toBottomOf="@+id/ReuploadFSSAIcard" />
 
     <Button
         android:id="@+id/ReuploadResProofCard"
@@ -57,43 +37,7 @@
         app:layout_constraintTop_toBottomOf="@+id/ReuploadAdhaarCard" />
 
     <TextView
-        android:id="@+id/RepanTextUploaded"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="54dp"
-        android:text="uploaded"
-        android:textColor="@color/cfdialog_positive_button_color"
-        android:visibility="invisible"
-        app:layout_constraintStart_toEndOf="@+id/ReuploadPANcard"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
         android:id="@+id/ReuploadFssaiText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="53dp"
-        android:text="uploaded"
-        android:textColor="@color/cfdialog_positive_button_color"
-        android:visibility="invisible"
-        app:layout_constraintStart_toEndOf="@+id/ReuploadFSSAIcard"
-        app:layout_constraintTop_toBottomOf="@+id/RepanTextUploaded" />
-
-    <TextView
-        android:id="@+id/ReuploadGstText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="51dp"
-        android:text="uploaded"
-        android:textColor="@color/cfdialog_positive_button_color"
-        android:visibility="invisible"
-        app:layout_constraintStart_toEndOf="@+id/ReuploadGSTcard"
-        app:layout_constraintTop_toBottomOf="@+id/ReuploadFssaiText" />
-
-    <TextView
-        android:id="@+id/ReuploadAdhaarCardText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
@@ -101,8 +45,20 @@
         android:text="uploaded"
         android:textColor="@color/cfdialog_positive_button_color"
         android:visibility="invisible"
+        app:layout_constraintStart_toEndOf="@+id/ReuploadFSSAIcard"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/ReuploadAdhaarCardText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="50dp"
+        android:text="uploaded"
+        android:textColor="@color/cfdialog_positive_button_color"
+        android:visibility="invisible"
         app:layout_constraintStart_toEndOf="@+id/ReuploadAdhaarCard"
-        app:layout_constraintTop_toBottomOf="@+id/ReuploadGstText" />
+        app:layout_constraintTop_toBottomOf="@+id/ReuploadFssaiText" />
 
     <TextView
         android:id="@+id/ReuploadResProofCardText"
