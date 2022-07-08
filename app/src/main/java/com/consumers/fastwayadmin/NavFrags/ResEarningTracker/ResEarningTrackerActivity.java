@@ -81,6 +81,7 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
                         dialogInterface.dismiss();
                         editor.putString("FastwayAdminPrem","h");
                         editor.apply();
+                        finish();
 //                        startActivity(new Intent(ResEarningTrackerActivity.this, FastwayPremiums.class));
                     }).setNegativeButton("Not Now", (dialogInterface, i) -> {
                         dialogInterface.dismiss();
