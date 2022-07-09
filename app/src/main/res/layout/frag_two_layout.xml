@@ -16,6 +16,7 @@
         android:layout_marginEnd="10dp"
         android:fontFamily="@font/merriweather_sans_bold"
         android:text="Manage all tables in one place"
+        android:textAlignment="center"
         android:textColor="#ffffff"
         android:textSize="25sp"
         android:textStyle="bold"
