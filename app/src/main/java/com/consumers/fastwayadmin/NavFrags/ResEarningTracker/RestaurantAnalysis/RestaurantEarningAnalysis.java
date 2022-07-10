@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.consumers.fastwayadmin.R;
 import com.google.common.reflect.TypeToken;
@@ -35,17 +36,24 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
         Type type = new TypeToken<List<List<String>>>() {
         }.getType();
         gson = new Gson();
-        json = storedOrders.getString(month,"");
-        List<List<String>> mainDataList = gson.fromJson(json, type);
-        List<String> date = new ArrayList<>(mainDataList.get(0));
-        List<String> transID = new ArrayList<>(mainDataList.get(1));
-        List<String> userID = new ArrayList<>(mainDataList.get(2));
-        List<String> orderAmountList = new ArrayList<>(mainDataList.get(3));
+        if(storedOrders.contains(month)) {
+            json = storedOrders.getString(month, "");
+            List<List<String>> mainDataList = gson.fromJson(json, type);
+            if (!mainDataList.isEmpty()) {
+                List<String> date = new ArrayList<>(mainDataList.get(0));
+                List<String> transID = new ArrayList<>(mainDataList.get(1));
+                List<String> userID = new ArrayList<>(mainDataList.get(2));
+                List<String> orderAmountList = new ArrayList<>(mainDataList.get(3));
 
-        Log.i("info",date.toString());
-        Log.i("info",transID.toString());
-        Log.i("info",userID.toString());
-        Log.i("info",orderAmountList.toString());
+                Log.i("info", date.toString());
+                Log.i("info", transID.toString());
+                Log.i("info", userID.toString());
+                Log.i("info", orderAmountList.toString());
+            } else {
+                Toast.makeText(this, "No order made", Toast.LENGTH_SHORT).show();
+            }
+        }else
+            Toast.makeText(this, "No order made", Toast.LENGTH_SHORT).show();
 
 
     }

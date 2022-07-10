@@ -131,8 +131,9 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
         BarChart mBarChart = (BarChart) findViewById(R.id.barchart);
         recyclerView = findViewById(R.id.monthNamesListViewRes);
         recyclerView.setLayoutManager(linearLayoutManager);
-        tackerAdapter = new TackerAdapter(allMonthsNames);
-        recyclerView.setAdapter(new TackerAdapter(allMonthsNames));
+        tackerAdapter = new TackerAdapter(allMonthsNames,month);
+        recyclerView.setAdapter(new TackerAdapter(allMonthsNames,month));
+        recyclerView.scrollToPosition(allMonthsNames.indexOf(month));
         LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
                 new IntentFilter("custom-message"));
 
