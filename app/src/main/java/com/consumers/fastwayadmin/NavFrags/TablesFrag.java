@@ -253,6 +253,18 @@ public class TablesFrag extends Fragment {
                     Log.i("info",timeOfBooking.toString());
                     tableView.notifyDataSetChanged();
 
+                }else{
+                    tableNumber.clear();
+                    timeOfUnavailability.clear();
+                    status.clear();
+                    timeOfBooking.clear();
+                    seats.clear();
+                    timeInMillis.clear();
+                    HashMap<String,List<String>> map = new HashMap<>();
+                    tableView = new TableView(tableNumber,status,map,getContext(),timeInMillis,timeOfBooking,timeOfUnavailability,seats);
+                    table.setAdapter(tableView);
+                    Log.i("info",timeOfBooking.toString());
+                    tableView.notifyDataSetChanged();
                 }
 
             }
