@@ -130,6 +130,7 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
         currentDay = calendar.get(Calendar.DAY_OF_MONTH);
         BarChart mBarChart = (BarChart) findViewById(R.id.barchart);
         recyclerView = findViewById(R.id.monthNamesListViewRes);
+
         recyclerView.setLayoutManager(linearLayoutManager);
         tackerAdapter = new TackerAdapter(allMonthsNames,month);
         recyclerView.setAdapter(new TackerAdapter(allMonthsNames,month));
