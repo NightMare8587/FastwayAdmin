@@ -50,74 +50,279 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.hasChild("totalCashTakeAway")){
-                    totalCashTransaction.setText("Total Cash Transactions " + "\u20B9" + snapshot.child("totalCashTakeAway").getValue(String.class));
-                    double totalCash = Double.parseDouble(Objects.requireNonNull(snapshot.child("totalCashTakeAway").getValue(String.class)));
-                     commissionAmount = (totalCash * 7)/100;
-                     if(snapshot.hasChild("totalMonthAmount")){
-                         platformFeeAmount = Double.parseDouble(Objects.requireNonNull(snapshot.child("totalMonthAmount").getValue(String.class)));
-                         if(platformFeeAmount == 0D){
-                             platformFeeAmount = 0D;
-                         }else if(platformFeeAmount >= 500000L){
-                             platformFeeAmount = 5000D;
-                         }else if(platformFeeAmount >= 350000L){
-                             platformFeeAmount = 3500D;
-                         }else if(platformFeeAmount >= 100000){
-                             platformFeeAmount = 2000D;
-                         }else{
-                             platformFeeAmount = 1000D;
-                         }
-                         platformFee.setText("Platform Fee: " + "\u20B9" + df.format(platformFeeAmount));
-                         platformFeeBool = true;
-                     }else{
-                         platformFeeAmount = 1000D;
-                         platformFee.setText("Platform Fee: " + "\u20B91000");
-                     }
-                    totalCommission.setText("Commission to be paid " + "\u20B9" + df.format(commissionAmount));
-                    payCommissionNow.setText("Pay \u20B9" + df.format(commissionAmount + platformFeeAmount) + " Now");
-                    payCommissionNow.setOnClickListener(view -> {
-                        if(commissionAmount != 0) {
-                            SharedPreferences cash = getSharedPreferences("CashCommission",MODE_PRIVATE);
-                            if(cash.contains("fine")) {
-                                String fine = cash.getString("fine","");
-                                AlertDialog.Builder builder = new AlertDialog.Builder(CashTransactionCommissionActivity.this);
-                                builder.setTitle("Pay Commission").setMessage("Do you sure wanna proceed to pay commission\nFine of " + fine + "% will be applied")
-                                        .setNegativeButton("No", (dialogInterface, i) -> dialogInterface.dismiss()).setPositiveButton("Yes", (dialogInterface, i) -> {
-                                    dialogInterface.dismiss();
-                                    double fineAmount = (commissionAmount * 10)/100;
-                                    commissionAmount = commissionAmount + fineAmount;
-                                    Intent intent = new Intent(CashTransactionCommissionActivity.this, CashFreeGateway.class);
-                                    intent.putExtra("amount", df.format(commissionAmount + platformFeeAmount) + "");
-                                    startActivityForResult(intent, 2);
-                                }).create();
-                                builder.show();
+                    if(snapshot.hasChild("lastCommissionPaid")){
+                        long date = Long.parseLong(Objects.requireNonNull(snapshot.child("lastCommissionPaid").getValue(String.class)));
+                        if(System.currentTimeMillis() - date >= 2073600000L){
+                            totalCashTransaction.setText("Total Cash Transactions " + "\u20B9" + snapshot.child("totalCashTakeAway").getValue(String.class));
+                            double totalCash = Double.parseDouble(Objects.requireNonNull(snapshot.child("totalCashTakeAway").getValue(String.class)));
+                            commissionAmount = (totalCash * 7)/100;
+                            if(snapshot.hasChild("totalMonthAmount")){
+                                platformFeeAmount = Double.parseDouble(Objects.requireNonNull(snapshot.child("totalMonthAmount").getValue(String.class)));
+                                if(platformFeeAmount == 0D){
+                                    platformFeeAmount = 0D;
+                                }else if(platformFeeAmount >= 500000L){
+                                    platformFeeAmount = 5000D;
+                                }else if(platformFeeAmount >= 350000L){
+                                    platformFeeAmount = 3500D;
+                                }else if(platformFeeAmount >= 100000){
+                                    platformFeeAmount = 2000D;
+                                }else{
+                                    platformFeeAmount = 1000D;
+                                }
+                                platformFee.setText("Platform Fee: " + "\u20B9" + df.format(platformFeeAmount));
+                                platformFeeBool = true;
                             }else{
-                                AlertDialog.Builder builder = new AlertDialog.Builder(CashTransactionCommissionActivity.this);
-                                builder.setTitle("Pay Commission").setMessage("Do you sure wanna proceed to pay commission")
-                                        .setNegativeButton("No", (dialogInterface, i) -> dialogInterface.dismiss()).setPositiveButton("Yes", (dialogInterface, i) -> {
-                                    dialogInterface.dismiss();
-                                    Intent intent = new Intent(CashTransactionCommissionActivity.this, CashFreeGateway.class);
-
-                                    intent.putExtra("amount", (commissionAmount + platformFeeAmount) + "");
-                                    startActivityForResult(intent, 2);
-                                }).create();
-                                builder.show();
+                                platformFeeAmount = 1000D;
+                                platformFee.setText("Platform Fee: " + "\u20B91000");
                             }
-                        }else
-                            Toast.makeText(CashTransactionCommissionActivity.this, "No commission amount pending", Toast.LENGTH_SHORT).show();
-                    });
-                }else{
-                    KAlertDialog kAlertDialog = new KAlertDialog(CashTransactionCommissionActivity.this,KAlertDialog.ERROR_TYPE)
-                            .setTitleText("No Transaction Made")
-                            .setContentText("No current amount due")
-                            .setConfirmText("Exit")
-                            .setConfirmClickListener(click -> {
-                                click.dismiss();
-                                finish();
-                            });
+                            totalCommission.setText("Commission to be paid " + "\u20B9" + df.format(commissionAmount));
+                            payCommissionNow.setText("Pay \u20B9" + df.format(commissionAmount + platformFeeAmount) + " Now");
+                            payCommissionNow.setOnClickListener(view -> {
+                                if(commissionAmount != 0) {
+                                    SharedPreferences cash = getSharedPreferences("CashCommission",MODE_PRIVATE);
+                                    if(cash.contains("fine")) {
+                                        String fine = cash.getString("fine","");
+                                        AlertDialog.Builder builder = new AlertDialog.Builder(CashTransactionCommissionActivity.this);
+                                        builder.setTitle("Pay Commission").setMessage("Do you sure wanna proceed to pay commission\nFine of " + fine + "% will be applied")
+                                                .setNegativeButton("No", (dialogInterface, i) -> dialogInterface.dismiss()).setPositiveButton("Yes", (dialogInterface, i) -> {
+                                                    dialogInterface.dismiss();
+                                                    double fineAmount = (commissionAmount * 10)/100;
+                                                    commissionAmount = commissionAmount + fineAmount;
+                                                    Intent intent = new Intent(CashTransactionCommissionActivity.this, CashFreeGateway.class);
+                                                    intent.putExtra("amount", df.format(commissionAmount + platformFeeAmount) + "");
+                                                    startActivityForResult(intent, 2);
+                                                }).create();
+                                        builder.show();
+                                    }else{
+                                        AlertDialog.Builder builder = new AlertDialog.Builder(CashTransactionCommissionActivity.this);
+                                        builder.setTitle("Pay Commission").setMessage("Do you sure wanna proceed to pay commission")
+                                                .setNegativeButton("No", (dialogInterface, i) -> dialogInterface.dismiss()).setPositiveButton("Yes", (dialogInterface, i) -> {
+                                                    dialogInterface.dismiss();
+                                                    Intent intent = new Intent(CashTransactionCommissionActivity.this, CashFreeGateway.class);
 
-                    kAlertDialog.setCancelable(false);
-                    kAlertDialog.show();
-                }
+                                                    intent.putExtra("amount", (commissionAmount + platformFeeAmount) + "");
+                                                    startActivityForResult(intent, 2);
+                                                }).create();
+                                        builder.show();
+                                    }
+                                }else
+                                    Toast.makeText(CashTransactionCommissionActivity.this, "No commission amount pending", Toast.LENGTH_SHORT).show();
+                            });
+                        }else{
+                            KAlertDialog kAlertDialog = new KAlertDialog(CashTransactionCommissionActivity.this,KAlertDialog.ERROR_TYPE)
+                                    .setTitleText("Too early")
+                                    .setContentText("No current amount due")
+                                    .setConfirmText("Exit")
+                                    .setConfirmClickListener(click -> {
+                                        click.dismiss();
+                                        finish();
+                                    })
+                                            .setCancelText("Leaving Fastway").setCancelClickListener(click -> {
+                                                click.dismissWithAnimation();
+                                        totalCashTransaction.setText("Total Cash Transactions " + "\u20B9" + snapshot.child("totalCashTakeAway").getValue(String.class));
+                                        double totalCash = Double.parseDouble(Objects.requireNonNull(snapshot.child("totalCashTakeAway").getValue(String.class)));
+                                        commissionAmount = (totalCash * 7)/100;
+                                        if(snapshot.hasChild("totalMonthAmount")){
+                                            platformFeeAmount = Double.parseDouble(Objects.requireNonNull(snapshot.child("totalMonthAmount").getValue(String.class)));
+                                            if(platformFeeAmount == 0D){
+                                                platformFeeAmount = 0D;
+                                            }else if(platformFeeAmount >= 500000L){
+                                                platformFeeAmount = 5000D;
+                                            }else if(platformFeeAmount >= 350000L){
+                                                platformFeeAmount = 3500D;
+                                            }else if(platformFeeAmount >= 100000){
+                                                platformFeeAmount = 2000D;
+                                            }else{
+                                                platformFeeAmount = 1000D;
+                                            }
+                                            platformFee.setText("Platform Fee: " + "\u20B9" + df.format(platformFeeAmount));
+                                            platformFeeBool = true;
+                                        }else{
+                                            platformFeeAmount = 1000D;
+                                            platformFee.setText("Platform Fee: " + "\u20B91000");
+                                        }
+                                        totalCommission.setText("Commission to be paid " + "\u20B9" + df.format(commissionAmount));
+                                        payCommissionNow.setText("Pay \u20B9" + df.format(commissionAmount + platformFeeAmount) + " Now");
+                                        payCommissionNow.setOnClickListener(view -> {
+                                            if(commissionAmount != 0) {
+                                                SharedPreferences cash = getSharedPreferences("CashCommission",MODE_PRIVATE);
+                                                if(cash.contains("fine")) {
+                                                    String fine = cash.getString("fine","");
+                                                    AlertDialog.Builder builder = new AlertDialog.Builder(CashTransactionCommissionActivity.this);
+                                                    builder.setTitle("Pay Commission").setMessage("Do you sure wanna proceed to pay commission\nFine of " + fine + "% will be applied")
+                                                            .setNegativeButton("No", (dialogInterface, i) -> dialogInterface.dismiss()).setPositiveButton("Yes", (dialogInterface, i) -> {
+                                                                dialogInterface.dismiss();
+                                                                double fineAmount = (commissionAmount * 10)/100;
+                                                                commissionAmount = commissionAmount + fineAmount;
+                                                                Intent intent = new Intent(CashTransactionCommissionActivity.this, CashFreeGateway.class);
+                                                                intent.putExtra("amount", df.format(commissionAmount + platformFeeAmount) + "");
+                                                                startActivityForResult(intent, 2);
+                                                            }).create();
+                                                    builder.show();
+                                                }else{
+                                                    AlertDialog.Builder builder = new AlertDialog.Builder(CashTransactionCommissionActivity.this);
+                                                    builder.setTitle("Pay Commission").setMessage("Do you sure wanna proceed to pay commission")
+                                                            .setNegativeButton("No", (dialogInterface, i) -> dialogInterface.dismiss()).setPositiveButton("Yes", (dialogInterface, i) -> {
+                                                                dialogInterface.dismiss();
+                                                                Intent intent = new Intent(CashTransactionCommissionActivity.this, CashFreeGateway.class);
+
+                                                                intent.putExtra("amount", (commissionAmount + platformFeeAmount) + "");
+                                                                startActivityForResult(intent, 2);
+                                                            }).create();
+                                                    builder.show();
+                                                }
+                                            }else
+                                                Toast.makeText(CashTransactionCommissionActivity.this, "No commission amount pending", Toast.LENGTH_SHORT).show();
+                                        });
+                                    });
+
+                            kAlertDialog.setCancelable(false);
+                            kAlertDialog.show();
+                        }
+                        }else if(snapshot.hasChild("registrationDate")){
+                        long date = Long.parseLong(Objects.requireNonNull(snapshot.child("registrationDate").getValue(String.class)));
+                        if(System.currentTimeMillis() - date >= 2073600000L){
+                            totalCashTransaction.setText("Total Cash Transactions " + "\u20B9" + snapshot.child("totalCashTakeAway").getValue(String.class));
+                            double totalCash = Double.parseDouble(Objects.requireNonNull(snapshot.child("totalCashTakeAway").getValue(String.class)));
+                            commissionAmount = (totalCash * 7)/100;
+                            if(snapshot.hasChild("totalMonthAmount")){
+                                platformFeeAmount = Double.parseDouble(Objects.requireNonNull(snapshot.child("totalMonthAmount").getValue(String.class)));
+                                if(platformFeeAmount == 0D){
+                                    platformFeeAmount = 0D;
+                                }else if(platformFeeAmount >= 500000L){
+                                    platformFeeAmount = 5000D;
+                                }else if(platformFeeAmount >= 350000L){
+                                    platformFeeAmount = 3500D;
+                                }else if(platformFeeAmount >= 100000){
+                                    platformFeeAmount = 2000D;
+                                }else{
+                                    platformFeeAmount = 1000D;
+                                }
+                                platformFee.setText("Platform Fee: " + "\u20B9" + df.format(platformFeeAmount));
+                                platformFeeBool = true;
+                            }else{
+                                platformFeeAmount = 1000D;
+                                platformFee.setText("Platform Fee: " + "\u20B91000");
+                            }
+                            totalCommission.setText("Commission to be paid " + "\u20B9" + df.format(commissionAmount));
+                            payCommissionNow.setText("Pay \u20B9" + df.format(commissionAmount + platformFeeAmount) + " Now");
+                            payCommissionNow.setOnClickListener(view -> {
+                                if(commissionAmount != 0) {
+                                    SharedPreferences cash = getSharedPreferences("CashCommission",MODE_PRIVATE);
+                                    if(cash.contains("fine")) {
+                                        String fine = cash.getString("fine","");
+                                        AlertDialog.Builder builder = new AlertDialog.Builder(CashTransactionCommissionActivity.this);
+                                        builder.setTitle("Pay Commission").setMessage("Do you sure wanna proceed to pay commission\nFine of " + fine + "% will be applied")
+                                                .setNegativeButton("No", (dialogInterface, i) -> dialogInterface.dismiss()).setPositiveButton("Yes", (dialogInterface, i) -> {
+                                                    dialogInterface.dismiss();
+                                                    double fineAmount = (commissionAmount * 10)/100;
+                                                    commissionAmount = commissionAmount + fineAmount;
+                                                    Intent intent = new Intent(CashTransactionCommissionActivity.this, CashFreeGateway.class);
+                                                    intent.putExtra("amount", df.format(commissionAmount + platformFeeAmount) + "");
+                                                    startActivityForResult(intent, 2);
+                                                }).create();
+                                        builder.show();
+                                    }else{
+                                        AlertDialog.Builder builder = new AlertDialog.Builder(CashTransactionCommissionActivity.this);
+                                        builder.setTitle("Pay Commission").setMessage("Do you sure wanna proceed to pay commission")
+                                                .setNegativeButton("No", (dialogInterface, i) -> dialogInterface.dismiss()).setPositiveButton("Yes", (dialogInterface, i) -> {
+                                                    dialogInterface.dismiss();
+                                                    Intent intent = new Intent(CashTransactionCommissionActivity.this, CashFreeGateway.class);
+
+                                                    intent.putExtra("amount", (commissionAmount + platformFeeAmount) + "");
+                                                    startActivityForResult(intent, 2);
+                                                }).create();
+                                        builder.show();
+                                    }
+                                }else
+                                    Toast.makeText(CashTransactionCommissionActivity.this, "No commission amount pending", Toast.LENGTH_SHORT).show();
+                            });
+                        }else{
+                            KAlertDialog kAlertDialog = new KAlertDialog(CashTransactionCommissionActivity.this,KAlertDialog.ERROR_TYPE)
+                                    .setTitleText("Too early")
+                                    .setContentText("No current amount due")
+                                    .setConfirmText("Exit")
+                                    .setConfirmClickListener(click -> {
+                                        click.dismiss();
+                                        finish();
+                                    })
+                                    .setCancelText("Leaving Fastway").setCancelClickListener(click -> {
+                                        click.dismissWithAnimation();
+                                        totalCashTransaction.setText("Total Cash Transactions " + "\u20B9" + snapshot.child("totalCashTakeAway").getValue(String.class));
+                                        double totalCash = Double.parseDouble(Objects.requireNonNull(snapshot.child("totalCashTakeAway").getValue(String.class)));
+                                        commissionAmount = (totalCash * 7)/100;
+                                        if(snapshot.hasChild("totalMonthAmount")){
+                                            platformFeeAmount = Double.parseDouble(Objects.requireNonNull(snapshot.child("totalMonthAmount").getValue(String.class)));
+                                            if(platformFeeAmount == 0D){
+                                                platformFeeAmount = 0D;
+                                            }else if(platformFeeAmount >= 500000L){
+                                                platformFeeAmount = 5000D;
+                                            }else if(platformFeeAmount >= 350000L){
+                                                platformFeeAmount = 3500D;
+                                            }else if(platformFeeAmount >= 100000){
+                                                platformFeeAmount = 2000D;
+                                            }else{
+                                                platformFeeAmount = 1000D;
+                                            }
+                                            platformFee.setText("Platform Fee: " + "\u20B9" + df.format(platformFeeAmount));
+                                            platformFeeBool = true;
+                                        }else{
+                                            platformFeeAmount = 1000D;
+                                            platformFee.setText("Platform Fee: " + "\u20B91000");
+                                        }
+                                        totalCommission.setText("Commission to be paid " + "\u20B9" + df.format(commissionAmount));
+                                        payCommissionNow.setText("Pay \u20B9" + df.format(commissionAmount + platformFeeAmount) + " Now");
+                                        payCommissionNow.setOnClickListener(view -> {
+                                            if(commissionAmount != 0) {
+                                                SharedPreferences cash = getSharedPreferences("CashCommission",MODE_PRIVATE);
+                                                if(cash.contains("fine")) {
+                                                    String fine = cash.getString("fine","");
+                                                    AlertDialog.Builder builder = new AlertDialog.Builder(CashTransactionCommissionActivity.this);
+                                                    builder.setTitle("Pay Commission").setMessage("Do you sure wanna proceed to pay commission\nFine of " + fine + "% will be applied")
+                                                            .setNegativeButton("No", (dialogInterface, i) -> dialogInterface.dismiss()).setPositiveButton("Yes", (dialogInterface, i) -> {
+                                                                dialogInterface.dismiss();
+                                                                double fineAmount = (commissionAmount * 10)/100;
+                                                                commissionAmount = commissionAmount + fineAmount;
+                                                                Intent intent = new Intent(CashTransactionCommissionActivity.this, CashFreeGateway.class);
+                                                                intent.putExtra("amount", df.format(commissionAmount + platformFeeAmount) + "");
+                                                                startActivityForResult(intent, 2);
+                                                            }).create();
+                                                    builder.show();
+                                                }else{
+                                                    AlertDialog.Builder builder = new AlertDialog.Builder(CashTransactionCommissionActivity.this);
+                                                    builder.setTitle("Pay Commission").setMessage("Do you sure wanna proceed to pay commission")
+                                                            .setNegativeButton("No", (dialogInterface, i) -> dialogInterface.dismiss()).setPositiveButton("Yes", (dialogInterface, i) -> {
+                                                                dialogInterface.dismiss();
+                                                                Intent intent = new Intent(CashTransactionCommissionActivity.this, CashFreeGateway.class);
+
+                                                                intent.putExtra("amount", (commissionAmount + platformFeeAmount) + "");
+                                                                startActivityForResult(intent, 2);
+                                                            }).create();
+                                                    builder.show();
+                                                }
+                                            }else
+                                                Toast.makeText(CashTransactionCommissionActivity.this, "No commission amount pending", Toast.LENGTH_SHORT).show();
+                                        });
+                                    });
+
+                            kAlertDialog.setCancelable(false);
+                            kAlertDialog.show();
+                        }
+                    }else{
+                        KAlertDialog kAlertDialog = new KAlertDialog(CashTransactionCommissionActivity.this,KAlertDialog.ERROR_TYPE)
+                                .setTitleText("No Transaction Made")
+                                .setContentText("No current amount due")
+                                .setConfirmText("Exit")
+                                .setConfirmClickListener(click -> {
+                                    click.dismiss();
+                                    finish();
+                                });
+
+                        kAlertDialog.setCancelable(false);
+                        kAlertDialog.show();
+                    }
+                    }
+
             }
 
             @Override

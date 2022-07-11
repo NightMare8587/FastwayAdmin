@@ -697,36 +697,39 @@ public class HomeFrag extends Fragment {
                         bubbleShowCase.dismiss();
                     }
                 });
-
-        bubbleShowCaseBuilder4 = new BubbleShowCaseBuilder(requireActivity());
-        bubbleShowCaseBuilder4.title("Restaurant Analysis")
-                .description("Here you can see restaurant all time analysis of order's and dishes")
-                .targetView(seeMoreDetails).listener(new BubbleShowCaseListener() {
-                    @Override
-                    public void onTargetClick(BubbleShowCase bubbleShowCase) {
-
-                    }
-
-                    @Override
-                    public void onCloseActionImageClick(BubbleShowCase bubbleShowCase) {
-
-                    }
-
-                    @Override
-                    public void onBackgroundDimClick(BubbleShowCase bubbleShowCase) {
-                        bubbleShowCase.dismiss();
-                    }
-
-                    @Override
-                    public void onBubbleClick(BubbleShowCase bubbleShowCase) {
-                        bubbleShowCase.dismiss();
-                    }
-                });
-
         BubbleShowCaseSequence bubbleShowCaseSequence = new BubbleShowCaseSequence();
-        bubbleShowCaseSequence.addShowCase(bubbleShowCaseBuilder5).addShowCase(bubbleShowCaseBuilder1).addShowCase(bubbleShowCaseBuilder2).addShowCase(bubbleShowCaseBuilder3).addShowCase(bubbleShowCaseBuilder4);
-        bubbleShowCaseSequence.show();
+        bubbleShowCaseSequence.addShowCase(bubbleShowCaseBuilder5).addShowCase(bubbleShowCaseBuilder1).addShowCase(bubbleShowCaseBuilder2).addShowCase(bubbleShowCaseBuilder3);
 
+        if(seeMoreDetails.isShown()) {
+            bubbleShowCaseBuilder4 = new BubbleShowCaseBuilder(requireActivity());
+            bubbleShowCaseBuilder4.title("Restaurant Analysis")
+                    .description("Here you can see restaurant all time analysis of order's and dishes")
+                    .targetView(seeMoreDetails).listener(new BubbleShowCaseListener() {
+                        @Override
+                        public void onTargetClick(BubbleShowCase bubbleShowCase) {
+
+                        }
+
+                        @Override
+                        public void onCloseActionImageClick(BubbleShowCase bubbleShowCase) {
+
+                        }
+
+                        @Override
+                        public void onBackgroundDimClick(BubbleShowCase bubbleShowCase) {
+                            bubbleShowCase.dismiss();
+                        }
+
+                        @Override
+                        public void onBubbleClick(BubbleShowCase bubbleShowCase) {
+                            bubbleShowCase.dismiss();
+                        }
+                    });
+            bubbleShowCaseSequence.addShowCase(bubbleShowCaseBuilder4);
+        }
+
+
+        bubbleShowCaseSequence.show();
         resInfoSharedEdit.putString("homeFragShow","yes");
         resInfoSharedEdit.apply();
     }

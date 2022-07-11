@@ -27,7 +27,7 @@
             android:id="@+id/comboDiscountImageView"
             android:layout_width="330dp"
             android:layout_height="120dp"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="6dp"
             android:scaleType="fitXY"
 
             app:layout_constraintEnd_toEndOf="parent"
@@ -38,7 +38,7 @@
         <LinearLayout
             android:id="@+id/mainFragLinearLayout"
             android:layout_width="0dp"
-            android:layout_height="200dp"
+            android:layout_height="190dp"
             android:layout_marginStart="10dp"
             android:layout_marginEnd="10dp"
             android:orientation="vertical"
@@ -109,7 +109,7 @@
         <LinearLayout
             android:id="@+id/secondFragLinearLayout"
             android:layout_width="0dp"
-            android:layout_height="200dp"
+            android:layout_height="190dp"
             android:layout_marginStart="10dp"
             android:layout_marginTop="3dp"
             android:layout_marginEnd="10dp"
@@ -181,7 +181,7 @@
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/homeFragToolBar"
             android:layout_width="match_parent"
-            android:layout_height="55dp"
+            android:layout_height="50dp"
             android:background="@drawable/toolbar_background_layout"
             android:maxHeight="60dp"
             android:minHeight="55dp"
@@ -196,7 +196,7 @@
             android:id="@+id/restaurantOnOff"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="3dp"
             android:layout_marginEnd="25dp"
             android:layout_marginBottom="8dp"
             android:checked="true"
@@ -214,13 +214,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="25dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="3dp"
+            android:layout_marginBottom="8dp"
             android:checked="true"
             android:fontFamily="@font/merriweather_sans_bold"
+            android:text="Accept Orders"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:layout_marginBottom="8dp"
-            android:text="Accept Orders"
             app:layout_constraintBottom_toTopOf="@+id/comboDiscountImageView"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/homeFragToolBar"
@@ -295,18 +295,18 @@
 
         <Button
             android:id="@+id/seeMoreDetailsHomeFragButton"
-            app:layout_constraintTop_toBottomOf="@+id/ggWP"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            android:layout_marginTop="10dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="See More Details"
-            android:textStyle="bold"
-            android:textSize="18sp"
+            android:layout_marginTop="5dp"
+            android:background="@drawable/edittext_back"
             android:padding="10dp"
+            android:text="See More Details"
             android:textColor="#000000"
-            android:background="@drawable/edittext_back"/>
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/ggWP" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>

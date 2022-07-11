@@ -30,6 +30,7 @@ import android.widget.RemoteViews;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
@@ -72,6 +73,7 @@ public class AddTables extends AppCompatActivity {
     StorageReference reference;
     ImageView imageView;
     ProgressBar progressBar;
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -243,9 +245,16 @@ public class AddTables extends AppCompatActivity {
                     intents.setDataAndType(FileProvider.getUriForFile(AddTables.this, AddTables.this.getApplicationContext().getPackageName() + ".provider",file), "application/pdf"); // here we set correct type for PDF
                     intents.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                     Log.i("info",selectedUri.toString());
+                    PendingIntent pendingIntent;
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+                        pendingIntent = PendingIntent.getActivity(AddTables.this, 698, intents, PendingIntent.FLAG_MUTABLE
+                        );
+                    }
+                    else{
+                        pendingIntent = PendingIntent.getActivity(AddTables.this, 698, intents, PendingIntent.FLAG_UPDATE_CURRENT
+                        );
+                    }
 
-                    PendingIntent pendingIntent = PendingIntent.getActivity(AddTables.this, 698, intents, PendingIntent.FLAG_UPDATE_CURRENT
-                    );
 
                     String channel_id = "notification_channel";
                     NotificationCompat.Builder builder
