@@ -40,6 +40,7 @@ public class DishView extends RecyclerView.Adapter<DishView.DishAdapter> {
     List<String> fullPrice;
     List<String> half;
     List<String> image;
+    List<String> enable;
     List<String> before;
     List<String> after;
     SharedPreferences sharedPreferences;
@@ -47,10 +48,11 @@ public class DishView extends RecyclerView.Adapter<DishView.DishAdapter> {
     FirebaseAuth auth;
     DatabaseReference ref;
     String type;
-    public DishView(List<String> names,List<String> full,List<String> half,String type,List<String> image,List<String> before,List<String> after,List<String> discount){
+    public DishView(List<String> names,List<String> full,List<String> half,String type,List<String> image,List<String> before,List<String> after,List<String> discount,List<String> enable){
         this.fullPrice = full;
         this.half = half;
         this.names = names;
+        this.enable = enable;
         this.before = before;
         this.after = after;
         this.discount = discount;
@@ -85,6 +87,15 @@ public class DishView extends RecyclerView.Adapter<DishView.DishAdapter> {
                 builder.show();
 
         });
+
+        if(enable.get(position).equals("yes")) {
+            holder.checkBox.setText("Enabled");
+            holder.checkBox.setChecked(true);
+        }else
+        {
+            holder.checkBox.setText("Disabled");
+            holder.checkBox.setChecked(false);
+        }
 
         holder.removeOffers.setOnClickListener(v -> {
             FirebaseAuth auth = FirebaseAuth.getInstance();
@@ -151,9 +162,11 @@ public class DishView extends RecyclerView.Adapter<DishView.DishAdapter> {
             if(isChecked){
                 databaseReference.child(names.get(position)).child("enable").setValue("yes");
                 holder.checkBox.setText("Enabled");
+//                holder.checkBox.setChecked(true);
             }else{
-                databaseReference.child(names.get(position)).child("enable").setValue("no");
                 holder.checkBox.setText("Disabled");
+//                holder.checkBox.setChecked(false);
+                databaseReference.child(names.get(position)).child("enable").setValue("no");
             }
         });
 

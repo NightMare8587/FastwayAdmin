@@ -39,13 +39,15 @@ public class ComboRecyclerView extends RecyclerView.Adapter<ComboRecyclerView.Ho
     List<String> comboName;
     List<List<String>> dishName;
     List<String> price;
+    List<String> enabled;
     List<String> comboImage;
     List<String> description;
     Context context;
-    public ComboRecyclerView(List<String> comboName, List<List<String>> dishName, List<String> price, Context context,List<String> comboImage,List<String> description) {
+    public ComboRecyclerView(List<String> comboName, List<List<String>> dishName, List<String> price, Context context,List<String> comboImage,List<String> description,List<String> enabled) {
         this.comboName = comboName;
         this.description = description;
         this.comboImage = comboImage;
+        this.enabled = enabled;
         this.dishName = dishName;
         this.price = price;
         this.context = context;
@@ -59,6 +61,7 @@ public class ComboRecyclerView extends RecyclerView.Adapter<ComboRecyclerView.Ho
         return new Holder(view);
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull Holder holder, @SuppressLint("RecyclerView") int position) {
         holder.comboName.setText(comboName.get(position));
@@ -69,6 +72,13 @@ public class ComboRecyclerView extends RecyclerView.Adapter<ComboRecyclerView.Ho
         ViewGroup.LayoutParams param = holder.listView.getLayoutParams();
         param.height = 150*current.size();
         holder.listView.setLayoutParams(param);
+        if(enabled.get(position).equals("yes")){
+            holder.checkBox.setText("Enabled");
+            holder.checkBox.setChecked(true);
+        }else{
+            holder.checkBox.setText("Disabled");
+            holder.checkBox.setChecked(false);
+        }
         holder.imageView.setOnClickListener(click -> {
             AlertDialog.Builder alert = new AlertDialog.Builder(click.getContext());
             alert.setTitle("Image");

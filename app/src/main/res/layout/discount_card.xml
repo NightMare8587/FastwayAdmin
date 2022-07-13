@@ -2,7 +2,7 @@
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/discountCard"
+    android:id="@+id/discountRecyclerCardView"
     android:layout_margin="3dp"
     android:layout_width="match_parent" android:layout_height="90dp">
 
@@ -11,14 +11,26 @@
         android:layout_height="match_parent">
 
         <TextView
+            android:id="@+id/alreadyHasDiscount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:layout_marginTop="7dp"
+            android:text="TextView"
+            android:textColor="#67CD6B"
+            android:textSize="15sp"
+            app:layout_constraintStart_toEndOf="@+id/discountViewDishName"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
             android:id="@+id/discountViewDishName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
+            android:layout_marginTop="6dp"
             android:text="TextView"
             android:textSize="18sp"
             android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@+id/discountCardImageView"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -30,6 +42,28 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:srcCompat="@tools:sample/avatars" />
+
+        <TextView
+            android:id="@+id/textPriceDishCardViewDiscount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="4dp"
+            android:text="TextView"
+            android:textSize="18sp"
+            app:layout_constraintStart_toEndOf="@+id/discountCardImageView"
+            app:layout_constraintTop_toBottomOf="@+id/discountViewDishName" />
+
+        <TextView
+            android:id="@+id/dishTypeTextCardViewRecycler"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="4dp"
+            android:text="TextView"
+            android:textSize="16sp"
+            app:layout_constraintStart_toEndOf="@+id/discountCardImageView"
+            app:layout_constraintTop_toBottomOf="@+id/textPriceDishCardViewDiscount" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

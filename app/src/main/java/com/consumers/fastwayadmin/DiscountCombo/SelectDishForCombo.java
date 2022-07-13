@@ -27,6 +27,7 @@ public class SelectDishForCombo extends AppCompatActivity {
     String state;
     List<String> name = new ArrayList<>();
     List<String> image = new ArrayList<>();
+    List<String> price = new ArrayList<>();
     DatabaseReference reference;
     String type;
     String locality;
@@ -49,9 +50,10 @@ public class SelectDishForCombo extends AppCompatActivity {
                     for(DataSnapshot dataSnapshot : snapshot.getChildren()){
                         name.add(String.valueOf(dataSnapshot.child("name").getValue()));
                         image.add(String.valueOf(dataSnapshot.child("image").getValue()));
+                        price.add(String.valueOf(dataSnapshot.child("full").getValue()));
                     }
                     recyclerView.setLayoutManager(new LinearLayoutManager(SelectDishForCombo.this));
-                    recyclerView.setAdapter(new SelectDishAdapter(name,image,SelectDishForCombo.this,state,locality));
+                    recyclerView.setAdapter(new SelectDishAdapter(name,image,SelectDishForCombo.this,state,locality,price));
                 }
             }
 

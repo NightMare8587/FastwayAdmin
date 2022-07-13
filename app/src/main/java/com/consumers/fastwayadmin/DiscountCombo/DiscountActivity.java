@@ -54,6 +54,8 @@ public class DiscountActivity extends AppCompatActivity {
     String resName;
     String URL = "https://fcm.googleapis.com/fcm/send";
     List<String> name = new ArrayList<>();
+    List<String> price = new ArrayList<>();
+    List<String> alreadyHasDiscount = new ArrayList<>();
     List<String> image = new ArrayList<>();
     HashMap<String,String> map = new HashMap<>();
     RecyclerView recyclerView;
@@ -83,16 +85,27 @@ public class DiscountActivity extends AppCompatActivity {
                             if (snapshot.exists()) {
                                 name.clear();
                                 map.clear();
+                                alreadyHasDiscount.clear();
+                                price.clear();
                                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                                     for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
                                         if (dataSnapshot1.exists() && String.valueOf(dataSnapshot1.child("mrp").getValue()).equals("no")) {
                                             map.put(dataSnapshot1.child("name").getValue(String.class), dataSnapshot.getKey());
                                             name.add(dataSnapshot1.child("name").getValue(String.class));
+                                            if(dataSnapshot1.hasChild("Discount")){
+                                                alreadyHasDiscount.add("yes");
+                                            }else
+                                                alreadyHasDiscount.add("no");
+                                            price.add(dataSnapshot1.child("full").getValue(String.class));
+                                            if(dataSnapshot1.hasChild("image"))
+                                                image.add(String.valueOf(dataSnapshot1.child("image").getValue()));
+                                            else
+                                                image.add("");
                                         }
                                     }
                                 }
                                 recyclerView.setLayoutManager(new LinearLayoutManager(DiscountActivity.this));
-                                recyclerView.setAdapter(new DiscountRecycler(map,DiscountActivity.this,name,image));
+                                recyclerView.setAdapter(new DiscountRecycler(map,DiscountActivity.this,name,image,price,alreadyHasDiscount));
                             }
                         }
 
@@ -112,11 +125,19 @@ public class DiscountActivity extends AppCompatActivity {
                         if (snapshot.exists()) {
                             name.clear();
                             map.clear();
+                            image.clear();
+                            price.clear();
+                            alreadyHasDiscount.clear();
                             for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                                 for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
                                     if (dataSnapshot1.exists() && String.valueOf(dataSnapshot1.child("mrp").getValue()).equals("no") && Objects.requireNonNull(dataSnapshot1.child("name").getValue(String.class).toLowerCase(Locale.ROOT)).contains(searchText.toLowerCase(Locale.ROOT))) {
                                         map.put(dataSnapshot1.child("name").getValue(String.class), dataSnapshot.getKey());
                                         name.add(dataSnapshot1.child("name").getValue(String.class));
+                                        if(dataSnapshot1.hasChild("Discount")){
+                                            alreadyHasDiscount.add("yes");
+                                        }else
+                                            alreadyHasDiscount.add("no");
+                                        price.add(dataSnapshot1.child("full").getValue(String.class));
                                         if(dataSnapshot1.hasChild("image"))
                                             image.add(String.valueOf(dataSnapshot1.child("image").getValue()));
                                         else
@@ -125,7 +146,7 @@ public class DiscountActivity extends AppCompatActivity {
                                 }
                             }
                             recyclerView.setLayoutManager(new LinearLayoutManager(DiscountActivity.this));
-                            recyclerView.setAdapter(new DiscountRecycler(map,DiscountActivity.this,name,image));
+                            recyclerView.setAdapter(new DiscountRecycler(map,DiscountActivity.this,name,image,price,alreadyHasDiscount));
                         }
                     }
 
@@ -147,15 +168,26 @@ public class DiscountActivity extends AppCompatActivity {
                 if (snapshot.exists()) {
                     name.clear();
                     map.clear();
+                    price.clear();
+                    alreadyHasDiscount.clear();
+                    image.clear();
                     for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                         for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
                             if (dataSnapshot1.exists() && String.valueOf(dataSnapshot1.child("mrp").getValue()).equals("no")) {
                                 map.put(dataSnapshot1.child("name").getValue(String.class), dataSnapshot.getKey());
                                 name.add(dataSnapshot1.child("name").getValue(String.class));
+//                                Log.i("where",dataSnapshot1.child("full").getValue(String.class) + "\n" + dataSnapshot1.toString());
+                                price.add(dataSnapshot1.child("full").getValue(String.class));
+                                if(dataSnapshot1.hasChild("Discount")){
+                                    alreadyHasDiscount.add("yes");
+                                }else
+                                    alreadyHasDiscount.add("no");
                                 if(dataSnapshot1.hasChild("image"))
                                     image.add(String.valueOf(dataSnapshot1.child("image").getValue()));
                                 else
                                     image.add("");
+
+                                Log.i("ingi",dataSnapshot1.toString());
                             }
                         }
                     }
@@ -231,7 +263,7 @@ public class DiscountActivity extends AppCompatActivity {
                 })
                 .withSecondButtonListner(view -> {
                     recyclerView.setLayoutManager(new LinearLayoutManager(DiscountActivity.this));
-                    recyclerView.setAdapter(new DiscountRecycler(map,DiscountActivity.this,name,image));
+                    recyclerView.setAdapter(new DiscountRecycler(map,DiscountActivity.this,name,image,price,alreadyHasDiscount));
                     flatDialog.dismiss();
                 }).show();
     }
@@ -287,8 +319,8 @@ public class DiscountActivity extends AppCompatActivity {
                                     Log.i("type", type);
                                     Log.i("name", dishName);
 //                                reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(auth.getUid()).child("List of Dish");
-                                    reference.child("List of Dish").child(type).child(dishName).child("full").setValue(afterDis);
-                                    reference.child("List of Dish").child(type).child(dishName).child("half").setValue(afterDisHalf);
+                                    reference.child("List of Dish").child(type).child(dishName).child("full").setValue(afterDis + "");
+                                    reference.child("List of Dish").child(type).child(dishName).child("half").setValue(afterDisHalf + "");
                                 }else{
                                     int price = Integer.parseInt(Objects.requireNonNull(String.valueOf(dataSnapshot1.child("full").getValue())));
                                     int discount = Integer.parseInt(firstTextField);
@@ -299,7 +331,7 @@ public class DiscountActivity extends AppCompatActivity {
                                     Log.i("type",type);
                                     Log.i("name",dishName);
 //                                reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(auth.getUid()).child("List of Dish");
-                                    reference.child("List of Dish").child(type).child(dishName).child("full").setValue(afterDis);
+                                    reference.child("List of Dish").child(type).child(dishName).child("full").setValue(afterDis + "");
                                 }
                             }
                         }
@@ -382,8 +414,8 @@ public class DiscountActivity extends AppCompatActivity {
                                     Log.i("type", type);
                                     Log.i("name", dishName);
 //                                    reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid()));
-                                    reference.child("List of Dish").child(type).child(dishName).child("full").setValue(afterDis);
-                                    reference.child("List of Dish").child(type).child(dishName).child("half").setValue(afterDisHalf);
+                                    reference.child("List of Dish").child(type).child(dishName).child("full").setValue(afterDis + "");
+                                    reference.child("List of Dish").child(type).child(dishName).child("half").setValue(afterDisHalf + "");
                                 }else{
                                     int price = Integer.parseInt(Objects.requireNonNull(String.valueOf(dataSnapshot1.child("full").getValue())));
                                     int discount = 40;
@@ -394,7 +426,7 @@ public class DiscountActivity extends AppCompatActivity {
                                     Log.i("type",type);
                                     Log.i("name",dishName);
 //                                    reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid()));
-                                    reference.child("List of Dish").child(type).child(dishName).child("full").setValue(afterDis);
+                                    reference.child("List of Dish").child(type).child(dishName).child("full").setValue(afterDis + "");
                                 }
                              }
                           }
@@ -494,8 +526,8 @@ public class DiscountActivity extends AppCompatActivity {
                                     Log.i("type", type);
                                     Log.i("name", dishName);
 //                                reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(auth.getUid()).child("List of Dish");
-                                    reference.child("List of Dish").child(type).child(dishName).child("full").setValue(afterDis);
-                                    reference.child("List of Dish").child(type).child(dishName).child("half").setValue(afterDisHalf);
+                                    reference.child("List of Dish").child(type).child(dishName).child("full").setValue(afterDis + "");
+                                    reference.child("List of Dish").child(type).child(dishName).child("half").setValue(afterDisHalf + "");
                                 }else{
                                     int price = Integer.parseInt(Objects.requireNonNull(String.valueOf(dataSnapshot1.child("full").getValue())));
                                     int discount = 50;
@@ -506,7 +538,7 @@ public class DiscountActivity extends AppCompatActivity {
                                     Log.i("type",type);
                                     Log.i("name",dishName);
 //                                reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(auth.getUid()).child("List of Dish");
-                                    reference.child("List of Dish").child(type).child(dishName).child("full").setValue(afterDis);
+                                    reference.child("List of Dish").child(type).child(dishName).child("full").setValue(afterDis + "");
                                 }
                             }
                         }

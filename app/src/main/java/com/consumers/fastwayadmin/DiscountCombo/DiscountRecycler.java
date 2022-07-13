@@ -38,17 +38,21 @@ import java.util.Objects;
 
 public class DiscountRecycler extends RecyclerView.Adapter<DiscountRecycler.Holder> {
     List<String> name;
+    List<String> price;
     Context context;
     List<String> image;
+    List<String> alreadyHasDiscount;
     SharedPreferences sharedPreferences;
     HashMap<String,String> dishName;
     FirebaseAuth auth = FirebaseAuth.getInstance();
     DatabaseReference addToDB = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid()));
     DatabaseReference dis = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
     DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid()));
-    public DiscountRecycler(HashMap<String,String> dishName,Context context,List<String> name,List<String> image){
+    public DiscountRecycler(HashMap<String,String> dishName,Context context,List<String> name,List<String> image,List<String> price,List<String> alreadyHasDiscount){
         this.dishName = dishName;
         this.image = image;
+        this.alreadyHasDiscount = alreadyHasDiscount;
+        this.price = price;
         this.context = context;
         this.name = name;
     }
@@ -60,9 +64,16 @@ public class DiscountRecycler extends RecyclerView.Adapter<DiscountRecycler.Hold
         return new Holder(view);
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull Holder holder, @SuppressLint("RecyclerView") int position) {
         holder.textView.setText(name.get(position));
+        holder.priceText.setText("\u20b9" + price.get(position));
+        if(alreadyHasDiscount.get(position).equals("yes"))
+            holder.discountApplied.setText("Discount Already Applied");
+        else
+            holder.discountApplied.setVisibility(View.INVISIBLE);
+        holder.dishtype.setText(dishName.get(name.get(position)));
         if(!image.get(position).equals("")){
             Picasso.get().load(image.get(position)).into(holder.imageView);
         }else
@@ -128,20 +139,23 @@ public class DiscountRecycler extends RecyclerView.Adapter<DiscountRecycler.Hold
     }
 
     public static class Holder extends RecyclerView.ViewHolder{
-        TextView textView;
+        TextView textView,priceText,dishtype,discountApplied;
         CardView cardView;
         ImageView imageView;
         public Holder(@NonNull View itemView) {
             super(itemView);
             textView = itemView.findViewById(R.id.discountViewDishName);
-            cardView = itemView.findViewById(R.id.discountCard);
+            cardView = itemView.findViewById(R.id.discountRecyclerCardView);
             imageView = itemView.findViewById(R.id.discountCardImageView);
+            priceText = itemView.findViewById(R.id.textPriceDishCardViewDiscount);
+            dishtype = itemView.findViewById(R.id.dishTypeTextCardViewRecycler);
+            discountApplied = itemView.findViewById(R.id.alreadyHasDiscount);
         }
     }
 
     private void customDiscount(String field, String textField, String firstTextField) {
         auth = FirebaseAuth.getInstance();
-        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
+        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid()));
         reference.child("List of Dish").child(field).child(textField).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot1) {
@@ -162,8 +176,8 @@ public class DiscountRecycler extends RecyclerView.Adapter<DiscountRecycler.Hold
                                     Log.i("type", type);
                                     Log.i("name", dishName);
 //                                reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(auth.getUid()).child("List of Dish");
-                                    reference.child("List of Dish").child(field).child(textField).child("full").setValue(afterDis);
-                                    reference.child("List of Dish").child(field).child(textField).child("half").setValue(afterDisHalf);
+                                    reference.child("List of Dish").child(field).child(textField).child("full").setValue(afterDis + "");
+                                    reference.child("List of Dish").child(field).child(textField).child("half").setValue(afterDisHalf + "");
                                 }else{
                                     int price = Integer.parseInt(Objects.requireNonNull(String.valueOf(dataSnapshot1.child("full").getValue())));
                                     int discount = Integer.parseInt(firstTextField);
@@ -174,7 +188,7 @@ public class DiscountRecycler extends RecyclerView.Adapter<DiscountRecycler.Hold
                                     Log.i("type",type);
                                     Log.i("name",dishName);
 //                                reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(auth.getUid()).child("List of Dish");
-                                    reference.child("List of Dish").child(field).child(textField).child("full").setValue(afterDis);
+                                    reference.child("List of Dish").child(field).child(textField).child("full").setValue(afterDis + "");
                                 }
                             }
                 }
@@ -190,7 +204,7 @@ public class DiscountRecycler extends RecyclerView.Adapter<DiscountRecycler.Hold
 
     private void fourtyDiscount(String s1, String s) {
         auth = FirebaseAuth.getInstance();
-        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
+        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid()));
         reference.child("List of Dish").child(s1).child(s).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot1) {
@@ -210,8 +224,8 @@ public class DiscountRecycler extends RecyclerView.Adapter<DiscountRecycler.Hold
                                     auth = FirebaseAuth.getInstance();
                                     Log.i("type", type);
                                     Log.i("name", dishName);
-                                    reference.child("List of Dish").child(s1).child(s).child("full").setValue(afterDis);
-                                    reference.child("List of Dish").child(s1).child(s).child("half").setValue(afterDisHalf);
+                                    reference.child("List of Dish").child(s1).child(s).child("full").setValue(afterDis + "");
+                                    reference.child("List of Dish").child(s1).child(s).child("half").setValue(afterDisHalf + "");
                                 }else{
                                     int price = Integer.parseInt(Objects.requireNonNull(String.valueOf(dataSnapshot1.child("full").getValue())));
                                     int discount = 40;
@@ -221,8 +235,8 @@ public class DiscountRecycler extends RecyclerView.Adapter<DiscountRecycler.Hold
                                     auth = FirebaseAuth.getInstance();
                                     Log.i("type",type);
                                     Log.i("name",dishName);
-                                    reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(Objects.requireNonNull(auth.getUid()));
-                                    reference.child("List of Dish").child(s1).child(s).child("full").setValue(afterDis);
+                                    reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid()));
+                                    reference.child("List of Dish").child(s1).child(s).child("full").setValue(afterDis + "");
                                 }
                             }
                 }
@@ -248,7 +262,7 @@ public class DiscountRecycler extends RecyclerView.Adapter<DiscountRecycler.Hold
 
     private void addToDiscountDatabase(String discount) {
         auth = FirebaseAuth.getInstance();
-        addToDB = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
+        addToDB = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid()));
         addToDB.child("Discount").child("available").setValue("yes");
         addToDB.child("Discount").child("dis").setValue(discount);
     }
@@ -260,7 +274,7 @@ public class DiscountRecycler extends RecyclerView.Adapter<DiscountRecycler.Hold
         else
             disInfo = new DisInfo(String.valueOf(price),String.valueOf(after),String.valueOf(discount),""+ halfPrice);
 
-        dis = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
+        dis = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid()));
         dis.child("List of Dish").child(type).child(name).child("Discount").child(name).setValue(disInfo);
     }
 
@@ -268,7 +282,7 @@ public class DiscountRecycler extends RecyclerView.Adapter<DiscountRecycler.Hold
     private void fiftyDiscount(String s1, String s) {
         auth = FirebaseAuth.getInstance();
 
-        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
+        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid()));
         reference.child("List of Dish").child(s1).child(s).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot1) {
@@ -289,9 +303,9 @@ public class DiscountRecycler extends RecyclerView.Adapter<DiscountRecycler.Hold
                                     auth = FirebaseAuth.getInstance();
                                     Log.i("type", type);
                                     Log.i("name", dishName);
-//                                reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(auth.getUid()).child("List of Dish");
-                                    reference.child("List of Dish").child(s1).child(s).child("full").setValue(afterDis);
-                                    reference.child("List of Dish").child(s1).child(s).child("half").setValue(afterDisHalf);
+                                reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid()));
+                                    reference.child("List of Dish").child(s1).child(s).child("full").setValue(afterDis + "");
+                                    reference.child("List of Dish").child(s1).child(s).child("half").setValue(afterDisHalf + "");
                                 }else{
                                     int price = Integer.parseInt(Objects.requireNonNull(String.valueOf(dataSnapshot1.child("full").getValue())));
                                     int discount = 50;
@@ -301,8 +315,8 @@ public class DiscountRecycler extends RecyclerView.Adapter<DiscountRecycler.Hold
                                     auth = FirebaseAuth.getInstance();
                                     Log.i("type",type);
                                     Log.i("name",dishName);
-//                                reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(auth.getUid()).child("List of Dish");
-                                    reference.child("List of Dish").child(s1).child(s).child("full").setValue(afterDis);
+                                    reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid()));
+                                    reference.child("List of Dish").child(s1).child(s).child("full").setValue(afterDis + "");
                                 }
                             }
                         }

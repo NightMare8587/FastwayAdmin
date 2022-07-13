@@ -6,9 +6,11 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -67,10 +69,15 @@ public class SearchFastwayClass extends RecyclerView.Adapter<SearchFastwayClass.
             alertDialog.setMessage("Enter Amount of half and full\nIf half not available leave empty");
             LinearLayout linearLayout = new LinearLayout(v.getContext());
             linearLayout.setOrientation(LinearLayout.VERTICAL);
+            linearLayout.setGravity(Gravity.CENTER);
             EditText halfPrice = new EditText(v.getContext());
             EditText fullPrice = new EditText(v.getContext());
             EditText ownDishName = new EditText(v.getContext());
             EditText dishDescription = new EditText(v.getContext());
+            CheckBox checkBox = new CheckBox(v.getContext());
+            checkBox.setText("Sell On MRP");
+            checkBox.setGravity(Gravity.CENTER_VERTICAL);
+            checkBox.setChecked(false);
             RadioGroup radioGroup = new RadioGroup(v.getContext());
             radioGroup.setOrientation(LinearLayout.HORIZONTAL);
             RadioButton veg = new RadioButton(v.getContext());
@@ -104,14 +111,20 @@ public class SearchFastwayClass extends RecyclerView.Adapter<SearchFastwayClass.
                 if(fullPrice.getText().toString().equals(""))
                     Toast.makeText(v.getContext(), "Full price can't be empty", Toast.LENGTH_SHORT).show();
                 else{
+                    String mrpChecked;
+                    if(checkBox.isChecked())
+                        mrpChecked = "yes";
+                    else
+                        mrpChecked = "no";
                     String half = halfPrice.getText().toString();
                     String full = fullPrice.getText().toString();
+
                     if(ownDishName.getText().toString().equals("")) {
-                        DishInfo info = new DishInfo(dishName.get(position), half, full, dishImage.get(position), "false", "0", "0", "0", "yes",dishDescription.getText().toString(),dishType);
+                        DishInfo info = new DishInfo(dishName.get(position), half, full, dishImage.get(position), mrpChecked, "0", "0", "0", "yes",dishDescription.getText().toString(),dishType);
                         reference.child(dishName.get(position)).setValue(info);
                         dishNameToAdd = dishName.get(position);
                     }else{
-                        DishInfo info = new DishInfo(ownDishName.getText().toString(), half, full, dishImage.get(position), "false", "0", "0", "0", "yes",dishDescription.getText().toString(),dishType);
+                        DishInfo info = new DishInfo(ownDishName.getText().toString(), half, full, dishImage.get(position), mrpChecked, "0", "0", "0", "yes",dishDescription.getText().toString(),dishType);
                         reference.child(ownDishName.getText().toString()).setValue(info);
                         dishNameToAdd = ownDishName.getText().toString();
                     }
@@ -144,6 +157,8 @@ public class SearchFastwayClass extends RecyclerView.Adapter<SearchFastwayClass.
             linearLayout.addView(fullPrice);
             linearLayout.addView(ownDishName);
             linearLayout.addView(radioGroup);
+            linearLayout.addView(checkBox);
+            linearLayout.setGravity(View.TEXT_ALIGNMENT_CENTER);
             alertDialog.setView(linearLayout);
 
 

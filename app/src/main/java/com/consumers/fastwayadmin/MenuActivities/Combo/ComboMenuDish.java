@@ -35,6 +35,7 @@ public class ComboMenuDish extends AppCompatActivity {
     String state;
     List<String> comboImage = new ArrayList<>();
     List<String> dish = new ArrayList<>();
+    List<String> enabled = new ArrayList<>();
     List<String> descriptionOfCombo = new ArrayList<>();
     List<String> price = new ArrayList<>();
     DatabaseReference reference;
@@ -64,7 +65,7 @@ public class ComboMenuDish extends AppCompatActivity {
                         for(DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()){
                             dish.add(String.valueOf(dataSnapshot1.child("name").child("name").getValue()));
                         }
-
+                        enabled.add(String.valueOf(dataSnapshot.child("enable").getValue()));
                         if(dataSnapshot.hasChild("description"))
                             descriptionOfCombo.add(dataSnapshot.child("description").getValue(String.class));
                         else
@@ -74,7 +75,7 @@ public class ComboMenuDish extends AppCompatActivity {
                         dish.clear();
                     }
                     recyclerView.setLayoutManager(new LinearLayoutManager(ComboMenuDish.this));
-                    recyclerView.setAdapter(new ComboRecyclerView(comboNames,dishNames,price,ComboMenuDish.this,comboImage,descriptionOfCombo));
+                    recyclerView.setAdapter(new ComboRecyclerView(comboNames,dishNames,price,ComboMenuDish.this,comboImage,descriptionOfCombo,enabled));
 
                     Log.i("tag",comboNames.toString());
                 }
@@ -122,6 +123,7 @@ public class ComboMenuDish extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.exists()){
                     comboNames.clear();
+                    enabled.clear();
                     price.clear();
                     comboImage.clear();
                     descriptionOfCombo.clear();
@@ -136,7 +138,7 @@ public class ComboMenuDish extends AppCompatActivity {
                         for(DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()){
                             dish.add(String.valueOf(dataSnapshot1.child("name").child("name").getValue()));
                         }
-
+                        enabled.add(String.valueOf(dataSnapshot.child("enable").getValue()));
                         if(dataSnapshot.hasChild("description"))
                             descriptionOfCombo.add(dataSnapshot.child("description").getValue(String.class));
                         else
@@ -146,7 +148,7 @@ public class ComboMenuDish extends AppCompatActivity {
                         dish.clear();
                     }
                     recyclerView.setLayoutManager(new LinearLayoutManager(ComboMenuDish.this));
-                    recyclerView.setAdapter(new ComboRecyclerView(comboNames,dishNames,price,ComboMenuDish.this,comboImage,descriptionOfCombo));
+                    recyclerView.setAdapter(new ComboRecyclerView(comboNames,dishNames,price,ComboMenuDish.this,comboImage,descriptionOfCombo,enabled));
 
                     Log.i("tag",comboNames.toString());
                 }
