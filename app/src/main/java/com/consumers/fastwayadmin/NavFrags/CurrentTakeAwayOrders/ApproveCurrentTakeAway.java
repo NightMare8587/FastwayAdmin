@@ -325,6 +325,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
         halfOrList.setAdapter(arrayAdapter2);
 
         approve.setOnClickListener(view -> {
+            approve.setEnabled(false);
             if(paymentMode.equals("cash")){
                 String month = monthName[calendar.get(Calendar.MONTH)];
 
@@ -715,6 +716,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
         });
 
         decline.setOnClickListener(v -> {
+
             AlertDialog.Builder alert  = new AlertDialog.Builder(v.getContext());
             alert.setTitle("Reason");
             alert.setMessage("Enter reason for order cancellation below");
@@ -735,6 +737,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                         RequestQueue requestQueue = Volley.newRequestQueue(ApproveCurrentTakeAway.this);
                         JSONObject main = new JSONObject();
 //                        new GenratePDF().execute();
+                        decline.setEnabled(false);
                         FirebaseAuth auth = FirebaseAuth.getInstance();
                         DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid())).child("Current TakeAway").child(id);
                         if (paymentMode.equals("online")) {

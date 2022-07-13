@@ -276,6 +276,7 @@ public class ApproveCurrentOrder extends AppCompatActivity {
         });
 
         approve.setOnClickListener(v -> {
+            approve.setEnabled(false);
             
             new addOrderToTableCurrent().execute();
 
@@ -285,8 +286,9 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                     Type type = new TypeToken<HashMap<String,HashMap<String,String>>>(){}.getType();
                     String storedHash = storeForDishAnalysis.getString("DishAnalysisMonthBasis","");
                     HashMap<String,HashMap<String,String>> myMap = gson.fromJson(storedHash,type);
+                    HashMap<String, String> map;
                     if(myMap.containsKey(month)){
-                        HashMap<String,String> map = new HashMap<>(myMap.get(month));
+                        map = new HashMap<>(myMap.get(month));
                         Log.i("checking",map.toString());
                         for(int k=0;k<dishNames.size();k++){
                             if(map.containsKey(dishNames.get(k))){
@@ -297,18 +299,15 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                                 map.put(dishNames.get(k),"1");
                             }
                         }
-                        myMap.put(month,map);
-                        dishAnalysis.putString("DishAnalysisMonthBasis",gson.toJson(myMap));
-                        dishAnalysis.apply();
                     }else{
-                        HashMap<String,String> map = new HashMap<>();
+                        map = new HashMap<>();
                         for(int i=0;i<dishNames.size();i++){
                             map.put(dishNames.get(i),"1");
                         }
-                        myMap.put(month,map);
-                        dishAnalysis.putString("DishAnalysisMonthBasis",gson.toJson(myMap));
-                        dishAnalysis.apply();
                     }
+                    myMap.put(month,map);
+                    dishAnalysis.putString("DishAnalysisMonthBasis",gson.toJson(myMap));
+                    dishAnalysis.apply();
                 }else{
                     HashMap<String,HashMap<String,String>> map = new HashMap<>();
                     HashMap<String,String> myMap = new HashMap<>();
@@ -413,6 +412,7 @@ public class ApproveCurrentOrder extends AppCompatActivity {
             alert.setMessage("Enter reason for order cancellation below");
             EditText editText = new EditText(v.getContext());
             editText.setMaxLines(200);
+
             editText.setHint("Enter reason here");
             LinearLayout linearLayout = new LinearLayout(v.getContext());
             linearLayout.setOrientation(LinearLayout.VERTICAL);
@@ -422,6 +422,7 @@ public class ApproveCurrentOrder extends AppCompatActivity {
             alert.setPositiveButton("submit", (dialogInterface, ii) -> {
                 if(!editText.getText().toString().equals("")) {
                     dialogInterface.dismiss();
+                    decline.setEnabled(false);
                     RequestQueue requestQueue = Volley.newRequestQueue(ApproveCurrentOrder.this);
                     JSONObject main = new JSONObject();
 //                    new GenratePDF().execute();
