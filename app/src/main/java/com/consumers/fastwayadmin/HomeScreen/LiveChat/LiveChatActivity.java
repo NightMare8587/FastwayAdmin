@@ -3,6 +3,8 @@ package com.consumers.fastwayadmin.HomeScreen.LiveChat;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.InputType;
+import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
@@ -49,6 +51,7 @@ public class LiveChatActivity extends AppCompatActivity {
     DatabaseReference reference; boolean connectedWithFastway = false;
     SharedPreferences sharedPreferences;
     DatabaseReference liveTalkWithAdmin;
+    DatabaseReference callBackFromAdmin;
     SharedPreferences.Editor editor;
     String FURL  = "https://fcm.googleapis.com/fcm/send";
     SharedPreferences saveInfo;
@@ -70,6 +73,7 @@ public class LiveChatActivity extends AppCompatActivity {
         reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
         botReply();
         liveTalkWithAdmin = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("LiveChat");
+        callBackFromAdmin = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("CallBack");
         reference.child("Live Chat").limitToLast(15).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -211,14 +215,19 @@ public class LiveChatActivity extends AppCompatActivity {
                     return;
                 }
 
-                if(messa.length() == 10){
+                if(messa.length() == 10 && TextUtils.isDigitsOnly(messa)){
                     String time = String.valueOf(System.currentTimeMillis());
 
                     liveChatClass liveChatClass = new liveChatClass(messa,time,"0");
                     reference.child("Live Chat").child(System.currentTimeMillis() + "").setValue(liveChatClass);
 
                     new Handler().postDelayed(() -> {
+                        SharedPreferences sharedPreferences = getSharedPreferences("RestaurantInfo",MODE_PRIVATE);
                         String stime = String.valueOf(System.currentTimeMillis());
+                        callBackFromAdmin.child(stime).child("id").setValue(auth.getUid());
+                        callBackFromAdmin.child(stime).child("number").setValue(messa);
+                        callBackFromAdmin.child(stime).child("name").setValue(sharedPreferences.getString("hotelName",""));
+                        callBackFromAdmin.child(stime).child("type").setValue("Admin");
                         liveChatClass liveChatClass1 = new liveChatClass("You will get callback from our fastway team\nAvg waiting time 2 minutes",stime,"1");
                         reference.child("Live Chat").child(System.currentTimeMillis() + "").setValue(liveChatClass1);
                     },500);
