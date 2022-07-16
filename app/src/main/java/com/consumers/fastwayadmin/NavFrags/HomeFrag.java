@@ -213,7 +213,7 @@ public class HomeFrag extends Fragment {
         restaurantTrackRecords = view.getContext().getSharedPreferences("RestaurantTrackRecords",Context.MODE_PRIVATE);
         restaurantTrackRecordsEditor = restaurantTrackRecords.edit();
         restaurantTrackEditor = restaurantDailyTrack.edit();
-        new dailyRestaurantTrackUpdate().execute();
+         dailyRestaurantTrackUpdate();
         SharedPreferences stopServices = requireActivity().getSharedPreferences("Stop Services",Context.MODE_PRIVATE);
          editor = stopServices.edit();
          acceptOrders = view.findViewById(R.id.acceptingOrdersSwitchHomeFrag);
@@ -601,26 +601,46 @@ public class HomeFrag extends Fragment {
 
     }
 
+    private void dailyRestaurantTrackUpdate() {
+        if(restaurantDailyTrack.contains("currentDate")){
+            if(Integer.parseInt(restaurantDailyTrack.getString("currentDate","")) == currentDay){
+                if(restaurantDailyTrack.contains("totalOrdersToday"))
+                    totalOrdersToday.setText(restaurantDailyTrack.getString("totalOrdersToday",""));
+
+                if(restaurantDailyTrack.contains("totalTransactionsToday"))
+                    totalTransactionsToday.setText("\u20B9" + decimalFormat.format(Double.parseDouble(restaurantDailyTrack.getString("totalTransactionsToday",""))));
+            }else{
+                restaurantTrackEditor.putString("currentDate", String.valueOf(currentDay));
+                restaurantTrackEditor.putString("totalOrdersToday","0");
+                restaurantTrackEditor.putString("totalTransactionsToday","0");
+                restaurantTrackEditor.apply();
+            }
+        }else{
+            restaurantTrackEditor.putString("currentDate",String.valueOf(currentDay));
+            restaurantTrackEditor.apply();
+        }
+    }
+
     private void initialise() {
         bubbleShowCaseBuilder5 = new BubbleShowCaseBuilder(requireActivity());
         bubbleShowCaseBuilder5.title("Welcome to Fastway").titleTextSize(20).listener(new BubbleShowCaseListener() {
             @Override
-            public void onTargetClick(BubbleShowCase bubbleShowCase) {
+            public void onTargetClick(@NonNull BubbleShowCase bubbleShowCase) {
 
             }
 
             @Override
-            public void onCloseActionImageClick(BubbleShowCase bubbleShowCase) {
+            public void onCloseActionImageClick(@NonNull BubbleShowCase bubbleShowCase) {
 
             }
 
             @Override
-            public void onBackgroundDimClick(BubbleShowCase bubbleShowCase) {
+            public void onBackgroundDimClick(@NonNull BubbleShowCase bubbleShowCase) {
                 bubbleShowCase.dismiss();
             }
 
             @Override
-            public void onBubbleClick(BubbleShowCase bubbleShowCase) {
+            public void onBubbleClick(@NonNull BubbleShowCase bubbleShowCase) {
                 bubbleShowCase.dismiss();
             }
         });
@@ -629,22 +649,22 @@ public class HomeFrag extends Fragment {
                 .description("You choose weather restaurant is online or taking order's right now")
                 .targetView(acceptOrders).listener(new BubbleShowCaseListener() {
                     @Override
-                    public void onTargetClick(BubbleShowCase bubbleShowCase) {
+                    public void onTargetClick(@NonNull BubbleShowCase bubbleShowCase) {
 
                     }
 
                     @Override
-                    public void onCloseActionImageClick(BubbleShowCase bubbleShowCase) {
+                    public void onCloseActionImageClick(@NonNull BubbleShowCase bubbleShowCase) {
 
                     }
 
                     @Override
-                    public void onBackgroundDimClick(BubbleShowCase bubbleShowCase) {
+                    public void onBackgroundDimClick(@NonNull BubbleShowCase bubbleShowCase) {
                         bubbleShowCase.dismiss();
                     }
 
                     @Override
-                    public void onBubbleClick(BubbleShowCase bubbleShowCase) {
+                    public void onBubbleClick(@NonNull BubbleShowCase bubbleShowCase) {
                         bubbleShowCase.dismiss();
                     }
                 });
@@ -653,22 +673,22 @@ public class HomeFrag extends Fragment {
                 .description("Here you can create different offer's and combo's")
                 .targetView(comboImage).listener(new BubbleShowCaseListener() {
                     @Override
-                    public void onTargetClick(BubbleShowCase bubbleShowCase) {
+                    public void onTargetClick(@NonNull BubbleShowCase bubbleShowCase) {
 
                     }
 
                     @Override
-                    public void onCloseActionImageClick(BubbleShowCase bubbleShowCase) {
+                    public void onCloseActionImageClick(@NonNull BubbleShowCase bubbleShowCase) {
 
                     }
 
                     @Override
-                    public void onBackgroundDimClick(BubbleShowCase bubbleShowCase) {
+                    public void onBackgroundDimClick(@NonNull BubbleShowCase bubbleShowCase) {
                         bubbleShowCase.dismiss();
                     }
 
                     @Override
-                    public void onBubbleClick(BubbleShowCase bubbleShowCase) {
+                    public void onBubbleClick(@NonNull BubbleShowCase bubbleShowCase) {
                         bubbleShowCase.dismiss();
                     }
                 });
@@ -678,12 +698,12 @@ public class HomeFrag extends Fragment {
                 .description("Here all of your current day transactions and order's made will be shown")
                 .targetView(totalOrdersToday).listener(new BubbleShowCaseListener() {
                     @Override
-                    public void onTargetClick(BubbleShowCase bubbleShowCase) {
+                    public void onTargetClick(@NonNull BubbleShowCase bubbleShowCase) {
 
                     }
 
                     @Override
-                    public void onCloseActionImageClick(BubbleShowCase bubbleShowCase) {
+                    public void onCloseActionImageClick(@NonNull BubbleShowCase bubbleShowCase) {
 
                     }
 
@@ -693,7 +713,7 @@ public class HomeFrag extends Fragment {
                     }
 
                     @Override
-                    public void onBubbleClick(BubbleShowCase bubbleShowCase) {
+                    public void onBubbleClick(@NonNull BubbleShowCase bubbleShowCase) {
                         bubbleShowCase.dismiss();
                     }
                 });
@@ -1241,30 +1261,5 @@ public class HomeFrag extends Fragment {
             return null;
         }
     }
-    public class dailyRestaurantTrackUpdate extends AsyncTask<Void,Void,Void>{
 
-        @SuppressLint("SetTextI18n")
-        @Override
-        protected Void doInBackground(Void... voids) {
-
-            if(restaurantDailyTrack.contains("currentDate")){
-                if(Integer.parseInt(restaurantDailyTrack.getString("currentDate","")) == currentDay){
-                    if(restaurantDailyTrack.contains("totalOrdersToday"))
-                        totalOrdersToday.setText(restaurantDailyTrack.getString("totalOrdersToday",""));
-
-                    if(restaurantDailyTrack.contains("totalTransactionsToday"))
-                        totalTransactionsToday.setText("\u20B9" + decimalFormat.format(Double.parseDouble(restaurantDailyTrack.getString("totalTransactionsToday",""))));
-                }else{
-                    restaurantTrackEditor.putString("currentDate", String.valueOf(currentDay));
-                    restaurantTrackEditor.putString("totalOrdersToday","0");
-                    restaurantTrackEditor.putString("totalTransactionsToday","0");
-                    restaurantTrackEditor.apply();
-                }
-            }else{
-                restaurantTrackEditor.putString("currentDate",String.valueOf(currentDay));
-                restaurantTrackEditor.apply();
-            }
-            return null;
-        }
-    }
 }

@@ -61,7 +61,7 @@ public class RecyclerClassView extends RecyclerView.Adapter<RecyclerClassView.ho
         }
 
         holder.dishName.setText(dishNames.get(position));
-        holder.totalCount.setText("Times Ordered\n" + dishTotalCount.get(position));
+        holder.totalCount.setText("Times Ordered: " + dishTotalCount.get(position));
     }
 
     @Override

@@ -190,9 +190,9 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
 //            new GenratePDF().execute();
             FirebaseAuth auth = FirebaseAuth.getInstance();
             DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid())).child("Current TakeAway").child(id);
+            String approveTime = String.valueOf(System.currentTimeMillis());
+            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(id).child("Recent Orders").child(time);
             if (paymentMode.equals("online")) {
-                String approveTime = String.valueOf(System.currentTimeMillis());
-                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(id).child("Recent Orders").child(time);
                 for(int i=0;i<dishName.size();i++){
                     MyClass myClass = new MyClass(dishName.get(i),dishPrice.get(i),image.get(i),type.get(i),""+approveTime,quantity.get(i),halfOr.get(i),state,String.valueOf(orderAmount),orderId,"TakeAway,Online","Order Declined",sharedPreferences.getString("locality",""));
                     databaseReference.child(auth.getUid()).child(dishName.get(i)).setValue(myClass);
@@ -231,8 +231,6 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                     Toast.makeText(ApproveCurrentTakeAway.this, e.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
                 }
             } else {
-                String approveTime = String.valueOf(System.currentTimeMillis());
-                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(id).child("Recent Orders").child(time);
                 for(int i=0;i<dishName.size();i++){
                     MyClass myClass = new MyClass(dishName.get(i),dishPrice.get(i),image.get(i),type.get(i),""+approveTime,quantity.get(i),halfOr.get(i),state,String.valueOf(orderAmount),orderId,"TakeAway,Cash","Order Declined",sharedPreferences.getString("locality",""));
                     databaseReference.child(auth.getUid()).child(dishName.get(i)).setValue(myClass);

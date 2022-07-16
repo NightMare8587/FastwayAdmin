@@ -70,10 +70,11 @@ public class LiveChatActivity extends AppCompatActivity {
         saveEdit = saveInfo.edit();
         linearLayoutManager = new LinearLayoutManager(getApplicationContext());
         linearLayoutManager.setStackFromEnd(true);
+        deleteFirstFifty();
         reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
         botReply();
-        liveTalkWithAdmin = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("LiveChat");
-        callBackFromAdmin = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("CallBack");
+        liveTalkWithAdmin = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("LiveChat").child(saveInfo.getString("state",""));
+        callBackFromAdmin = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("CallBack").child(saveInfo.getString("state",""));
         reference.child("Live Chat").limitToLast(15).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -133,6 +134,8 @@ public class LiveChatActivity extends AppCompatActivity {
                         timeOfJoining = stime;
                         talkWithAgent = true;
                         liveTalkWithAdmin.child(stime).child("id").setValue(auth.getUid());
+                        SharedPreferences sharedPreferences = getSharedPreferences("RestaurantInfo",MODE_PRIVATE);
+                        liveTalkWithAdmin.child(stime).child("name").setValue(sharedPreferences.getString("hotelName",""));
                         liveTalkWithAdmin.child(stime).child("type").setValue("Admin");
                         liveChatClass liveChatClass1 = new liveChatClass("Connecting you with an agent. Avg waiting time 2 min",stime,"1");
                         reference.child("Live Chat").child(System.currentTimeMillis() + "").setValue(liveChatClass1);
@@ -182,35 +185,6 @@ public class LiveChatActivity extends AppCompatActivity {
                         reference.child("Live Chat").child(System.currentTimeMillis() + "").setValue(liveChatClass1);
                     },500);
 
-                    RequestQueue requestQueue = Volley.newRequestQueue(LiveChatActivity.this);
-                    JSONObject main = new JSONObject();
-                    try {
-                        main.put("to", "/topics/" + "FastwayLiveChat");
-                        JSONObject notification = new JSONObject();
-                        notification.put("title", "CallBack Request");
-                        notification.put("body", "Callback request from number " + editText.getText().toString());
-                        main.put("notification", notification);
-
-                        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, FURL, main, response -> {
-
-                        }, error -> {
-                            Log.i("info",error.getLocalizedMessage() + " s");
-                            Toast.makeText(getApplicationContext(), error.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
-                        }) {
-                            @Override
-                            public Map<String, String> getHeaders() {
-                                Map<String, String> header = new HashMap<>();
-                                header.put("content-type", "application/json");
-                                header.put("authorization", "key=AAAAsigSEMs:APA91bEUF9ZFwIu84Jctci56DQd0TQOepztGOIKIBhoqf7N3ueQrkClw0xBTlWZEWyvwprXZmZgW2MNywF1pNBFpq1jFBr0CmlrJ0wygbZIBOnoZ0jP1zZC6nPxqF2MAP6iF3wuBHD2R");
-                                return header;
-                            }
-                        };
-
-                        requestQueue.add(jsonObjectRequest);
-                    } catch (Exception e) {
-                        Log.i("info",e.getLocalizedMessage() + " s");
-                        Toast.makeText(getApplicationContext(), e.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
-                    }
                     editText.setText("");
                     return;
                 }
@@ -327,6 +301,12 @@ public class LiveChatActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    private void deleteFirstFifty() {
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
+        databaseReference.child("Live Chat").removeValue();
     }
 
     private void botReply() {

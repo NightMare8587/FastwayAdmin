@@ -57,7 +57,7 @@ public class recyclerAllDish extends RecyclerView.Adapter<recyclerAllDish.holder
         }else
             holder.progressBar.setVisibility(View.INVISIBLE);
         holder.dishName.setText(dishNames.get(position));
-        holder.totalCount.setText("Times Ordered\n" + dishTotalCount.get(position));
+        holder.totalCount.setText("Times Ordered: " + dishTotalCount.get(position));
     }
 
     @Override

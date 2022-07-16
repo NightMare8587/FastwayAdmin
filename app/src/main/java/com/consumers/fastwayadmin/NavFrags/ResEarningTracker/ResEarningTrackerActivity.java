@@ -167,7 +167,7 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
                 HashMap<String,String> map = new HashMap<>(myMap.get(month));
                 List<String> values = new ArrayList<String>(map.values());
                 Log.i("info",values.toString());
-                Collections.sort(values,Collections.reverseOrder());
+                Collections.sort(values);
                 Log.i("info",values.toString());
 
                Map<String,String> sorted = map
