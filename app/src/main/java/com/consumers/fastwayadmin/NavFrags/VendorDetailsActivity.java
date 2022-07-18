@@ -51,6 +51,7 @@ public class VendorDetailsActivity extends AppCompatActivity {
     String ifscURL = "https://intercellular-stabi.000webhostapp.com/verifyIFSCBank/verifyIFSC.php";
     String mauthId;
     FastDialog fastDialog;
+    String prodVerifyBankAccount = "https://intercellular-stabi.000webhostapp.com/VerifyBankAccount/verifyAcc.php";
     String genratedToken = "";
     FirebaseAuth auth = FirebaseAuth.getInstance();
     DatabaseReference reference;
@@ -89,11 +90,8 @@ public class VendorDetailsActivity extends AppCompatActivity {
                 verifyIFSC = true;
             }else
                 Toast.makeText(VendorDetailsActivity.this, "Check your IFSC code again", Toast.LENGTH_SHORT).show();
-        }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
+        }).setNegativeButton("Cancel", (dialogInterface, i) -> {
 
-            }
         });
         builder.create().show();
         mAuth = FirebaseAuth.getInstance();
@@ -107,20 +105,16 @@ public class VendorDetailsActivity extends AppCompatActivity {
                 if (phoneEdit.getText().toString().equals("")) {
                     phoneEdit.setError("Field can't be empty");
                     phoneEdit.requestFocus();
-                    return;
                 }else if(emailEdit.getText().toString().equals("")){
                     emailEdit.requestFocus();
                     emailEdit.setError("Field can't be empty");
-                    return;
                 }
                 else if (accountNumber.getText().toString().equals("")) {
                     accountNumber.requestFocus();
                     accountNumber.setError("Field can't be empty");
-                    return;
                 } else if (accountName.getText().toString().equals("")) {
                     accountName.requestFocus();
                     accountName.setError("Field can't be empty");
-                    return;
                 } else {
                     name = nameEdit.getText().toString();
                     email = emailEdit.getText().toString();
@@ -140,7 +134,7 @@ public class VendorDetailsActivity extends AppCompatActivity {
                                 new MakePayout().execute();
                                 fastDialog.show();
                                 kAlertDialog1.dismissWithAnimation();
-                            }).setCancelClickListener(kAlertDialog12 -> kAlertDialog12.dismissWithAnimation());
+                            }).setCancelClickListener(KAlertDialog::dismissWithAnimation);
 
                     kAlertDialog.setCanceledOnTouchOutside(true);
                     kAlertDialog.create();
@@ -221,6 +215,37 @@ public class VendorDetailsActivity extends AppCompatActivity {
                 }
             };
             requestQueue.add(stringRequest);
+            return null;
+        }
+    }
+
+    public class verifyBankAcc extends AsyncTask<Void,Void,Void>{
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            RequestQueue requestQueue = Volley.newRequestQueue(VendorDetailsActivity.this);
+            StringRequest stringRequest = new StringRequest(Request.Method.POST, prodVerifyBankAccount, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+
+                }
+            }){
+                @Override
+                public Map<String, String> getParams(){
+                    Map<String,String> params = new HashMap<>();
+                    params.put("accNum",acNumber);
+                    params.put("ifscCode",acIFSC);
+                    params.put("name",name);
+                    params.put("token",genratedToken);
+                    params.put("number",phone);
+                    return params;
+                }
+            };
             return null;
         }
     }
