@@ -105,10 +105,9 @@ public class RandomChatNoww extends AppCompatActivity {
 
                     if(!containsBad) {
                         SharedPreferences preferences = getSharedPreferences("AccountInfo", MODE_PRIVATE);
-                        chat chat = new chat(editText.getText().toString().trim(), auth.getUid() + "", System.currentTimeMillis() + "", "0", preferences.getString("name", ""));
+                        chat chat = new chat(editText.getText().toString().trim(), auth.getUid() + "", System.currentTimeMillis() + "", "0", preferences.getString("name", ""),"message");
                         databaseReference.child(System.currentTimeMillis() + "").setValue(chat);
                         editText.setText("");
-
                         updateChat();
                     }
                     else

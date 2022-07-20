@@ -1,7 +1,9 @@
 package com.consumers.fastwayadmin.Tables;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -24,6 +26,9 @@ import com.android.volley.toolbox.Volley;
 import com.consumers.fastwayadmin.Chat.chat;
 import com.consumers.fastwayadmin.Chat.chatAdapter;
 import com.consumers.fastwayadmin.R;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -31,6 +36,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.itextpdf.text.pdf.parser.Line;
 
 import org.json.JSONObject;
@@ -45,11 +53,16 @@ public class ChatWithCustomer extends AppCompatActivity {
     DatabaseReference reference;
     FirebaseAuth auth;
     String id;
+    FirebaseStorage storage;
+    StorageReference storageReference;
     boolean containsBad = false;
+    Uri filepath;
     String restaurantName;
+    Button imageSend;
     String URL = "https://fcm.googleapis.com/fcm/send";
     RecyclerView recyclerView;
     List<String> message = new ArrayList<>();
+    List<String> typeOfMessage = new ArrayList<>();
     List<String> time = new ArrayList<>();
     SharedPreferences sharedPreferences;
     List<String> badWords = new ArrayList<>();
@@ -64,15 +77,18 @@ public class ChatWithCustomer extends AppCompatActivity {
         setContentView(R.layout.activity_chat_with_customer);
         auth = FirebaseAuth.getInstance();
         addBadWords();
+        imageSend = findViewById(R.id.sendImageChatWithCustomer);
         sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
         editText = findViewById(R.id.sendMessageEditText);
         sendME = findViewById(R.id.sendMessageButton);
+        storage = FirebaseStorage.getInstance();
+        storageReference = storage.getReference();
         endConversation = findViewById(R.id.endConversationWithUSer);
         linearLayoutManager = new LinearLayoutManager(getApplicationContext());
         reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
         recyclerView = findViewById(R.id.messageRecyclerView);
          id = getIntent().getStringExtra("id");
-        resName = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(auth.getUid());
+        resName = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(auth.getUid());
         resName.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull  DataSnapshot snapshot) {
@@ -85,6 +101,7 @@ public class ChatWithCustomer extends AppCompatActivity {
 
             }
         });
+
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         endConversation.setOnClickListener(click -> {
             reference.child("messages").child(id).removeValue();
@@ -96,10 +113,12 @@ public class ChatWithCustomer extends AppCompatActivity {
                 if(snapshot.exists()) {
                     message.clear();
                     time.clear();
+                    typeOfMessage.clear();
                     leftOrRight.clear();
                     for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                         message.add(String.valueOf(dataSnapshot.child("message").getValue()));
                         time.add(String.valueOf(dataSnapshot.child("time").getValue()));
+                        typeOfMessage.add(String.valueOf(dataSnapshot.child("typeOfMessage").getValue()));
                         leftOrRight.add(String.valueOf(dataSnapshot.child("id").getValue()));
                     }
                     if(message.size() != 0)
@@ -109,7 +128,7 @@ public class ChatWithCustomer extends AppCompatActivity {
                     linearLayoutManager.setStackFromEnd(true);
                     recyclerView.setLayoutManager(linearLayoutManager);
 //                    recyclerView.smoothScrollToPosition(message.size()-1);
-                    recyclerView.setAdapter(new chatAdapter(message,time,leftOrRight));
+                    recyclerView.setAdapter(new chatAdapter(message,time,leftOrRight,typeOfMessage));
                 }
             }
 
@@ -117,6 +136,13 @@ public class ChatWithCustomer extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError error) {
 
             }
+        });
+
+        imageSend.setOnClickListener(click -> {
+            Intent intent = new Intent();
+            intent.setType("image/*");
+            intent.setAction("android.intent.action.PICK");
+            startActivityForResult(Intent.createChooser(intent, "Select Picture"), 1);
         });
 
         reference.child("messages").child(id).addChildEventListener(new ChildEventListener() {
@@ -195,7 +221,7 @@ public class ChatWithCustomer extends AppCompatActivity {
                             Toast.makeText(getApplicationContext(), e.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
                         }
                         SharedPreferences sharedPreferences = getSharedPreferences("loginInfo", MODE_PRIVATE);
-                        chat chat = new chat(editText.getText().toString(), auth.getUid() + "", System.currentTimeMillis() + "", "1", sharedPreferences.getString("name", ""));
+                        chat chat = new chat(editText.getText().toString(), auth.getUid() + "", System.currentTimeMillis() + "", "1", sharedPreferences.getString("name", ""),"message");
                         reference.child("messages").child(id).child(System.currentTimeMillis() + "").setValue(chat);
                         editText.setText("");
                         updateChat();
@@ -231,11 +257,13 @@ public class ChatWithCustomer extends AppCompatActivity {
                 if(snapshot.exists()) {
                     message.clear();
                     time.clear();
+                    typeOfMessage.clear();
                     leftOrRight.clear();
                     for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                         message.add(String.valueOf(dataSnapshot.child("message").getValue()));
                         time.add(String.valueOf(dataSnapshot.child("time").getValue()));
                         leftOrRight.add(String.valueOf(dataSnapshot.child("id").getValue()));
+                        typeOfMessage.add(String.valueOf(dataSnapshot.child("typeOfMessage").getValue()));
                     }
                     if(message.size() != 0)
                         endConversation.setVisibility(View.VISIBLE);
@@ -244,7 +272,7 @@ public class ChatWithCustomer extends AppCompatActivity {
                     linearLayoutManager.setStackFromEnd(true);
                     recyclerView.setLayoutManager(linearLayoutManager);
 //                    recyclerView.smoothScrollToPosition(message.size()-1);
-                    recyclerView.setAdapter(new chatAdapter(message,time,leftOrRight));
+                    recyclerView.setAdapter(new chatAdapter(message,time,leftOrRight,typeOfMessage));
                 }
             }
 
@@ -253,6 +281,41 @@ public class ChatWithCustomer extends AppCompatActivity {
 
             }
         });
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == 20 && resultCode == RESULT_OK && data != null){
+            Toast.makeText(this, "Hello", Toast.LENGTH_SHORT).show();
+        }else if(requestCode == 1 && resultCode == RESULT_OK && data != null){
+            filepath = data.getData();
+            String times = System.currentTimeMillis() + "";
+            try {
+                FirebaseAuth dishAuth = FirebaseAuth.getInstance();
+                StorageReference reference = storageReference.child(dishAuth.getUid() + "/" + "Chats" + "/" + times);
+                reference.putFile(filepath).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                        Toast.makeText(ChatWithCustomer.this, "Upload Complete", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ChatWithCustomer.this, "Image Uploaded", Toast.LENGTH_SHORT).show();
+                        StorageReference reference = storageReference.child(dishAuth.getUid() + "/" + "Chats" + "/"  + times);
+                        reference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                            @Override
+                            public void onSuccess(@NonNull Uri uri) {
+//                    TempClass tempClass = new TempClass(restaurantName,resId,name,email,issueName,details,uri+"",state,orderID,locality);
+                                SharedPreferences sharedPreferences = getSharedPreferences("loginInfo", MODE_PRIVATE);
+                                chat chat = new chat(uri + "", auth.getUid() + "", System.currentTimeMillis() + "", "1", sharedPreferences.getString("name", ""),"image");
+                                DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid());;
+                                reference.child("messages").child(Objects.requireNonNull(id)).child(System.currentTimeMillis() + "").setValue(chat);
+                                updateChat();
+                            }
+                        });
+                    }
+                }).addOnFailureListener(e -> Toast.makeText(ChatWithCustomer.this, "Failed. Try again later", Toast.LENGTH_SHORT).show());
+            } catch (Exception e) {
+                Toast.makeText(ChatWithCustomer.this, "" + e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
 }

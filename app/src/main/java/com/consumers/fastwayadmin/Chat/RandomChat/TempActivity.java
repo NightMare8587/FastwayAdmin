@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -48,10 +49,12 @@ public class TempActivity extends AppCompatActivity {
     DatabaseReference resName;
     EditText editText;
     FirebaseAuth auth;
+    SharedPreferences sharedPreferences;
     DatabaseReference reference;
     String userId;
     Button button;
     List<String> time = new ArrayList<>();
+    List<String> typeOfMessage = new ArrayList<>();
     LinearLayoutManager linearLayoutManager;
     RecyclerView recyclerView;
     @Override
@@ -60,6 +63,7 @@ public class TempActivity extends AppCompatActivity {
         setContentView(R.layout.activity_temp);
         message = getIntent().getStringArrayListExtra("message");
         editText = findViewById(R.id.tempAcitvityEdittext);
+        sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
         button = findViewById(R.id.tempActivityButton);
         userId = getIntent().getStringExtra("userId");
         recyclerView = findViewById(R.id.tempRecyclerView);
@@ -69,9 +73,9 @@ public class TempActivity extends AppCompatActivity {
         linearLayoutManager.setStackFromEnd(true);
         recyclerView.setLayoutManager(linearLayoutManager);
 //                    recyclerView.smoothScrollToPosition(message.size()-1);
-        recyclerView.setAdapter(new chatAdapter(message,time,id));
+        recyclerView.setAdapter(new chatAdapter(message,time,id,typeOfMessage));
         auth = FirebaseAuth.getInstance();
-        resName = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(auth.getUid());
+        resName = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(auth.getUid());
         resName.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull  DataSnapshot snapshot) {
@@ -124,7 +128,7 @@ public class TempActivity extends AppCompatActivity {
                 catch (Exception e){
                     Toast.makeText(getApplicationContext(), e.getLocalizedMessage()+"null", Toast.LENGTH_SHORT).show();
                 }
-                chat chat = new chat(editText.getText().toString(),auth.getUid(),currentTime,"1","BHANGY");
+                chat chat = new chat(editText.getText().toString(),auth.getUid(),currentTime,"1","BHANGY","message");
                 reference.child(currentTime).setValue(chat);
                 editText.setText("");
             }
@@ -164,17 +168,19 @@ public class TempActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 message.clear();
                 id.clear();
+                typeOfMessage.clear();
                 time.clear();
                 for(DataSnapshot dataSnapshot : snapshot.getChildren()){
                     message.add(String.valueOf(dataSnapshot.child("message").getValue()));
                     time.add(String.valueOf(dataSnapshot.child("time").getValue()));
+                    typeOfMessage.add(String.valueOf(dataSnapshot.child("typeOfMessage").getValue()));
                     id.add(String.valueOf(dataSnapshot.child("id").getValue()));
                 }
                 linearLayoutManager = new LinearLayoutManager(getApplicationContext());
                 linearLayoutManager.setStackFromEnd(true);
                 recyclerView.setLayoutManager(linearLayoutManager);
 //                    recyclerView.smoothScrollToPosition(message.size()-1);
-                recyclerView.setAdapter(new chatAdapter(message,time,id));
+                recyclerView.setAdapter(new chatAdapter(message,time,id,typeOfMessage));
             }
 
             @Override
