@@ -296,7 +296,7 @@ public class ChatWithCustomer extends AppCompatActivity {
                 reference.putFile(filepath).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-                        Toast.makeText(ChatWithCustomer.this, "Upload Complete", Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(ChatWithCustomer.this, "Upload Complete", Toast.LENGTH_SHORT).show();
                         Toast.makeText(ChatWithCustomer.this, "Image Uploaded", Toast.LENGTH_SHORT).show();
                         StorageReference reference = storageReference.child(dishAuth.getUid() + "/" + "Chats" + "/"  + times);
                         reference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
