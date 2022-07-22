@@ -1,10 +1,14 @@
 package com.consumers.fastwayadmin.Tables;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -12,7 +16,9 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -43,7 +49,11 @@ import com.itextpdf.text.pdf.parser.Line;
 
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +63,7 @@ public class ChatWithCustomer extends AppCompatActivity {
     DatabaseReference reference;
     FirebaseAuth auth;
     String id;
+    Uri photoURI;
     FirebaseStorage storage;
     StorageReference storageReference;
     boolean containsBad = false;
@@ -139,10 +150,33 @@ public class ChatWithCustomer extends AppCompatActivity {
         });
 
         imageSend.setOnClickListener(click -> {
-            Intent intent = new Intent();
-            intent.setType("image/*");
-            intent.setAction("android.intent.action.PICK");
-            startActivityForResult(Intent.createChooser(intent, "Select Picture"), 1);
+            AlertDialog.Builder builder = new AlertDialog.Builder(ChatWithCustomer.this);
+            builder.setTitle("Choose one option").setMessage("Choose one option from below").setPositiveButton("Open Gallery", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Intent intent = new Intent();
+                    dialog.dismiss();
+                    intent.setType("image/*");
+                    intent.setAction("android.intent.action.PICK");
+                    startActivityForResult(Intent.createChooser(intent, "Select Picture"), 1);
+                }
+            }).setNegativeButton("Open Camera", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+
+                    String file = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)+"/" + Calendar.getInstance().getTimeInMillis() + ".jpg";
+                    File file1 = new File(file);
+                    photoURI = FileProvider.getUriForFile(ChatWithCustomer.this, getApplicationContext().getPackageName() + ".provider", file1);
+                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    intent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                    startActivityForResult(intent, 11);
+                }
+            }).setNeutralButton("Exit", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            }).create().show();
         });
 
         reference.child("messages").child(id).addChildEventListener(new ChildEventListener() {
@@ -315,6 +349,58 @@ public class ChatWithCustomer extends AppCompatActivity {
             } catch (Exception e) {
                 Toast.makeText(ChatWithCustomer.this, "" + e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
             }
+        }else if(requestCode == 11 && resultCode == RESULT_OK){
+            String times = System.currentTimeMillis() + "";
+            Bitmap bmp = null;
+            StorageReference childRef2 = storageReference.child(auth.getUid() + "/" + "Chats" + "/" + times);
+            try {
+                bmp = MediaStore.Images.Media.getBitmap(getContentResolver(), photoURI);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            bmp.compress(Bitmap.CompressFormat.JPEG, 25, baos);
+            byte[] dataa = baos.toByteArray();
+
+            UploadTask uploadTask2 = childRef2.putBytes(dataa);
+            uploadTask2.addOnSuccessListener(taskSnapshot -> {
+
+                Toast.makeText(ChatWithCustomer.this, "Upload successful", Toast.LENGTH_LONG).show();
+                StorageReference reference = storageReference.child(auth.getUid() + "/" + "Chats" + "/"  + times);
+                reference.getDownloadUrl().addOnSuccessListener(uri -> {
+                    SharedPreferences preferences = getSharedPreferences("loginInfo", MODE_PRIVATE);
+                    chat chat = new chat(uri + "", auth.getUid() + "", System.currentTimeMillis() + "", "1", preferences.getString("name", ""),"image");
+                    DatabaseReference reference1 = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));;
+                    reference1.child("messages").child(Objects.requireNonNull(id)).child(System.currentTimeMillis() + "").setValue(chat);
+                    updateChat();
+                });
+
+            }).addOnFailureListener(e -> Toast.makeText(ChatWithCustomer.this, "Upload Failed -> " + e, Toast.LENGTH_LONG).show());
+//            try {
+//                FirebaseAuth dishAuth = FirebaseAuth.getInstance();
+//                StorageReference reference = storageReference.child(dishAuth.getUid() + "/" + "Chats" + "/" + times);
+//                reference.putFile(photoURI).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+//                        Toast.makeText(ChatWithOwner.this, "Upload Complete", Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(ChatWithOwner.this, "Image Uploaded", Toast.LENGTH_SHORT).show();
+//                        StorageReference reference = storageReference.child(dishAuth.getUid() + "/" + "Chats" + "/"  + times);
+//                        reference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+//                            @Override
+//                            public void onSuccess(@NonNull Uri uri) {
+////                    TempClass tempClass = new TempClass(restaurantName,resId,name,email,issueName,details,uri+"",state,orderID,locality);
+//                                SharedPreferences preferences = getSharedPreferences("AccountInfo", MODE_PRIVATE);
+//                                chat chat = new chat(uri + "", auth.getUid() + "", System.currentTimeMillis() + "", "0", preferences.getString("name", ""),"image");
+//                                DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(id);;
+//                                reference.child("messages").child(Objects.requireNonNull(auth.getUid())).child(System.currentTimeMillis() + "").setValue(chat);
+//                                updateChat();
+//                            }
+//                        });
+//                    }
+//                }).addOnFailureListener(e -> Toast.makeText(ChatWithOwner.this, "Failed. Try again later", Toast.LENGTH_SHORT).show());
+//            } catch (Exception e) {
+//                Toast.makeText(ChatWithOwner.this, "" + e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+//            }
         }
     }
 
