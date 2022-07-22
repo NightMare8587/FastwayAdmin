@@ -29,7 +29,7 @@
         android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+        android:theme="@style/Theme.FastwayAdmin"
         tools:replace="android:icon,android:allowBackup">
         <activity
             android:name=".Info.RestaurantDocuments.UploadRemainingDocs"
