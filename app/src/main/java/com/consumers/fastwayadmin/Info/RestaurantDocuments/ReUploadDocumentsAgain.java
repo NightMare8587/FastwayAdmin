@@ -11,9 +11,13 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.text.InputType;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -58,6 +62,7 @@ public class ReUploadDocumentsAgain extends AppCompatActivity {
     StorageReference storageReference;
     Uri filePath;
     FirebaseStorage storage;
+    String fssaiDigitsNums;
     File file;
     Bitmap bitmap;
     TextView panText,gstText,adhaarText,FssaiText,resText;
@@ -119,17 +124,51 @@ public class ReUploadDocumentsAgain extends AppCompatActivity {
 //            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},1);
                 requestPermissions(new String[]{Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.ACCESS_FINE_LOCATION},88);
             }else {
-                AlertDialog.Builder alert = new AlertDialog.Builder(ReUploadDocumentsAgain.this);
-                alert.setTitle("Choose one option")
-                        .setPositiveButton("Upload from gallery", (dialogInterface, i) -> {
-                            dialogInterface.dismiss();
-                            Intent intent = new Intent();
-                            intent.setType("image/*");
-                            intent.setAction("android.intent.action.PICK");
-                            startActivityForResult(Intent.createChooser(intent, "Select Picture"), 2);
-                        }).setNegativeButton("Cancel", (dialogInterface, i) -> dialogInterface.dismiss()).create();
+                AlertDialog.Builder fssaiBuild = new AlertDialog.Builder(ReUploadDocumentsAgain.this);
+                fssaiBuild.setTitle("Fssai Number").setMessage("Enter your 14 digit FSSAI number below");
+                LinearLayout linearLayout = new LinearLayout(ReUploadDocumentsAgain.this);
+                linearLayout.setOrientation(LinearLayout.VERTICAL);
+                EditText editText = new EditText(ReUploadDocumentsAgain.this);
+                editText.setHint("Enter FSSAI Number here");
+                editText.setInputType(InputType.TYPE_CLASS_NUMBER);
+                editText.setMaxLines(14);
+                linearLayout.addView(editText);
+                fssaiBuild.setPositiveButton("Next", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if(editText.length() == 14 && TextUtils.isDigitsOnly(editText.getText().toString())) {
+                            fssaiDigitsNums = editText.getText().toString();
+                            AlertDialog.Builder alert = new AlertDialog.Builder(ReUploadDocumentsAgain.this);
+                            alert.setTitle("Choose one option")
+                                    .setPositiveButton("Upload from gallery", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                            dialogInterface.dismiss();
+                                            Intent intent = new Intent();
+                                            intent.setType("image/*");
+                                            intent.setAction("android.intent.action.PICK");
+                                            startActivityForResult(Intent.createChooser(intent, "Select Picture"), 2);
+                                        }
+                                    }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                            dialogInterface.dismiss();
+                                        }
+                                    }).create();
 
-                alert.show();
+                            alert.show();
+                        }else
+                            Toast.makeText(ReUploadDocumentsAgain.this, "Check your input", Toast.LENGTH_LONG).show();
+                    }
+                }).setNegativeButton("Exit", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                }).create();
+                fssaiBuild.setView(linearLayout);
+                fssaiBuild.show();
+
             }
         });
 
@@ -315,6 +354,10 @@ public class ReUploadDocumentsAgain extends AppCompatActivity {
                             fssaiUrl = uri + "";
                             DatabaseReference dish = FirebaseDatabase.getInstance().getReference().getRoot();
                             dish.child("Admin").child(Objects.requireNonNull(auth.getUid())).child("Restaurant Documents").child("fssai").setValue(uri + "");
+                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                            editor.putString("fssaiNumDigit",fssaiDigitsNums);
+                            editor.apply();
+                            dish.child("Admin").child(Objects.requireNonNull(auth.getUid())).child("Restaurant Documents").child("fssaiDigits").setValue(fssaiDigitsNums + "");
                             checkIfAllUploaded();
                         });
 

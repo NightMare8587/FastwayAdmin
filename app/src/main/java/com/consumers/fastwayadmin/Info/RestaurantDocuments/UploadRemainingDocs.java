@@ -20,9 +20,13 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.StrictMode;
 import android.provider.MediaStore;
+import android.text.InputType;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -66,6 +70,7 @@ public class UploadRemainingDocs extends AppCompatActivity {
     StorageReference storageReference;
     Uri filePath;
     FirebaseStorage storage;
+    String fssaiDigitNums = "";
     File file;
     Bitmap bitmap;
     TextView panText,gstText,adhaarText,FssaiText,resProofText;
@@ -91,8 +96,8 @@ public class UploadRemainingDocs extends AppCompatActivity {
                 .setAnimation(Animations.FADE_IN)
                 .create();
 
-        gstText = findViewById(R.id.uploadGstTextRemaining);
-        panText = findViewById(R.id.panTextUploadedRemaining);
+//        gstText = findViewById(R.id.uploadGstTextRemaining);
+//        panText = findViewById(R.id.panTextUploadedRemaining);
         adhaarText = findViewById(R.id.uploadAdhaarCardTextRemaining);
         FssaiText = findViewById(R.id.uploadFssaiTextRemaining);
         resProofText = findViewById(R.id.uploadResidentialTextRemaining);
@@ -105,24 +110,12 @@ public class UploadRemainingDocs extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.hasChild("Restaurant Documents")){
                     fastDialog.show();
-                    if(snapshot.child("Restaurant Documents").hasChild("pan")){
-                        pan = true;
-                        panUrl = snapshot.child("Restaurant Documents").child("pan").getValue(String.class);
-                        panText.setVisibility(View.VISIBLE);
-                        panCard.setClickable(false);
-                    }
                     if(snapshot.child("Restaurant Documents").hasChild("fssai")){
                         fssai = true;
                         fssaiUrl = snapshot.child("Restaurant Documents").child("fssai").getValue(String.class);
+                        fssaiDigitNums = snapshot.child("Restaurant Documents").child("fssaiDigits").getValue(String.class);
                         FssaiText.setVisibility(View.VISIBLE);
                         fssaiCard.setClickable(false);
-                    }
-                    if(snapshot.child("Restaurant Documents").hasChild("gst")){
-                        gst = true;
-                        gstUrl = snapshot.child("Restaurant Documents").child("gst").getValue(String.class);
-                        gstText.setVisibility(View.VISIBLE);
-
-                        gstCard.setClickable(false);
                     }
                     if(snapshot.child("Restaurant Documents").hasChild("adhaar")){
                         adhaar = true;
@@ -147,31 +140,31 @@ public class UploadRemainingDocs extends AppCompatActivity {
             }
         });
 
-        panCard.setOnClickListener(click -> {
-            if(ContextCompat.checkSelfPermission(UploadRemainingDocs.this, Manifest.permission.ACCESS_FINE_LOCATION) + ContextCompat.checkSelfPermission(UploadRemainingDocs.this , Manifest.permission.CAMERA)
-                    + ContextCompat.checkSelfPermission(UploadRemainingDocs.this, Manifest.permission.WRITE_EXTERNAL_STORAGE )
-                    != PackageManager.PERMISSION_GRANTED){
-//            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},1);
-                requestPermissions(new String[]{Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.ACCESS_FINE_LOCATION},88);
-            }else {
-                AlertDialog.Builder alert = new AlertDialog.Builder(UploadRemainingDocs.this);
-                alert.setTitle("Choose one option")
-                        .setPositiveButton("Upload from gallery", (dialogInterface, i) -> {
-                            dialogInterface.dismiss();
-                            Intent intent = new Intent();
-                            intent.setType("image/*");
-                            intent.setAction("android.intent.action.PICK");
-                            startActivityForResult(Intent.createChooser(intent, "Select Picture"), 1);
-                        }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                dialogInterface.dismiss();
-                            }
-                        }).create();
-
-                alert.show();
-            }
-        });
+//        panCard.setOnClickListener(click -> {
+//            if(ContextCompat.checkSelfPermission(UploadRemainingDocs.this, Manifest.permission.ACCESS_FINE_LOCATION) + ContextCompat.checkSelfPermission(UploadRemainingDocs.this , Manifest.permission.CAMERA)
+//                    + ContextCompat.checkSelfPermission(UploadRemainingDocs.this, Manifest.permission.WRITE_EXTERNAL_STORAGE )
+//                    != PackageManager.PERMISSION_GRANTED){
+////            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},1);
+//                requestPermissions(new String[]{Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.ACCESS_FINE_LOCATION},88);
+//            }else {
+//                AlertDialog.Builder alert = new AlertDialog.Builder(UploadRemainingDocs.this);
+//                alert.setTitle("Choose one option")
+//                        .setPositiveButton("Upload from gallery", (dialogInterface, i) -> {
+//                            dialogInterface.dismiss();
+//                            Intent intent = new Intent();
+//                            intent.setType("image/*");
+//                            intent.setAction("android.intent.action.PICK");
+//                            startActivityForResult(Intent.createChooser(intent, "Select Picture"), 1);
+//                        }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+//                            @Override
+//                            public void onClick(DialogInterface dialogInterface, int i) {
+//                                dialogInterface.dismiss();
+//                            }
+//                        }).create();
+//
+//                alert.show();
+//            }
+//        });
 
         fssaiCard.setOnClickListener(click -> {
             if(ContextCompat.checkSelfPermission(UploadRemainingDocs.this, Manifest.permission.ACCESS_FINE_LOCATION) + ContextCompat.checkSelfPermission(UploadRemainingDocs.this , Manifest.permission.CAMERA)
@@ -180,25 +173,51 @@ public class UploadRemainingDocs extends AppCompatActivity {
 //            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},1);
                 requestPermissions(new String[]{Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.ACCESS_FINE_LOCATION},88);
             }else {
-                AlertDialog.Builder alert = new AlertDialog.Builder(UploadRemainingDocs.this);
-                alert.setTitle("Choose one option")
-                        .setPositiveButton("Upload from gallery", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                dialogInterface.dismiss();
-                                Intent intent = new Intent();
-                                intent.setType("image/*");
-                                intent.setAction("android.intent.action.PICK");
-                                startActivityForResult(Intent.createChooser(intent, "Select Picture"), 2);
-                            }
-                        }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                dialogInterface.dismiss();
-                            }
-                        }).create();
+                AlertDialog.Builder fssaiBuild = new AlertDialog.Builder(UploadRemainingDocs.this);
+                fssaiBuild.setTitle("Fssai Number").setMessage("Enter your 14 digit FSSAI number below");
+                LinearLayout linearLayout = new LinearLayout(UploadRemainingDocs.this);
+                linearLayout.setOrientation(LinearLayout.VERTICAL);
+                EditText editText = new EditText(UploadRemainingDocs.this);
+                editText.setHint("Enter FSSAI Number here");
+                editText.setInputType(InputType.TYPE_CLASS_NUMBER);
+                editText.setMaxLines(14);
+                linearLayout.addView(editText);
+                fssaiBuild.setPositiveButton("Next", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if(editText.length() == 14 && TextUtils.isDigitsOnly(editText.getText().toString())) {
+                            fssaiDigitNums = editText.getText().toString();
+                            AlertDialog.Builder alert = new AlertDialog.Builder(UploadRemainingDocs.this);
+                            alert.setTitle("Choose one option")
+                                    .setPositiveButton("Upload from gallery", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                            dialogInterface.dismiss();
+                                            Intent intent = new Intent();
+                                            intent.setType("image/*");
+                                            intent.setAction("android.intent.action.PICK");
+                                            startActivityForResult(Intent.createChooser(intent, "Select Picture"), 2);
+                                        }
+                                    }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                            dialogInterface.dismiss();
+                                        }
+                                    }).create();
 
-                alert.show();
+                            alert.show();
+                        }else
+                            Toast.makeText(UploadRemainingDocs.this, "Check your input", Toast.LENGTH_LONG).show();
+                    }
+                }).setNegativeButton("Exit", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                }).create();
+                fssaiBuild.setView(linearLayout);
+                fssaiBuild.show();
+
             }
         });
 
@@ -252,32 +271,32 @@ public class UploadRemainingDocs extends AppCompatActivity {
             }
         });
 
-        gstCard.setOnClickListener(click -> {
-            if(ContextCompat.checkSelfPermission(UploadRemainingDocs.this, Manifest.permission.ACCESS_FINE_LOCATION) + ContextCompat.checkSelfPermission(UploadRemainingDocs.this , Manifest.permission.CAMERA)
-                    + ContextCompat.checkSelfPermission(UploadRemainingDocs.this, Manifest.permission.WRITE_EXTERNAL_STORAGE )
-                    != PackageManager.PERMISSION_GRANTED){
-//            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},1);
-                requestPermissions(new String[]{Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.ACCESS_FINE_LOCATION},88);
-            }else {
-                AlertDialog.Builder alert = new AlertDialog.Builder(UploadRemainingDocs.this);
-                alert.setTitle("Choose one option")
-                        .setPositiveButton("Upload from gallery", (dialogInterface, i) -> {
-                            dialogInterface.dismiss();
-                            Intent intent = new Intent();
-                            intent.setType("image/*");
-                            intent.setAction("android.intent.action.PICK");
-                            startActivityForResult(Intent.createChooser(intent, "Select Picture"), 4);
-                        }).setNegativeButton("Cancel", (dialogInterface, i) -> dialogInterface.dismiss()).create();
-
-                alert.show();
-            }
-        });
+//        gstCard.setOnClickListener(click -> {
+//            if(ContextCompat.checkSelfPermission(UploadRemainingDocs.this, Manifest.permission.ACCESS_FINE_LOCATION) + ContextCompat.checkSelfPermission(UploadRemainingDocs.this , Manifest.permission.CAMERA)
+//                    + ContextCompat.checkSelfPermission(UploadRemainingDocs.this, Manifest.permission.WRITE_EXTERNAL_STORAGE )
+//                    != PackageManager.PERMISSION_GRANTED){
+////            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},1);
+//                requestPermissions(new String[]{Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.ACCESS_FINE_LOCATION},88);
+//            }else {
+//                AlertDialog.Builder alert = new AlertDialog.Builder(UploadRemainingDocs.this);
+//                alert.setTitle("Choose one option")
+//                        .setPositiveButton("Upload from gallery", (dialogInterface, i) -> {
+//                            dialogInterface.dismiss();
+//                            Intent intent = new Intent();
+//                            intent.setType("image/*");
+//                            intent.setAction("android.intent.action.PICK");
+//                            startActivityForResult(Intent.createChooser(intent, "Select Picture"), 4);
+//                        }).setNegativeButton("Cancel", (dialogInterface, i) -> dialogInterface.dismiss()).create();
+//
+//                alert.show();
+//            }
+//        });
     }
     private void initialise() {
-        panCard = findViewById(R.id.uploadPANcardRemaining);
+//        panCard = findViewById(R.id.uploadPANcardRemaining);
         adhaarCard = findViewById(R.id.uploadAdhaarCardRemaining);
         fssaiCard = findViewById(R.id.uploadFSSAIcardRemaining);
-        gstCard= findViewById(R.id.uploadGSTcardRemaining);
+//        gstCard= findViewById(R.id.uploadGSTcardRemaining);
         residentialProof = findViewById(R.id.uploadResidentialProofRemaining);
         panUrl = "";
         adhaarUrl = "";
@@ -286,7 +305,7 @@ public class UploadRemainingDocs extends AppCompatActivity {
         fssaiUrl = "";
     }
     private void checkIfAllUploaded() {
-        if(adhaar && pan && gst && fssai && resProof){
+        if(adhaar && fssai && resProof){
             DatabaseReference databaseReferenceCheck = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Registered Restaurants").child(sharedPreferences.getString("state",""));
             databaseReferenceCheck.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
@@ -445,6 +464,7 @@ public class UploadRemainingDocs extends AppCompatActivity {
                                 fssaiUrl = uri + "";
                                 DatabaseReference dish = FirebaseDatabase.getInstance().getReference().getRoot();
                                 dish.child("Admin").child(Objects.requireNonNull(auth.getUid())).child("Restaurant Documents").child("fssai").setValue(uri + "");
+                                dish.child("Admin").child(Objects.requireNonNull(auth.getUid())).child("Restaurant Documents").child("fssaiDigits").setValue(fssaiDigitNums + "");
                                 checkIfAllUploaded();
                             }
                         });
@@ -668,11 +688,7 @@ public class UploadRemainingDocs extends AppCompatActivity {
             reference.putFile(filePath).addOnSuccessListener(taskSnapshot -> {
                 StorageReference reference1 = storageReference.child(auth.getUid() + "/" + "Documents" + "/"  + value);
                 reference1.getDownloadUrl().addOnSuccessListener(uri -> {
-                    if(value.equals("pan")) {
-                        panUrl = uri + "";
-                        pan = true;
-                        panText.setVisibility(View.VISIBLE);
-                    }
+
                     if(value.equals("fssai")) {
                         fssai = true;
                         fssaiUrl = uri + "";
@@ -683,11 +699,7 @@ public class UploadRemainingDocs extends AppCompatActivity {
                         adhaarUrl = uri + "";
                         adhaarText.setVisibility(View.VISIBLE);
                     }
-                    if(value.equals("gst")) {
-                        gst = true;
-                        gstUrl = uri + "";
-                        gstText.setVisibility(View.VISIBLE);
-                    }
+
                     if(value.equals("resProof")){
                         resProof = true;
                         residentialProofSubmitUrl = uri + "";

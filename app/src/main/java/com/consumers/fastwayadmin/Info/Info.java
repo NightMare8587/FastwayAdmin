@@ -72,6 +72,7 @@ public class Info extends AppCompatActivity {
     Bitmap bitmap;
     StorageReference storageReference;
     AlertDialog.Builder builder;
+
     boolean mapLocations = false;
     String cityName,subAdminArea;
     AlertDialog alertDialog;

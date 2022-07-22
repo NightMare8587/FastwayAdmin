@@ -3,6 +3,7 @@ package com.consumers.fastwayadmin.Info.RestaurantDocuments.ReUploadDocuments;
 import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -10,10 +11,14 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.text.InputType;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -24,6 +29,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import com.consumers.fastwayadmin.Info.RestaurantDocuments.UploadRemainingDocs;
 import com.consumers.fastwayadmin.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -57,9 +63,11 @@ public class ViewAndReuploadDocuments extends AppCompatActivity {
     DatabaseReference databaseReference;
     FirebaseAuth auth = FirebaseAuth.getInstance();
     String currentString = "";
+    boolean fssaiNum = false;
     ProgressBar progressBar;
     String pan,adhaar,fssai,gst,resProof;
     FastDialog loading;
+    String fssaiDigitsNums;
     Button panButton,gstButton,adhaarButton,fssaiButton,resProofButton;
     File file;
     OutputStream outputStream;
@@ -83,6 +91,7 @@ public class ViewAndReuploadDocuments extends AppCompatActivity {
 //                gst = String.valueOf(dataSnapshot.child("gst").getValue());
 //                pan = String.valueOf(dataSnapshot.child("pan").getValue());
                 fssai = String.valueOf(dataSnapshot.child("fssai").getValue());
+                fssaiDigitsNums = String.valueOf(dataSnapshot.child("fssaiDigits").getValue());
                 resProof = String.valueOf(dataSnapshot.child("resProof").getValue());
             }
 
@@ -130,18 +139,48 @@ public class ViewAndReuploadDocuments extends AppCompatActivity {
     }
 
     private void reuploadImageOrNotUploaded(String str) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(ViewAndReuploadDocuments.this);
-        builder.setTitle("Choose one option").setPositiveButton("Choose from Gallery", new DialogInterface.OnClickListener() {
+        AlertDialog.Builder fssaiBuild = new AlertDialog.Builder(ViewAndReuploadDocuments.this);
+        fssaiBuild.setTitle("Fssai Number").setMessage("Enter your 14 digit FSSAI number below");
+        LinearLayout linearLayout = new LinearLayout(ViewAndReuploadDocuments.this);
+        linearLayout.setOrientation(LinearLayout.VERTICAL);
+        EditText editText = new EditText(ViewAndReuploadDocuments.this);
+        editText.setHint("Enter FSSAI Number here");
+        editText.setInputType(InputType.TYPE_CLASS_NUMBER);
+        editText.setMaxLines(14);
+        linearLayout.addView(editText);
+        fssaiBuild.setPositiveButton("Next", new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                dialogInterface.dismiss();
-                Intent intent = new Intent();
-                intent.setType("image/*");
-                intent.setAction("android.intent.action.PICK");
-                currentString = str;
-                startActivityForResult(Intent.createChooser(intent, "Select Picture"), 5);
+            public void onClick(DialogInterface dialog, int which) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(ViewAndReuploadDocuments.this);
+                builder.setTitle("Choose one option").setPositiveButton("Choose from Gallery", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        if(editText.length() == 14 && TextUtils.isDigitsOnly(editText.getText().toString())) {
+                            dialogInterface.dismiss();
+                            Intent intent = new Intent();
+                            intent.setType("image/*");
+                            fssaiDigitsNums = editText.getText().toString();
+                            SharedPreferences sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
+                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                            editor.putString("fssaiNumDigit",fssaiDigitsNums);
+                            editor.apply();
+                            fssaiNum = true;
+                            intent.setAction("android.intent.action.PICK");
+                            currentString = str;
+                            startActivityForResult(Intent.createChooser(intent, "Select Picture"), 5);
+                        }
+                    }
+                }).setNegativeButton("Cancel", (dialogInterface, i) -> dialogInterface.dismiss()).create().show();
             }
-        }).setNegativeButton("Cancel", (dialogInterface, i) -> dialogInterface.dismiss()).create().show();
+        }).setNegativeButton("Exit", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        }).create();
+        fssaiBuild.setView(linearLayout);
+        fssaiBuild.show();
+
     }
 
     private void showAlertDialog(String str,String name) {
@@ -156,6 +195,7 @@ public class ViewAndReuploadDocuments extends AppCompatActivity {
                         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE); //IMAGE CAPTURE CODE
                         startActivityForResult(intent, 22);
                     }).setNegativeButton("Choose from gallery", (dialogInterface12, i12) -> {
+
                         dialogInterface12.dismiss();
                         Intent intent = new Intent();
                         intent.setType("image/*");
@@ -327,6 +367,8 @@ public class ViewAndReuploadDocuments extends AppCompatActivity {
                         loading.dismiss();
                         DatabaseReference dish = FirebaseDatabase.getInstance().getReference().getRoot();
                         dish.child("Admin").child(Objects.requireNonNull(auth.getUid())).child("Restaurant Documents").child(currentString).setValue(uri + "");
+                        if(fssaiNum)
+                            dish.child("Admin").child(Objects.requireNonNull(auth.getUid())).child("Restaurant Documents").child("fssaiDigits").setValue(fssaiDigitsNums + "");
                     });
                 }).addOnFailureListener(e -> loading.dismiss());
             } catch (IOException e) {

@@ -19,9 +19,13 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.StrictMode;
 import android.provider.MediaStore;
+import android.text.InputType;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -62,6 +66,7 @@ public class UploadRequiredDocuments extends AppCompatActivity {
     SharedPreferences sharedPreferences;
     Button panCard,adhaarCard,fssaiCard,gstCard,residentialProof;
     StorageReference storageReference;
+    String fssaiNumDigits = "";
     Uri filePath;
     FirebaseStorage storage;
     File file;
@@ -74,6 +79,7 @@ public class UploadRequiredDocuments extends AppCompatActivity {
     boolean gst = false;
     boolean adhaar = false;
     boolean fssai = false;
+    SharedPreferences.Editor editor;
     Button proceedFurther;
     boolean resProof = false;
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -98,6 +104,7 @@ public class UploadRequiredDocuments extends AppCompatActivity {
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
         sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
+        editor = sharedPreferences.edit();
         databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -114,6 +121,9 @@ public class UploadRequiredDocuments extends AppCompatActivity {
                         fssai = true;
                         fssaiUrl = snapshot.child("Restaurant Documents").child("fssai").getValue(String.class);
                         FssaiText.setVisibility(View.VISIBLE);
+                        fssaiNumDigits = snapshot.child("Restaurant Documents").child("fssaiDigits").getValue(String.class);
+                        editor.putString("fssaiNumDigit",fssaiNumDigits);
+                        editor.apply();
                         fssaiCard.setClickable(false);
                     }
 //                    if(snapshot.child("Restaurant Documents").hasChild("gst")){
@@ -239,25 +249,51 @@ public class UploadRequiredDocuments extends AppCompatActivity {
 //            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},1);
                 requestPermissions(new String[]{Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.ACCESS_FINE_LOCATION},88);
             }else {
-                AlertDialog.Builder alert = new AlertDialog.Builder(UploadRequiredDocuments.this);
-                alert.setTitle("Choose one option")
-                        .setPositiveButton("Upload from gallery", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                dialogInterface.dismiss();
-                                Intent intent = new Intent();
-                                intent.setType("image/*");
-                                intent.setAction("android.intent.action.PICK");
-                                startActivityForResult(Intent.createChooser(intent, "Select Picture"), 2);
-                            }
-                        }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                AlertDialog.Builder fssaiBuild = new AlertDialog.Builder(UploadRequiredDocuments.this);
+                fssaiBuild.setTitle("Fssai Number").setMessage("Enter your 14 digit FSSAI number below");
+                LinearLayout linearLayout = new LinearLayout(UploadRequiredDocuments.this);
+                linearLayout.setOrientation(LinearLayout.VERTICAL);
+                EditText editText = new EditText(UploadRequiredDocuments.this);
+                editText.setHint("Enter FSSAI Number here");
+                editText.setInputType(InputType.TYPE_CLASS_NUMBER);
+                editText.setMaxLines(14);
+                linearLayout.addView(editText);
+                fssaiBuild.setPositiveButton("Next", new DialogInterface.OnClickListener() {
                     @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
+                    public void onClick(DialogInterface dialog, int which) {
+                        if(editText.length() == 14 && TextUtils.isDigitsOnly(editText.getText().toString())) {
+                            fssaiNumDigits = editText.getText().toString();
+                            AlertDialog.Builder alert = new AlertDialog.Builder(UploadRequiredDocuments.this);
+                            alert.setTitle("Choose one option")
+                                    .setPositiveButton("Upload from gallery", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                            dialogInterface.dismiss();
+                                            Intent intent = new Intent();
+                                            intent.setType("image/*");
+                                            intent.setAction("android.intent.action.PICK");
+                                            startActivityForResult(Intent.createChooser(intent, "Select Picture"), 2);
+                                        }
+                                    }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                            dialogInterface.dismiss();
+                                        }
+                                    }).create();
+
+                            alert.show();
+                        }else
+                            Toast.makeText(UploadRequiredDocuments.this, "Check your input", Toast.LENGTH_LONG).show();
+                    }
+                }).setNegativeButton("Exit", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
                     }
                 }).create();
+                fssaiBuild.setView(linearLayout);
+                fssaiBuild.show();
 
-                alert.show();
             }
         });
 
@@ -532,6 +568,7 @@ public class UploadRequiredDocuments extends AppCompatActivity {
                                 fssaiUrl = uri + "";
                                 DatabaseReference dish = FirebaseDatabase.getInstance().getReference().getRoot();
                                 dish.child("Admin").child(Objects.requireNonNull(auth.getUid())).child("Restaurant Documents").child("fssai").setValue(uri + "");
+                                dish.child("Admin").child(Objects.requireNonNull(auth.getUid())).child("Restaurant Documents").child("fssaiDigits").setValue(fssaiNumDigits + "");
                                 checkIfAllUploaded();
                             }
                         });
