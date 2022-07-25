@@ -73,12 +73,12 @@ public class CashFreeGateway extends AppCompatActivity {
         ranV = String.valueOf(ran);
         SharedPreferences sharedPreferences = getSharedPreferences("CashFreeToken", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        orderId = String.valueOf(auth.getUid()) + ranV;
-        while (sharedPreferences.contains(orderId)) {
-            ran = random.nextInt(100000 - 1) + 1;
-            ranV = String.valueOf(ran);
-            orderId = ranV + String.valueOf(auth.getUid());
-        }
+        orderId = "ORDER_" + System.currentTimeMillis() + "_" + ranV;
+//        while (sharedPreferences.contains(orderId)) {
+//            ran = random.nextInt(100000 - 1) + 1;
+//            ranV = String.valueOf(ran);
+//            orderId = ranV + String.valueOf(auth.getUid());
+//        }
 
         editor.putString(orderId, orderId);
         editor.apply();
@@ -86,27 +86,24 @@ public class CashFreeGateway extends AppCompatActivity {
 //       JSONObject jsonObject = new JSONObject();
         RequestQueue requestQueue = Volley.newRequestQueue(this);
         try {
-            StringRequest stringRequest = new StringRequest(Request.Method.POST, test, new Response.Listener<String>() {
-                @Override
-                public void onResponse(String response) {
-                    if (response == null)
-                        Log.i("null", "response");
-                    else {
-                        Log.i("resposnse", response.toString());
-                        token = response;
-                        Map<String, String> map = new HashMap<>();
+            StringRequest stringRequest = new StringRequest(Request.Method.POST, test, response -> {
+                if (response == null)
+                    Log.i("null", "response");
+                else {
+                    Log.i("resposnse", response.toString());
+                    token = response;
+                    Map<String, String> map = new HashMap<>();
 
-                        map.put(PARAM_APP_ID, "61532dad5cd9ca634ae8ca59d23516");
-                        map.put(PARAM_ORDER_ID, orderId);
-                        map.put(PARAM_ORDER_AMOUNT, "" + df.format(Double.parseDouble(amount)));
-                        map.put(PARAM_ORDER_CURRENCY, "INR");
-                        map.put(PARAM_CUSTOMER_NAME, "Pulkit Loya");
-                        map.put(PARAM_CUSTOMER_EMAIL, "maheshwariloya@gmail.com");
-                        map.put(PARAM_CUSTOMER_PHONE, "8076531395");
-                        Log.i("here", "success");
-                        CFPaymentService cfPaymentService = CFPaymentService.getCFPaymentServiceInstance();
-                        cfPaymentService.doPayment(CashFreeGateway.this, map, token, "TEST");
-                    }
+                    map.put(PARAM_APP_ID, "61532dad5cd9ca634ae8ca59d23516");
+                    map.put(PARAM_ORDER_ID, orderId);
+                    map.put(PARAM_ORDER_AMOUNT, "" + df.format(Double.parseDouble(amount)));
+                    map.put(PARAM_ORDER_CURRENCY, "INR");
+                    map.put(PARAM_CUSTOMER_NAME, "Pulkit Loya");
+                    map.put(PARAM_CUSTOMER_EMAIL, "maheshwariloya@gmail.com");
+                    map.put(PARAM_CUSTOMER_PHONE, "8076531395");
+                    Log.i("here", "success");
+                    CFPaymentService cfPaymentService = CFPaymentService.getCFPaymentServiceInstance();
+                    cfPaymentService.doPayment(CashFreeGateway.this, map, token, "TEST");
                 }
             }, error -> {
                 Log.i("error", "error");
