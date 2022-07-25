@@ -172,12 +172,7 @@ public class ViewAndReuploadDocuments extends AppCompatActivity {
                     }
                 }).setNegativeButton("Cancel", (dialogInterface, i) -> dialogInterface.dismiss()).create().show();
             }
-        }).setNegativeButton("Exit", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        }).create();
+        }).setNegativeButton("Exit", (dialog, which) -> dialog.dismiss()).create();
         fssaiBuild.setView(linearLayout);
         fssaiBuild.show();
 
@@ -185,7 +180,7 @@ public class ViewAndReuploadDocuments extends AppCompatActivity {
 
     private void showAlertDialog(String str,String name) {
         AlertDialog.Builder builder = new AlertDialog.Builder(ViewAndReuploadDocuments.this);
-        builder.setTitle("Dialog").setMessage("Choose one option from below!").setPositiveButton("Reupload Document", (dialogInterface, i) -> {
+        builder.setTitle("Dialog").setMessage("Choose one option from below!").setPositiveButton("Re-upload Document", (dialogInterface, i) -> {
             dialogInterface.dismiss();
             AlertDialog.Builder alert = new AlertDialog.Builder(ViewAndReuploadDocuments.this);
             alert.setTitle("Dialog").setMessage("Choose one option from below")

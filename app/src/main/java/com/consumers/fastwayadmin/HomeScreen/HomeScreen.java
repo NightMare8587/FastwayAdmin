@@ -546,7 +546,7 @@ public class HomeScreen extends AppCompatActivity {
                                 alert.show();
                             }
                         }else{
-
+                            checkIfCommissionNeeded.child("registrationDate").setValue(System.currentTimeMillis() + "");
                         }
                     }
                 }

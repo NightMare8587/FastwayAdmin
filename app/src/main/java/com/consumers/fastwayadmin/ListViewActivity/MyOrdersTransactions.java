@@ -1,25 +1,19 @@
 package com.consumers.fastwayadmin.ListViewActivity;
 
 import android.annotation.SuppressLint;
-import android.app.DatePickerDialog;
-import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
-import android.widget.DatePicker;
-import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -41,12 +35,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
@@ -60,6 +52,11 @@ public class MyOrdersTransactions extends AppCompatActivity {
     String singleBenStatus = "https://intercellular-stabi.000webhostapp.com/benStatusFolder/singleStatus.php";
     String genratedToken = "";
     List<String> status = new ArrayList<>();
+    HashMap<String,String> finalTransID = new HashMap<>();
+    HashMap<String,String> finalAmountMap = new HashMap<>();
+    HashMap<String,String> finalCustomerID = new HashMap<>();
+    HashMap<String,String> finalStatus = new HashMap<>();
+
     List<String> allTransID = new ArrayList<>();
     long startMilli = 0;
     boolean start = false;
@@ -128,6 +125,8 @@ public class MyOrdersTransactions extends AppCompatActivity {
                         transID.add(String.valueOf(dataSnapshot.child("transID").getValue()));
                         map.put(String.valueOf(dataSnapshot.child("transID").getValue()),String.valueOf(dataSnapshot.child("customerID").getValue()));
                         timeMap.put(String.valueOf(dataSnapshot.child("transID").getValue()),String.valueOf(dataSnapshot.getKey()));
+//                        finalTransID.put(String.valueOf(dataSnapshot.getKey()),String.valueOf(dataSnapshot.child("transID").getValue()));
+//                        finalAmountMap.put(String.valueOf(dataSnapshot.getKey()),)
                     }
 
                     new MakePayout().execute();
@@ -156,106 +155,101 @@ public class MyOrdersTransactions extends AppCompatActivity {
 
 
         showAllTransactions.setOnClickListener(click -> {
-            final Calendar myCalendar= Calendar.getInstance();
-//            DatePickerDialog.OnDateSetListener date =new DatePickerDialog.OnDateSetListener() {
+            startActivity(new Intent(click.getContext() , ViewExcelSheets.class));
+//            final Calendar myCalendar= Calendar.getInstance();
+////            DatePickerDialog.OnDateSetListener date =new DatePickerDialog.OnDateSetListener() {
+////                @Override
+////                public void onDateSet(DatePicker view, int year, int month, int day) {
+////                    myCalendar.set(Calendar.YEAR, year);
+////                    myCalendar.set(Calendar.MONTH,month);
+////                    myCalendar.set(Calendar.DAY_OF_MONTH,day);
+////                }
+////            };
+//            AlertDialog.Builder alert = new AlertDialog.Builder(MyOrdersTransactions.this);
+//            alert.setTitle("Pick Date Range").setMessage("Pick date range for your transaction details\nMax 1 month");
+//            LinearLayout linearLayout = new LinearLayout(MyOrdersTransactions.this);
+//            linearLayout.setOrientation(LinearLayout.VERTICAL);
+//            TextView startDate = new TextView(MyOrdersTransactions.this);
+//            TextView endDate = new TextView(MyOrdersTransactions.this);
+//            startDate.setText("Pick Starting Date");
+//            endDate.setText("Pick Ending Date");
+//            startDate.setTextSize(18f);
+//            endDate.setTextSize(18f);
+//
+//
+//
+//            startDate.setGravity(Gravity.CENTER);
+//            startDate.setPadding(8,8,8,8);
+//            endDate.setPadding(8,8,8,8);
+//            endDate.setGravity(Gravity.CENTER);
+//
+//            endDate.setOnClickListener(view -> {
+//                DatePickerDialog.OnDateSetListener date =new DatePickerDialog.OnDateSetListener() {
+//                    @Override
+//                    public void onDateSet(DatePicker view, int year, int month, int day) {
+//                        myCalendar.set(Calendar.YEAR, year);
+//                        myCalendar.set(Calendar.MONTH,month);
+//                        myCalendar.set(Calendar.DAY_OF_MONTH,day);
+//                        String myFormat="dd/MM/yy";
+//                        SimpleDateFormat dateFormat=new SimpleDateFormat(myFormat, Locale.getDefault());
+//                        endDate.setText(dateFormat.format(myCalendar.getTime()));
+//                        endMilli = Long.parseLong(String.valueOf(myCalendar.getTimeInMillis()));
+//                        Log.i("info","" + endMilli);
+//                        end = true;
+//                    }
+//                };
+//                new DatePickerDialog(MyOrdersTransactions.this,date,myCalendar.get(Calendar.YEAR),myCalendar.get(Calendar.MONTH),myCalendar.get(Calendar.DAY_OF_MONTH)).show();
+//
+//            });
+//
+//            startDate.setOnClickListener(view -> {
+//                DatePickerDialog.OnDateSetListener date =new DatePickerDialog.OnDateSetListener() {
+//                    @Override
+//                    public void onDateSet(DatePicker view, int year, int month, int day) {
+//                        myCalendar.set(Calendar.YEAR, year);
+//                        myCalendar.set(Calendar.MONTH,month);
+//                        myCalendar.set(Calendar.DAY_OF_MONTH,day);
+//                        String myFormat="dd/MM/yy";
+//                        SimpleDateFormat dateFormat=new SimpleDateFormat(myFormat, Locale.getDefault());
+//                        startDate.setText(dateFormat.format(myCalendar.getTime()));
+//                        startMilli = Long.parseLong(String.valueOf(myCalendar.getTimeInMillis()));
+//                        Log.i("info","" + startMilli);
+//                        start = true;
+//                    }
+//                };
+//                new DatePickerDialog(MyOrdersTransactions.this,date,myCalendar.get(Calendar.YEAR),myCalendar.get(Calendar.MONTH),myCalendar.get(Calendar.DAY_OF_MONTH)).show();
+//
+//            });
+//
+//            alert.setPositiveButton("Request Report", new DialogInterface.OnClickListener() {
 //                @Override
-//                public void onDateSet(DatePicker view, int year, int month, int day) {
-//                    myCalendar.set(Calendar.YEAR, year);
-//                    myCalendar.set(Calendar.MONTH,month);
-//                    myCalendar.set(Calendar.DAY_OF_MONTH,day);
+//                public void onClick(DialogInterface dialogInterface, int i) {
+//                    dialogInterface.dismiss();
+//                    if(Math.abs(endMilli - startMilli) > 2592000000f)
+//                        Toast.makeText(MyOrdersTransactions.this, "Date Exceeded 30 days", Toast.LENGTH_SHORT).show();
+//                    else if(startMilli > endMilli){
+//                        Toast.makeText(MyOrdersTransactions.this, "Check your starting and ending date", Toast.LENGTH_SHORT).show();
+//                    }
+//                    else{
+//                        if(start && end) {
+//                            FirebaseAuth auth = FirebaseAuth.getInstance();
+//                            SharedPreferences sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
+//                            TransactionReportClass transactionReportClass = new TransactionReportClass(startDate.getText().toString(),endDate.getText().toString(),auth.getUid(),sharedPreferences.getString("email",""),startMilli + "",endMilli + "");
+//                            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Transaction Request").child(Objects.requireNonNull(auth.getUid()));
+//                            databaseReference.setValue(transactionReportClass);
+//                            Toast.makeText(MyOrdersTransactions.this, "Request Submitted Successfully", Toast.LENGTH_SHORT).show();
+//                        }else{
+//                            Toast.makeText(MyOrdersTransactions.this, "Please Select Dates To Proceed", Toast.LENGTH_SHORT).show();
+//                        }
+//                    }
 //                }
-//            };
-            AlertDialog.Builder alert = new AlertDialog.Builder(MyOrdersTransactions.this);
-            alert.setTitle("Pick Date Range").setMessage("Pick date range for your transaction details\nMax 1 month");
-            LinearLayout linearLayout = new LinearLayout(MyOrdersTransactions.this);
-            linearLayout.setOrientation(LinearLayout.VERTICAL);
-            TextView startDate = new TextView(MyOrdersTransactions.this);
-            TextView endDate = new TextView(MyOrdersTransactions.this);
-            startDate.setText("Pick Starting Date");
-            endDate.setText("Pick Ending Date");
-            startDate.setTextSize(18f);
-            endDate.setTextSize(18f);
-
-
-
-            startDate.setGravity(Gravity.CENTER);
-            startDate.setPadding(8,8,8,8);
-            endDate.setPadding(8,8,8,8);
-            endDate.setGravity(Gravity.CENTER);
-
-            endDate.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    DatePickerDialog.OnDateSetListener date =new DatePickerDialog.OnDateSetListener() {
-                        @Override
-                        public void onDateSet(DatePicker view, int year, int month, int day) {
-                            myCalendar.set(Calendar.YEAR, year);
-                            myCalendar.set(Calendar.MONTH,month);
-                            myCalendar.set(Calendar.DAY_OF_MONTH,day);
-                            String myFormat="dd/MM/yy";
-                            SimpleDateFormat dateFormat=new SimpleDateFormat(myFormat, Locale.getDefault());
-                            endDate.setText(dateFormat.format(myCalendar.getTime()));
-                            endMilli = Long.parseLong(String.valueOf(myCalendar.getTimeInMillis()));
-                            Log.i("info","" + endMilli);
-                            end = true;
-                        }
-                    };
-                    new DatePickerDialog(MyOrdersTransactions.this,date,myCalendar.get(Calendar.YEAR),myCalendar.get(Calendar.MONTH),myCalendar.get(Calendar.DAY_OF_MONTH)).show();
-
-                }
-            });
-
-            startDate.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    DatePickerDialog.OnDateSetListener date =new DatePickerDialog.OnDateSetListener() {
-                        @Override
-                        public void onDateSet(DatePicker view, int year, int month, int day) {
-                            myCalendar.set(Calendar.YEAR, year);
-                            myCalendar.set(Calendar.MONTH,month);
-                            myCalendar.set(Calendar.DAY_OF_MONTH,day);
-                            String myFormat="dd/MM/yy";
-                            SimpleDateFormat dateFormat=new SimpleDateFormat(myFormat, Locale.getDefault());
-                            startDate.setText(dateFormat.format(myCalendar.getTime()));
-                            startMilli = Long.parseLong(String.valueOf(myCalendar.getTimeInMillis()));
-                            Log.i("info","" + startMilli);
-                            start = true;
-                        }
-                    };
-                    new DatePickerDialog(MyOrdersTransactions.this,date,myCalendar.get(Calendar.YEAR),myCalendar.get(Calendar.MONTH),myCalendar.get(Calendar.DAY_OF_MONTH)).show();
-
-                }
-            });
-
-            alert.setPositiveButton("Request Report", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    dialogInterface.dismiss();
-                    if(Math.abs(endMilli - startMilli) > 2592000000f)
-                        Toast.makeText(MyOrdersTransactions.this, "Date Exceeded 30 days", Toast.LENGTH_SHORT).show();
-                    else if(startMilli > endMilli){
-                        Toast.makeText(MyOrdersTransactions.this, "Check your starting and ending date", Toast.LENGTH_SHORT).show();
-                    }
-                    else{
-                        if(start && end) {
-                            FirebaseAuth auth = FirebaseAuth.getInstance();
-                            SharedPreferences sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
-                            TransactionReportClass transactionReportClass = new TransactionReportClass(startDate.getText().toString(),endDate.getText().toString(),auth.getUid(),sharedPreferences.getString("email",""),startMilli + "",endMilli + "");
-                            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Transaction Request").child(Objects.requireNonNull(auth.getUid()));
-                            databaseReference.setValue(transactionReportClass);
-                            Toast.makeText(MyOrdersTransactions.this, "Request Submitted Successfully", Toast.LENGTH_SHORT).show();
-                        }else{
-                            Toast.makeText(MyOrdersTransactions.this, "Please Select Dates To Proceed", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                }
-            }).setNegativeButton("Cancel", (dialogInterface, i) -> dialogInterface.dismiss());
-
-            linearLayout.addView(startDate);
-            linearLayout.addView(endDate);
-
-            alert.setView(linearLayout);
-            alert.create().show();
+//            }).setNegativeButton("Cancel", (dialogInterface, i) -> dialogInterface.dismiss());
+//
+//            linearLayout.addView(startDate);
+//            linearLayout.addView(endDate);
+//
+//            alert.setView(linearLayout);
+//            alert.create().show();
         });
 
     }
@@ -307,87 +301,86 @@ public class MyOrdersTransactions extends AppCompatActivity {
             List<String> transactionID = new ArrayList<>();
             HashMap<String,String> amountMap = new HashMap<>();
             RequestQueue requestQueue = Volley.newRequestQueue(MyOrdersTransactions.this);
-            StringRequest stringRequest = new StringRequest(Request.Method.POST, testBearerToken, new Response.Listener<String>() {
-                @Override
-                public void onResponse(String response) {
+            StringRequest stringRequest = new StringRequest(Request.Method.POST, testBearerToken, response -> {
 
-                    Log.i("response",response);
-                    if(response.trim().equals("Token is valid")){
-                        for(int i=0;i<time.size();i++){
-                            currentTransID = transID.get(i);
-                            Log.i("transID",currentTransID + "");
+                Log.i("response",response);
+                if(response.trim().equals("Token is valid")){
+                    for(int i=0;i<time.size();i++){
+                        currentTransID = transID.get(i);
+                        Log.i("transID",currentTransID + "");
 //                            new fetchBenDetails().execute();
-                            RequestQueue requestQueue = Volley.newRequestQueue(MyOrdersTransactions.this);
-                             finalI = i;
-                            int finalI1 = i;
-                            StringRequest stringRequest = new StringRequest(Request.Method.POST, singleBenStatus, new Response.Listener<String>() {
-                                @SuppressLint("SetTextI18n")
-                                @Override
-                                public void onResponse(String response) {
-                                    Log.i("resp", response);
-                                    String[] resp = response.trim().split(",");
-
-                                    status.add(resp[0]);
-                                    days++;
-                                    if(resp[0].equals("PENDING")) {
-                                    }else{
-                                        if(!resp[1].equals("")) {
-                                            Double d = Double.parseDouble(resp[1]);
-                                            totalAmount = totalAmount + d.intValue();
-                                            amount.add(resp[1]);
-                                        }else{
-                                            amount.add("");
-                                        }
-                                        transactionID.add(resp[2]);
-
-                                    }
-
-                                    amountList.add(totalAmount);
-                                    daysList.add(days);
-                                    Log.i("value",totalAmount + "");
-                                    count++;
-                                    if(amountList.size() == time.size()){
-                                        fastDialog.dismiss();
-                                        Log.i("infoMap",transactionID.toString());
-                                        Log.i("infoMap",amountMap.toString());
-                                        Log.i("infoMap",timeMap.toString());
-                                        showAllTransactions.setVisibility(View.VISIBLE);
-                                        handler.removeCallbacksAndMessages(null);
-                                        Log.i("infoMap",allTransID.toString());
-                                        recyclerView.setLayoutManager(new LinearLayoutManager(MyOrdersTransactions.this));
-                                        recyclerView.setAdapter(new MyOrderAdapter(amount,allTimeID,transactionID,status,MyOrdersTransactions.this,totalAmount,days,map,amountMap,timeMap));
-                                    }
-
-                                    if(amountList.size() == time.size()){
-                                        numberOfTransactions.setText("Transactions: " + days);
-                                        earningAmount.setText("\u20B9" + totalAmount);
-                                    }
+                        RequestQueue requestQueue1 = Volley.newRequestQueue(MyOrdersTransactions.this);
+                         finalI = i;
+                        int finalI1 = i;
+                        StringRequest stringRequest1 = new StringRequest(Request.Method.POST, singleBenStatus, response1 -> {
+                            Log.i("resp", response1);
+                            String[] resp = response1.trim().split(",");
+                            Log.i("resp", response1);
+                            status.add(resp[0]);
+                            days++;
+                            if(resp[0].equals("PENDING")) {
+                            }else{
+                                if(!resp[1].equals("")) {
+                                    Double d = Double.parseDouble(resp[1]);
+                                    totalAmount = totalAmount + d.intValue();
+                                    amount.add(resp[1]);
+                                }else{
+                                    amount.add("");
                                 }
-                            }, error -> {
+                                transactionID.add(resp[2]);
+                                finalTransID.put(timeMap.get(resp[2]),resp[2]);
+                                finalAmountMap.put(timeMap.get(resp[2]),resp[1]);
+                                finalCustomerID.put(timeMap.get(resp[2]),map.get(resp[2]));
+                                finalStatus.put(timeMap.get(resp[2]),resp[0]);
+                            }
 
-                            }){
-                                @Nullable
-                                @Override
-                                protected Map<String, String> getParams() {
-                                    Map<String,String> params = new HashMap<>();
-                                    FirebaseAuth auth = FirebaseAuth.getInstance();
-                                    params.put("token",genratedToken);
-                                    params.put("benID",transID.get(finalI1));
-                                    allTransID.add(transID.get(finalI1));
-                                    allTimeID.add(time.get(finalI1));
+
+
+                            amountList.add(totalAmount);
+                            daysList.add(days);
+                            Log.i("value",totalAmount + "");
+                            count++;
+                            if(amountList.size() == time.size()){
+                                fastDialog.dismiss();
+                                Log.i("infoMap",transactionID.toString());
+                                Log.i("infoMap",amountMap.toString());
+                                Log.i("infoMap",timeMap.toString());
+                                showAllTransactions.setVisibility(View.VISIBLE);
+                                handler.removeCallbacksAndMessages(null);
+                                Log.i("infoMap",allTransID.toString());
+                                recyclerView.setLayoutManager(new LinearLayoutManager(MyOrdersTransactions.this));
+                                Collections.sort(time);
+                                recyclerView.setAdapter(new MyOrderAdapter(amount,time,transactionID,status,MyOrdersTransactions.this,totalAmount,days,map,amountMap,timeMap,finalAmountMap,finalCustomerID,finalTransID,finalStatus));
+                            }
+
+                            if(amountList.size() == time.size()){
+                                numberOfTransactions.setText("Transactions: " + days);
+                                earningAmount.setText("\u20B9" + totalAmount);
+                            }
+                        }, error -> {
+
+                        }){
+                            @Nullable
+                            @Override
+                            protected Map<String, String> getParams() {
+                                Map<String,String> params = new HashMap<>();
+                                FirebaseAuth auth = FirebaseAuth.getInstance();
+                                params.put("token",genratedToken);
+                                params.put("benID",transID.get(finalI1));
+                                allTransID.add(transID.get(finalI1));
+                                allTimeID.add(time.get(finalI1));
 //                                    Log.i("customTrans",transID.get(finalI1) + "");
-                                    return params;
+                                return params;
 
-                                }
-                            };
-                            requestQueue.add(stringRequest);
-                            stringRequest.setRetryPolicy(new DefaultRetryPolicy(
-                                    0,
-                                    DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-                        }
-//                        Log.i("value",transID.toString());
+                            }
+                        };
+                        requestQueue1.add(stringRequest1);
+                        stringRequest1.setRetryPolicy(new DefaultRetryPolicy(
+                                0,
+                                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
                     }
+//                        Log.i("value",transID.toString());
                 }
             }, new Response.ErrorListener() {
                 @Override
