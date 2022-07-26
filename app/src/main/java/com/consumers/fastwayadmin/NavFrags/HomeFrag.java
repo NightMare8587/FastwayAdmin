@@ -801,87 +801,91 @@ public class HomeFrag extends Fragment {
 
     private void checkInfo() {
 
-        onlineOrOfflineRestaurant.child("Tables").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(snapshot.exists()){
-                    for(DataSnapshot dataSnapshot : snapshot.getChildren()){
-                        if(Objects.equals(dataSnapshot.child("status").getValue(String.class), "unavailable")){
-                            check = true;
-                            AlertDialog.Builder alert = new AlertDialog.Builder(requireContext());
-                            alert.setTitle("Error").setMessage("You still have an active table. Contact user before closing restaurant");
-                            alert.setPositiveButton("Exit", (dialogInterface, i) -> dialogInterface.dismiss()).create();
-                            onlineOrOffline.setChecked(true);
-                            acceptOrders.setChecked(true);
-                            alert.show();
-                            break;
-                        }else if(Objects.equals(dataSnapshot.child("status").getValue(String.class), "Reserved")){
-                            check = true;
-                            AlertDialog.Builder alert = new AlertDialog.Builder(requireContext());
-                            alert.setTitle("Error").setMessage("You still have an active Reserved Table. Contact user before closing restaurant");
-                            alert.setPositiveButton("Exit", (dialogInterface, i) -> dialogInterface.dismiss()).create();
-                            onlineOrOffline.setChecked(true);
-                            acceptOrders.setChecked(true);
-                            alert.show();
-                            break;
+        new Thread(() -> {
+            onlineOrOfflineRestaurant.child("Tables").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if(snapshot.exists()){
+                        for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                            if(Objects.equals(dataSnapshot.child("status").getValue(String.class), "unavailable")){
+                                check = true;
+                                AlertDialog.Builder alert = new AlertDialog.Builder(requireContext());
+                                alert.setTitle("Error").setMessage("You still have an active table. Contact user before closing restaurant");
+                                alert.setPositiveButton("Exit", (dialogInterface, i) -> dialogInterface.dismiss()).create();
+                                onlineOrOffline.setChecked(true);
+                                acceptOrders.setChecked(true);
+                                alert.show();
+                                break;
+                            }else if(Objects.equals(dataSnapshot.child("status").getValue(String.class), "Reserved")){
+                                check = true;
+                                AlertDialog.Builder alert = new AlertDialog.Builder(requireContext());
+                                alert.setTitle("Error").setMessage("You still have an active Reserved Table. Contact user before closing restaurant");
+                                alert.setPositiveButton("Exit", (dialogInterface, i) -> dialogInterface.dismiss()).create();
+                                onlineOrOffline.setChecked(true);
+                                acceptOrders.setChecked(true);
+                                alert.show();
+                                break;
+                            }
+                        }
+
+                        if(!check){
+                            statusEditor.putString("status","offline");
+                            statusEditor.putString("resOrdersAccepting","no");
+                            onlineOrOffline.setText("offline");
+                            acceptOrders.setChecked(false);
+                            statusEditor.apply();
+                            comboImage.setVisibility(View.INVISIBLE);
+                            linearLayout.setVisibility(View.INVISIBLE);
+                            secondLinearLayout.setVisibility(View.INVISIBLE);
+                            onlineOrOfflineRestaurant.child("status").setValue("offline");
+                            onlineOrOfflineRestaurant.child("acceptingOrders").setValue("no");
+                            editor.putString("online","false");
+                            FastDialog fastDialog = new FastDialogBuilder(requireContext(), Type.PROGRESS)
+                                    .progressText("Closing restaurant... please wait")
+                                    .setAnimation(Animations.SLIDE_BOTTOM)
+                                    .cancelable(false)
+                                    .create();
+
+                            fastDialog.show();
+
+                            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(resInfoShared.getString("state","")).child(resInfoShared.getString("locality","")).child(Objects.requireNonNull(UID)).child("Tables");
+                            databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                    if(snapshot.exists()){
+                                        for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                                            if(String.valueOf(dataSnapshot.child("status").getValue()).equals("unavailable")){
+                                                databaseReference.child(String.valueOf(dataSnapshot.getKey())).child("status").setValue("available");
+                                                databaseReference.child(String.valueOf(dataSnapshot.getKey())).child("customerId").removeValue();
+                                                databaseReference.child(String.valueOf(dataSnapshot.getKey())).child("Current Order").removeValue();
+                                            }else if(String.valueOf(dataSnapshot.child("status").getValue()).equals("Reserved")){
+                                                databaseReference.child(String.valueOf(dataSnapshot.getKey())).child("status").setValue("available");
+                                                databaseReference.child(String.valueOf(dataSnapshot.getKey())).child("customerId").removeValue();
+                                                databaseReference.child(String.valueOf(dataSnapshot.getKey())).child("time").removeValue();
+                                                databaseReference.child(String.valueOf(dataSnapshot.getKey())).child("timeInMillis").removeValue();
+                                            }
+                                        }
+                                        fastDialog.dismiss();
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError error) {
+
+                                }
+                            });
                         }
                     }
-
-                    if(!check){
-                        statusEditor.putString("status","offline");
-                        statusEditor.putString("resOrdersAccepting","no");
-                        onlineOrOffline.setText("offline");
-                        acceptOrders.setChecked(false);
-                        statusEditor.apply();
-                        comboImage.setVisibility(View.INVISIBLE);
-                        linearLayout.setVisibility(View.INVISIBLE);
-                        secondLinearLayout.setVisibility(View.INVISIBLE);
-                        onlineOrOfflineRestaurant.child("status").setValue("offline");
-                        onlineOrOfflineRestaurant.child("acceptingOrders").setValue("no");
-                        editor.putString("online","false");
-                        FastDialog fastDialog = new FastDialogBuilder(requireContext(), Type.PROGRESS)
-                                .progressText("Closing restaurant... please wait")
-                                .setAnimation(Animations.SLIDE_BOTTOM)
-                                .cancelable(false)
-                                .create();
-
-                        fastDialog.show();
-
-                        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(resInfoShared.getString("state","")).child(resInfoShared.getString("locality","")).child(Objects.requireNonNull(UID)).child("Tables");
-                        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                if(snapshot.exists()){
-                                    for(DataSnapshot dataSnapshot : snapshot.getChildren()){
-                                        if(String.valueOf(dataSnapshot.child("status").getValue()).equals("unavailable")){
-                                            databaseReference.child(String.valueOf(dataSnapshot.getKey())).child("status").setValue("available");
-                                            databaseReference.child(String.valueOf(dataSnapshot.getKey())).child("customerId").removeValue();
-                                            databaseReference.child(String.valueOf(dataSnapshot.getKey())).child("Current Order").removeValue();
-                                        }else if(String.valueOf(dataSnapshot.child("status").getValue()).equals("Reserved")){
-                                            databaseReference.child(String.valueOf(dataSnapshot.getKey())).child("status").setValue("available");
-                                            databaseReference.child(String.valueOf(dataSnapshot.getKey())).child("customerId").removeValue();
-                                            databaseReference.child(String.valueOf(dataSnapshot.getKey())).child("time").removeValue();
-                                            databaseReference.child(String.valueOf(dataSnapshot.getKey())).child("timeInMillis").removeValue();
-                                        }
-                                    }
-                                    fastDialog.dismiss();
-                                }
-                            }
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError error) {
-
-                            }
-                        });
-                    }
                 }
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
 
-            }
-        });
+                }
+            });
+        }).start();
+
+
     }
 
     private void inAppUpdateInfo() {
@@ -999,6 +1003,11 @@ public class HomeFrag extends Fragment {
         @Override
         protected void onPostExecute(Void unused) {
             super.onPostExecute(unused);
+
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
             reference.child("Tables").addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -1030,10 +1039,7 @@ public class HomeFrag extends Fragment {
 
                 }
             });
-        }
 
-        @Override
-        protected Void doInBackground(Void... voids) {
             return null;
         }
 
@@ -1097,8 +1103,13 @@ public class HomeFrag extends Fragment {
         @Override
         protected void onPostExecute(Void unused) {
             super.onPostExecute(unused);
+
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
             FirebaseAuth auth = FirebaseAuth.getInstance();
-            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(resInfoShared.getString("state","")).child(UID).child("Tables");
+            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(resInfoShared.getString("state","")).child(resInfoShared.getString("locality","")).child(UID).child("Tables");
             databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -1116,10 +1127,7 @@ public class HomeFrag extends Fragment {
 
                 }
             });
-        }
 
-        @Override
-        protected Void doInBackground(Void... voids) {
             return null;
         }
     }

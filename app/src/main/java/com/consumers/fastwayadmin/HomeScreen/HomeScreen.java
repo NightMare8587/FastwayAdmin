@@ -167,7 +167,7 @@ public class HomeScreen extends AppCompatActivity {
                     break;
             }
         });
-        new checkBank().execute();
+//        new checkBank().execute();
         StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
         StrictMode.setVmPolicy(builder.build());
         File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
@@ -253,29 +253,30 @@ public class HomeScreen extends AppCompatActivity {
         }
         DatabaseReference myRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(UID).child("Restaurant Documents");
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(UID)).child("Tables");
-        myRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            if(dataSnapshot.exists() && dataSnapshot.hasChild("verified")){
-                                if(Objects.equals(dataSnapshot.child("verified").getValue(String.class), "no")){
-                                     AlertDialog.Builder alert = new AlertDialog.Builder(HomeScreen.this);
-                                     alert.setTitle("Error")
-                                             .setMessage("Your restaurant is not yet verified so you can't accept orders until verified")
-                                             .setPositiveButton("Exit", (dialogInterface, i) -> {
-                                                 dialogInterface.dismiss();
-                                             }).setNegativeButton("Contact Fastway", (dialogInterface, i) -> {
-                                                 dialogInterface.dismiss();
+        new Thread(() -> myRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists() && dataSnapshot.hasChild("verified")){
+                    if(Objects.equals(dataSnapshot.child("verified").getValue(String.class), "no")){
+                        AlertDialog.Builder alert = new AlertDialog.Builder(HomeScreen.this);
+                        alert.setTitle("Error")
+                                .setMessage("Your restaurant is not yet verified so you can't accept orders until verified")
+                                .setPositiveButton("Exit", (dialogInterface, i) -> {
+                                    dialogInterface.dismiss();
+                                }).setNegativeButton("Contact Fastway", (dialogInterface, i) -> {
+                                    dialogInterface.dismiss();
 
-                                             }).create();
-                                     alert.setCancelable(false);
-                                     alert.show();
-                                }
-                            }
-                        }
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
-                        }
-                    });
+                                }).create();
+                        alert.setCancelable(false);
+                        alert.show();
+                    }
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+            }
+        })).start();
+
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
@@ -551,18 +552,17 @@ public class HomeScreen extends AppCompatActivity {
                     }
                 }
 
+
+
+
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
 
                 }
             });
-            return null;
-        }
-    }
-    public class checkBank extends AsyncTask<Void,Void,Void>{
 
-        @Override
-        protected Void doInBackground(Void... voids) {
+
+
             checkForBank = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(UID));
             checkForBank.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
@@ -572,7 +572,7 @@ public class HomeScreen extends AppCompatActivity {
                         alertDialog.setTitle("Important");
                         alertDialog.setMessage("You need to add bank details to accept payments");
                         alertDialog.setPositiveButton("Add", (dialogInterface, i) -> {
-                           SharedPreferences accountInfo = getSharedPreferences("AccountInfo",Context.MODE_PRIVATE);
+                            SharedPreferences accountInfo = getSharedPreferences("AccountInfo",Context.MODE_PRIVATE);
                             Intent intent = new Intent(HomeScreen.this, VendorDetailsActivity.class);
                             intent.putExtra("name",accountInfo.getString("name",""));
                             intent.putExtra("email",accountInfo.getString("email",""));
@@ -609,6 +609,14 @@ public class HomeScreen extends AppCompatActivity {
 
                 }
             });
+            return null;
+        }
+    }
+    public class checkBank extends AsyncTask<Void,Void,Void>{
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+
 
             return null;
         }
