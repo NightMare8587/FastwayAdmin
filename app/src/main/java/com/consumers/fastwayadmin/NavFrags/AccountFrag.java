@@ -4,7 +4,6 @@ import static android.content.Context.MODE_PRIVATE;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -14,7 +13,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.CompoundButton;
 import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.Toast;
@@ -39,8 +37,6 @@ import com.consumers.fastwayadmin.SplashAndIntro.SplashScreen;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -102,21 +98,12 @@ public class AccountFrag extends Fragment {
          sharedPreferences = requireContext().getSharedPreferences("loginInfo",MODE_PRIVATE);
          editor = sharedPreferences.edit();
 
-        if(sharedPreferences.getString("storeInDevice","").equals("yes"))
-            aSwitch.setChecked(true);
-        else
-            aSwitch.setChecked(false);
+        aSwitch.setChecked(sharedPreferences.getString("storeInDevice", "").equals("yes"));
 
-        if(sharedPreferences.getString("TakeAwayAllowed","").equals("yes"))
-            takeawaySwitch.setChecked(true);
-        else
-            takeawaySwitch.setChecked(false);
+        takeawaySwitch.setChecked(sharedPreferences.getString("TakeAwayAllowed", "").equals("yes"));
 
-        if(sharedPreferences.getString("TableBookAllowed","").equals("yes"))
-            tableSwitch.setChecked(true);
-        else
-            tableSwitch.setChecked(false);
-        ArrayAdapter arrayAdapter = new ArrayAdapter<>(view.getContext(), R.layout.list, names);
+        tableSwitch.setChecked(sharedPreferences.getString("TableBookAllowed", "").equals("yes"));
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(view.getContext(), R.layout.list, names);
         listView.setAdapter(arrayAdapter);
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
@@ -137,24 +124,13 @@ public class AccountFrag extends Fragment {
                     AlertDialog.Builder alert = new AlertDialog.Builder(requireContext());
                     alert.setTitle("Choose");
                     alert.setMessage("Choose one option from below");
-                    alert.setPositiveButton("Show Online Transactions", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            dialogInterface.dismiss();
-                            startActivity(new Intent(getActivity(), MyOrdersTransactions.class));
-                        }
-                    }).setNegativeButton("Show Cash Transactions", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            dialogInterface.dismiss();
-                            startActivity(new Intent(getActivity(), CashTransactions.class));
-                        }
-                    }).setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            dialogInterface.dismiss();
-                        }
-                    }).create();
+                    alert.setPositiveButton("Show Online Transactions", (dialogInterface, i12) -> {
+                        dialogInterface.dismiss();
+                        startActivity(new Intent(getActivity(), MyOrdersTransactions.class));
+                    }).setNegativeButton("Show Cash Transactions", (dialogInterface, i13) -> {
+                        dialogInterface.dismiss();
+                        startActivity(new Intent(getActivity(), CashTransactions.class));
+                    }).setNeutralButton("Cancel", (dialogInterface, i14) -> dialogInterface.dismiss()).create();
 
                     alert.show();
                     break;
@@ -174,47 +150,39 @@ public class AccountFrag extends Fragment {
                                 editor.putString("online","false");
                                 editor.apply();
                                 auth.signOut();
-                                googleSignInClient.signOut().addOnCompleteListener((Activity) getContext(), new OnCompleteListener<Void>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<Void> task) {
-                                    }
+                                googleSignInClient.signOut().addOnCompleteListener((Activity) requireContext(), task -> {
                                 });
 
-                                settings.edit().clear().commit();
+                                settings.edit().clear().apply();
 
                                 SharedPreferences res = view1.getContext().getSharedPreferences("RestaurantInfo", MODE_PRIVATE);
-                                res.edit().clear().commit();
+                                res.edit().clear().apply();
 
                                 SharedPreferences intro = view1.getContext().getSharedPreferences("IntroAct", MODE_PRIVATE);
-                                intro.edit().clear().commit();
+                                intro.edit().clear().apply();
 
                                 SharedPreferences storeOrders = view1.getContext().getSharedPreferences("StoreOrders", MODE_PRIVATE);
-                                storeOrders.edit().clear().commit();
+                                storeOrders.edit().clear().apply();
 
                                 SharedPreferences location = view1.getContext().getSharedPreferences("LocationMaps", MODE_PRIVATE);
-                                location.edit().clear().commit();
+                                location.edit().clear().apply();
 
                                 SharedPreferences cashCommission = view1.getContext().getSharedPreferences("CashCommission", MODE_PRIVATE);
-                                cashCommission.edit().clear().commit();
+                                cashCommission.edit().clear().apply();
 
                                 SharedPreferences RestaurantTrackingDaily = view1.getContext().getSharedPreferences("RestaurantTrackingDaily", MODE_PRIVATE);
-                                RestaurantTrackingDaily.edit().clear().commit();
+                                RestaurantTrackingDaily.edit().clear().apply();
 
                                 SharedPreferences RestaurantTrackRecords = view1.getContext().getSharedPreferences("RestaurantTrackRecords", MODE_PRIVATE);
-                                RestaurantTrackRecords.edit().clear().commit();
+                                RestaurantTrackRecords.edit().clear().apply();
 
                                 SharedPreferences DishAnalysis = view1.getContext().getSharedPreferences("DishAnalysis", MODE_PRIVATE);
-                                DishAnalysis.edit().clear().commit();
+                                DishAnalysis.edit().clear().apply();
 
                                 startActivity(new Intent(getActivity(), SplashScreen.class));
-                                getActivity().finish();
+                                requireActivity().finish();
                             })
-                            .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    dialogInterface.dismiss();
-                                }
-                            }).create();
+                            .setNegativeButton("No", (dialogInterface, i15) -> dialogInterface.dismiss()).create();
 
                     builder.show();
                     break;
@@ -243,19 +211,15 @@ public class AccountFrag extends Fragment {
         });
 
 
-        aSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                if (b) {
-                    Toast.makeText(requireContext(), "Images Will be stored in device storage", Toast.LENGTH_SHORT).show();
-                    editor.putString("storeInDevice","yes");
-                    editor.apply();
-                } else {
-                    Toast.makeText(requireContext(), "Images Will not be stored in device storage", Toast.LENGTH_SHORT).show();
-                    editor.putString("storeInDevice","no");
-                    editor.apply();
-                }
+        aSwitch.setOnCheckedChangeListener((compoundButton, b) -> {
+            if (b) {
+                Toast.makeText(requireContext(), "Images Will be stored in device storage", Toast.LENGTH_SHORT).show();
+                editor.putString("storeInDevice","yes");
+            } else {
+                Toast.makeText(requireContext(), "Images Will not be stored in device storage", Toast.LENGTH_SHORT).show();
+                editor.putString("storeInDevice","no");
             }
+            editor.apply();
         });
 
         takeawaySwitch.setOnCheckedChangeListener((compoundButton, b) -> {
