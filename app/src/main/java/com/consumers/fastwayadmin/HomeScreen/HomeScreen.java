@@ -11,6 +11,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.os.StrictMode;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -105,7 +106,7 @@ public class HomeScreen extends AppCompatActivity {
         editor = calenderForExcel.edit();
         ConnectivityManager cm =
                 (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
-
+        FirebaseMessaging.getInstance().subscribeToTopic("FastwayQueryDB");
       new BackgroundWork().execute();
 //        if(sharedPreferences.contains("myListStored")){
 //            Type type = new TypeToken<List<List<String>>>() {
@@ -253,29 +254,34 @@ public class HomeScreen extends AppCompatActivity {
         }
         DatabaseReference myRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(UID).child("Restaurant Documents");
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(UID)).child("Tables");
-        new Thread(() -> myRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        new Handler().postDelayed(new Runnable() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if(dataSnapshot.exists() && dataSnapshot.hasChild("verified")){
-                    if(Objects.equals(dataSnapshot.child("verified").getValue(String.class), "no")){
-                        AlertDialog.Builder alert = new AlertDialog.Builder(HomeScreen.this);
-                        alert.setTitle("Error")
-                                .setMessage("Your restaurant is not yet verified so you can't accept orders until verified")
-                                .setPositiveButton("Exit", (dialogInterface, i) -> {
-                                    dialogInterface.dismiss();
-                                }).setNegativeButton("Contact Fastway", (dialogInterface, i) -> {
-                                    dialogInterface.dismiss();
+            public void run() {
+                myRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if(dataSnapshot.exists() && dataSnapshot.hasChild("verified")){
+                            if(Objects.equals(dataSnapshot.child("verified").getValue(String.class), "no")){
+                                AlertDialog.Builder alert = new AlertDialog.Builder(HomeScreen.this);
+                                alert.setTitle("Error")
+                                        .setMessage("Your restaurant is not yet verified so you can't accept orders until verified")
+                                        .setPositiveButton("Exit", (dialogInterface, i) -> {
+                                            dialogInterface.dismiss();
+                                        }).setNegativeButton("Contact Fastway", (dialogInterface, i) -> {
+                                            dialogInterface.dismiss();
 
-                                }).create();
-                        alert.setCancelable(false);
-                        alert.show();
+                                        }).create();
+                                alert.setCancelable(false);
+                                alert.show();
+                            }
+                        }
                     }
-                }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                    }
+                });
             }
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-            }
-        })).start();
+        },0);
 
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
@@ -451,6 +457,7 @@ public class HomeScreen extends AppCompatActivity {
                     if(dataSnapshot.hasChild("lastCommissionPaid")){
                             long lastPaidDate = Long.parseLong(Objects.requireNonNull(dataSnapshot.child("lastCommissionPaid").getValue(String.class)));
                         if(currentTime - lastPaidDate >= 2678400000L){
+                            checkIfNeededToAddToQuery();
                             SharedPreferences sharedPreferences = getSharedPreferences("CashCommission",MODE_PRIVATE);
                              SharedPreferences.Editor editor = sharedPreferences.edit();
                              editor.putString("fine","10");
@@ -464,7 +471,7 @@ public class HomeScreen extends AppCompatActivity {
                             alert.setCancelable(false);
                             alert.show();
                         } else if(currentTime - lastPaidDate >= 2592000000L){
-
+                            checkIfNeededToAddToQuery();
                             AlertDialog.Builder alert = new AlertDialog.Builder(HomeScreen.this);
                             alert.setTitle("Cash Transaction").setMessage("It's time for payment of cash transaction commission, today is last day for else fine of 10% will be applied\nDo you wanna pay now or you can pay later!")
                                     .setPositiveButton("Pay Now", (dialogInterface, i) -> {
@@ -475,7 +482,7 @@ public class HomeScreen extends AppCompatActivity {
                             alert.show();
                         }
                         else if(currentTime - lastPaidDate >= 2505600000L){
-
+                            checkIfNeededToAddToQuery();
                             AlertDialog.Builder alert = new AlertDialog.Builder(HomeScreen.this);
                             alert.setTitle("Cash Transaction").setMessage("It's time for payment of cash transaction commission, tomorrow is last day after that fine will be applied\nDo you wanna pay now or you can pay later!")
                                     .setPositiveButton("Pay Now", (dialogInterface, i) -> {
@@ -486,12 +493,15 @@ public class HomeScreen extends AppCompatActivity {
                             alert.show();
                         }
                         else if(currentTime - lastPaidDate >= 2419200000L){
-
+                            checkIfNeededToAddToQuery();
                             AlertDialog.Builder alert = new AlertDialog.Builder(HomeScreen.this);
                             alert.setTitle("Cash Transaction").setMessage("It's time for payment of cash transaction commission\nDo you wanna pay now or you can pay later!")
                                     .setPositiveButton("Pay Now", (dialogInterface, i) -> {
                                         dialogInterface.dismiss();
                                         startActivity(new Intent(HomeScreen.this, CashTransactionCommissionActivity.class));
+//                                        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Fines");
+//                                        CashCommissionClass cashCommissionClass = new CashCommissionClass("","Cash Commission & Platform Fee",System.currentTimeMillis() + "","Admin");
+//                                        databaseReference.child(Objects.requireNonNull(auth.getUid())).setValue(cashCommissionClass);
                                     }).setNegativeButton("Later", (dialogInterface, i) -> dialogInterface.dismiss()).create();
                             alert.setCancelable(false);
                             alert.show();
@@ -501,6 +511,7 @@ public class HomeScreen extends AppCompatActivity {
                             long registerTime = Long.parseLong(Objects.requireNonNull(dataSnapshot.child("registrationDate").getValue(String.class)));
 
                             if(currentTime - registerTime >= 2678400000L){
+                                checkIfNeededToAddToQuery();
                                 SharedPreferences sharedPreferences = getSharedPreferences("CashCommission",MODE_PRIVATE);
                                 SharedPreferences.Editor editor = sharedPreferences.edit();
                                 editor.putString("fine","10");
@@ -510,11 +521,13 @@ public class HomeScreen extends AppCompatActivity {
                                         .setPositiveButton("Pay Now", (dialogInterface, i) -> {
                                             dialogInterface.dismiss();
                                             startActivity(new Intent(HomeScreen.this, CashTransactionCommissionActivity.class));
+
                                         }).setNegativeButton("Later", (dialogInterface, i) -> dialogInterface.dismiss()).create();
                                 alert.setCancelable(false);
                                 alert.show();
                             }
                            else if(currentTime - registerTime >= 2592000000L){
+                                checkIfNeededToAddToQuery();
                                 AlertDialog.Builder alert = new AlertDialog.Builder(HomeScreen.this);
                                 alert.setTitle("Cash Transaction").setMessage("It's time for payment of cash transaction commission, today is last day for else fine of 10% will be applied\nDo you wanna pay now or you can pay later!")
                                         .setPositiveButton("Pay Now", (dialogInterface, i) -> {
@@ -525,7 +538,7 @@ public class HomeScreen extends AppCompatActivity {
                                 alert.show();
                             }
                             else if(currentTime - registerTime >= 2505600000L){
-
+                                checkIfNeededToAddToQuery();
                                 AlertDialog.Builder alert = new AlertDialog.Builder(HomeScreen.this);
                                 alert.setTitle("Cash Transaction").setMessage("It's time for payment of cash transaction commission, tomorrow is last day after that fine will be applied\nDo you wanna pay now or you can pay later!")
                                         .setPositiveButton("Pay Now", (dialogInterface, i) -> {
@@ -536,12 +549,13 @@ public class HomeScreen extends AppCompatActivity {
                                 alert.show();
                             }
                             else if(currentTime - registerTime >= 2419200000L){
-
+                                checkIfNeededToAddToQuery();
                                 AlertDialog.Builder alert = new AlertDialog.Builder(HomeScreen.this);
                                 alert.setTitle("Cash Transaction").setMessage("It's time for payment of cash transaction commission\nDo you wanna pay now or you can pay later!")
                                         .setPositiveButton("Pay Now", (dialogInterface, i) -> {
                                             dialogInterface.dismiss();
                                             startActivity(new Intent(HomeScreen.this, CashTransactionCommissionActivity.class));
+
                                         }).setNegativeButton("Later", (dialogInterface, i) -> dialogInterface.dismiss()).create();
                                 alert.setCancelable(false);
                                 alert.show();
@@ -612,6 +626,29 @@ public class HomeScreen extends AppCompatActivity {
             return null;
         }
     }
+
+    private void checkIfNeededToAddToQuery() {
+        new Handler().postDelayed(() -> {
+            DatabaseReference check = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Fines");
+            check.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if(!snapshot.hasChild(Objects.requireNonNull(auth.getUid()))){
+                        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Fines");
+
+                        CashCommissionClass cashCommissionClass = new CashCommissionClass("","Cash Commission & Platform Fee",System.currentTimeMillis() + "","Admin");
+                        databaseReference.child(Objects.requireNonNull(auth.getUid())).setValue(cashCommissionClass);
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+        },0);
+    }
+
     public class checkBank extends AsyncTask<Void,Void,Void>{
 
         @Override

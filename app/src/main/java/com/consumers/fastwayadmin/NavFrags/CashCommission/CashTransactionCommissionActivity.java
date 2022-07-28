@@ -343,6 +343,9 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
                         kAlertDialog1.dismiss();
                         finish();
                     });
+            auth = FirebaseAuth.getInstance();
+            DatabaseReference fineQuery = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Fines").child(Objects.requireNonNull(auth.getUid()));
+            fineQuery.removeValue();
             SharedPreferences sharedPreferences = getSharedPreferences("CashCommission",MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.remove("fine");
