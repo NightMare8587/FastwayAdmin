@@ -139,22 +139,21 @@ public class ViewAndReuploadDocuments extends AppCompatActivity {
     }
 
     private void reuploadImageOrNotUploaded(String str) {
-        AlertDialog.Builder fssaiBuild = new AlertDialog.Builder(ViewAndReuploadDocuments.this);
-        fssaiBuild.setTitle("Fssai Number").setMessage("Enter your 14 digit FSSAI number below");
-        LinearLayout linearLayout = new LinearLayout(ViewAndReuploadDocuments.this);
-        linearLayout.setOrientation(LinearLayout.VERTICAL);
-        EditText editText = new EditText(ViewAndReuploadDocuments.this);
-        editText.setHint("Enter FSSAI Number here");
-        editText.setInputType(InputType.TYPE_CLASS_NUMBER);
-        editText.setMaxLines(14);
-        linearLayout.addView(editText);
-        fssaiBuild.setPositiveButton("Next", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(ViewAndReuploadDocuments.this);
-                builder.setTitle("Choose one option").setPositiveButton("Choose from Gallery", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
+        if(str.equals("fssai")){
+            AlertDialog.Builder fssaiBuild = new AlertDialog.Builder(ViewAndReuploadDocuments.this);
+            fssaiBuild.setTitle("Fssai Number").setMessage("Enter your 14 digit FSSAI number below");
+            LinearLayout linearLayout = new LinearLayout(ViewAndReuploadDocuments.this);
+            linearLayout.setOrientation(LinearLayout.VERTICAL);
+            EditText editText = new EditText(ViewAndReuploadDocuments.this);
+            editText.setHint("Enter FSSAI Number here");
+            editText.setInputType(InputType.TYPE_CLASS_NUMBER);
+            editText.setMaxLines(14);
+            linearLayout.addView(editText);
+            fssaiBuild.setPositiveButton("Next", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(ViewAndReuploadDocuments.this);
+                    builder.setTitle("Choose one option").setPositiveButton("Choose from Gallery", (dialogInterface, i) -> {
                         if(editText.length() == 14 && TextUtils.isDigitsOnly(editText.getText().toString())) {
                             dialogInterface.dismiss();
                             Intent intent = new Intent();
@@ -169,12 +168,29 @@ public class ViewAndReuploadDocuments extends AppCompatActivity {
                             currentString = str;
                             startActivityForResult(Intent.createChooser(intent, "Select Picture"), 5);
                         }
-                    }
-                }).setNegativeButton("Cancel", (dialogInterface, i) -> dialogInterface.dismiss()).create().show();
-            }
-        }).setNegativeButton("Exit", (dialog, which) -> dialog.dismiss()).create();
-        fssaiBuild.setView(linearLayout);
-        fssaiBuild.show();
+                    }).setNegativeButton("Cancel", (dialogInterface, i) -> dialogInterface.dismiss()).create().show();
+                }
+            }).setNegativeButton("Exit", (dialog, which) -> dialog.dismiss()).create();
+            fssaiBuild.setView(linearLayout);
+            fssaiBuild.show();
+        }else{
+            AlertDialog.Builder builder = new AlertDialog.Builder(ViewAndReuploadDocuments.this);
+            builder.setTitle("Choose one option").setPositiveButton("Choose from Gallery", (dialogInterface, i) -> {
+                    dialogInterface.dismiss();
+                    Intent intent = new Intent();
+                    intent.setType("image/*");
+//                        fssaiDigitsNums = editText.getText().toString();
+//                        SharedPreferences sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
+//                        SharedPreferences.Editor editor = sharedPreferences.edit();
+//                        editor.putString("fssaiNumDigit",fssaiDigitsNums);
+//                        editor.apply();
+                    fssaiNum = false;
+                    intent.setAction("android.intent.action.PICK");
+                    currentString = str;
+                    startActivityForResult(Intent.createChooser(intent, "Select Picture"), 5);
+            }).setNegativeButton("Cancel", (dialogInterface, i) -> dialogInterface.dismiss()).create().show();
+        }
+
 
     }
 
