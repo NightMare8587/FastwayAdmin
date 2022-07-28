@@ -28,7 +28,7 @@ public class FaqActivity extends AppCompatActivity {
 //        webSettings.setJavaScriptEnabled(true);
 //        webSettings.setDefaultZoom(WebSettings.ZoomDensity.FAR);
 
-        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://intercellular-stabi.000webhostapp.com/faqweb/index.html"));
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://intercellular-stabi.000webhostapp.com/faqweb/indexadmin.html"));
         startActivity(browserIntent);
 
 
