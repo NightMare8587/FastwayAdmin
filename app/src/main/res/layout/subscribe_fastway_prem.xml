@@ -8,74 +8,73 @@
     tools:context=".NavFrags.FastwayPremiumActivites.FastwayPremiums">
 
     <TextView
-        android:id="@+id/textView25"
-        android:layout_width="wrap_content"
+        android:id="@+id/textView19"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="15dp"
-        android:layout_marginTop="45dp"
-        android:fontFamily="@font/amaranth_bold"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:fontFamily="@font/merriweather_bold"
         android:text="Fastway Premium"
-        android:textSize="38sp"
+        android:textColor="#000000"
+        android:textSize="40sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/textView26"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="30dp"
-        android:layout_marginTop="16dp"
-        android:fontFamily="@font/amaranth_bold"
-        android:text="1. Get Detailed Analysis"
-        android:textSize="26sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView25" />
-    <TextView
-        android:id="@+id/textView27"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="30dp"
-        android:layout_marginTop="16dp"
-        android:fontFamily="@font/amaranth_bold"
-        android:text="2. Genrate XML Reports"
-        android:textSize="26sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView26" />
-    <TextView
-        android:id="@+id/textView28"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="30dp"
-        android:layout_marginTop="16dp"
-        android:fontFamily="@font/amaranth_bold"
-        android:text="3. See Customer's Reviews"
-        android:textSize="26sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView27" />
-
-    <TextView
-        android:id="@+id/textView29"
+        android:id="@+id/textView20"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:fontFamily="@font/merriweather_sans_bold"
-        android:text="Starting ₹149 per month"
-        android:textAlignment="center"
-        android:textSize="28sp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="11dp"
+        android:layout_marginEnd="8dp"
+        android:fontFamily="@font/inter"
+        android:letterSpacing="0"
+        android:lineSpacingExtra="8sp"
+        android:text="1. Excel Sheet to store all transactions made\n2. Analysis based on previous orders made \n3.Create notifications to notify users about new deals and offers\n4.Check Restaurant Reviews and reply to users\n5.Track Order's (Most ordered Dish and Least Ordered Dish)"
+        android:textSize="22sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView28" />
+        app:layout_constraintTop_toBottomOf="@+id/textView19" />
 
-    <Button
-        android:id="@+id/subscribeFastwayPremButton"
+    <TextView
+        android:id="@+id/textView21"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:text="Subscribe Now"
-        android:textSize="18sp"
+        android:layout_marginTop="35dp"
+        android:text="Starting \u20b9249 per month"
+        android:textColor="#000000"
+        android:textSize="28sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView29" />
+        app:layout_constraintTop_toBottomOf="@+id/textView20" />
+
+    <Button
+        android:id="@+id/subscribeFastwayPremium"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/merriweather_bold"
+        android:text="Subscribe Premium Now"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView21"
+        app:layout_constraintVertical_bias="0.04000002" />
+
+    <TextView
+        android:id="@+id/textView22"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="12dp"
+        android:textColor="#E43E3E"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

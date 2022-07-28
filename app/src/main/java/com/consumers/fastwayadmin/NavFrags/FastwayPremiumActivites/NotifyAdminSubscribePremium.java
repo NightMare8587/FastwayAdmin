@@ -19,7 +19,7 @@ public class NotifyAdminSubscribePremium extends AppCompatActivity {
         setContentView(R.layout.activity_notify_admin_subscribe_premium);
         doItLater = findViewById(R.id.DoItLaterButtonActivity);
         subscribe = findViewById(R.id.SubscribeNowserActivityButton);
-        sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
+        sharedPreferences = getSharedPreferences("AdminPremiumDetails",MODE_PRIVATE);
         editor = sharedPreferences.edit();
         doItLater.setOnClickListener(click -> {
             editor.putString("lastPremNotified",String.valueOf(System.currentTimeMillis()));

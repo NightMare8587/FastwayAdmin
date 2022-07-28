@@ -71,16 +71,35 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_res_earning_tracker);
         loginInfoShared = getSharedPreferences("loginInfo",MODE_PRIVATE);
+        SharedPreferences adminPrem = getSharedPreferences("AdminPremiumDetails",MODE_PRIVATE);
+        SharedPreferences.Editor premEdit = adminPrem.edit();
         editor = loginInfoShared.edit();
         seeAnalysis = findViewById(R.id.seeRestaurantAnalysisButtonTracker);
-        if(!loginInfoShared.contains("FastwayAdminPrem")){
+        if(adminPrem.contains("status")) {
+            if (!adminPrem.getString("status", "").equals("active")) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(ResEarningTrackerActivity.this);
+                builder.setCancelable(false);
+                builder.setTitle("Dialog").setMessage("You need to subscribe to premium plan to see analysis")
+                        .setPositiveButton("Subscribe Now", (dialogInterface, i) -> {
+                            dialogInterface.dismiss();
+                            premEdit.putString("status", "active");
+                            premEdit.apply();
+                            finish();
+//                        startActivity(new Intent(ResEarningTrackerActivity.this, FastwayPremiums.class));
+                        }).setNegativeButton("Not Now", (dialogInterface, i) -> {
+                            dialogInterface.dismiss();
+                            finish();
+                        }).create().show();
+                return;
+            }
+        }else{
             AlertDialog.Builder builder = new AlertDialog.Builder(ResEarningTrackerActivity.this);
             builder.setCancelable(false);
             builder.setTitle("Dialog").setMessage("You need to subscribe to premium plan to see analysis")
                     .setPositiveButton("Subscribe Now", (dialogInterface, i) -> {
                         dialogInterface.dismiss();
-                        editor.putString("FastwayAdminPrem","h");
-                        editor.apply();
+                        premEdit.putString("status", "active");
+                        premEdit.apply();
                         finish();
 //                        startActivity(new Intent(ResEarningTrackerActivity.this, FastwayPremiums.class));
                     }).setNegativeButton("Not Now", (dialogInterface, i) -> {

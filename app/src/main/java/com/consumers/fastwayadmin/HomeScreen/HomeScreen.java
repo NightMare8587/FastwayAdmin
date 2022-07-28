@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.StrictMode;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -27,12 +28,14 @@ import androidx.fragment.app.FragmentManager;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 //import com.aspose.cells.Workbook;
 import com.consumers.fastwayadmin.Info.RestaurantDocuments.ReUploadDocumentsAgain;
 import com.consumers.fastwayadmin.Info.RestaurantDocuments.UploadRemainingDocs;
 import com.consumers.fastwayadmin.NavFrags.AccountFrag;
 import com.consumers.fastwayadmin.NavFrags.CashCommission.CashTransactionCommissionActivity;
+import com.consumers.fastwayadmin.NavFrags.FastwayPremiumActivites.NotifyAdminSubscribePremium;
 import com.consumers.fastwayadmin.NavFrags.HomeFrag;
 import com.consumers.fastwayadmin.NavFrags.MenuFrag;
 import com.consumers.fastwayadmin.NavFrags.ReplaceOrders.ReplaceOrderRequests;
@@ -74,8 +77,12 @@ public class HomeScreen extends AppCompatActivity {
     BubbleNavigationConstraintView bubble;
     String URL = "https://fcm.googleapis.com/fcm/send";
     FragmentManager manager;
+    String url = "https://intercellular-stabi.000webhostapp.com/payouts/prodInitialise.php";
     SharedPreferences sharedPreferences;
+    String subRefID;
     SharedPreferences calenderForExcel;
+    SharedPreferences adminPrem;
+    SharedPreferences.Editor premEditor;
     SharedPreferences.Editor editor;
     Calendar calendar = Calendar.getInstance();
     String[] monthName = {"January", "February",
@@ -104,6 +111,8 @@ public class HomeScreen extends AppCompatActivity {
         manager.beginTransaction().replace(R.id.homescreen,new HomeFrag()).commit();
         calenderForExcel = getSharedPreferences("CalenderForExcel",MODE_PRIVATE);
         editor = calenderForExcel.edit();
+        adminPrem = getSharedPreferences("AdminPremiumDetails",MODE_PRIVATE);
+        premEditor = adminPrem.edit();
         ConnectivityManager cm =
                 (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
         FirebaseMessaging.getInstance().subscribeToTopic("FastwayQueryDB");
@@ -185,52 +194,16 @@ public class HomeScreen extends AppCompatActivity {
 //        }
 
 
-
-        if(!sharedPreferences.contains("FileGeneratedExcel")) {
-            try {
-                String month = monthName[calendar.get(Calendar.MONTH)];
-                File file = new File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "RestaurantEarningTracker.xlsx");
-                XSSFWorkbook workbook1 = new XSSFWorkbook();
+        if(adminPrem.contains("status") && adminPrem.getString("status","").equals("active")) {
+            if (!sharedPreferences.contains("FileGeneratedExcel")) {
+                try {
+                    String month = monthName[calendar.get(Calendar.MONTH)];
+                    File file = new File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "RestaurantEarningTracker.xlsx");
+                    XSSFWorkbook workbook1 = new XSSFWorkbook();
 //                Sheet sheet = workbook1.getSheetAt(0);
 //                int row = sheet.getLastRowNum();
 //                Toast.makeText(this, "" + row, Toast.LENGTH_SHORT).show();
-                Sheet sheet = workbook1.createSheet("" + month + "_Earnings");
-                Row row = sheet.createRow(0);
-                Cell cell = row.createCell(0);
-                cell.setCellValue("Date");
-                cell = row.createCell(1);
-
-                cell.setCellValue("Transaction ID");
-                cell = row.createCell(2);
-                cell.setCellValue("Payment Mode");
-                cell = row.createCell(3);
-                cell.setCellValue("Amount");
-                FileOutputStream fileOutputStream = new FileOutputStream(file);
-                workbook1.write(fileOutputStream);
-                fileOutputStream.flush();
-                fileOutputStream.close();
-                myEditor.putString("FileGeneratedExcel","f");
-                editor.putString("currentMonth",month);
-                editor.apply();
-                myEditor.apply();
-//                Toast.makeText(this, "Finished", Toast.LENGTH_SHORT).show();
-
-            } catch (IOException e) {
-                e.printStackTrace();
-                Toast.makeText(this, "Noob", Toast.LENGTH_SHORT).show();
-            }
-        }else{
-            String month = monthName[calendar.get(Calendar.MONTH)];
-            if(month.equals(calenderForExcel.getString("currentString",""))){
-
-            }else{
-                File file = new File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "RestaurantEarningTracker.xlsx");
-                try {
-                    FileInputStream fileInputStream = new FileInputStream(file);
-                    XSSFWorkbook workbooks = new XSSFWorkbook(fileInputStream);
-                    Sheet sheet = workbooks.createSheet("" + month + "_Earnings");
-                    workbooks.setSheetOrder("" + month + "_Earnings",0);
-                    workbooks.setActiveSheet(0);
+                    Sheet sheet = workbook1.createSheet("" + month + "_Earnings");
                     Row row = sheet.createRow(0);
                     Cell cell = row.createCell(0);
                     cell.setCellValue("Date");
@@ -241,47 +214,110 @@ public class HomeScreen extends AppCompatActivity {
                     cell.setCellValue("Payment Mode");
                     cell = row.createCell(3);
                     cell.setCellValue("Amount");
-
                     FileOutputStream fileOutputStream = new FileOutputStream(file);
-                    workbooks.write(fileOutputStream);
+                    workbook1.write(fileOutputStream);
                     fileOutputStream.flush();
                     fileOutputStream.close();
-                    workbooks.close();
-                }catch (Exception ignored){
+                    myEditor.putString("FileGeneratedExcel", "f");
+                    editor.putString("currentMonth", month);
+                    editor.apply();
+                    myEditor.apply();
+//                Toast.makeText(this, "Finished", Toast.LENGTH_SHORT).show();
 
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Toast.makeText(this, "Noob", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                String month = monthName[calendar.get(Calendar.MONTH)];
+                if (month.equals(calenderForExcel.getString("currentString", ""))) {
+
+                } else {
+                    File file = new File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "RestaurantEarningTracker.xlsx");
+                    try {
+                        FileInputStream fileInputStream = new FileInputStream(file);
+                        XSSFWorkbook workbooks = new XSSFWorkbook(fileInputStream);
+                        Sheet sheet = workbooks.createSheet("" + month + "_Earnings");
+                        workbooks.setSheetOrder("" + month + "_Earnings", 0);
+                        workbooks.setActiveSheet(0);
+                        Row row = sheet.createRow(0);
+                        Cell cell = row.createCell(0);
+                        cell.setCellValue("Date");
+                        cell = row.createCell(1);
+
+                        cell.setCellValue("Transaction ID");
+                        cell = row.createCell(2);
+                        cell.setCellValue("Payment Mode");
+                        cell = row.createCell(3);
+                        cell.setCellValue("Amount");
+
+                        FileOutputStream fileOutputStream = new FileOutputStream(file);
+                        workbooks.write(fileOutputStream);
+                        fileOutputStream.flush();
+                        fileOutputStream.close();
+                        workbooks.close();
+                    } catch (Exception ignored) {
+
+                    }
                 }
             }
         }
         DatabaseReference myRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(UID).child("Restaurant Documents");
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(UID)).child("Tables");
-        new Handler().postDelayed(new Runnable() {
+        new Handler().postDelayed(() -> myRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void run() {
-                myRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        if(dataSnapshot.exists() && dataSnapshot.hasChild("verified")){
-                            if(Objects.equals(dataSnapshot.child("verified").getValue(String.class), "no")){
-                                AlertDialog.Builder alert = new AlertDialog.Builder(HomeScreen.this);
-                                alert.setTitle("Error")
-                                        .setMessage("Your restaurant is not yet verified so you can't accept orders until verified")
-                                        .setPositiveButton("Exit", (dialogInterface, i) -> {
-                                            dialogInterface.dismiss();
-                                        }).setNegativeButton("Contact Fastway", (dialogInterface, i) -> {
-                                            dialogInterface.dismiss();
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists() && dataSnapshot.hasChild("verified")){
+                    if(Objects.equals(dataSnapshot.child("verified").getValue(String.class), "no")){
+                        AlertDialog.Builder alert = new AlertDialog.Builder(HomeScreen.this);
+                        alert.setTitle("Error")
+                                .setMessage("Your restaurant is not yet verified so you can't accept orders until verified")
+                                .setPositiveButton("Exit", (dialogInterface, i) -> {
+                                    dialogInterface.dismiss();
+                                }).setNegativeButton("Contact Fastway", (dialogInterface, i) -> {
+                                    dialogInterface.dismiss();
 
-                                        }).create();
-                                alert.setCancelable(false);
-                                alert.show();
+                                }).create();
+                        alert.setCancelable(false);
+                        alert.show();
+                    }
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+            }
+        }),0);
+
+
+        new Handler().postDelayed(() -> {
+            DatabaseReference databaseReference1 = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
+            databaseReference1.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if(snapshot.hasChild("subRefID")){
+                        subRefID = String.valueOf(snapshot.child("subRefID").getValue()).trim();
+                        new checkStatus().execute();
+                    }else{
+                        premEditor.putString("status","not active");
+                        premEditor.apply();
+                        if(adminPrem.contains("lastNotifiedPrem")){
+                            if(172800000L + System.currentTimeMillis() < Long.parseLong(adminPrem.getString("lastNotifiedPrem",""))){
+                                startActivity(new Intent(HomeScreen.this, NotifyAdminSubscribePremium.class));
                             }
+                        }else
+                        {
+                            premEditor.putString("lastNotifiedPrem",String.valueOf(System.currentTimeMillis()));
+                            premEditor.apply();
                         }
                     }
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-                    }
-                });
-            }
-        },0);
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+        },1000);
 
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
@@ -649,12 +685,39 @@ public class HomeScreen extends AppCompatActivity {
         },0);
     }
 
-    public class checkBank extends AsyncTask<Void,Void,Void>{
+    public class checkStatus extends AsyncTask<Void,Void,Void>{
 
         @Override
         protected Void doInBackground(Void... voids) {
-
-
+            RequestQueue requestQueue = Volley.newRequestQueue(HomeScreen.this);
+            StringRequest stringRequest = new StringRequest(Request.Method.POST, url, response -> {
+                Log.i("resp",response + "");
+                Log.i("id",subRefID);
+                String respo = response.trim();
+                if(respo.equals("INITIALIZE")) {
+                    premEditor.putString("status","initialized");
+                    premEditor.apply();
+                }else if(respo.equals("ACTIVE")){
+                    premEditor.putString("status","active");
+                    premEditor.apply();
+                }else{
+                    premEditor.putString("status","not active");
+                    premEditor.apply();
+                }
+//                editor.putString("status","active");
+//                editor.apply();
+            }, error -> {
+                Log.i("resp","error");
+            }){
+                @NonNull
+                @Override
+                protected Map<String, String> getParams() {
+                    Map<String,String> params = new HashMap<>();
+                    params.put("subID",subRefID);
+                    return params;
+                }
+            };
+            requestQueue.add(stringRequest);
             return null;
         }
     }

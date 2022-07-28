@@ -47,54 +47,56 @@ public class FastwayPremiums extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
-        sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
+        sharedPreferences = getSharedPreferences("AdminPremiumDetails",MODE_PRIVATE);
         editor = sharedPreferences.edit();
-        if(sharedPreferences.contains("FastwayAdminPrems")){
+        if(sharedPreferences.contains("status") && sharedPreferences.getString("status","").equals("active")){
             setContentView(R.layout.activity_fastway_premiums);
         }else{
-            setContentView(R.layout.subscribe_fastway_prem);
-            subscribePrem = findViewById(R.id.subscribeFastwayPremButton);
-            subscribePrem.setOnClickListener(click -> {
-                RequestQueue requestQueue = Volley.newRequestQueue(FastwayPremiums.this);
-                StringRequest stringRequest = new StringRequest(Request.Method.POST, prodUrl, response -> {
-                    Log.i("resp", response);
+            if(sharedPreferences.contains("status")) {
+                setContentView(R.layout.subscribe_fastway_prem);
+                subscribePrem = findViewById(R.id.subscribeFastwayPremium);
+                subscribePrem.setOnClickListener(click -> {
+                    RequestQueue requestQueue = Volley.newRequestQueue(FastwayPremiums.this);
+                    StringRequest stringRequest = new StringRequest(Request.Method.POST, prodUrl, response -> {
+                        Log.i("resp", response);
 
-                    if(response != null){
-                        String[] url = response.split(",");
+                        if (response != null) {
+                            String[] url = response.split(",");
 //                                                Log.i("resp",url.toString());
-                        String paymentURL = url[0];
-                        String subID = url[1];
-                        Log.i("resp",paymentURL);
-                        Log.i("resp",subID);
-                        SharedPreferences sharedPreferences = getSharedPreferences("AdminPremiumDetails",MODE_PRIVATE);
-                        SharedPreferences.Editor editor = sharedPreferences.edit();
-                        editor.putString("url",paymentURL);
-                        editor.putString("subID",subID);
-                        editor.apply();
-                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(paymentURL));
-                        startActivity(browserIntent);
-                        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid());
-                        reference.child("premium").setValue("INITIALIZE");
-                        reference.child("subRefID").setValue(subID.trim());
-                        reference.child("subRefURL").setValue(paymentURL.trim());
-                    }
+                            String paymentURL = url[0];
+                            String subID = url[1];
+                            Log.i("resp", paymentURL);
+                            Log.i("resp", subID);
+                            SharedPreferences sharedPreferences = getSharedPreferences("AdminPremiumDetails", MODE_PRIVATE);
+                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                            editor.putString("url", paymentURL);
+                            editor.putString("subID", subID);
+                            editor.apply();
+                            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(paymentURL));
+                            startActivity(browserIntent);
+                            DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid());
+                            reference.child("premium").setValue("INITIALIZE");
+                            reference.child("subRefID").setValue(subID.trim());
+                            reference.child("subRefURL").setValue(paymentURL.trim());
+                        }
 
-                }, error -> {
+                    }, error -> {
 
-                }){
-                    @NonNull
-                    @Override
-                    protected Map<String, String> getParams() {
-                        Map<String,String> params = new HashMap<>();
-                        params.put("subscriptionID",auth.getUid() + "2");
-                        params.put("planID","FastwayAdminPrem");
-                        params.put("email","maheshwariloya@gmail.com");
-                        params.put("phone","8076531395");
-                        return params;
-                    }
-                };
-                requestQueue.add(stringRequest);
-            });
+                    }) {
+                        @NonNull
+                        @Override
+                        protected Map<String, String> getParams() {
+                            Map<String, String> params = new HashMap<>();
+                            params.put("subscriptionID", auth.getUid() + "4");
+                            params.put("planID", "FastwayAdminPremium");
+                            params.put("email", "maheshwariloya@gmail.com");
+                            params.put("phone", "8076531395");
+                            return params;
+                        }
+                    };
+                    requestQueue.add(stringRequest);
+                });
+            }
         }
     }
 }
