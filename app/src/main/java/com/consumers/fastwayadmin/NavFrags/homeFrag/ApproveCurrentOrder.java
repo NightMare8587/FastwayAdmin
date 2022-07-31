@@ -310,7 +310,6 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                     }
                     myMap.put(month, map);
                     dishAnalysis.putString("DishAnalysisMonthBasis", gson.toJson(myMap));
-                    dishAnalysis.apply();
                 } else {
                     HashMap<String, HashMap<String, String>> map = new HashMap<>();
                     HashMap<String, String> myMap = new HashMap<>();
@@ -320,8 +319,8 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                     map.put(month, myMap);
                     gson = new Gson();
                     dishAnalysis.putString("DishAnalysisMonthBasis", gson.toJson(map));
-                    dishAnalysis.apply();
                 }
+                dishAnalysis.apply();
             }
 
 
