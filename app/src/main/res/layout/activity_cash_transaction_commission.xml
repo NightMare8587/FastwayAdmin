@@ -49,9 +49,23 @@
         android:id="@+id/PayCommissionNowButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="75dp"
+        android:layout_marginTop="85dp"
         android:text="Pay Now"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/totalCommissionToBePaidByAdmin" />
+
+    <TextView
+        android:id="@+id/seeFeesBreakdownAdminAppCash"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="7dp"
+        android:text="See Fee's Breakdown"
+        android:textColor="#3F51B5"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toTopOf="@+id/PayCommissionNowButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/platformFeeToBePaid" />
 </androidx.constraintlayout.widget.ConstraintLayout>

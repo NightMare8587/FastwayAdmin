@@ -1,10 +1,14 @@
 package com.consumers.fastwayadmin.NavFrags.CashCommission;
 
 import android.annotation.SuppressLint;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,8 +36,10 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
     FirebaseAuth auth = FirebaseAuth.getInstance();
     TextView totalCashTransaction,totalCommission,platformFee;
     Button payCommissionNow;
+    TextView seeBreakDown;
     boolean platformFeeBool = false;
     Double platformFeeAmount;
+    double gstToBePaid;
     double commissionAmount;
     DecimalFormat df = new DecimalFormat("0.00");
     @Override
@@ -42,6 +48,7 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
         setContentView(R.layout.activity_cash_transaction_commission);
         totalCashTransaction = findViewById(R.id.totalCashTakeAwayCommission);
         totalCommission = findViewById(R.id.totalCommissionToBePaidByAdmin);
+        seeBreakDown = findViewById(R.id.seeFeesBreakdownAdminAppCash);
         platformFee = findViewById(R.id.platformFeeToBePaid);
         payCommissionNow = findViewById(R.id.PayCommissionNowButton);
         databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
@@ -55,7 +62,8 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
                         if(System.currentTimeMillis() - date >= 2073600000L){
                             totalCashTransaction.setText("Total Cash Transactions " + "\u20B9" + snapshot.child("totalCashTakeAway").getValue(String.class));
                             double totalCash = Double.parseDouble(Objects.requireNonNull(snapshot.child("totalCashTakeAway").getValue(String.class)));
-                            commissionAmount = (totalCash * 7)/100;
+                            commissionAmount = (totalCash * 3)/100;
+                            gstToBePaid = (totalCash * 5)/100;
                             if(snapshot.hasChild("totalMonthAmount")){
                                 platformFeeAmount = Double.parseDouble(Objects.requireNonNull(snapshot.child("totalMonthAmount").getValue(String.class)));
                                 if(platformFeeAmount == 0D){
@@ -69,17 +77,51 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
                                     platformFeeAmount = 4000D;
                                 }else if(platformFeeAmount >= 100000){
                                     platformFeeAmount = 2000D;
-                                }else{
+                                }else if(platformFeeAmount >= 50000){
+                                    platformFeeAmount = 1500D;
+                                }else
                                     platformFeeAmount = 1000D;
-                                }
                                 platformFee.setText("Platform Fee: " + "\u20B9" + df.format(platformFeeAmount));
                                 platformFeeBool = true;
                             }else{
                                 platformFeeAmount = 1000D;
                                 platformFee.setText("Platform Fee: " + "\u20B91000");
                             }
-                            totalCommission.setText("Commission to be paid " + "\u20B9" + df.format(commissionAmount));
-                            payCommissionNow.setText("Pay \u20B9" + df.format(commissionAmount + platformFeeAmount) + " Now");
+                            totalCommission.setText("Commission to be paid " + "\u20B9" + df.format(commissionAmount + gstToBePaid));
+                            payCommissionNow.setText("Pay \u20B9" + df.format(commissionAmount + platformFeeAmount + gstToBePaid) + " Now");
+                            seeBreakDown.setOnClickListener(click -> {
+                                AlertDialog.Builder dialog = new AlertDialog.Builder(CashTransactionCommissionActivity.this);
+                                dialog.setTitle("Breakdown").setMessage("Below you can see breakdown of fees and gst to be paid");
+                                LinearLayout linearLayout = new LinearLayout(CashTransactionCommissionActivity.this);
+                                linearLayout.setOrientation(LinearLayout.VERTICAL);
+                                TextView commissionAmountText = new TextView(CashTransactionCommissionActivity.this);
+                                commissionAmountText.setGravity(View.TEXT_ALIGNMENT_CENTER);
+                                commissionAmountText.setTextSize(18);
+                                TextView gstAmount = new TextView(CashTransactionCommissionActivity.this);
+                                gstAmount.setGravity(View.TEXT_ALIGNMENT_CENTER);
+                                gstAmount.setTextSize(18);
+                                TextView platformFee = new TextView(CashTransactionCommissionActivity.this);
+                                platformFee.setGravity(View.TEXT_ALIGNMENT_CENTER);
+                                platformFee.setTextSize(18);
+                                commissionAmountText.setText("Cash Commission Amount: " +  df.format(commissionAmount));
+                                gstAmount.setText("5% Gst: " + df.format(gstToBePaid) + "");
+                                platformFee.setText("Platform Fee: " + df.format(platformFeeAmount) + "");
+
+                                TextView totalSummary = new TextView(CashTransactionCommissionActivity.this);
+                                totalSummary.setGravity(View.TEXT_ALIGNMENT_CENTER);
+                                totalSummary.setTextSize(18);
+                                totalSummary.setTextColor(Color.BLACK);
+                                totalSummary.setText("Final Amount: " + df.format(commissionAmount + platformFeeAmount + gstToBePaid) + "");
+
+                                linearLayout.addView(commissionAmountText);
+                                linearLayout.addView(gstAmount);
+                                linearLayout.addView(platformFee);
+                                linearLayout.addView(totalSummary);
+
+                                dialog.setView(linearLayout);
+                                dialog.setPositiveButton("Exit", (dialog1, which) -> dialog1.dismiss()).create();
+                                dialog.show();
+                            });
                             payCommissionNow.setOnClickListener(view -> {
                                 if(commissionAmount != 0) {
                                     SharedPreferences cash = getSharedPreferences("CashCommission",MODE_PRIVATE);
