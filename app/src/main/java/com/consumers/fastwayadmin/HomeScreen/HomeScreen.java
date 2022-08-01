@@ -34,6 +34,7 @@ import com.android.volley.toolbox.Volley;
 import com.consumers.fastwayadmin.Info.RestaurantDocuments.ReUploadDocumentsAgain;
 import com.consumers.fastwayadmin.Info.RestaurantDocuments.UploadRemainingDocs;
 import com.consumers.fastwayadmin.NavFrags.AccountFrag;
+import com.consumers.fastwayadmin.NavFrags.AccountSettingsFragment;
 import com.consumers.fastwayadmin.NavFrags.CashCommission.CashTransactionCommissionActivity;
 import com.consumers.fastwayadmin.NavFrags.FastwayPremiumActivites.NotifyAdminSubscribePremium;
 import com.consumers.fastwayadmin.NavFrags.HomeFrag;
@@ -173,7 +174,7 @@ public class HomeScreen extends AppCompatActivity {
                     manager.beginTransaction().replace(R.id.homescreen,new TablesFrag()).commit();
                     break;
                 case 3:
-                    manager.beginTransaction().replace(R.id.homescreen,new AccountFrag()).commit();
+                    manager.beginTransaction().replace(R.id.homescreen,new AccountSettingsFragment()).commit();
                     break;
             }
         });

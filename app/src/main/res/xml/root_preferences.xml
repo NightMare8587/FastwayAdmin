@@ -1,0 +1,56 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+    <PreferenceCategory app:title="Account">
+
+        <Preference
+            app:key="myAccount"
+            app:title="My Account"
+            app:summary=""/>
+
+        <Preference
+            app:key="blockedUsers"
+            app:title="Blocked Users"
+            app:summary=""/>
+
+        <Preference
+            app:key="myTrans"
+            app:title="My Transactions"
+            app:summary=""/>
+
+        <Preference
+            app:key="logoutNow"
+            app:title="Logout"
+            app:summary=""/>
+        <Preference
+            app:key="premium"
+            app:title="Fastway Premium"
+            app:summary=""/>
+
+
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/sync_header">
+
+        <SwitchPreferenceCompat
+            app:key="TakeAwaySwitch"
+            app:title="TakeAway Allowed" />
+
+        <SwitchPreferenceCompat
+            app:title="Table Booking Allowed"
+            app:key="tableBookingAllowedSwitch"
+           />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="Other">
+        <Preference
+            app:key="termsConditions"
+            app:title="Terms And Conditions"
+            app:summary=""/>
+
+        <Preference
+            app:key="privacyPolicy"
+            app:title="Privacy Policy"
+            app:summary=""/>
+    </PreferenceCategory>
+
+</PreferenceScreen>
