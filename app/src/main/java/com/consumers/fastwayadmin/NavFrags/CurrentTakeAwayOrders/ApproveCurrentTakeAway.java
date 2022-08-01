@@ -202,7 +202,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                 databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(sharedPreferences.getString("locality","")).child(auth.getUid());
                 for(int i=0;i<dishName.size();i++){
                     MyClass myClass = new MyClass(dishName.get(i),dishPrice.get(i),image.get(i),type.get(i),""+approveTime,quantity.get(i),halfOr.get(i),state,String.valueOf(orderAmount),orderId,"TakeAway,Online","Order Declined",sharedPreferences.getString("locality",""));
-                    databaseReference.child("Recent Orders").child("" + time).child(auth.getUid()).child(dishName.get(i)).setValue(myClass);
+                    databaseReference.child("Recent Orders").child("" + time).child(id).child(dishName.get(i)).setValue(myClass);
                 }
                 new InitiateRefund().execute();
                 try {
@@ -240,7 +240,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                 databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(sharedPreferences.getString("locality","")).child(auth.getUid());
                 for(int i=0;i<dishName.size();i++){
                     MyClass myClass = new MyClass(dishName.get(i),dishPrice.get(i),image.get(i),type.get(i),""+approveTime,quantity.get(i),halfOr.get(i),state,String.valueOf(orderAmount),orderId,"TakeAway,Cash","Order Declined",sharedPreferences.getString("locality",""));
-                    databaseReference.child("Recent Orders").child("" + time).child(auth.getUid()).child(dishName.get(i)).setValue(myClass);
+                    databaseReference.child("Recent Orders").child("" + time).child(id).child(dishName.get(i)).setValue(myClass);
                 }
                 try {
                     main.put("to", "/topics/" + id + "");
@@ -268,17 +268,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                 }
             }
            builder.setTitle("Info").setMessage("Order has been automatically cancelled because it was neither accepted nor denied")
-                   .setPositiveButton("Exit", new DialogInterface.OnClickListener() {
-                       @Override
-                       public void onClick(DialogInterface dialogInterface, int i) {
-                           new Handler().postDelayed(new Runnable() {
-                               @Override
-                               public void run() {
-                                  finish();
-                               }
-                           },300);
-                       }
-                   }).create();
+                   .setPositiveButton("Exit", (dialogInterface, i) -> new Handler().postDelayed(() -> finish(),300)).create();
             builder.setCancelable(false);
             builder.show();
         }
@@ -568,7 +558,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                                 databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(sharedPreferences.getString("locality", "")).child(auth.getUid());
                                 for (int i = 0; i < dishName.size(); i++) {
                                     MyClass myClass = new MyClass(dishName.get(i), dishPrice.get(i), image.get(i), type.get(i), "" + approveTime, quantity.get(i), halfOr.get(i), state, String.valueOf(orderAmount), orderId, "TakeAway,Cash", "Order Approved", sharedPreferences.getString("locality", ""));
-                                    databaseReference.child("Recent Orders").child("" + time).child(auth.getUid()).child(dishName.get(i)).setValue(myClass);
+                                    databaseReference.child("Recent Orders").child("" + time).child(id).child(dishName.get(i)).setValue(myClass);
                                 }
 
 
@@ -675,7 +665,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                     databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(sharedPreferences.getString("locality", "")).child(auth.getUid());
                     for (int i = 0; i < dishName.size(); i++) {
                         MyClass myClass = new MyClass(dishName.get(i), dishPrice.get(i), image.get(i), type.get(i), "" + approveTime, quantity.get(i), halfOr.get(i), state, String.valueOf(orderAmount), orderId, "TakeAway,Cash", "Order Approved", sharedPreferences.getString("locality", ""));
-                        databaseReference.child("Recent Orders").child("" + time).child(auth.getUid()).child(dishName.get(i)).setValue(myClass);
+                        databaseReference.child("Recent Orders").child("" + time).child(id).child(dishName.get(i)).setValue(myClass);
                     }
 
 
@@ -775,7 +765,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                         databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(sharedPreferences.getString("locality","")).child(auth.getUid());
                         for(int i=0;i<dishName.size();i++){
                             MyClass myClass = new MyClass(dishName.get(i),dishPrice.get(i),image.get(i),type.get(i),""+approveTime,quantity.get(i),halfOr.get(i),state,String.valueOf(orderAmount),orderId,"TakeAway,Online","Order Approved",sharedPreferences.getString("locality",""));
-                            databaseReference.child("Recent Orders").child("" + time).child(auth.getUid()).child(dishName.get(i)).setValue(myClass);
+                            databaseReference.child("Recent Orders").child("" + time).child(id).child(dishName.get(i)).setValue(myClass);
                         }
 
                         Toast.makeText(ApproveCurrentTakeAway.this, "Order Confirmed", Toast.LENGTH_SHORT).show();
@@ -859,7 +849,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                             databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(sharedPreferences.getString("locality","")).child(auth.getUid());
                             for(int i=0;i<dishName.size();i++){
                                 MyClass myClass = new MyClass(dishName.get(i),dishPrice.get(i),image.get(i),type.get(i),""+approveTime,quantity.get(i),halfOr.get(i),state,String.valueOf(orderAmount),orderId,"TakeAway,Online","Order Declined",sharedPreferences.getString("locality",""));
-                                databaseReference.child("Recent Orders").child("" + time).child(auth.getUid()).child(dishName.get(i)).setValue(myClass);
+                                databaseReference.child("Recent Orders").child("" + time).child(id).child(dishName.get(i)).setValue(myClass);
                             }
                             new InitiateRefund().execute();
                             try {
@@ -900,7 +890,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                                 databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(sharedPreferences.getString("locality","")).child(auth.getUid());
                                 for(int i=0;i<dishName.size();i++){
                                     MyClass myClass = new MyClass(dishName.get(i),dishPrice.get(i),image.get(i),type.get(i),""+approveTime,quantity.get(i),halfOr.get(i),state,String.valueOf(orderAmount),orderId,"TakeAway,Cash","Order Declined",sharedPreferences.getString("locality",""));
-                                    databaseReference.child("Recent Orders").child("" + time).child(auth.getUid()).child(dishName.get(i)).setValue(myClass);
+                                    databaseReference.child("Recent Orders").child("" + time).child(id).child(dishName.get(i)).setValue(myClass);
                                 }
                                 main.put("to", "/topics/" + id + "");
                                 JSONObject notification = new JSONObject();
