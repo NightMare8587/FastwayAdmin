@@ -61,9 +61,12 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
                                 if(platformFeeAmount == 0D){
                                     platformFeeAmount = 0D;
                                 }else if(platformFeeAmount >= 500000L){
-                                    platformFeeAmount = 5000D;
-                                }else if(platformFeeAmount >= 350000L){
-                                    platformFeeAmount = 3500D;
+                                    platformFeeAmount = (platformFeeAmount / 100) * 2;
+                                }else if(platformFeeAmount >= 300000L){
+                                    platformFeeAmount = 6000D;
+                                }
+                                else if(platformFeeAmount >= 200000L){
+                                    platformFeeAmount = 4000D;
                                 }else if(platformFeeAmount >= 100000){
                                     platformFeeAmount = 2000D;
                                 }else{
