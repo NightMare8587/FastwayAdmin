@@ -380,8 +380,9 @@ public class Info extends AppCompatActivity {
             alert.setMessage("Do you wanna add images of your restaurant\n(This image will be visible to user)!!\nYou can skip this step and add image later");
             alert.setPositiveButton("Add Image", (dialogInterface, i) -> {
                 Intent intent = new Intent(Info.this, AddRestaurantImages.class);
-                intent.putExtra("state", sharedPreferences.getString("state", ""));
-                intent.putExtra("locality", sharedPreferences.getString("locality", ""));
+                SharedPreferences sharedPreferences1 = getSharedPreferences("loginInfo",MODE_PRIVATE);
+                intent.putExtra("state", sharedPreferences1.getString("state", ""));
+                intent.putExtra("locality", sharedPreferences1.getString("locality", ""));
                 startActivity(intent);
             }).setNegativeButton("Skip", (dialogInterface, i) -> {
                 dialogInterface.dismiss();

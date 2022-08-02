@@ -125,6 +125,7 @@ public class UploadRequiredDocuments extends AppCompatActivity {
                         editor.putString("fssaiNumDigit",fssaiNumDigits);
                         editor.apply();
                         fssaiCard.setClickable(false);
+                        proceedFurther.setVisibility(View.VISIBLE);
                     }
 //                    if(snapshot.child("Restaurant Documents").hasChild("gst")){
 //                        gst = true;
@@ -138,12 +139,14 @@ public class UploadRequiredDocuments extends AppCompatActivity {
                         adhaarText.setVisibility(View.VISIBLE);
                         adhaarUrl = snapshot.child("Restaurant Documents").child("adhaar").getValue(String.class);
                         adhaarCard.setClickable(false);
+                        proceedFurther.setVisibility(View.VISIBLE);
                     }
                     if(snapshot.child("Restaurant Documents").hasChild("resProof")){
                         resProof = true;
                         resProofText.setVisibility(View.VISIBLE);
                         residentialProofSubmitUrl = snapshot.child("Restaurant Documents").child("resProof").getValue(String.class);
                         residentialProof.setClickable(false);
+                        proceedFurther.setVisibility(View.VISIBLE);
                     }
 
                     checkIfAllUploaded();
@@ -183,6 +186,7 @@ public class UploadRequiredDocuments extends AppCompatActivity {
                                         SharedPreferences loginShared = getSharedPreferences("loginInfo",MODE_PRIVATE);
                                         databaseReference.child(auth.getUid()).child("state").setValue(loginShared.getString("state",""));
                                         databaseReference.child(auth.getUid()).child("locality").setValue(loginShared.getString("locality",""));
+                                        databaseReference.child(auth.getUid()).child("fssaiDigits").setValue(fssaiNumDigits);
 
                                         databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid()).child("Restaurant Documents");
                                         databaseReference.child("verified").setValue("no");
@@ -407,6 +411,7 @@ public class UploadRequiredDocuments extends AppCompatActivity {
                         SharedPreferences loginShared = getSharedPreferences("loginInfo",MODE_PRIVATE);
                         databaseReference.child(auth.getUid()).child("state").setValue(loginShared.getString("state",""));
                         databaseReference.child(auth.getUid()).child("locality").setValue(loginShared.getString("locality",""));
+                        databaseReference.child(auth.getUid()).child("fssaiDigits").setValue(fssaiNumDigits);
 
                         databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid()).child("Restaurant Documents");
                         databaseReference.child("verified").setValue("no");
@@ -819,6 +824,8 @@ public class UploadRequiredDocuments extends AppCompatActivity {
                     proceedFurther.setVisibility(View.VISIBLE);
                     DatabaseReference dish = FirebaseDatabase.getInstance().getReference().getRoot();
                     dish.child("Admin").child(Objects.requireNonNull(auth.getUid())).child("Restaurant Documents").child(value).setValue(uri + "");
+                    if(value.equals("fssai"))
+                        dish.child("Admin").child(auth.getUid()).child("Restaurant Documents").child("fssaiDigits").setValue(fssaiNumDigits);
                    checkIfAllUploaded();
                 });
             }).addOnFailureListener(e -> loading.dismiss());
