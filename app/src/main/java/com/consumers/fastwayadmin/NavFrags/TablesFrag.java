@@ -109,8 +109,39 @@ public class TablesFrag extends Fragment {
             initialise();
         }
 
-        new backGroundWork().execute();
+//        new backGroundWork().execute();
+        tableRef.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                updateChild();
+                called++;
+                Log.i("call",called + "");
+            }
 
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                updateChild();
+                called++;
+                Log.i("call",called + "");
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+                updateChild();
+                called++;
+                Log.i("call",called + "");
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
         addTable.setOnClickListener(view1 -> startActivity(new Intent(getActivity(), AddTables.class)));
 
         layout.setOnRefreshListener(() -> {
@@ -207,7 +238,7 @@ public class TablesFrag extends Fragment {
     }
 
     private void updateChild() {
-        tableRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        new Thread(() -> tableRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -250,6 +281,16 @@ public class TablesFrag extends Fragment {
                     }
                     tableView = new TableView(tableNumber,status,map,getContext(),timeInMillis,timeOfBooking,timeOfUnavailability,seats);
                     table.setAdapter(tableView);
+                    table.addOnScrollListener(new RecyclerView.OnScrollListener() {
+                        @Override
+                        public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                            super.onScrolled(recyclerView, dx, dy);
+                            if(dy > 0)
+                                addTable.hide();
+                            else if(dy < 0)
+                                addTable.show();
+                        }
+                    });
                     Log.i("info",timeOfBooking.toString());
                     tableView.notifyDataSetChanged();
 
@@ -273,45 +314,15 @@ public class TablesFrag extends Fragment {
             public void onCancelled(@NonNull DatabaseError error) {
 
             }
-        });
+        })).start();
+
     }
 
     public class backGroundWork extends AsyncTask<Void,Void,Void>{
 
         @Override
         protected Void doInBackground(Void... voids) {
-            tableRef.addChildEventListener(new ChildEventListener() {
-                @Override
-                public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                    updateChild();
-                    called++;
-                    Log.i("call",called + "");
-                }
 
-                @Override
-                public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                    updateChild();
-                    called++;
-                    Log.i("call",called + "");
-                }
-
-                @Override
-                public void onChildRemoved(@NonNull DataSnapshot snapshot) {
-                    updateChild();
-                    called++;
-                    Log.i("call",called + "");
-                }
-
-                @Override
-                public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-
-                }
-            });
             return null;
         }
     }

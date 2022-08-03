@@ -54,7 +54,7 @@ public class FirebaseNotification extends FirebaseMessagingService {
         remoteViews.setTextViewText(R.id.title, title);
         remoteViews.setTextViewText(R.id.message, message);
         remoteViews.setImageViewResource(R.id.icon,
-                R.drawable.ic_baseline_home_24);
+                R.drawable.foodinelogo);
         return remoteViews;
     }
     // Method to display the notifications
@@ -77,17 +77,10 @@ public class FirebaseNotification extends FirebaseMessagingService {
         // Pass the intent to PendingIntent to start the
         // next Activity
         PendingIntent pendingIntent;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
-             pendingIntent
-                    = PendingIntent.getActivity(
-                    this, 0, intent,
-                    PendingIntent.FLAG_MUTABLE);
-        }else{
-            pendingIntent
-                    = PendingIntent.getActivity(
-                    this, 0, intent,
-                    PendingIntent.FLAG_ONE_SHOT);
-        }
+        pendingIntent
+               = PendingIntent.getActivity(
+               this, 0, intent,
+               PendingIntent.FLAG_IMMUTABLE);
 
         SharedPreferences preferences = this.getSharedPreferences("value",MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
@@ -102,7 +95,7 @@ public class FirebaseNotification extends FirebaseMessagingService {
                 .Builder(getApplicationContext(),
                 channel_id)
                 .setPriority(NotificationManager.IMPORTANCE_HIGH)
-                .setSmallIcon(R.drawable.ic_baseline_home_24)
+                .setSmallIcon(R.drawable.foodinelogo)
                 .setAutoCancel(true)
                 .setVibrate(new long[]{1000, 1000, 1000,
                         1000, 1000})

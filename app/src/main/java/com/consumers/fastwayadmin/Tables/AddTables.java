@@ -5,11 +5,11 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -64,6 +64,8 @@ import java.util.Objects;
 public class AddTables extends AppCompatActivity {
 
     EditText tableNumber;
+    Bitmap bmp,scaled;
+
     EditText numberOfSeats;
     Button generateQrCode;
     SharedPreferences sharedPreferences;
@@ -211,19 +213,24 @@ public class AddTables extends AppCompatActivity {
 
                 PdfDocument pdfDocument = new PdfDocument();
                 Paint myPaint = new Paint();
-                PdfDocument.PageInfo myPage = new  PdfDocument.PageInfo.Builder(1024,720,1).create();
+                PdfDocument.PageInfo myPage = new  PdfDocument.PageInfo.Builder(1240,980,1).create();
                 PdfDocument.Page page = pdfDocument.startPage(myPage);
 
                 Paint text = new Paint();
 
                 Canvas canvas = page.getCanvas();
 
-                canvas.drawBitmap(bitmap,275,70,myPaint);
-                text.setTextAlign(Paint.Align.LEFT);
+                canvas.drawBitmap(bitmap,345,180,myPaint);
                 text.setTypeface(Typeface.create(Typeface.DEFAULT,Typeface.BOLD));
+                text.setTextSize(85);
+                SharedPreferences resNamePref = getSharedPreferences("RestaurantInfo",MODE_PRIVATE);
+                text.setTextAlign(Paint.Align.LEFT);
+                canvas.drawText("Name: " + resNamePref.getString("hotelName",""),300,90,text);
+                text.setTextAlign(Paint.Align.LEFT);
                 text.setTextSize(70);
-                canvas.drawText("Table Number: " + tableNumber.getText().toString(),275,85,text);
-                canvas.drawText("Seats: " + numberOfSeats.getText().toString(),395,595,text);
+                canvas.drawText("Table Number: " + tableNumber.getText().toString(),345,215,text);
+                canvas.drawText("Seats: " + numberOfSeats.getText().toString(),475,710,text);
+                canvas.drawBitmap(scaled,950,700,myPaint);
 
                 pdfDocument.finishPage(page);
 
@@ -246,14 +253,8 @@ public class AddTables extends AppCompatActivity {
                     intents.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                     Log.i("info",selectedUri.toString());
                     PendingIntent pendingIntent;
-                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
-                        pendingIntent = PendingIntent.getActivity(AddTables.this, 698, intents, PendingIntent.FLAG_MUTABLE
-                        );
-                    }
-                    else{
-                        pendingIntent = PendingIntent.getActivity(AddTables.this, 698, intents, PendingIntent.FLAG_UPDATE_CURRENT
-                        );
-                    }
+                    pendingIntent = PendingIntent.getActivity(AddTables.this, 698, intents, PendingIntent.FLAG_IMMUTABLE
+                    );
 
 
                     String channel_id = "notification_channel";
@@ -261,15 +262,15 @@ public class AddTables extends AppCompatActivity {
                             = new NotificationCompat
                             .Builder(getApplicationContext(),
                             channel_id)
-                            .setPriority(NotificationManager.IMPORTANCE_HIGH)
-                            .setSmallIcon(R.drawable.ic_baseline_home_24)
+                            .setPriority(NotificationManager.IMPORTANCE_MAX)
+                            .setSmallIcon(R.drawable.foodinelogo)
                             .setAutoCancel(true)
                             .setVibrate(new long[]{1000, 1000, 1000,
                                     1000, 1000})
                             .setOnlyAlertOnce(true)
                             .setContentIntent(pendingIntent);
                     builder = builder.setContent(
-                            getCustomDesign("Invoice", ""));
+                            getCustomDesign());
                     NotificationManager notificationManager
                             = (NotificationManager) getSystemService(
                             Context.NOTIFICATION_SERVICE);
@@ -292,15 +293,14 @@ public class AddTables extends AppCompatActivity {
 
         });
     }
-    private RemoteViews getCustomDesign(String title,
-                                        String message) {
+    private RemoteViews getCustomDesign() {
         RemoteViews remoteViews = new RemoteViews(
                 getApplicationContext().getPackageName(),
                 R.layout.notification);
-        remoteViews.setTextViewText(R.id.title, title);
-        remoteViews.setTextViewText(R.id.message, message);
+        remoteViews.setTextViewText(R.id.title, "Invoice");
+        remoteViews.setTextViewText(R.id.message, "Click here to check Invoice PDF (Print and paste on Table)");
         remoteViews.setImageViewResource(R.id.icon,
-                R.drawable.ic_baseline_home_24);
+                R.drawable.foodinelogo);
         return remoteViews;
     }
     @Override
@@ -327,6 +327,8 @@ public class AddTables extends AppCompatActivity {
     }
 
     private void initialise() {
+        bmp = BitmapFactory.decodeResource(getResources(),R.drawable.foodinelogo);
+        scaled = Bitmap.createScaledBitmap(bmp,250,250,false);
         sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
         tableNumber = findViewById(R.id.tableNumber);
         numberOfSeats = findViewById(R.id.numberOfSeats);
