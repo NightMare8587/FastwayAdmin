@@ -418,7 +418,7 @@ public class UploadRequiredDocuments extends AppCompatActivity {
                         databaseReference.child("bankVerified").setValue("no");
                         new KAlertDialog(UploadRequiredDocuments.this,KAlertDialog.SUCCESS_TYPE)
                                 .setTitleText("Documents Uploaded")
-                                .setContentText("Documents uploaded and will be verified by our fastway staff with an on-site verification")
+                                .setContentText("Documents uploaded and will be verified by our Foodine staff with an on-site verification")
                                 .setConfirmText("Exit")
                                 .setConfirmClickListener(click -> {
                                     click.dismissWithAnimation();

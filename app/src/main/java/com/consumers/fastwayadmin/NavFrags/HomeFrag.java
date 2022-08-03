@@ -623,7 +623,7 @@ public class HomeFrag extends Fragment {
 
     private void initialise() {
         bubbleShowCaseBuilder5 = new BubbleShowCaseBuilder(requireActivity());
-        bubbleShowCaseBuilder5.title("Welcome to Fastway").titleTextSize(20).listener(new BubbleShowCaseListener() {
+        bubbleShowCaseBuilder5.title("Welcome to Foodine").titleTextSize(20).listener(new BubbleShowCaseListener() {
             @Override
             public void onTargetClick(@NonNull BubbleShowCase bubbleShowCase) {
 

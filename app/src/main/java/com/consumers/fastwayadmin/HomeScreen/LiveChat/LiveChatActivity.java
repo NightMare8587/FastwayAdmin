@@ -202,7 +202,7 @@ public class LiveChatActivity extends AppCompatActivity {
                         callBackFromAdmin.child(stime).child("number").setValue(messa);
                         callBackFromAdmin.child(stime).child("name").setValue(sharedPreferences.getString("hotelName",""));
                         callBackFromAdmin.child(stime).child("type").setValue("Admin");
-                        liveChatClass liveChatClass1 = new liveChatClass("You will get callback from our fastway team\nAvg waiting time 2 minutes",stime,"1");
+                        liveChatClass liveChatClass1 = new liveChatClass("You will get callback from our Foodine team\nAvg waiting time 2 minutes",stime,"1");
                         reference.child("Live Chat").child(System.currentTimeMillis() + "").setValue(liveChatClass1);
                     },500);
 
@@ -311,7 +311,7 @@ public class LiveChatActivity extends AppCompatActivity {
 
     private void botReply() {
 
-        liveChatClass liveChatClass = new liveChatClass("Hi I am Fastway Bot",System.currentTimeMillis() + "","1");
+        liveChatClass liveChatClass = new liveChatClass("Hi I am Foodine Bot",System.currentTimeMillis() + "","1");
         reference.child("Live Chat").child(System.currentTimeMillis() + "").setValue(liveChatClass);
 
         new Handler().postDelayed(() -> {
@@ -335,11 +335,11 @@ public class LiveChatActivity extends AppCompatActivity {
                         leftOrRight.add(String.valueOf(dataSnapshot.child("leftOr").getValue()));
                     }
 
-                    if(message.get(message.size() - 1).equals("Connected with Fastway Agent")) {
+                    if(message.get(message.size() - 1).equals("Connected with Foodine Agent")) {
                         connectedWithFastway = true;
                         saveEdit.putString("liveChat","yes");
                         saveEdit.apply();
-                    }else if(message.get(message.size()-1).equals("Fastway Agent has left the chat")) {
+                    }else if(message.get(message.size()-1).equals("Foodine Agent has left the chat")) {
                         connectedWithFastway = false;
                         saveEdit.remove("liveChat");
                         saveEdit.apply();
@@ -377,7 +377,7 @@ public class LiveChatActivity extends AppCompatActivity {
     }
     private void modiFiedBotReply() {
         new Handler().postDelayed(() -> {
-            liveChatClass liveChatClass = new liveChatClass("Choose One Option\n3.Fastway Website\n4.Live Chat With Customer Support\n5.Get A Call Back from Fastway\n\n Enter number as input",System.currentTimeMillis() + "","1");
+            liveChatClass liveChatClass = new liveChatClass("Choose One Option\n3.Foodine Website\n4.Live Chat With Customer Support\n5.Get A Call Back from Foodine\n\n Enter number as input",System.currentTimeMillis() + "","1");
             reference.child("Live Chat").child(System.currentTimeMillis() + "").setValue(liveChatClass);
         },500);
     }

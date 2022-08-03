@@ -14,7 +14,7 @@
         android:layout_marginStart="10dp"
         android:layout_marginTop="10dp"
         android:fontFamily="@font/merriweather_bold"
-        android:text="Fastway Premium"
+        android:text="Foodine Premium"
         android:textColor="#000000"
         android:textSize="40sp"
         android:textStyle="bold"

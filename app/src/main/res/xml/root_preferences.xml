@@ -22,7 +22,7 @@
             app:summary=""/>
         <Preference
             app:key="premium"
-            app:title="Fastway Premium"
+            app:title="Foodine Premium"
             app:summary=""/>
 
 
