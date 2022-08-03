@@ -341,6 +341,7 @@ public class Info extends AppCompatActivity {
             infoRef.child("nearby").setValue(nearby);
             infoRef.child("pin").setValue(pin);
             infoRef.child("rating").setValue("0");
+            infoRef.child("DisplayImage").setValue("");
             infoRef.child("totalRate").setValue("0");
             infoRef.child("count").setValue("0");
             infoRef.child("status").setValue("online");

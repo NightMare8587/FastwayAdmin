@@ -38,6 +38,8 @@ import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 
 import com.consumers.fastwayadmin.R;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -66,6 +68,7 @@ public class AddTables extends AppCompatActivity {
     EditText tableNumber;
     Bitmap bmp,scaled;
 
+    Uri filePath;
     EditText numberOfSeats;
     Button generateQrCode;
     SharedPreferences sharedPreferences;
@@ -243,7 +246,11 @@ public class AddTables extends AppCompatActivity {
                     e.printStackTrace();
                 }
 
-
+                StorageReference storageReference = reference.child(tableAuth.getUid() + "/" + "Tables" + fileNames);
+                storageReference.putFile(Uri.fromFile(file)).addOnCompleteListener(task -> {
+                    if(task.isSuccessful())
+                        Toast.makeText(AddTables.this, "PDF Uploaded", Toast.LENGTH_SHORT).show();
+                });
 
                 pdfDocument.close();
                 if(file.exists()){
