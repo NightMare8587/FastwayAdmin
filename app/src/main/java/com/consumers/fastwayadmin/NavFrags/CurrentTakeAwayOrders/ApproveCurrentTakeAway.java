@@ -314,9 +314,9 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
 
         approve.setOnClickListener(view -> {
             approve.setEnabled(false);
-            if(paymentMode.equals("cash")){
-                SharedPreferences checkPrem = getSharedPreferences("AdminPremiumDetails",MODE_PRIVATE);
-                if(checkPrem.contains("status") && checkPrem.getString("status","").equals("active")) {
+            if (paymentMode.equals("cash")) {
+                SharedPreferences checkPrem = getSharedPreferences("AdminPremiumDetails", MODE_PRIVATE);
+                if (checkPrem.contains("status") && checkPrem.getString("status", "").equals("active")) {
                     String month = monthName[calendar.get(Calendar.MONTH)];
 
                     if (storeForDishAnalysis.contains("DishAnalysisMonthBasis")) {
@@ -598,7 +598,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                                 new Handler().postDelayed(this::finish, 1500);
                             }).setCancelText("No Wait")
                             .setCancelClickListener(KAlertDialog::dismissWithAnimation).show();
-                }else{
+                } else {
                     totalOrders.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -704,7 +704,10 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                     }
                     new Handler().postDelayed(this::finish, 1500);
                 }
-            }else {
+            } else {
+                SharedPreferences loginInfo = getSharedPreferences("loginInfo", MODE_PRIVATE);
+
+
                 FastDialog fastDialog = new FastDialogBuilder(ApproveCurrentTakeAway.this, Type.DIALOG)
                         .setTitleText("OTP Code")
                         .setText("Enter 6 digit code below provided by user")
@@ -721,29 +724,30 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                         Toast.makeText(ApproveCurrentTakeAway.this, "Field can't be empty", Toast.LENGTH_SHORT).show();
                         fastDialog.dismiss();
                     } else if (fastDialog.getInputText().equals(digitCode.trim())) {
-                        if(restaurantDailyTrack.contains("totalOrdersToday")){
-                            int val = Integer.parseInt(restaurantDailyTrack.getString("totalOrdersToday",""));
+
+                        if (restaurantDailyTrack.contains("totalOrdersToday")) {
+                            int val = Integer.parseInt(restaurantDailyTrack.getString("totalOrdersToday", ""));
                             val = val + 1;
-                            restaurantTrackEditor.putString("totalOrdersToday",String.valueOf(val));
-                        }else{
-                            restaurantTrackEditor.putString("totalOrdersToday",String.valueOf(1));
+                            restaurantTrackEditor.putString("totalOrdersToday", String.valueOf(val));
+                        } else {
+                            restaurantTrackEditor.putString("totalOrdersToday", String.valueOf(1));
                         }
-                        if(restaurantDailyTrack.contains("totalTransactionsToday")){
-                            double val = Double.parseDouble(restaurantDailyTrack.getString("totalTransactionsToday",""));
+                        if (restaurantDailyTrack.contains("totalTransactionsToday")) {
+                            double val = Double.parseDouble(restaurantDailyTrack.getString("totalTransactionsToday", ""));
                             val = val + Double.parseDouble(orderAmount);
-                            restaurantTrackEditor.putString("totalTransactionsToday",String.valueOf(val));
-                        }else{
-                            restaurantTrackEditor.putString("totalTransactionsToday",String.valueOf(orderAmount));
+                            restaurantTrackEditor.putString("totalTransactionsToday", String.valueOf(val));
+                        } else {
+                            restaurantTrackEditor.putString("totalTransactionsToday", String.valueOf(orderAmount));
                         }
                         restaurantTrackEditor.apply();
                         totalOrders.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                if(snapshot.hasChild("totalOrdersMade")){
+                                if (snapshot.hasChild("totalOrdersMade")) {
                                     int totalOrder = Integer.parseInt(String.valueOf(snapshot.child("totalOrdersMade").getValue()));
                                     totalOrder = totalOrder + 1;
                                     totalOrders.child("totalOrdersMade").setValue(totalOrder);
-                                }else{
+                                } else {
                                     totalOrders.child("totalOrdersMade").setValue("1");
                                 }
                             }
@@ -756,25 +760,69 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                         updateTotalAmountValueDB(orderAmount);
                         String approveTime = String.valueOf(System.currentTimeMillis());
                         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(id).child("Recent Orders").child(time);
-                        for(int i=0;i<dishName.size();i++){
-                            MyClass myClass = new MyClass(dishName.get(i),dishPrice.get(i),image.get(i),type.get(i),""+approveTime,quantity.get(i),halfOr.get(i),state,String.valueOf(orderAmount),orderId,"TakeAway,Online","Order Approved",sharedPreferences.getString("locality",""));
+                        for (int i = 0; i < dishName.size(); i++) {
+                            MyClass myClass = new MyClass(dishName.get(i), dishPrice.get(i), image.get(i), type.get(i), "" + approveTime, quantity.get(i), halfOr.get(i), state, String.valueOf(orderAmount), orderId, "TakeAway,Online", "Order Approved", sharedPreferences.getString("locality", ""));
                             databaseReference.child(auth.getUid()).child(dishName.get(i)).setValue(myClass);
                         }
 
 
-                        databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(sharedPreferences.getString("locality","")).child(auth.getUid());
-                        for(int i=0;i<dishName.size();i++){
-                            MyClass myClass = new MyClass(dishName.get(i),dishPrice.get(i),image.get(i),type.get(i),""+approveTime,quantity.get(i),halfOr.get(i),state,String.valueOf(orderAmount),orderId,"TakeAway,Online","Order Approved",sharedPreferences.getString("locality",""));
+                        databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(sharedPreferences.getString("locality", "")).child(auth.getUid());
+                        for (int i = 0; i < dishName.size(); i++) {
+                            MyClass myClass = new MyClass(dishName.get(i), dishPrice.get(i), image.get(i), type.get(i), "" + approveTime, quantity.get(i), halfOr.get(i), state, String.valueOf(orderAmount), orderId, "TakeAway,Online", "Order Approved", sharedPreferences.getString("locality", ""));
                             databaseReference.child("Recent Orders").child("" + time).child(id).child(dishName.get(i)).setValue(myClass);
                         }
 
                         Toast.makeText(ApproveCurrentTakeAway.this, "Order Confirmed", Toast.LENGTH_SHORT).show();
-                        new MakePayout().execute();
+                        if (loginInfo.contains("payoutMethodChoosen")) {
+                            if (loginInfo.getString("payoutMethodChoosen", "").equals("imps"))
+                                new MakePayout().execute();
+                            else {
+                                DatabaseReference updatePayoutOrder = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid());
+                                updatePayoutOrder.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                        if (snapshot.hasChild("totalPayoutAmount")) {
+                                            double current = Double.parseDouble(String.valueOf(snapshot.child("totalPayoutAmount").getValue()));
+                                            current += Double.parseDouble(orderAmount);
+                                            updatePayoutOrder.child("totalPayoutAmount").setValue(String.valueOf(current));
+                                        } else {
+                                            updatePayoutOrder.child("totalPayoutAmount").setValue(String.valueOf(orderAmount));
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError error) {
+
+                                    }
+                                });
+                            }
+                        }else{
+//                            Toast.makeText(this, "Defau", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(this, "No payout method choosen\nDefault Method will be applicable", Toast.LENGTH_LONG).show();
+                            DatabaseReference updatePayoutOrder = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid());
+                            updatePayoutOrder.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                    if (snapshot.hasChild("totalPayoutAmount")) {
+                                        double current = Double.parseDouble(String.valueOf(snapshot.child("totalPayoutAmount").getValue()));
+                                        current += Double.parseDouble(orderAmount);
+                                        updatePayoutOrder.child("totalPayoutAmount").setValue(String.valueOf(current));
+                                    } else {
+                                        updatePayoutOrder.child("totalPayoutAmount").setValue(String.valueOf(orderAmount));
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError error) {
+
+                                }
+                            });
+                        }
                         RequestQueue requestQueue = Volley.newRequestQueue(ApproveCurrentTakeAway.this);
                         fastDialog.dismiss();
                         JSONObject main = new JSONObject();
                         FirebaseAuth auth = FirebaseAuth.getInstance();
-                        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid())).child("Current TakeAway").child(id);
+                        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(sharedPreferences.getString("locality", "")).child(Objects.requireNonNull(auth.getUid())).child("Current TakeAway").child(id);
 
                         try {
                             main.put("to", "/topics/" + id + "");
@@ -807,9 +855,9 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                     }
                 });
 
+
                 fastDialog.negativeClickListener(view1 -> fastDialog.dismiss());
             }
-
         });
 
         decline.setOnClickListener(v -> {

@@ -33,15 +33,15 @@ import com.android.volley.toolbox.Volley;
 //import com.aspose.cells.Workbook;
 import com.consumers.fastwayadmin.Info.RestaurantDocuments.ReUploadDocumentsAgain;
 import com.consumers.fastwayadmin.Info.RestaurantDocuments.UploadRemainingDocs;
-import com.consumers.fastwayadmin.NavFrags.AccountFrag;
 import com.consumers.fastwayadmin.NavFrags.AccountSettingsFragment;
+import com.consumers.fastwayadmin.NavFrags.BankVerification.SelectPayoutMethodType;
 import com.consumers.fastwayadmin.NavFrags.CashCommission.CashTransactionCommissionActivity;
 import com.consumers.fastwayadmin.NavFrags.FastwayPremiumActivites.NotifyAdminSubscribePremium;
 import com.consumers.fastwayadmin.NavFrags.HomeFrag;
 import com.consumers.fastwayadmin.NavFrags.MenuFrag;
 import com.consumers.fastwayadmin.NavFrags.ReplaceOrders.ReplaceOrderRequests;
 import com.consumers.fastwayadmin.NavFrags.TablesFrag;
-import com.consumers.fastwayadmin.NavFrags.VendorDetailsActivity;
+import com.consumers.fastwayadmin.NavFrags.BankVerification.VendorDetailsActivity;
 import com.consumers.fastwayadmin.R;
 import com.consumers.fastwayadmin.RandomChatNoww;
 import com.gauravk.bubblenavigation.BubbleNavigationConstraintView;
@@ -118,6 +118,7 @@ public class HomeScreen extends AppCompatActivity {
                 (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
         FirebaseMessaging.getInstance().subscribeToTopic("FastwayQueryDB");
       new BackgroundWork().execute();
+        checkIfBankDetailsSubmitted();
 //        if(sharedPreferences.contains("myListStored")){
 //            Type type = new TypeToken<List<List<String>>>() {
 //            }.getType();
@@ -287,7 +288,7 @@ public class HomeScreen extends AppCompatActivity {
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
             }
-        }),0);
+        }),800);
 
 
         new Handler().postDelayed(() -> {
@@ -318,7 +319,7 @@ public class HomeScreen extends AppCompatActivity {
 
                 }
             });
-        },1000);
+        },1700);
 
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
@@ -614,54 +615,80 @@ public class HomeScreen extends AppCompatActivity {
 
 
 
-            checkForBank = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(UID));
-            checkForBank.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    if(!snapshot.hasChild("Bank Details")){
-                        AlertDialog.Builder alertDialog = new AlertDialog.Builder(HomeScreen.this);
-                        alertDialog.setTitle("Important");
-                        alertDialog.setMessage("You need to add bank details to accept payments");
-                        alertDialog.setPositiveButton("Add", (dialogInterface, i) -> {
-                            SharedPreferences accountInfo = getSharedPreferences("AccountInfo",Context.MODE_PRIVATE);
-                            Intent intent = new Intent(HomeScreen.this, VendorDetailsActivity.class);
-                            intent.putExtra("name",accountInfo.getString("name",""));
-                            intent.putExtra("email",accountInfo.getString("email",""));
-                            startActivity(intent);
-                        }).create();
 
-                        alertDialog.show();
-                    }
+            return null;
+        }
+    }
 
-                    if(snapshot.child("Restaurant Documents").hasChild("timeToUploadDocs")){
-                        long remainingTime = Long.parseLong(Objects.requireNonNull(snapshot.child("Restaurant Documents").child("timeToUploadDocs").getValue(String.class)));
-                        if(remainingTime > System.currentTimeMillis()) {
-                            long daysLeft = remainingTime - System.currentTimeMillis();
+    private void checkIfBankDetailsSubmitted() {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                checkForBank = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(UID));
+                checkForBank.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if(!snapshot.hasChild("Bank Details")){
                             AlertDialog.Builder alertDialog = new AlertDialog.Builder(HomeScreen.this);
                             alertDialog.setTitle("Important");
-
-                            alertDialog.setMessage("You need to upload required documents within " + TimeUnit.MILLISECONDS.toDays(daysLeft) + " days");
-                            alertDialog.setPositiveButton("Upload Now", (dialogInterface, i) -> {
-                                startActivity(new Intent(HomeScreen.this, UploadRemainingDocs.class));
-                            }).setNegativeButton("Later", (dialogInterface, i) -> dialogInterface.dismiss()).create();
+                            alertDialog.setMessage("You need to add bank details to accept payments");
+                            alertDialog.setPositiveButton("Add", (dialogInterface, i) -> {
+                                SharedPreferences accountInfo = getSharedPreferences("AccountInfo",Context.MODE_PRIVATE);
+                                Intent intent = new Intent(HomeScreen.this, VendorDetailsActivity.class);
+                                intent.putExtra("name",accountInfo.getString("name",""));
+                                intent.putExtra("email",accountInfo.getString("email",""));
+                                startActivity(intent);
+                            }).create();
 
                             alertDialog.show();
                         }else{
-                            AlertDialog.Builder builder = new AlertDialog.Builder(HomeScreen.this);
-                            builder.setTitle("Time Exceeded").setMessage("Your 2 weeks period to submit documents is over\nYour restaurant is now suspended from Fastway")
-                                    .setPositiveButton("Exit", (dialogInterface, i) -> dialogInterface.dismiss()).create().show();
+                            SharedPreferences sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
+                            if(!sharedPreferences.contains("payoutMethodChoosen")){
+                                AlertDialog.Builder builder = new AlertDialog.Builder(HomeScreen.this);
+                                builder.setTitle("Payout Method").setMessage("You need to choose payout method in-order to receive payments")
+                                        .setPositiveButton("Choose Now", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                startActivity(new Intent(HomeScreen.this, SelectPayoutMethodType.class));
+                                            }
+                                        }).setNegativeButton("Later", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                dialog.dismiss();
+                                            }
+                                        }).create().show();
+                            }
+                        }
 
+                        if(snapshot.child("Restaurant Documents").hasChild("timeToUploadDocs")){
+                            long remainingTime = Long.parseLong(Objects.requireNonNull(snapshot.child("Restaurant Documents").child("timeToUploadDocs").getValue(String.class)));
+                            if(remainingTime > System.currentTimeMillis()) {
+                                long daysLeft = remainingTime - System.currentTimeMillis();
+                                AlertDialog.Builder alertDialog = new AlertDialog.Builder(HomeScreen.this);
+                                alertDialog.setTitle("Important");
+
+                                alertDialog.setMessage("You need to upload required documents within " + TimeUnit.MILLISECONDS.toDays(daysLeft) + " days");
+                                alertDialog.setPositiveButton("Upload Now", (dialogInterface, i) -> {
+                                    startActivity(new Intent(HomeScreen.this, UploadRemainingDocs.class));
+                                }).setNegativeButton("Later", (dialogInterface, i) -> dialogInterface.dismiss()).create();
+
+                                alertDialog.show();
+                            }else{
+                                AlertDialog.Builder builder = new AlertDialog.Builder(HomeScreen.this);
+                                builder.setTitle("Time Exceeded").setMessage("Your 2 weeks period to submit documents is over\nYour restaurant is now suspended from Fastway")
+                                        .setPositiveButton("Exit", (dialogInterface, i) -> dialogInterface.dismiss()).create().show();
+
+                            }
                         }
                     }
-                }
 
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
 
-                }
-            });
-            return null;
-        }
+                    }
+                });
+            }
+        },400);
     }
 
     private void checkIfNeededToAddToQuery() {
@@ -683,7 +710,7 @@ public class HomeScreen extends AppCompatActivity {
 
                 }
             });
-        },0);
+        },200);
     }
 
     public class checkStatus extends AsyncTask<Void,Void,Void>{

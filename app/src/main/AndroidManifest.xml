@@ -19,6 +19,7 @@
     <uses-permission
         android:name="android.permission.RECEIVE_SMS"
         tools:node="remove" />
+
     <application
         android:name=".ServiceInitiatorClass"
         android:allowBackup="false"
@@ -30,6 +31,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         tools:replace="android:icon,android:allowBackup">
+        <activity
+            android:name=".ListViewActivity.InitiatePayoutForAdminNEFT"
+            android:exported="false" />
+        <activity
+            android:name=".NavFrags.BankVerification.SelectPayoutMethodType"
+            android:exported="false" />
         <activity
             android:name=".Info.RestaurantDocuments.UploadRemainingDocs"
             android:exported="false" />
@@ -121,7 +128,7 @@
             android:name=".NavFrags.EditVendorDetails"
             android:exported="true" />
         <activity
-            android:name=".NavFrags.VendorDetailsActivity"
+            android:name=".NavFrags.BankVerification.VendorDetailsActivity"
             android:exported="true" />
         <activity
             android:name=".Chat.RandomChat.TempActivity"
@@ -288,9 +295,11 @@
         <activity
             android:name=".Info.Info"
             android:exported="true" />
+
         <meta-data
             android:name="firebase_performance_logcat_enabled"
             android:value="true" />
+
         <activity
             android:name=".SplashAndIntro.SplashScreen"
             android:exported="true">

@@ -1,6 +1,5 @@
-package com.consumers.fastwayadmin.NavFrags;
+package com.consumers.fastwayadmin.NavFrags.BankVerification;
 
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -91,7 +90,7 @@ public class VendorDetailsActivity extends AppCompatActivity {
             }else
                 Toast.makeText(VendorDetailsActivity.this, "Check your IFSC code again", Toast.LENGTH_SHORT).show();
         }).setNegativeButton("Cancel", (dialogInterface, i) -> {
-
+            finish();
         });
         builder.create().show();
         mAuth = FirebaseAuth.getInstance();

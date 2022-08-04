@@ -1,4 +1,4 @@
-package com.consumers.fastwayadmin.NavFrags;
+package com.consumers.fastwayadmin.NavFrags.BankVerification;
 
 public class VendorBankClass {
     public String name,email,accountNumber,accountName,ifscCode,phoneNumber,vendorID,address;
