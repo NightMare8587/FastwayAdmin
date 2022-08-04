@@ -109,6 +109,8 @@ public class HomeScreen extends AppCompatActivity {
         initialise();
         sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
         myEditor = sharedPreferences.edit();
+        myEditor.putString("payoutMethodChoosen","imps");
+        myEditor.apply();
         manager.beginTransaction().replace(R.id.homescreen,new HomeFrag()).commit();
         calenderForExcel = getSharedPreferences("CalenderForExcel",MODE_PRIVATE);
         editor = calenderForExcel.edit();
