@@ -82,6 +82,7 @@ public class ApproveCurrentOrder extends AppCompatActivity {
     List<String> type = new ArrayList<>();
     Gson gson;
     String json;
+    double amountToBeSend;
     DatabaseReference storeTotalAmountMonth;
     SharedPreferences storeOrdersForAdminInfo;
     SharedPreferences storeDailyTotalOrdersMade;
@@ -109,8 +110,11 @@ public class ApproveCurrentOrder extends AppCompatActivity {
     String URL = "https://fcm.googleapis.com/fcm/send";
     String url = "https://intercellular-stabi.000webhostapp.com/refunds/initiateRefund.php";
     String testPayoutToken = "https://intercellular-stabi.000webhostapp.com/CheckoutPayouts/testToken.php";
+    String prodPayoutToken = "https://intercellular-stabi.000webhostapp.com/CheckoutPayouts/payoutIMPS.php";
     String testBearerToken = "https://intercellular-stabi.000webhostapp.com/CheckoutPayouts/test/testBearerToken.php";
+    String prodBearerToken = "https://intercellular-stabi.000webhostapp.com/CheckoutPayouts/authBEarerToken.php";
     String testPaymentToVendor = "https://intercellular-stabi.000webhostapp.com/CheckoutPayouts/test/testPayment.php";
+    String prodPaymentToVendor = "https://intercellular-stabi.000webhostapp.com/CheckoutPayouts/PaymentToVendor.php";
     ProgressBar progressBar;
     DatabaseReference saveRefundInfo;
     MakePaymentToVendor makePaymentToVendor = new MakePaymentToVendor();
@@ -382,8 +386,11 @@ public class ApproveCurrentOrder extends AppCompatActivity {
             DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid())).child("Tables").child(table);
             SharedPreferences loginInfo = getSharedPreferences("loginInfo",MODE_PRIVATE);
             if (loginInfo.contains("payoutMethodChoosen")) {
-                if (loginInfo.getString("payoutMethodChoosen", "").equals("imps"))
+                if (loginInfo.getString("payoutMethodChoosen", "").equals("imps")) {
+                    amountToBeSend = Double.parseDouble(orderAmount);
+                    amountToBeSend = amountToBeSend - 5;
                     new MakePayout().execute();
+                }
                 else {
                     DatabaseReference updatePayoutOrder = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid());
                     updatePayoutOrder.addListenerForSingleValueEvent(new ValueEventListener() {

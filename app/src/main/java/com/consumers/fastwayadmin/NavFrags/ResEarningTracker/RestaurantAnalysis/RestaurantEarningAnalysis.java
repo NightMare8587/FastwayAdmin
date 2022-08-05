@@ -90,10 +90,10 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
                 List<String> totalORders = new ArrayList<>(mainDataList.get(2));
                 List<String> orderAmountList = new ArrayList<>(mainDataList.get(1));
 
-                if(date.size() < 7){
+                if(date.size() < 7) {
                     moreDays.setVisibility(View.INVISIBLE);
                     daysLeftToShow = 6;
-                    for(int i=date.size() - 1;i>=0;i--){
+                    for (int i = date.size() - 1; i >= 0; i--) {
                         daysLeftToShow--;
                         days.add(date.get(i) + "th " + month);
                         orders.add(totalORders.get(i) + "");
@@ -103,66 +103,67 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
                         mBarChart.addBar(new BarModel(Float.parseFloat(orderAmountList.get(i)), 0xFF1BA4E6));
                     }
                     totalAmount.setText("Total Transaction Amount: \u20b9" + totalAmountOrdersText);
-                    totalOrders.setText("Total Order's: "  + totalOrdersMade + "");
+                    totalOrders.setText("Total Order's: " + totalOrdersMade + "");
                     recyclerView.setLayoutManager(linearLayoutManager);
-                    recyclerView.setAdapter(new TackerAdapterAnalysis(days,days.get(0),orders,amounts));
-                    totalAmountThatDay.setText("Total Transaction Amount: \u20b9" + orderAmountList.get(orderAmountList.size()-1) + "");
-                    totalOrderThatDay.setText("Total Order's: " + totalORders.get(totalORders.size()-1) + "");
+                    recyclerView.setAdapter(new TackerAdapterAnalysis(days, days.get(0), orders, amounts));
+                    totalAmountThatDay.setText("Total Transaction Amount: \u20b9" + orderAmountList.get(orderAmountList.size() - 1) + "");
+                    totalOrderThatDay.setText("Total Order's: " + totalORders.get(totalORders.size() - 1) + "");
                     LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
                             new IntentFilter("custom-message-analysis"));
 
-                    for(int i = daysLeftToShow;i >= 0;i--)
+                    for (int i = daysLeftToShow; i >= 0; i--)
                         mBarChart.addBar(new BarModel(0.f, 0xFF1BA4E6));
-                }else{
-                    int remainingDays = date.size() - 7;
-                    for(int i = date.size() - 1; i >= remainingDays;i--){
-                        totalOrdersMade += Integer.parseInt(totalORders.get(i));
-                        days.add(date.get(i) + "th " + month);
-                        totalAmountOrdersText += Double.parseDouble(orderAmountList.get(i));
-                        orders.add(totalORders.get(i) + "");
-                        amounts.add(orderAmountList.get(i));
-                        mBarChart.addBar(new BarModel(Float.parseFloat(orderAmountList.get(i)), 0xFF1BA4E6));
-                    }
-                    totalAmount.setText("Total Transaction Amount: " + totalAmountOrdersText);
-                    totalOrders.setText("Total Order's: "  + totalOrdersMade + "");
-
-
-                    moreDays.setOnClickListener(click -> {
-                        totalOrdersMade = 0;
-                        totalAmountOrdersText = 0;
-                        moreDays.setVisibility(View.INVISIBLE);
-                        textView.setText("Showing last 14 days analysis");
-                        if(date.size() < 14){
-                            daysLeftToShow = 13;
-                            for(int i=date.size() - 1;i>=0;i--){
-                                daysLeftToShow--;
-                                totalOrdersMade += Integer.parseInt(totalORders.get(i));
-                                totalAmountOrdersText += Double.parseDouble(orderAmountList.get(i));
-                                mBarChart.addBar(new BarModel(Float.parseFloat(orderAmountList.get(i)), 0xFF1BA4E6));
-                            }
-                            totalAmount.setText(String.valueOf("Total Transaction Amount: " + totalAmountOrdersText));
-                            totalOrders.setText("Total Order's: "  + totalOrdersMade + "");
-
-                            for(int i = daysLeftToShow;i >= 0;i--)
-                                mBarChart.addBar(new BarModel(0.f, 0xFF1BA4E6));
-                        }else{
-                            int daysLeft = date.size() - 14;
-                            for(int i = date.size() - 1; i >= daysLeft;i--){
-                                totalOrdersMade += Integer.parseInt(totalORders.get(i));
-                                totalAmountOrdersText += Double.parseDouble(orderAmountList.get(i));
-                                mBarChart.addBar(new BarModel(Float.parseFloat(orderAmountList.get(i)), 0xFF1BA4E6));
-                            }
-                            totalAmount.setText(String.valueOf("Total Transaction Amount: " + totalAmountOrdersText));
-                            totalOrders.setText("Total Order's: "  + totalOrdersMade + "");
-                        }
-                    });
-                    recyclerView.setLayoutManager(linearLayoutManager);
-                    recyclerView.setAdapter(new TackerAdapterAnalysis(days,days.get(0),orders,amounts));
-                    totalAmountThatDay.setText("Total Transaction Amount: \u20b9" + orderAmountList.get(orderAmountList.size()-1) + "");
-                    totalOrderThatDay.setText("Total Order's: " + totalORders.get(totalORders.size()-1) + "");
-                    LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
-                            new IntentFilter("custom-message-analysis"));
                 }
+//                }else{
+//                    int remainingDays = date.size() - 7;
+//                    for(int i = date.size() - 1; i >= remainingDays;i--){
+//                        totalOrdersMade += Integer.parseInt(totalORders.get(i));
+//                        days.add(date.get(i) + "th " + month);
+//                        totalAmountOrdersText += Double.parseDouble(orderAmountList.get(i));
+//                        orders.add(totalORders.get(i) + "");
+//                        amounts.add(orderAmountList.get(i));
+//                        mBarChart.addBar(new BarModel(Float.parseFloat(orderAmountList.get(i)), 0xFF1BA4E6));
+//                    }
+//                    totalAmount.setText("Total Transaction Amount: " + totalAmountOrdersText);
+//                    totalOrders.setText("Total Order's: "  + totalOrdersMade + "");
+//
+//
+//                    moreDays.setOnClickListener(click -> {
+//                        totalOrdersMade = 0;
+//                        totalAmountOrdersText = 0;
+//                        moreDays.setVisibility(View.INVISIBLE);
+//                        textView.setText("Showing last 14 days analysis");
+//                        if(date.size() < 14){
+//                            daysLeftToShow = 13;
+//                            for(int i=date.size() - 1;i>=0;i--){
+//                                daysLeftToShow--;
+//                                totalOrdersMade += Integer.parseInt(totalORders.get(i));
+//                                totalAmountOrdersText += Double.parseDouble(orderAmountList.get(i));
+//                                mBarChart.addBar(new BarModel(Float.parseFloat(orderAmountList.get(i)), 0xFF1BA4E6));
+//                            }
+//                            totalAmount.setText(String.valueOf("Total Transaction Amount: " + totalAmountOrdersText));
+//                            totalOrders.setText("Total Order's: "  + totalOrdersMade + "");
+//
+//                            for(int i = daysLeftToShow;i >= 0;i--)
+//                                mBarChart.addBar(new BarModel(0.f, 0xFF1BA4E6));
+//                        }else{
+//                            int daysLeft = date.size() - 14;
+//                            for(int i = date.size() - 1; i >= daysLeft;i--){
+//                                totalOrdersMade += Integer.parseInt(totalORders.get(i));
+//                                totalAmountOrdersText += Double.parseDouble(orderAmountList.get(i));
+//                                mBarChart.addBar(new BarModel(Float.parseFloat(orderAmountList.get(i)), 0xFF1BA4E6));
+//                            }
+//                            totalAmount.setText(String.valueOf("Total Transaction Amount: " + totalAmountOrdersText));
+//                            totalOrders.setText("Total Order's: "  + totalOrdersMade + "");
+//                        }
+//                    });
+//                    recyclerView.setLayoutManager(linearLayoutManager);
+//                    recyclerView.setAdapter(new TackerAdapterAnalysis(days,days.get(0),orders,amounts));
+//                    totalAmountThatDay.setText("Total Transaction Amount: \u20b9" + orderAmountList.get(orderAmountList.size()-1) + "");
+//                    totalOrderThatDay.setText("Total Order's: " + totalORders.get(totalORders.size()-1) + "");
+//                    LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
+//                            new IntentFilter("custom-message-analysis"));
+//                }
 
                 Log.i("info", date.toString());
                 Log.i("info", totalORders.toString());
