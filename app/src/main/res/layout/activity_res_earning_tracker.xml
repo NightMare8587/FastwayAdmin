@@ -69,6 +69,48 @@
         app:layout_constraintStart_toStartOf="parent"
         tools:layout_editor_absoluteY="415dp">
 
+        <TextView
+            android:id="@+id/totalCustomerInAMonthTracker"
+            android:layout_width="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="5dp"
+            android:textSize="17sp"
+            android:textColor="@color/black"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@+id/seeRestaurantAnalysisButtonTracker"
+            android:text="Total Customers: "
+            tools:layout_editor_absoluteX="20dp"
+            tools:layout_editor_absoluteY="281dp" />
+
+        <TextView
+            android:id="@+id/oneTimeCustomersTracker"
+            android:layout_width="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginStart="15dp"
+            android:textSize="17sp"
+            android:layout_marginTop="5dp"
+            android:textColor="@color/black"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@+id/totalCustomerInAMonthTracker"
+            android:text="One Time Customer's: "
+            tools:layout_editor_absoluteX="20dp"
+            tools:layout_editor_absoluteY="281dp" />
+
+        <TextView
+            android:id="@+id/recurringCustomersTracker"
+            android:layout_width="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginStart="15dp"
+            android:textSize="17sp"
+            android:layout_marginTop="5dp"
+            android:textColor="@color/black"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@+id/oneTimeCustomersTracker"
+            android:text="Recurring Customer's: "
+            tools:layout_editor_absoluteX="20dp"
+            tools:layout_editor_absoluteY="281dp" />
+
         <Button
             android:id="@+id/seeRestaurantAnalysisButtonTracker"
             android:layout_width="wrap_content"

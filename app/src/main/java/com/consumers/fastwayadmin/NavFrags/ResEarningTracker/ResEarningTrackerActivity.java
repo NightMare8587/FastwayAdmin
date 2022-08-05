@@ -50,14 +50,17 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
     RecyclerView recyclerView,dishRecyclerView;
     TackerAdapter tackerAdapter;
     SharedPreferences loginInfoShared;
+    SharedPreferences usersFrequencyPref;
     DecimalFormat df = new DecimalFormat("0.00");
     double totalAmountPerMonth = 0;
     Button seeMoreDetails,seeAnalysis;
     Gson gson;
     TextView totalOrdersMade,totalTransactionsMade;
     String json;
+    TextView totalCustomers,oneTime,Recuuring;
     SharedPreferences dish;
     SharedPreferences.Editor editor;
+    SharedPreferences.Editor userFrequencyEdit;
     String[] monthName = {"January", "February",
             "March", "April", "May", "June", "July",
             "August", "September", "October", "November",
@@ -72,7 +75,12 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
         setContentView(R.layout.activity_res_earning_tracker);
         loginInfoShared = getSharedPreferences("loginInfo",MODE_PRIVATE);
         SharedPreferences adminPrem = getSharedPreferences("AdminPremiumDetails",MODE_PRIVATE);
+        usersFrequencyPref = getSharedPreferences("UsersFrequencyPerMonth",MODE_PRIVATE);
+        userFrequencyEdit = usersFrequencyPref.edit();
         SharedPreferences.Editor premEdit = adminPrem.edit();
+        totalCustomers = findViewById(R.id.totalCustomerInAMonthTracker);
+        oneTime = findViewById(R.id.oneTimeCustomersTracker);
+        Recuuring = findViewById(R.id.recurringCustomersTracker);
         editor = loginInfoShared.edit();
         seeAnalysis = findViewById(R.id.seeRestaurantAnalysisButtonTracker);
         if(adminPrem.contains("status")) {
@@ -125,6 +133,28 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
         }.getType();
         gson = new Gson();
         seeMoreDetails = findViewById(R.id.seeMoreDishAnalysisDetails);
+
+        if(usersFrequencyPref.contains(month)){
+            java.lang.reflect.Type types = new TypeToken<HashMap<String,String>>() {
+            }.getType();
+            json = usersFrequencyPref.getString(month,"");
+            HashMap<String,String> map = gson.fromJson(json,types);
+
+            totalCustomers.setText("Total Customer's: " + map.size() + "");
+
+            int count = 0;
+            int otherCount = 0;
+            for(String i : map.keySet()){
+                int value = Integer.parseInt(map.get(i));
+                if(value == 1)
+                    count++;
+                else
+                    otherCount++;
+            }
+
+            oneTime.setText("One Time Customer: " + count);
+            Recuuring.setText("Recurring Customers: " + otherCount);
+        }
 
         if(storeOrdersForAdminInfo.contains(month)) {
             json = storeOrdersForAdminInfo.getString(month, "");
@@ -252,6 +282,32 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
                 totalOrdersMade.setText("Total Transactions Made: " + 0);
                 totalTransactionsMade.setText("Total Transactions Made: \u20B9" + 0);
                 Toast.makeText(context, "No transactions made in Month " + MonthName, Toast.LENGTH_SHORT).show();
+            }
+
+            if(usersFrequencyPref.contains(MonthName)){
+                java.lang.reflect.Type types = new TypeToken<HashMap<String,String>>() {
+                }.getType();
+                json = usersFrequencyPref.getString("month","");
+                HashMap<String,String> map = gson.fromJson(json,types);
+
+                totalCustomers.setText("Total Customer's: " + map.size() + "");
+
+                int count = 0;
+                int otherCount = 0;
+                for(String i : map.keySet()){
+                    int value = Integer.parseInt(map.get(i));
+                    if(value == 1)
+                        count++;
+                    else
+                        otherCount++;
+                }
+
+                oneTime.setText("One Time Customer: " + count);
+                Recuuring.setText("Recurring Customers: " + otherCount);
+            }else{
+                totalCustomers.setText("0");
+                oneTime.setText("0");
+                Recuuring.setText("0");
             }
 
             if(dish.contains("DishAnalysisMonthBasis")){

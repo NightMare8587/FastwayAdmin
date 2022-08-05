@@ -108,8 +108,13 @@ public class HomeScreen extends AppCompatActivity {
         setContentView(R.layout.activity_home_screen);
         initialise();
         sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
+        int year = calendar.get(Calendar.YEAR);
         myEditor = sharedPreferences.edit();
         myEditor.putString("payoutMethodChoosen","imps");
+        if(!sharedPreferences.contains("currentYear"))
+        {
+            myEditor.putString("currentYear",year + "");
+        }
         myEditor.apply();
         manager.beginTransaction().replace(R.id.homescreen,new HomeFrag()).commit();
         calenderForExcel = getSharedPreferences("CalenderForExcel",MODE_PRIVATE);
@@ -199,15 +204,19 @@ public class HomeScreen extends AppCompatActivity {
 
 
         if(adminPrem.contains("status") && adminPrem.getString("status","").equals("active")) {
+
+
+
             if (!sharedPreferences.contains("FileGeneratedExcel")) {
                 try {
                     String month = monthName[calendar.get(Calendar.MONTH)];
+
                     File file = new File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "RestaurantEarningTracker.xlsx");
                     XSSFWorkbook workbook1 = new XSSFWorkbook();
 //                Sheet sheet = workbook1.getSheetAt(0);
 //                int row = sheet.getLastRowNum();
 //                Toast.makeText(this, "" + row, Toast.LENGTH_SHORT).show();
-                    Sheet sheet = workbook1.createSheet("" + month + "_Earnings");
+                    Sheet sheet = workbook1.createSheet("" + month + "_Earnings_" + year);
                     Row row = sheet.createRow(0);
                     Cell cell = row.createCell(0);
                     cell.setCellValue("Date");
@@ -223,7 +232,7 @@ public class HomeScreen extends AppCompatActivity {
                     fileOutputStream.flush();
                     fileOutputStream.close();
                     myEditor.putString("FileGeneratedExcel", "f");
-                    editor.putString("currentMonth", month);
+                    editor.putString("currentMonth", month + "_" + year);
                     editor.apply();
                     myEditor.apply();
 //                Toast.makeText(this, "Finished", Toast.LENGTH_SHORT).show();
@@ -233,22 +242,45 @@ public class HomeScreen extends AppCompatActivity {
                     Toast.makeText(this, "Noob", Toast.LENGTH_SHORT).show();
                 }
             } else {
-                String month = monthName[calendar.get(Calendar.MONTH)];
-                if (month.equals(calenderForExcel.getString("currentString", ""))) {
+
+                if(year > Integer.parseInt(sharedPreferences.getString("currentYear",""))){
+                    myEditor.putString("currentYear",year + "");
+                    myEditor.apply();
+
+                    SharedPreferences storeEditor = getSharedPreferences("DishAnalysis",MODE_PRIVATE);
+                    SharedPreferences.Editor storeEdit = storeEditor.edit();
+                    storeEdit.clear().apply();
+
+                    SharedPreferences dailyStore = getSharedPreferences("RestaurantDailyStoreForAnalysis",MODE_PRIVATE);
+                    SharedPreferences.Editor dailyEdit = dailyStore.edit();
+                    dailyEdit.clear().apply();
+
+                    SharedPreferences storeOrder = getSharedPreferences("StoreOrders",MODE_PRIVATE);
+                    SharedPreferences.Editor storeEditORder = storeOrder.edit();
+                    storeEditORder.clear().apply();
+
+                    SharedPreferences usersF = getSharedPreferences("UsersFrequencyPerMonth",MODE_PRIVATE);
+                    SharedPreferences.Editor userFEdit = usersF.edit();
+                    userFEdit.clear().apply();
+                }
+
+                String month = monthName[calendar.get(Calendar.MONTH)] + "_" + year;
+                if (month.equals(calenderForExcel.getString("currentMonth", ""))) {
 
                 } else {
                     File file = new File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "RestaurantEarningTracker.xlsx");
                     try {
                         FileInputStream fileInputStream = new FileInputStream(file);
                         XSSFWorkbook workbooks = new XSSFWorkbook(fileInputStream);
-                        Sheet sheet = workbooks.createSheet("" + month + "_Earnings");
-                        workbooks.setSheetOrder("" + month + "_Earnings", 0);
+                        Sheet sheet = workbooks.createSheet("" + month + "_Earnings_" + year);
+                        workbooks.setSheetOrder("" + month + "_Earnings_" + year, 0);
                         workbooks.setActiveSheet(0);
                         Row row = sheet.createRow(0);
                         Cell cell = row.createCell(0);
                         cell.setCellValue("Date");
                         cell = row.createCell(1);
-
+                        editor.putString("currentMonth", month);
+                        editor.apply();
                         cell.setCellValue("Transaction ID");
                         cell = row.createCell(2);
                         cell.setCellValue("Payment Mode");

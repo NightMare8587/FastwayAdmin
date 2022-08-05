@@ -57,6 +57,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Calendar;
 import java.util.Objects;
 
 import karpuzoglu.enes.com.fastdialog.Animations;
@@ -195,6 +196,7 @@ public class Info extends AppCompatActivity {
         if(!sharedPreferences.getString("postalCode","").equals(""))
             pinCode.setText(sharedPreferences.getString("postalCode",""));
         editor = sharedPreferences.edit();
+
 
         AlertDialog.Builder builder = new AlertDialog.Builder(Info.this);
         builder.setTitle("Important").setMessage("Are you currently present at restaurant location").setPositiveButton("Yes", new DialogInterface.OnClickListener() {
@@ -362,6 +364,10 @@ public class Info extends AppCompatActivity {
                 infoRef.child("TableBookAllowed").setValue("no");
                 this.editor.putString("TableBookAllowed", "no");
             }
+
+            Calendar calendar = Calendar.getInstance();
+            this.editor.putString("currentYear",String.valueOf(calendar.get(Calendar.YEAR)));
+
             if(mapLocations){
                 this.editor.putString("state",cityName);
                 this.editor.putString("locality",subAdminArea);
