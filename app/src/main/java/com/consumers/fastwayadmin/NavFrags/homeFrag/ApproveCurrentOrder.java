@@ -84,6 +84,7 @@ public class ApproveCurrentOrder extends AppCompatActivity {
     String json;
     double amountToBeSend;
     DatabaseReference storeTotalAmountMonth;
+    SharedPreferences userFrequency;
     SharedPreferences storeOrdersForAdminInfo;
     SharedPreferences storeDailyTotalOrdersMade;
     SharedPreferences.Editor storeDailyEditor;
@@ -136,6 +137,7 @@ public class ApproveCurrentOrder extends AppCompatActivity {
     Calendar calendar = Calendar.getInstance();
     List<String> dishHalfOr = new ArrayList<>();
     Button approve,decline,showCustomisation;
+    SharedPreferences.Editor userFedit;
     SharedPreferences storeForDishAnalysis;
     SharedPreferences.Editor dishAnalysis;
     @SuppressLint("SetTextI18n")
@@ -152,6 +154,8 @@ public class ApproveCurrentOrder extends AppCompatActivity {
         storeDailyEditor = storeDailyTotalOrdersMade.edit();
         storeForDishAnalysis = getSharedPreferences("DishAnalysis",MODE_PRIVATE);
         dishAnalysis = storeForDishAnalysis.edit();
+        userFrequency = getSharedPreferences("UsersFrequencyPerMonth",MODE_PRIVATE);
+        userFedit = userFrequency.edit();
         restaurantTrackRecordsEditor = restaurantTrackRecords.edit();
         restaurantTrackEditor = restaurantDailyTrack.edit();
         StrictMode.VmPolicy.Builder builders = new StrictMode.VmPolicy.Builder();
@@ -668,6 +672,35 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                 SharedPreferences checkPrem = getSharedPreferences("AdminPremiumDetails",MODE_PRIVATE);
                 if(checkPrem.contains("status") && checkPrem.getString("status","").equals("active")) {
                     String month = monthName[calendar.get(Calendar.MONTH)];
+
+                    new Thread(() -> {
+                        if(userFrequency.contains(month)){
+                            java.lang.reflect.Type type = new TypeToken<HashMap<String,String>>() {
+                            }.getType();
+                            gson = new Gson();
+                            json = userFrequency.getString(month,"");
+                            HashMap<String,String> map = gson.fromJson(json,type);
+                            if(map.containsKey(id)){
+                                int val = Integer.parseInt(map.get(id) + "");
+                                val++;
+                                map.put(id,val + "");
+                            }else
+                            {
+                                map.put(id,"1");
+                            }
+
+                            json = gson.toJson(map);
+                        }else{
+                            HashMap<String,String> map = new HashMap<>();
+                            map.put(id,"1");
+
+                            gson = new Gson();
+                            json = gson.toJson(map);
+
+                        }
+                        userFedit.putString(month,json);
+                        userFedit.apply();
+                    }).start();
                     if (storeOrdersForAdminInfo.contains(month)) {
                         Type type = new TypeToken<List<List<String>>>() {
                         }.getType();
