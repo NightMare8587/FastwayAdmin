@@ -795,6 +795,10 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
 
                             }
                         });
+
+
+
+
                         updateTotalAmountValueDB(orderAmount);
                         String approveTime = String.valueOf(System.currentTimeMillis());
                         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(id).child("Recent Orders").child(time);
@@ -1167,6 +1171,35 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                     }
                     dishAnalysis.apply();
                     Log.i("response", response);
+
+                    new Thread(() -> {
+                        if(userFrequency.contains(month)){
+                            java.lang.reflect.Type type = new TypeToken<HashMap<String,String>>() {
+                            }.getType();
+                            gson = new Gson();
+                            json = userFrequency.getString(month,"");
+                            HashMap<String,String> map = gson.fromJson(json,type);
+                            if(map.containsKey(id)){
+                                int val = Integer.parseInt(map.get(id) + "");
+                                val++;
+                                map.put(id,val + "");
+                            }else
+                            {
+                                map.put(id,"1");
+                            }
+
+                            json = gson.toJson(map);
+                        }else{
+                            HashMap<String,String> map = new HashMap<>();
+                            map.put(id,"1");
+
+                            gson = new Gson();
+                            json = gson.toJson(map);
+
+                        }
+                        userFedit.putString(month,json);
+                        userFedit.apply();
+                    }).start();
 
                     if (storeOrdersForAdminInfo.contains(month)) {
                         java.lang.reflect.Type type = new TypeToken<List<List<String>>>() {

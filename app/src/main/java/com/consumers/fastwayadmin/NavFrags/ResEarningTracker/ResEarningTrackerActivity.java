@@ -287,7 +287,7 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
             if(usersFrequencyPref.contains(MonthName)){
                 java.lang.reflect.Type types = new TypeToken<HashMap<String,String>>() {
                 }.getType();
-                json = usersFrequencyPref.getString("month","");
+                json = usersFrequencyPref.getString(MonthName,"");
                 HashMap<String,String> map = gson.fromJson(json,types);
 
                 totalCustomers.setText("Total Customer's: " + map.size() + "");
