@@ -68,17 +68,17 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
                                 platformFeeAmount = Double.parseDouble(Objects.requireNonNull(snapshot.child("totalMonthAmount").getValue(String.class)));
                                 if(platformFeeAmount == 0D){
                                     platformFeeAmount = 0D;
-                                }else if(platformFeeAmount >= 500000L){
-                                    platformFeeAmount = (platformFeeAmount / 100) * 2;
+                                }else if(platformFeeAmount >= 400000L){
+                                    platformFeeAmount = (platformFeeAmount / 100) * 4;
                                 }else if(platformFeeAmount >= 300000L){
-                                    platformFeeAmount = 6000D;
+                                    platformFeeAmount = 12000D;
                                 }
                                 else if(platformFeeAmount >= 200000L){
-                                    platformFeeAmount = 4000D;
+                                    platformFeeAmount = 8000D;
                                 }else if(platformFeeAmount >= 100000){
-                                    platformFeeAmount = 2000D;
+                                    platformFeeAmount = 4000D;
                                 }else if(platformFeeAmount >= 50000){
-                                    platformFeeAmount = 1500D;
+                                    platformFeeAmount = 2000D;
                                 }else
                                     platformFeeAmount = 1000D;
                                 platformFee.setText("Platform Fee: " + "\u20B9" + df.format(platformFeeAmount));

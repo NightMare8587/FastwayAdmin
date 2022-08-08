@@ -36,6 +36,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.consumers.fastwayadmin.GMailSender;
+import com.consumers.fastwayadmin.HomeScreen.HomeScreen;
 import com.consumers.fastwayadmin.Info.Info;
 import com.consumers.fastwayadmin.R;
 import com.developer.kalert.KAlertDialog;
@@ -178,6 +179,34 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }if(!ccp.getSelectedCountryCodeWithPlus().equals("+91")){
                 Toast.makeText(MainActivity.this, "This app currently operates only in India", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if(emailAddress.getText().toString().equals("foodinetest858784@gmail.com") && phoneNumber.getText().toString().equals("1234567890")){
+                FastDialog fastDialog = new FastDialogBuilder(MainActivity.this,Type.PROGRESS)
+                        .setAnimation(Animations.FADE_IN)
+                        .progressText("Logging in using test... Please Wait")
+                        .create();
+                fastDialog.show();
+                DatabaseAdmin user = new DatabaseAdmin(number,name,email);
+                editor.putString("name",name);
+                editor.putString("email",email);
+                editor.apply();
+                loginAuth.signInWithEmailAndPassword("foodinetest858784@gmail.com","FoodineTest858784").addOnCompleteListener(task -> {
+                    if(task.isSuccessful()){
+                        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Users");
+                        databaseReference.child("8AzmseJgrNcYL7GcH05B3mYcDfp2").setValue(user);
+                        fastDialog.dismiss();
+                        editor.putString("testUser","8AzmseJgrNcYL7GcH05B3mYcDfp2");
+                        editor.apply();
+                        Toast.makeText(MainActivity.this, "Test Login Successfully", Toast.LENGTH_SHORT).show();
+                        startActivity(new Intent(getApplicationContext(),HomeScreen.class));
+                        finish();
+                    }else {
+                        fastDialog.dismiss();
+                        Toast.makeText(MainActivity.this, "Something went wrong", Toast.LENGTH_SHORT).show();
+                    }
+                });
                 return;
             }
 

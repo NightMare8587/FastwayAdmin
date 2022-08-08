@@ -36,6 +36,7 @@ import com.consumers.fastwayadmin.Info.RestaurantDocuments.UploadRemainingDocs;
 import com.consumers.fastwayadmin.NavFrags.AccountSettingsFragment;
 import com.consumers.fastwayadmin.NavFrags.BankVerification.SelectPayoutMethodType;
 import com.consumers.fastwayadmin.NavFrags.CashCommission.CashTransactionCommissionActivity;
+import com.consumers.fastwayadmin.NavFrags.FastwayPremiumActivites.FastwayPremiums;
 import com.consumers.fastwayadmin.NavFrags.FastwayPremiumActivites.NotifyAdminSubscribePremium;
 import com.consumers.fastwayadmin.NavFrags.HomeFrag;
 import com.consumers.fastwayadmin.NavFrags.MenuFrag;
@@ -124,8 +125,101 @@ public class HomeScreen extends AppCompatActivity {
         ConnectivityManager cm =
                 (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
         FirebaseMessaging.getInstance().subscribeToTopic("FastwayQueryDB");
+
+        resRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(UID)).child("Restaurant Documents");
+        resRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists() && snapshot.hasChild("reasonForCancel")){
+                    AlertDialog.Builder alert = new AlertDialog.Builder(HomeScreen.this);
+                    String reason = snapshot.child("reasonForCancel").getValue(String.class);
+                    alert.setTitle("Error").setMessage("Your restaurant registration is denied by fastway for following reason's:\n\n" + reason + "\n\nYou can submit another response for restaurant registration")
+                            .setPositiveButton("Re-Submit", (dialogInterface, i) -> {
+                                startActivity(new Intent(HomeScreen.this, ReUploadDocumentsAgain.class));
+                                dialogInterface.dismiss();
+                            }).setNegativeButton("Skip", (dialogInterface, i) -> dialogInterface.dismiss()).create();
+
+                    alert.show();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        DatabaseReference adminCheck = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(UID);
+        adminCheck.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists() && snapshot.hasChild("freeTrialDate")){
+                    long currTime = Long.parseLong(String.valueOf(snapshot.child("freeTrialDate").getValue()));
+
+                    if(currTime <= System.currentTimeMillis()){
+                        SharedPreferences adminPrem = getSharedPreferences("AdminPremiumDetails",MODE_PRIVATE);
+                        SharedPreferences.Editor premEdit = adminPrem.edit();
+                        premEdit.putString("status", "not active");
+                        premEdit.apply();
+                        AlertDialog.Builder builder = new AlertDialog.Builder(HomeScreen.this);
+                        builder.setCancelable(false);
+                        builder.setTitle("Trial Finished").setMessage("Your current free trial is finished\nSubscribe premium")
+                                .setPositiveButton("Subscribe", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        startActivity(new Intent(HomeScreen.this, FastwayPremiums.class));
+                                    }
+                                }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+                                }).create();
+                        builder.show();
+                    }else{
+                        SharedPreferences adminPrem = getSharedPreferences("AdminPremiumDetails",MODE_PRIVATE);
+                        SharedPreferences.Editor premEdit = adminPrem.edit();
+                        premEdit.putString("status", "active");
+                        premEdit.apply();
+                    }
+                }else{
+                    DatabaseReference databaseReference1 = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
+                    databaseReference1.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            if(snapshot.hasChild("subRefID")){
+                                subRefID = String.valueOf(snapshot.child("subRefID").getValue()).trim();
+                                new checkStatus().execute();
+                            }else{
+                                premEditor.putString("status","not active");
+                                premEditor.apply();
+                                if(adminPrem.contains("lastNotifiedPrem")){
+                                    if(172800000L + System.currentTimeMillis() < Long.parseLong(adminPrem.getString("lastNotifiedPrem",""))){
+                                        startActivity(new Intent(HomeScreen.this, NotifyAdminSubscribePremium.class));
+                                    }
+                                }else
+                                {
+                                    premEditor.putString("lastNotifiedPrem",String.valueOf(System.currentTimeMillis()));
+                                    premEditor.apply();
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
       new BackgroundWork().execute();
-        checkIfBankDetailsSubmitted();
+//        checkIfBankDetailsSubmitted();
 //        if(sharedPreferences.contains("myListStored")){
 //            Type type = new TypeToken<List<List<String>>>() {
 //            }.getType();
@@ -204,9 +298,6 @@ public class HomeScreen extends AppCompatActivity {
 
 
         if(adminPrem.contains("status") && adminPrem.getString("status","").equals("active")) {
-
-
-
             if (!sharedPreferences.contains("FileGeneratedExcel")) {
                 try {
                     String month = monthName[calendar.get(Calendar.MONTH)];
@@ -322,38 +413,12 @@ public class HomeScreen extends AppCompatActivity {
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
             }
-        }),800);
+        }),60);
 
 
-        new Handler().postDelayed(() -> {
-            DatabaseReference databaseReference1 = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
-            databaseReference1.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    if(snapshot.hasChild("subRefID")){
-                        subRefID = String.valueOf(snapshot.child("subRefID").getValue()).trim();
-                        new checkStatus().execute();
-                    }else{
-                        premEditor.putString("status","not active");
-                        premEditor.apply();
-                        if(adminPrem.contains("lastNotifiedPrem")){
-                            if(172800000L + System.currentTimeMillis() < Long.parseLong(adminPrem.getString("lastNotifiedPrem",""))){
-                                startActivity(new Intent(HomeScreen.this, NotifyAdminSubscribePremium.class));
-                            }
-                        }else
-                        {
-                            premEditor.putString("lastNotifiedPrem",String.valueOf(System.currentTimeMillis()));
-                            premEditor.apply();
-                        }
-                    }
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-
-                }
-            });
-        },1700);
+//        new Handler().postDelayed(() -> {
+//
+//        },1700);
 
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
@@ -467,6 +532,11 @@ public class HomeScreen extends AppCompatActivity {
 
     public class BackgroundWork extends AsyncTask<Void,Void,Void>{
         @Override
+        protected void onPostExecute(Void unused) {
+            super.onPostExecute(unused);
+        }
+
+        @Override
         protected Void doInBackground(Void... voids) {
             resRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(UID));
             resRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -499,28 +569,7 @@ public class HomeScreen extends AppCompatActivity {
                 }
             });
 
-            resRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(UID)).child("Restaurant Documents");
-            resRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    if(snapshot.exists() && snapshot.hasChild("reasonForCancel")){
-                        AlertDialog.Builder alert = new AlertDialog.Builder(HomeScreen.this);
-                        String reason = snapshot.child("reasonForCancel").getValue(String.class);
-                        alert.setTitle("Error").setMessage("Your restaurant registration is denied by fastway for following reason's:\n\n" + reason + "\n\nYou can submit another response for restaurant registration")
-                                .setPositiveButton("Re-Submit", (dialogInterface, i) -> {
-                                    startActivity(new Intent(HomeScreen.this, ReUploadDocumentsAgain.class));
-                                    dialogInterface.dismiss();
-                                }).setNegativeButton("Skip", (dialogInterface, i) -> dialogInterface.dismiss()).create();
 
-                        alert.show();
-                    }
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-
-                }
-            });
 
             DatabaseReference checkIfCommissionNeeded = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(UID));
             checkIfCommissionNeeded.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -633,12 +682,25 @@ public class HomeScreen extends AppCompatActivity {
                                 alert.show();
                             }
                         }else{
-                            checkIfCommissionNeeded.child("registrationDate").setValue(System.currentTimeMillis() + "");
+                            DatabaseReference checkIfApproved = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Registered Restaurants").child(sharedPreferences.getString("state",""));
+                            checkIfApproved.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                    if(snapshot.hasChild(Objects.requireNonNull(auth.getUid()))){
+
+                                    }else
+                                        checkIfCommissionNeeded.child("registrationDate").setValue(System.currentTimeMillis() + "");
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError error) {
+
+                                }
+                            });
+
                         }
                     }
                 }
-
-
 
 
                 @Override
@@ -648,81 +710,78 @@ public class HomeScreen extends AppCompatActivity {
             });
 
 
+            checkForBank = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(UID));
+            checkForBank.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if(!snapshot.hasChild("Bank Details")){
+                        AlertDialog.Builder alertDialog = new AlertDialog.Builder(HomeScreen.this);
+                        alertDialog.setTitle("Important");
+                        alertDialog.setMessage("You need to add bank details to accept payments");
+                        alertDialog.setPositiveButton("Add", (dialogInterface, i) -> {
+                            SharedPreferences accountInfo = getSharedPreferences("AccountInfo",Context.MODE_PRIVATE);
+                            Intent intent = new Intent(HomeScreen.this, VendorDetailsActivity.class);
+                            intent.putExtra("name",accountInfo.getString("name",""));
+                            intent.putExtra("email",accountInfo.getString("email",""));
+                            startActivity(intent);
+                        }).create();
 
+                        alertDialog.show();
+                    }else{
+                        SharedPreferences sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
+                        if(!sharedPreferences.contains("payoutMethodChoosen")){
+                            AlertDialog.Builder builder = new AlertDialog.Builder(HomeScreen.this);
+                            builder.setTitle("Payout Method").setMessage("You need to choose payout method in-order to receive payments")
+                                    .setPositiveButton("Choose Now", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            startActivity(new Intent(HomeScreen.this, SelectPayoutMethodType.class));
+                                        }
+                                    }).setNegativeButton("Later", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            dialog.dismiss();
+                                        }
+                                    }).create().show();
+                        }
+                    }
+
+                    if(snapshot.child("Restaurant Documents").hasChild("timeToUploadDocs")){
+                        long remainingTime = Long.parseLong(Objects.requireNonNull(snapshot.child("Restaurant Documents").child("timeToUploadDocs").getValue(String.class)));
+                        if(remainingTime > System.currentTimeMillis()) {
+                            long daysLeft = remainingTime - System.currentTimeMillis();
+                            AlertDialog.Builder alertDialog = new AlertDialog.Builder(HomeScreen.this);
+                            alertDialog.setTitle("Important");
+
+                            alertDialog.setMessage("You need to upload required documents within " + TimeUnit.MILLISECONDS.toDays(daysLeft) + " days");
+                            alertDialog.setPositiveButton("Upload Now", (dialogInterface, i) -> {
+                                startActivity(new Intent(HomeScreen.this, UploadRemainingDocs.class));
+                            }).setNegativeButton("Later", (dialogInterface, i) -> dialogInterface.dismiss()).create();
+
+                            alertDialog.show();
+                        }else{
+                            AlertDialog.Builder builder = new AlertDialog.Builder(HomeScreen.this);
+                            builder.setTitle("Time Exceeded").setMessage("Your 30 days period to submit documents is over\nYour restaurant is now suspended from Foodine")
+                                    .setPositiveButton("Exit", (dialogInterface, i) -> dialogInterface.dismiss()).create().show();
+
+                        }
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
 
             return null;
         }
     }
 
     private void checkIfBankDetailsSubmitted() {
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                checkForBank = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(UID));
-                checkForBank.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if(!snapshot.hasChild("Bank Details")){
-                            AlertDialog.Builder alertDialog = new AlertDialog.Builder(HomeScreen.this);
-                            alertDialog.setTitle("Important");
-                            alertDialog.setMessage("You need to add bank details to accept payments");
-                            alertDialog.setPositiveButton("Add", (dialogInterface, i) -> {
-                                SharedPreferences accountInfo = getSharedPreferences("AccountInfo",Context.MODE_PRIVATE);
-                                Intent intent = new Intent(HomeScreen.this, VendorDetailsActivity.class);
-                                intent.putExtra("name",accountInfo.getString("name",""));
-                                intent.putExtra("email",accountInfo.getString("email",""));
-                                startActivity(intent);
-                            }).create();
+        new Handler().postDelayed(() -> {
 
-                            alertDialog.show();
-                        }else{
-                            SharedPreferences sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
-                            if(!sharedPreferences.contains("payoutMethodChoosen")){
-                                AlertDialog.Builder builder = new AlertDialog.Builder(HomeScreen.this);
-                                builder.setTitle("Payout Method").setMessage("You need to choose payout method in-order to receive payments")
-                                        .setPositiveButton("Choose Now", new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                startActivity(new Intent(HomeScreen.this, SelectPayoutMethodType.class));
-                                            }
-                                        }).setNegativeButton("Later", new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                dialog.dismiss();
-                                            }
-                                        }).create().show();
-                            }
-                        }
-
-                        if(snapshot.child("Restaurant Documents").hasChild("timeToUploadDocs")){
-                            long remainingTime = Long.parseLong(Objects.requireNonNull(snapshot.child("Restaurant Documents").child("timeToUploadDocs").getValue(String.class)));
-                            if(remainingTime > System.currentTimeMillis()) {
-                                long daysLeft = remainingTime - System.currentTimeMillis();
-                                AlertDialog.Builder alertDialog = new AlertDialog.Builder(HomeScreen.this);
-                                alertDialog.setTitle("Important");
-
-                                alertDialog.setMessage("You need to upload required documents within " + TimeUnit.MILLISECONDS.toDays(daysLeft) + " days");
-                                alertDialog.setPositiveButton("Upload Now", (dialogInterface, i) -> {
-                                    startActivity(new Intent(HomeScreen.this, UploadRemainingDocs.class));
-                                }).setNegativeButton("Later", (dialogInterface, i) -> dialogInterface.dismiss()).create();
-
-                                alertDialog.show();
-                            }else{
-                                AlertDialog.Builder builder = new AlertDialog.Builder(HomeScreen.this);
-                                builder.setTitle("Time Exceeded").setMessage("Your 2 weeks period to submit documents is over\nYour restaurant is now suspended from Fastway")
-                                        .setPositiveButton("Exit", (dialogInterface, i) -> dialogInterface.dismiss()).create().show();
-
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-
-                    }
-                });
-            }
-        },400);
+        },50);
     }
 
     private void checkIfNeededToAddToQuery() {
@@ -744,7 +803,7 @@ public class HomeScreen extends AppCompatActivity {
 
                 }
             });
-        },200);
+        },80);
     }
 
     public class checkStatus extends AsyncTask<Void,Void,Void>{

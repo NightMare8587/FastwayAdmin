@@ -53,6 +53,17 @@ public class FastwayPremiums extends AppCompatActivity {
             setContentView(R.layout.activity_fastway_premiums);
         }else{
             if(sharedPreferences.contains("status")) {
+//                databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+//                    @Override
+//                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                        if(snapshot.hasChild())
+//                    }
+//
+//                    @Override
+//                    public void onCancelled(@NonNull DatabaseError error) {
+//
+//                    }
+//                });
                 setContentView(R.layout.subscribe_fastway_prem);
                 subscribePrem = findViewById(R.id.subscribeFastwayPremium);
                 subscribePrem.setOnClickListener(click -> {

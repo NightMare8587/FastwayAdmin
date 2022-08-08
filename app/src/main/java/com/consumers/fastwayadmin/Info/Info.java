@@ -349,6 +349,8 @@ public class Info extends AppCompatActivity {
             infoRef.child("status").setValue("online");
             infoRef.child("acceptingOrders").setValue("yes");
             infoRef.child("totalReports").setValue("0");
+
+
             if (optForTakeaway.isChecked()) {
                 infoRef.child("TakeAwayAllowed").setValue("yes");
                 this.editor.putString("TakeAwayAllowed", "yes");
@@ -379,7 +381,7 @@ public class Info extends AppCompatActivity {
                 editor1.putString("location","yes");
                 editor1.apply();
             }
-
+//            this.editor.putString("firstTimeRestaurant")
             this.editor.apply();
 //            clientsLocation.removeLocationUpdates(mLocationCallback);
             AlertDialog.Builder alert = new AlertDialog.Builder(Info.this);

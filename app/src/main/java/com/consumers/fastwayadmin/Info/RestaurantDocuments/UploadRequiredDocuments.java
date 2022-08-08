@@ -194,10 +194,14 @@ public class UploadRequiredDocuments extends AppCompatActivity {
                                         new KAlertDialog(UploadRequiredDocuments.this,KAlertDialog.SUCCESS_TYPE)
                                                 .setTitleText("Documents Uploaded")
                                                 .setContentText("Documents uploaded and will be verified by our fastway staff with an on-site verification")
-                                                .setConfirmText("Exit")
+                                                .setConfirmText("Continue")
                                                 .setConfirmClickListener(click -> {
                                                     click.dismissWithAnimation();
-                                                    startActivity(new Intent(getApplicationContext(), MapsActivity.class));
+                                                    SharedPreferences location = getSharedPreferences("LocationMaps",MODE_PRIVATE);
+                                                    if(!location.contains("location"))
+                                                        startActivity(new Intent(getApplicationContext(), MapsActivity.class));
+                                                    else
+                                                        startActivity(new Intent(getApplicationContext(), HomeScreen.class));
                                                 }).show();
                                     }
                                 }
