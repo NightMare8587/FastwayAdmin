@@ -305,7 +305,7 @@ public class UploadRemainingDocs extends AppCompatActivity {
         fssaiUrl = "";
     }
     private void checkIfAllUploaded() {
-        if(adhaar && fssai && resProof){
+        if(adhaar){
             DatabaseReference databaseReferenceCheck = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Registered Restaurants").child(sharedPreferences.getString("state",""));
             databaseReferenceCheck.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
@@ -321,7 +321,7 @@ public class UploadRemainingDocs extends AppCompatActivity {
                             public void run() {
                                 finish();
                             }
-                        },600);
+                        },300);
                     }else{
                         ResDocuments resDocuments = new ResDocuments(panUrl,adhaarUrl,fssaiUrl,gstUrl,residentialProofSubmitUrl);
                         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Restaurant Registration");

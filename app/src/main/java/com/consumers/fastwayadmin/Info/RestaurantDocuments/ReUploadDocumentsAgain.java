@@ -63,6 +63,7 @@ public class ReUploadDocumentsAgain extends AppCompatActivity {
     Uri filePath;
     FirebaseStorage storage;
     String fssaiDigitsNums;
+    String state;
     File file;
     Bitmap bitmap;
     TextView panText,gstText,adhaarText,FssaiText,resText;
@@ -606,7 +607,7 @@ public class ReUploadDocumentsAgain extends AppCompatActivity {
     }
 
     private void checkIfAllUploaded() {
-        if(adhaar && fssai && resProof){
+        if(adhaar){
 
             ResDocuments resDocuments = new ResDocuments(panUrl,adhaarUrl,fssaiUrl,gstUrl,resUrl);
             DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Restaurant Registration");
@@ -616,6 +617,7 @@ public class ReUploadDocumentsAgain extends AppCompatActivity {
             databaseReference.child(auth.getUid()).child("ResAddress").setValue(sharedPreferences.getString("hotelAddress",""));
             databaseReference.child(auth.getUid()).child("ResNumber").setValue(sharedPreferences.getString("hotelNumber",""));
             databaseReference.child(auth.getUid()).child("state").setValue(this.sharedPreferences.getString("state",""));
+            databaseReference.child(auth.getUid()).child("locality").setValue(this.sharedPreferences.getString("locality",""));
 
             databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid()).child("Restaurant Documents");
             databaseReference.child("verified").setValue("no");
@@ -639,5 +641,7 @@ public class ReUploadDocumentsAgain extends AppCompatActivity {
         fssaiCard = findViewById(R.id.ReuploadFSSAIcard);
 //        gstCard= findViewById(R.id.ReuploadGSTcard);
         resProofCard= findViewById(R.id.ReuploadResProofCard);
+        SharedPreferences sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
+        state = sharedPreferences.getString("state","");
     }
 }

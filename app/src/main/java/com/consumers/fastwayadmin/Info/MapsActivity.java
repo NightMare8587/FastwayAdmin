@@ -118,7 +118,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             SharedPreferences locationShared = getSharedPreferences("LocationMaps",MODE_PRIVATE);
             SharedPreferences.Editor editor = locationShared.edit();
             ref = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid()));
-            RestLocation restLocation = new RestLocation(String.valueOf(latitude),String.valueOf(longitude));
+            RestLocation restLocation = new RestLocation(String.valueOf(longitude),String.valueOf(latitude));
             ref.child("location").setValue(restLocation);
             startActivity(new Intent(getApplicationContext(), HomeScreen.class));
             editor.putString("location","yes");
@@ -218,8 +218,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                mMap.clear();
                latitude = mLastLocation.getLatitude();
                longitude = mLastLocation.getLongitude();
-               editor.putString("longi",String.valueOf(latitude));
-               editor.putString("lati",String.valueOf(longitude));
+               editor.putString("longi",String.valueOf(longitude));
+               editor.putString("lati",String.valueOf(latitude));
                editor.apply();
 //               RestLocation restLocation = new RestLocation(String.valueOf(latitude),String.valueOf(longitude));
 //               ref = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants");
@@ -251,8 +251,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 mMap.clear();
                 latitude = latLng.latitude;
                 longitude = latLng.longitude;
-                editor.putString("longi",String.valueOf(latitude));
-                editor.putString("lati",String.valueOf(longitude));
+                editor.putString("longi",String.valueOf(longitude));
+                editor.putString("lati",String.valueOf(latitude));
                 editor.apply();
                 mMap.addMarker(new MarkerOptions().title("Current Position").position(latLng));
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng,15));

@@ -10,7 +10,7 @@
         android:id="@+id/uploadFSSAIcard"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="95dp"
         android:text="Upload FSSAI"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -31,7 +31,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
-        android:layout_marginTop="45dp"
+        android:layout_marginTop="108dp"
         android:text="uploaded"
         android:textColor="@color/cfdialog_positive_button_color"
         android:visibility="invisible"
@@ -43,7 +43,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
-        android:layout_marginTop="44dp"
+        android:layout_marginTop="48dp"
         android:text="uploaded"
         android:textColor="@color/cfdialog_positive_button_color"
         android:visibility="invisible"
@@ -64,7 +64,7 @@
         android:id="@+id/uploadResidentialText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
+        android:layout_marginStart="17dp"
         android:layout_marginTop="55dp"
         android:text="uploaded"
         android:textColor="@color/cfdialog_positive_button_color"
@@ -76,10 +76,82 @@
         android:id="@+id/proceedFurther"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="45dp"
+        android:layout_marginTop="20dp"
         android:text="Proceed"
         android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/radioGroupGSTINhaveOrNot" />
+
+    <CheckBox
+        android:id="@+id/fssaiCheckBoxIfAvailabeUploadRequired"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:text="I don't have FSSAI"
+        app:layout_constraintBottom_toTopOf="@+id/uploadFSSAIcard"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/textView27"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="Upload Required Docuents"
+        android:textColor="#000000"
+        android:textSize="22sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textView28"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="12dp"
+        android:text="*Uploading adhaar card is mandatory\nYou can upload later"
+        android:textColor="#EA1313"
+        android:textSize="17sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/textView34"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:text="Do you have GSTIN ?"
+        android:textSize="17sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/uploadResidentialProof" />
+
+    <RadioGroup
+        android:id="@+id/radioGroupGSTINhaveOrNot"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView34">
+
+        <RadioButton
+            android:id="@+id/noIdontHavrGSTIN"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="No, I dont have GSTIN" />
+
+        <RadioButton
+            android:id="@+id/yesIhaveGSTINnumber"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Yes I Have GSTIN" />
+    </RadioGroup>
 </androidx.constraintlayout.widget.ConstraintLayout>
