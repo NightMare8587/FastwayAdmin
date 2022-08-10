@@ -143,8 +143,8 @@ public class AddTables extends AppCompatActivity {
                 String fileName = String.format("Table " + tableNumber.getText().toString() + ".jpg", "Table " + tableNumber.getText().toString());
                 File outFile = new File(dir, fileName);
                 File checkIfExist = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + "/" + fileName);
-                if(checkIfExist.exists())
-                    checkIfExist.delete();
+                if(outFile.exists())
+                    outFile.delete();
 
                 try {
                     outStream = new FileOutputStream(outFile);
