@@ -158,6 +158,7 @@ public class SearchFastwayClass extends RecyclerView.Adapter<SearchFastwayClass.
             linearLayout.addView(ownDishName);
             linearLayout.addView(radioGroup);
             linearLayout.addView(checkBox);
+            linearLayout.addView(dishDescription);
             linearLayout.setGravity(View.TEXT_ALIGNMENT_CENTER);
             alertDialog.setView(linearLayout);
 
