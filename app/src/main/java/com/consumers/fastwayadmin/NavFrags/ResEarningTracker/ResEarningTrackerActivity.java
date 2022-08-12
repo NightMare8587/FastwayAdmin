@@ -8,14 +8,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -28,6 +31,12 @@ import com.consumers.fastwayadmin.NavFrags.ResDishTracker.seeAllDishAnalysis;
 import com.consumers.fastwayadmin.NavFrags.ResEarningTracker.RestaurantAnalysis.RestaurantEarningAnalysis;
 import com.consumers.fastwayadmin.R;
 import com.google.common.reflect.TypeToken;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 
 import org.eazegraph.lib.charts.BarChart;
@@ -42,14 +51,23 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class ResEarningTrackerActivity extends AppCompatActivity  {
     SharedPreferences resTrackInfo;
     SharedPreferences storeOrdersForAdminInfo;
+    int totalValOver = 0;
+    int totalResOver = 0;
     Calendar calendar;
+//    int overVeg = 0,overNon = 0,overVegan = 0,resVegVal = 0,resVeganVal = 0,resNonVal = 0;
+    boolean resAvailable = false;
+    boolean overallAvailable = false;
+    LinearLayout overall,restaurant;
+    TextView overallVeg,overallNon,overallVegan,resVeg,resNon,resVegan,resHeading,overallHeading;
     RecyclerView recyclerView,dishRecyclerView;
     TackerAdapter tackerAdapter;
     SharedPreferences loginInfoShared;
+    FirebaseAuth auth = FirebaseAuth.getInstance();
     SharedPreferences usersFrequencyPref;
     DecimalFormat df = new DecimalFormat("0.00");
     double totalAmountPerMonth = 0;
@@ -73,6 +91,7 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_res_earning_tracker);
+        initialise();
         loginInfoShared = getSharedPreferences("loginInfo",MODE_PRIVATE);
         SharedPreferences adminPrem = getSharedPreferences("AdminPremiumDetails",MODE_PRIVATE);
         usersFrequencyPref = getSharedPreferences("UsersFrequencyPerMonth",MODE_PRIVATE);
@@ -82,6 +101,7 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
         oneTime = findViewById(R.id.oneTimeCustomersTracker);
         Recuuring = findViewById(R.id.recurringCustomersTracker);
         editor = loginInfoShared.edit();
+
         seeAnalysis = findViewById(R.id.seeRestaurantAnalysisButtonTracker);
         if(adminPrem.contains("status")) {
             if (!adminPrem.getString("status", "").equals("active")) {
@@ -117,6 +137,7 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
             return;
         }
 
+        new newAsyncTask().execute();
         seeAnalysis.setOnClickListener(click -> {
             startActivity(new Intent(click.getContext(), RestaurantEarningAnalysis.class));
         });
@@ -256,6 +277,20 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
             }
         }
     }
+
+    private void initialise() {
+        overall = findViewById(R.id.linearLayoutResEarningOverall);
+        restaurant = findViewById(R.id.linearLayoutResEarningRestaurant);
+        overallVegan = findViewById(R.id.overallVegan);
+        overallVeg = findViewById(R.id.overallVeg);
+        overallNon = findViewById(R.id.overallNon);
+        overallHeading = findViewById(R.id.textViewShowingDishTracker);
+        resVeg = findViewById(R.id.resVeg);
+        resNon = findViewById(R.id.resNon);
+        resVegan = findViewById(R.id.resVegan);
+        resHeading = findViewById(R.id.textViewShowingDishTrackerRestaurant);
+    }
+
     public BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @RequiresApi(api = Build.VERSION_CODES.N)
         @SuppressLint("SetTextI18n")
@@ -360,4 +395,107 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
             }
         }
     };
+
+    public class newAsyncTask extends AsyncTask<Void,Void,Void>{
+
+
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("ResAnalysis").child(loginInfoShared.getString("state","")).child(loginInfoShared.getString("locality",""));
+            databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+
+                @SuppressLint("SetTextI18n")
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if(snapshot.exists()){
+                        int vegVal = 0;
+                        int nonVegVal = 0;
+                        int veganVal = 0;
+
+
+                        overallAvailable = true;
+                        Log.i("resInfo","i am gere");
+                        if(snapshot.hasChild("veg")){
+                            vegVal =  Integer.parseInt(Objects.requireNonNull(snapshot.child("veg").getValue(String.class)));
+                        }
+                        if(snapshot.hasChild("NonVeg")){
+                            nonVegVal =  Integer.parseInt(Objects.requireNonNull(snapshot.child("NonVeg").getValue(String.class)));
+                        }
+                        if(snapshot.hasChild("vegan")){
+                            veganVal =  Integer.parseInt(Objects.requireNonNull(snapshot.child("vegan").getValue(String.class)));
+                        }
+
+                        totalValOver = vegVal + nonVegVal + veganVal;
+
+                        overall.setVisibility(View.VISIBLE);
+                        overallHeading.setVisibility(View.VISIBLE);
+                        overallHeading.setText(loginInfoShared.getString("locality","") + " Users Preferences");
+                        overallVeg.setText("Veg: " + vegVal * 100 / totalValOver  + "%");
+                        overallNon.setText("NonVeg: "  + nonVegVal* 100 / totalValOver  + "%");
+                        overallVegan.setText("Vegan: " + veganVal* 100 / totalValOver  + "%");
+
+                        DatabaseReference resRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("ResAnalysis").child(loginInfoShared.getString("state","")).child(loginInfoShared.getString("locality","")).child(auth.getUid());
+                        resRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @SuppressLint("SetTextI18n")
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                if(snapshot.exists()){
+                                    int ResvegVal = 0;
+                                    int ResnonVegVal = 0;
+                                    int ResveganVal = 0;
+                                    resAvailable = true;
+
+                                    if(snapshot.hasChild("veg")){
+                                        ResvegVal =  Integer.parseInt(Objects.requireNonNull(snapshot.child("veg").getValue(String.class)));
+                                    }
+                                    if(snapshot.hasChild("NonVeg")){
+                                        ResnonVegVal =  Integer.parseInt(Objects.requireNonNull(snapshot.child("NonVeg").getValue(String.class)));
+                                    }
+                                    if(snapshot.hasChild("vegan")){
+                                        ResveganVal =  Integer.parseInt(Objects.requireNonNull(snapshot.child("vegan").getValue(String.class)));
+                                    }
+
+                                    totalResOver = ResvegVal + ResnonVegVal + ResveganVal;
+
+                                    restaurant.setVisibility(View.VISIBLE);
+                                    resHeading.setVisibility(View.VISIBLE);
+                                    resHeading.setText("Your Restaurant Users Preferences");
+                                    resVeg.setText("Veg: " + ResvegVal * 100 / totalResOver  + "%");
+                                    resNon.setText("NonVeg: " + ResnonVegVal * 100 / totalResOver  + "%");
+                                    resVegan.setText("Vegan: " + ResveganVal * 100 / totalResOver  + "%");
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+
+                            }
+                        });
+
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+            return null;
+        }
+
+        @SuppressLint("SetTextI18n")
+        @Override
+        protected void onPostExecute(Void unused) {
+            super.onPostExecute(unused);
+            Log.i("info","here there iam");
+            if(overallAvailable){
+
+            }
+
+            if(resAvailable){
+
+            }
+        }
+    }
 }
