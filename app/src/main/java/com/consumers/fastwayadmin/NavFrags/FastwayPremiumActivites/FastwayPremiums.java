@@ -513,6 +513,7 @@ public class FastwayPremiums extends AppCompatActivity {
                 databaseReference.child("freeTrialDate").removeValue();
 
             finish();
-        }
+        }else
+            Toast.makeText(this, "Payment Failed... Try again", Toast.LENGTH_SHORT).show();
     }
 }
