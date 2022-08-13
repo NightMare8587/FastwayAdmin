@@ -56,8 +56,8 @@ import java.util.Objects;
 public class ResEarningTrackerActivity extends AppCompatActivity  {
     SharedPreferences resTrackInfo;
     SharedPreferences storeOrdersForAdminInfo;
-    int totalValOver = 0;
-    int totalResOver = 0;
+    double totalValOver = 0;
+    double totalResOver = 0;
     Calendar calendar;
 //    int overVeg = 0,overNon = 0,overVegan = 0,resVegVal = 0,resVeganVal = 0,resNonVal = 0;
     boolean resAvailable = false;
@@ -409,21 +409,22 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     if(snapshot.exists()){
-                        int vegVal = 0;
-                        int nonVegVal = 0;
-                        int veganVal = 0;
+                        DecimalFormat decimalFormat = new DecimalFormat("0.00");
+                        double vegVal = 0;
+                        double nonVegVal = 0;
+                        double veganVal = 0;
 
 
                         overallAvailable = true;
                         Log.i("resInfo","i am gere");
                         if(snapshot.hasChild("veg")){
-                            vegVal =  Integer.parseInt(Objects.requireNonNull(snapshot.child("veg").getValue(String.class)));
+                            vegVal = Double.parseDouble(Objects.requireNonNull(snapshot.child("veg").getValue(String.class)));
                         }
                         if(snapshot.hasChild("NonVeg")){
-                            nonVegVal =  Integer.parseInt(Objects.requireNonNull(snapshot.child("NonVeg").getValue(String.class)));
+                            nonVegVal =  Double.parseDouble(Objects.requireNonNull(snapshot.child("NonVeg").getValue(String.class)));
                         }
                         if(snapshot.hasChild("vegan")){
-                            veganVal =  Integer.parseInt(Objects.requireNonNull(snapshot.child("vegan").getValue(String.class)));
+                            veganVal =  Double.parseDouble(Objects.requireNonNull(snapshot.child("vegan").getValue(String.class)));
                         }
 
                         totalValOver = vegVal + nonVegVal + veganVal;
@@ -431,9 +432,9 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
                         overall.setVisibility(View.VISIBLE);
                         overallHeading.setVisibility(View.VISIBLE);
                         overallHeading.setText(loginInfoShared.getString("locality","") + " Users Preferences");
-                        overallVeg.setText("Veg: " + vegVal * 100 / totalValOver  + "%");
-                        overallNon.setText("NonVeg: "  + nonVegVal* 100 / totalValOver  + "%");
-                        overallVegan.setText("Vegan: " + veganVal* 100 / totalValOver  + "%");
+                        overallVeg.setText("Veg: " + decimalFormat.format(vegVal * 100 / totalValOver)  + "%");
+                        overallNon.setText("NonVeg: "  + decimalFormat.format(nonVegVal * 100 / totalValOver)  + "%");
+                        overallVegan.setText("Vegan: " + decimalFormat.format(veganVal * 100 / totalValOver)  + "%");
 
                         DatabaseReference resRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("ResAnalysis").child(loginInfoShared.getString("state","")).child(loginInfoShared.getString("locality","")).child(auth.getUid());
                         resRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -441,19 +442,19 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot snapshot) {
                                 if(snapshot.exists()){
-                                    int ResvegVal = 0;
-                                    int ResnonVegVal = 0;
-                                    int ResveganVal = 0;
+                                    double ResvegVal = 0;
+                                    double ResnonVegVal = 0;
+                                    double ResveganVal = 0;
                                     resAvailable = true;
 
                                     if(snapshot.hasChild("veg")){
-                                        ResvegVal =  Integer.parseInt(Objects.requireNonNull(snapshot.child("veg").getValue(String.class)));
+                                        ResvegVal =  Double.parseDouble(Objects.requireNonNull(snapshot.child("veg").getValue(String.class)));
                                     }
                                     if(snapshot.hasChild("NonVeg")){
-                                        ResnonVegVal =  Integer.parseInt(Objects.requireNonNull(snapshot.child("NonVeg").getValue(String.class)));
+                                        ResnonVegVal =  Double.parseDouble(Objects.requireNonNull(snapshot.child("NonVeg").getValue(String.class)));
                                     }
                                     if(snapshot.hasChild("vegan")){
-                                        ResveganVal =  Integer.parseInt(Objects.requireNonNull(snapshot.child("vegan").getValue(String.class)));
+                                        ResveganVal =  Double.parseDouble(Objects.requireNonNull(snapshot.child("vegan").getValue(String.class)));
                                     }
 
                                     totalResOver = ResvegVal + ResnonVegVal + ResveganVal;
@@ -461,9 +462,9 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
                                     restaurant.setVisibility(View.VISIBLE);
                                     resHeading.setVisibility(View.VISIBLE);
                                     resHeading.setText("Your Restaurant Users Preferences");
-                                    resVeg.setText("Veg: " + ResvegVal * 100 / totalResOver  + "%");
-                                    resNon.setText("NonVeg: " + ResnonVegVal * 100 / totalResOver  + "%");
-                                    resVegan.setText("Vegan: " + ResveganVal * 100 / totalResOver  + "%");
+                                    resVeg.setText("Veg: " + decimalFormat.format(ResvegVal * 100 / totalResOver)  + "%");
+                                    resNon.setText("NonVeg: " + decimalFormat.format(ResnonVegVal * 100 / totalResOver)  + "%");
+                                    resVegan.setText("Vegan: " + decimalFormat.format(ResveganVal * 100 / totalResOver)  + "%");
                                 }
                             }
 
@@ -489,13 +490,7 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
         protected void onPostExecute(Void unused) {
             super.onPostExecute(unused);
             Log.i("info","here there iam");
-            if(overallAvailable){
 
-            }
-
-            if(resAvailable){
-
-            }
         }
     }
 }

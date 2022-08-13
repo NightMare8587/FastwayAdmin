@@ -187,9 +187,30 @@ public class HomeScreen extends AppCompatActivity {
                     databaseReference1.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            if(snapshot.hasChild("subRefID")){
-                                subRefID = String.valueOf(snapshot.child("subRefID").getValue()).trim();
-                                new checkStatus().execute();
+                            if(snapshot.hasChild("subscriptionStatus")){
+                                long time = Long.parseLong(String.valueOf(snapshot.child("subscriptionStatus").getValue()));
+                                if(System.currentTimeMillis() > time){
+                                    premEditor.putString("status","not active");
+                                    premEditor.apply();
+                                    AlertDialog.Builder builder = new AlertDialog.Builder(HomeScreen.this);
+                                    builder.setTitle("ReSubscribe").setMessage("Your Subscription Period is over. ReSubscribe Now")
+                                            .setPositiveButton("ReSubscribe", new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    dialog.dismiss();
+                                                    startActivity(new Intent(HomeScreen.this,FastwayPremiums.class));
+                                                }
+                                            }).setNegativeButton("Later", new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+
+                                                }
+                                            }).create();
+                                    builder.show();
+                                }else{
+                                    premEditor.putString("status","active");
+                                    premEditor.apply();
+                                }
                             }else{
                                 premEditor.putString("status","not active");
                                 premEditor.apply();

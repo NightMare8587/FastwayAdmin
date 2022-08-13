@@ -131,12 +131,14 @@
             android:id="@+id/linearLayoutResEarningOverall"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            android:padding="3dp"
             android:orientation="horizontal"
             android:visibility="invisible"
             app:layout_constraintTop_toBottomOf="@id/textViewShowingDishTracker"
             android:layout_width="match_parent"
             android:layout_marginTop="5dp"
-            android:layout_marginStart="15dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
             android:layout_height="wrap_content">
 
             <TextView
@@ -186,11 +188,13 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             android:orientation="horizontal"
+            android:padding="3dp"
             app:layout_constraintTop_toBottomOf="@id/textViewShowingDishTrackerRestaurant"
             android:layout_width="match_parent"
             android:visibility="invisible"
             android:layout_marginTop="5dp"
-            android:layout_marginStart="15dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
             android:layout_height="wrap_content">
 
             <TextView
