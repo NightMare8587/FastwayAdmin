@@ -47,6 +47,8 @@ public class VendorDetailsActivity extends AppCompatActivity {
     String name, email, phone, acNumber, acName, acIFSC,acAddress;
     String url = "https://intercellular-stabi.000webhostapp.com/CheckoutPayouts/addBenificiary.php";
     FirebaseAuth mAuth;
+
+    
     String ifscURL = "https://intercellular-stabi.000webhostapp.com/verifyIFSCBank/verifyIFSC.php";
     String mauthId;
     FastDialog fastDialog;
