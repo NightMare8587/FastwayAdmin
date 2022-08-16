@@ -1,5 +1,6 @@
 package com.consumers.fastwayadmin.NavFrags.BankVerification;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -198,7 +199,7 @@ public class VendorDetailsActivity extends AppCompatActivity {
                         if(verifyIFSC)
                         new verifyBankIFSC().execute();
                         else
-                            new AddBenificiary().execute();
+                            new verifyBankAcc().execute();
                     }
                 }
             }, new Response.ErrorListener() {
@@ -228,7 +229,10 @@ public class VendorDetailsActivity extends AppCompatActivity {
             StringRequest stringRequest = new StringRequest(Request.Method.POST, prodVerifyBankAccount, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
-
+                    List<String> lst = Arrays.asList(response.split("/"));
+                    if(lst.get(0).equals("SUCCESS") && lst.get(0).equals("VALID") && lst.get(1).equals("ACCOUNT_IS_VALID")){
+                        new AddBenificiary().execute();
+                    }
                 }
             }, new Response.ErrorListener() {
                 @Override
@@ -247,6 +251,7 @@ public class VendorDetailsActivity extends AppCompatActivity {
                     return params;
                 }
             };
+            requestQueue.add(stringRequest);
             return null;
         }
     }
@@ -292,7 +297,7 @@ public class VendorDetailsActivity extends AppCompatActivity {
             RequestQueue requestQueue = Volley.newRequestQueue(VendorDetailsActivity.this);
             StringRequest stringRequest = new StringRequest(Request.Method.POST, url, response -> {
                 Log.i("response",response.trim());
-                Log.i("response",response.trim());
+//                Log.i("response",response.trim());
                 Toast.makeText(VendorDetailsActivity.this, "" + response.trim(), Toast.LENGTH_SHORT).show();
                 fastDialog.dismiss();
                 if(response.trim().equals("SUCCESS"))
@@ -300,7 +305,12 @@ public class VendorDetailsActivity extends AppCompatActivity {
                 else
                     Toast.makeText(VendorDetailsActivity.this, "Something went wrong", Toast.LENGTH_SHORT).show();
 
-                finish();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        startActivity(new Intent(VendorDetailsActivity.this,SelectPayoutMethodType.class));
+                    }
+                });
             }, error -> {
 
             }){
