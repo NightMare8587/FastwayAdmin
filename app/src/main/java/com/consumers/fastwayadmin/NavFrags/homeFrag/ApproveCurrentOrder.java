@@ -90,6 +90,7 @@ public class ApproveCurrentOrder extends AppCompatActivity {
     SharedPreferences userFrequency;
     SharedPreferences storeOrdersForAdminInfo;
     SharedPreferences storeDailyTotalOrdersMade;
+    String paymentType;
     SharedPreferences.Editor storeDailyEditor;
     SharedPreferences.Editor storeEditor;
     String[] monthName = {"January", "February",
@@ -200,21 +201,26 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                     image.add(String.valueOf(dataSnapshot.child("image").getValue()));
                     dishPrices.add(String.valueOf(dataSnapshot.child("price").getValue()));
                     orderAndPayment.add(String.valueOf(dataSnapshot.child("orderAndPayment").getValue()));
+                    paymentType = String.valueOf(dataSnapshot.child("orderAndPayment").getValue());
                     orderAmount = String.valueOf(dataSnapshot.child("orderAmount").getValue());
                     time = String.valueOf(dataSnapshot.child("time").getValue());
                     totalPrice = totalPrice + Integer.parseInt(String.valueOf(dataSnapshot.child("price").getValue()));
                     customisation = String.valueOf(dataSnapshot.child("customisation").getValue());
                     type.add(String.valueOf(dataSnapshot.child("type").getValue()));
                 }
+                String[] arr = paymentType.split(",");
+                paymentType = arr[2];
                 progressBar.setVisibility(View.INVISIBLE);
                 uploadToArrayAdapter(dishNames,dishQuantity,dishHalfOr);
 
                 dishNamePdf = new ArrayList<>(dishNames);
 
+
                 AsyncTask.execute(new Runnable() {
                     @Override
                     public void run() {
                         for(int i=0;i<type.size();i++){
+
                             DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(sharedPreferences.getString("locality","")).child(auth.getUid()).child("List of Dish");
                             databaseReference.child(type.get(i)).child(dishNames.get(i)).addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
@@ -312,252 +318,272 @@ public class ApproveCurrentOrder extends AppCompatActivity {
         });
 
         approve.setOnClickListener(v -> {
-            approve.setEnabled(false);
-            
-            new addOrderToTableCurrent().execute();
+            if(paymentType.equals("instantCheckOut")) {
+                approve.setEnabled(false);
 
-            AsyncTask.execute(new Runnable() {
-                @Override
-                public void run() {
-                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("ResAnalysis").child(state).child(sharedPreferences.getString("locality",""));
-                    databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            if(snapshot.exists()){
-                                if(snapshot.hasChild("veg")) {
-                                    int vegVal = Integer.parseInt(String.valueOf(snapshot.child("veg").getValue()));
-                                    vegVal += veg;
-                                    databaseReference.child("veg").setValue(vegVal + "");
-                                }else
-                                    databaseReference.child("veg").setValue(veg + "");
+                new addOrderToTableCurrent().execute();
 
-                                if(snapshot.hasChild("NonVeg")) {
-                                    int vegVal = Integer.parseInt(String.valueOf(snapshot.child("NonVeg").getValue()));
-                                    vegVal += nonVeg;
-                                    databaseReference.child("NonVeg").setValue(vegVal + "");
-                                }else
-                                    databaseReference.child("NonVeg").setValue(nonVeg + "");
+                AsyncTask.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("ResAnalysis").child(state).child(sharedPreferences.getString("locality", ""));
+                        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                if (snapshot.exists()) {
+                                    if (snapshot.hasChild("veg")) {
+                                        int vegVal = Integer.parseInt(String.valueOf(snapshot.child("veg").getValue()));
+                                        vegVal += veg;
+                                        databaseReference.child("veg").setValue(vegVal + "");
+                                    } else
+                                        databaseReference.child("veg").setValue(veg + "");
 
-                                if(snapshot.hasChild("vegan")) {
-                                    int vegVal = Integer.parseInt(String.valueOf(snapshot.child("vegan").getValue()));
-                                    vegVal += vegan;
-                                    databaseReference.child("vegan").setValue(vegVal + "");
-                                }else
-                                    databaseReference.child("vegan").setValue(vegan + "");
+                                    if (snapshot.hasChild("NonVeg")) {
+                                        int vegVal = Integer.parseInt(String.valueOf(snapshot.child("NonVeg").getValue()));
+                                        vegVal += nonVeg;
+                                        databaseReference.child("NonVeg").setValue(vegVal + "");
+                                    } else
+                                        databaseReference.child("NonVeg").setValue(nonVeg + "");
 
-                                DatabaseReference checkRestaurant = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("ResAnalysis").child(state).child(sharedPreferences.getString("locality","")).child(auth.getUid());
-                                checkRestaurant.addListenerForSingleValueEvent(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                        if(snapshot.exists()){
-                                            if(snapshot.hasChild("veg")) {
-                                                int vegVal = Integer.parseInt(String.valueOf(snapshot.child("veg").getValue()));
-                                                vegVal += veg;
-                                                checkRestaurant.child("veg").setValue(vegVal + "");
-                                            }else
-                                                checkRestaurant.child("veg").setValue(veg + "");
+                                    if (snapshot.hasChild("vegan")) {
+                                        int vegVal = Integer.parseInt(String.valueOf(snapshot.child("vegan").getValue()));
+                                        vegVal += vegan;
+                                        databaseReference.child("vegan").setValue(vegVal + "");
+                                    } else
+                                        databaseReference.child("vegan").setValue(vegan + "");
 
-                                            if(snapshot.hasChild("NonVeg")) {
-                                                int vegVal = Integer.parseInt(String.valueOf(snapshot.child("NonVeg").getValue()));
-                                                vegVal += nonVeg;
-                                                checkRestaurant.child("NonVeg").setValue(vegVal + "");
-                                            }else
-                                                checkRestaurant.child("NonVeg").setValue(nonVeg + "");
+                                    DatabaseReference checkRestaurant = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("ResAnalysis").child(state).child(sharedPreferences.getString("locality", "")).child(auth.getUid());
+                                    checkRestaurant.addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                            if (snapshot.exists()) {
+                                                if (snapshot.hasChild("veg")) {
+                                                    int vegVal = Integer.parseInt(String.valueOf(snapshot.child("veg").getValue()));
+                                                    vegVal += veg;
+                                                    checkRestaurant.child("veg").setValue(vegVal + "");
+                                                } else
+                                                    checkRestaurant.child("veg").setValue(veg + "");
 
-                                            if(snapshot.hasChild("vegan")) {
-                                                int vegVal = Integer.parseInt(String.valueOf(snapshot.child("vegan").getValue()));
-                                                vegVal += vegan;
-                                                checkRestaurant.child("vegan").setValue(vegVal + "");
-                                            }else
-                                                checkRestaurant.child("vegan").setValue(vegan + "");
-                                        }else{
-                                            if(!(veg == 0))
-                                                checkRestaurant.child("veg").setValue(veg + "");
+                                                if (snapshot.hasChild("NonVeg")) {
+                                                    int vegVal = Integer.parseInt(String.valueOf(snapshot.child("NonVeg").getValue()));
+                                                    vegVal += nonVeg;
+                                                    checkRestaurant.child("NonVeg").setValue(vegVal + "");
+                                                } else
+                                                    checkRestaurant.child("NonVeg").setValue(nonVeg + "");
 
-                                            if(!(vegan == 0))
-                                                checkRestaurant.child("vegan").setValue(vegan + "");
+                                                if (snapshot.hasChild("vegan")) {
+                                                    int vegVal = Integer.parseInt(String.valueOf(snapshot.child("vegan").getValue()));
+                                                    vegVal += vegan;
+                                                    checkRestaurant.child("vegan").setValue(vegVal + "");
+                                                } else
+                                                    checkRestaurant.child("vegan").setValue(vegan + "");
+                                            } else {
+                                                if (!(veg == 0))
+                                                    checkRestaurant.child("veg").setValue(veg + "");
 
-                                            if(!(nonVeg == 0))
-                                                checkRestaurant.child("NonVeg").setValue(nonVeg + "");
+                                                if (!(vegan == 0))
+                                                    checkRestaurant.child("vegan").setValue(vegan + "");
+
+                                                if (!(nonVeg == 0))
+                                                    checkRestaurant.child("NonVeg").setValue(nonVeg + "");
+                                            }
                                         }
-                                    }
 
-                                    @Override
-                                    public void onCancelled(@NonNull DatabaseError error) {
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError error) {
 
-                                    }
-                                });
-                            }else{
-
-                                DatabaseReference checkRestaurant = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("ResAnalysis").child(state).child(sharedPreferences.getString("locality","")).child(auth.getUid());
-                                checkRestaurant.addListenerForSingleValueEvent(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                        if(snapshot.exists()){
-                                            if(snapshot.hasChild("veg")) {
-                                                int vegVal = Integer.parseInt(String.valueOf(snapshot.child("veg").getValue()));
-                                                vegVal += veg;
-                                                checkRestaurant.child("veg").setValue(vegVal + "");
-                                            }else
-                                                checkRestaurant.child("veg").setValue(veg + "");
-
-                                            if(snapshot.hasChild("NonVeg")) {
-                                                int vegVal = Integer.parseInt(String.valueOf(snapshot.child("NonVeg").getValue()));
-                                                vegVal += nonVeg;
-                                                checkRestaurant.child("NonVeg").setValue(vegVal + "");
-                                            }else
-                                                checkRestaurant.child("NonVeg").setValue(nonVeg + "");
-
-                                            if(snapshot.hasChild("vegan")) {
-                                                int vegVal = Integer.parseInt(String.valueOf(snapshot.child("vegan").getValue()));
-                                                vegVal += vegan;
-                                                checkRestaurant.child("vegan").setValue(vegVal + "");
-                                            }else
-                                                checkRestaurant.child("vegan").setValue(vegan + "");
-                                        }else{
-                                            if(!(veg == 0))
-                                                checkRestaurant.child("veg").setValue(veg + "");
-
-                                            if(!(vegan == 0))
-                                                checkRestaurant.child("vegan").setValue(vegan + "");
-
-                                            if(!(nonVeg == 0))
-                                                checkRestaurant.child("NonVeg").setValue(nonVeg + "");
                                         }
-                                    }
+                                    });
+                                } else {
 
-                                    @Override
-                                    public void onCancelled(@NonNull DatabaseError error) {
+                                    DatabaseReference checkRestaurant = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("ResAnalysis").child(state).child(sharedPreferences.getString("locality", "")).child(auth.getUid());
+                                    checkRestaurant.addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                            if (snapshot.exists()) {
+                                                if (snapshot.hasChild("veg")) {
+                                                    int vegVal = Integer.parseInt(String.valueOf(snapshot.child("veg").getValue()));
+                                                    vegVal += veg;
+                                                    checkRestaurant.child("veg").setValue(vegVal + "");
+                                                } else
+                                                    checkRestaurant.child("veg").setValue(veg + "");
 
-                                    }
-                                });
-                                if(!(veg == 0))
-                                    databaseReference.child("veg").setValue(veg + "");
+                                                if (snapshot.hasChild("NonVeg")) {
+                                                    int vegVal = Integer.parseInt(String.valueOf(snapshot.child("NonVeg").getValue()));
+                                                    vegVal += nonVeg;
+                                                    checkRestaurant.child("NonVeg").setValue(vegVal + "");
+                                                } else
+                                                    checkRestaurant.child("NonVeg").setValue(nonVeg + "");
 
-                                if(!(vegan == 0))
-                                    databaseReference.child("vegan").setValue(vegan + "");
+                                                if (snapshot.hasChild("vegan")) {
+                                                    int vegVal = Integer.parseInt(String.valueOf(snapshot.child("vegan").getValue()));
+                                                    vegVal += vegan;
+                                                    checkRestaurant.child("vegan").setValue(vegVal + "");
+                                                } else
+                                                    checkRestaurant.child("vegan").setValue(vegan + "");
+                                            } else {
+                                                if (!(veg == 0))
+                                                    checkRestaurant.child("veg").setValue(veg + "");
 
-                                if(!(nonVeg == 0))
-                                    databaseReference.child("NonVeg").setValue(nonVeg + "");
+                                                if (!(vegan == 0))
+                                                    checkRestaurant.child("vegan").setValue(vegan + "");
+
+                                                if (!(nonVeg == 0))
+                                                    checkRestaurant.child("NonVeg").setValue(nonVeg + "");
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError error) {
+
+                                        }
+                                    });
+                                    if (!(veg == 0))
+                                        databaseReference.child("veg").setValue(veg + "");
+
+                                    if (!(vegan == 0))
+                                        databaseReference.child("vegan").setValue(vegan + "");
+
+                                    if (!(nonVeg == 0))
+                                        databaseReference.child("NonVeg").setValue(nonVeg + "");
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+
+                            }
+                        });
+                    }
+                });
+
+                SharedPreferences checkPrem = getSharedPreferences("AdminPremiumDetails", MODE_PRIVATE);
+                if (checkPrem.contains("status") && checkPrem.getString("status", "").equals("active")) {
+                    String month = monthName[calendar.get(Calendar.MONTH)];
+                    if (storeForDishAnalysis.contains("DishAnalysisMonthBasis")) {
+                        gson = new Gson();
+                        Type type = new TypeToken<HashMap<String, HashMap<String, String>>>() {
+                        }.getType();
+                        String storedHash = storeForDishAnalysis.getString("DishAnalysisMonthBasis", "");
+                        HashMap<String, HashMap<String, String>> myMap = gson.fromJson(storedHash, type);
+                        HashMap<String, String> map;
+                        if (myMap.containsKey(month)) {
+                            map = new HashMap<>(myMap.get(month));
+                            Log.i("checking", map.toString());
+                            for (int k = 0; k < dishNames.size(); k++) {
+                                if (map.containsKey(dishNames.get(k))) {
+                                    int val = Integer.parseInt(map.get(dishNames.get(k)));
+                                    val++;
+                                    map.put(dishNames.get(k), String.valueOf(val));
+                                } else {
+                                    map.put(dishNames.get(k), "1");
+                                }
+                            }
+                        } else {
+                            map = new HashMap<>();
+                            for (int i = 0; i < dishNames.size(); i++) {
+                                map.put(dishNames.get(i), "1");
                             }
                         }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError error) {
-
-                        }
-                    });
-                }
-            });
-
-            SharedPreferences checkPrem = getSharedPreferences("AdminPremiumDetails",MODE_PRIVATE);
-            if(checkPrem.contains("status") && checkPrem.getString("status","").equals("active")) {
-                String month = monthName[calendar.get(Calendar.MONTH)];
-                if (storeForDishAnalysis.contains("DishAnalysisMonthBasis")) {
-                    gson = new Gson();
-                    Type type = new TypeToken<HashMap<String, HashMap<String, String>>>() {
-                    }.getType();
-                    String storedHash = storeForDishAnalysis.getString("DishAnalysisMonthBasis", "");
-                    HashMap<String, HashMap<String, String>> myMap = gson.fromJson(storedHash, type);
-                    HashMap<String, String> map;
-                    if (myMap.containsKey(month)) {
-                        map = new HashMap<>(myMap.get(month));
-                        Log.i("checking", map.toString());
-                        for (int k = 0; k < dishNames.size(); k++) {
-                            if (map.containsKey(dishNames.get(k))) {
-                                int val = Integer.parseInt(map.get(dishNames.get(k)));
-                                val++;
-                                map.put(dishNames.get(k), String.valueOf(val));
-                            } else {
-                                map.put(dishNames.get(k), "1");
-                            }
-                        }
+                        myMap.put(month, map);
+                        dishAnalysis.putString("DishAnalysisMonthBasis", gson.toJson(myMap));
                     } else {
-                        map = new HashMap<>();
-                        for (int i = 0; i < dishNames.size(); i++) {
-                            map.put(dishNames.get(i), "1");
+                        HashMap<String, HashMap<String, String>> map = new HashMap<>();
+                        HashMap<String, String> myMap = new HashMap<>();
+                        for (int j = 0; j < dishNames.size(); j++) {
+                            myMap.put(dishNames.get(j), "1");
+                        }
+                        map.put(month, myMap);
+                        gson = new Gson();
+                        dishAnalysis.putString("DishAnalysisMonthBasis", gson.toJson(map));
+                    }
+                    dishAnalysis.apply();
+                }
+
+
+                updateTotalAmount(orderAmount);
+                RequestQueue requestQueue = Volley.newRequestQueue(ApproveCurrentOrder.this);
+                JSONObject main = new JSONObject();
+                FirebaseAuth auth = FirebaseAuth.getInstance();
+                totalOrders.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (snapshot.hasChild("totalOrdersMade")) {
+                            int totalOrder = Integer.parseInt(String.valueOf(snapshot.child("totalOrdersMade").getValue()));
+                            totalOrder = totalOrder + 1;
+                            totalOrders.child("totalOrdersMade").setValue(totalOrder);
+                        } else {
+                            totalOrders.child("totalOrdersMade").setValue("1");
                         }
                     }
-                    myMap.put(month, map);
-                    dishAnalysis.putString("DishAnalysisMonthBasis", gson.toJson(myMap));
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+
+
+                if (restaurantDailyTrack.contains("totalOrdersToday")) {
+                    int val = Integer.parseInt(restaurantDailyTrack.getString("totalOrdersToday", ""));
+                    val = val + 1;
+                    restaurantTrackEditor.putString("totalOrdersToday", String.valueOf(val));
                 } else {
-                    HashMap<String, HashMap<String, String>> map = new HashMap<>();
-                    HashMap<String, String> myMap = new HashMap<>();
-                    for (int j = 0; j < dishNames.size(); j++) {
-                        myMap.put(dishNames.get(j), "1");
+                    restaurantTrackEditor.putString("totalOrdersToday", String.valueOf(1));
+                }
+                if (restaurantDailyTrack.contains("totalTransactionsToday")) {
+                    double val = Double.parseDouble(restaurantDailyTrack.getString("totalTransactionsToday", ""));
+                    val = val + Double.parseDouble(orderAmount);
+                    restaurantTrackEditor.putString("totalTransactionsToday", String.valueOf(val));
+                } else {
+                    restaurantTrackEditor.putString("totalTransactionsToday", String.valueOf(orderAmount));
+                }
+
+                String approveTime = String.valueOf(System.currentTimeMillis());
+                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(id).child("Recent Orders").child(time);
+                for (int i = 0; i < dishNames.size(); i++) {
+                    MyClass myClass = new MyClass(dishNames.get(i), dishPrices.get(i), image.get(i), type.get(i), "" + approveTime, dishQuantity.get(i), dishHalfOr.get(i), state, String.valueOf(orderAmount), orderID, orderAndPayment.get(i), "Order Approved", sharedPreferences.getString("locality", ""));
+                    databaseReference.child(Objects.requireNonNull(auth.getUid())).child(dishNames.get(i)).setValue(myClass);
+                }
+
+
+                databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(sharedPreferences.getString("locality", "")).child(auth.getUid());
+                for (int i = 0; i < dishNames.size(); i++) {
+
+                    MyClass myClass = new MyClass(dishNames.get(i), dishPrices.get(i), image.get(i), type.get(i), "" + approveTime, dishQuantity.get(i), dishHalfOr.get(i), state, String.valueOf(orderAmount), orderID, orderAndPayment.get(i), "Order Approved", sharedPreferences.getString("locality", ""));
+                    databaseReference.child("Recent Orders").child("" + time).child(auth.getUid()).child(dishNames.get(i)).setValue(myClass);
+                }
+                restaurantTrackEditor.apply();
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(sharedPreferences.getString("locality", "")).child(Objects.requireNonNull(auth.getUid())).child("Tables").child(table);
+                SharedPreferences loginInfo = getSharedPreferences("loginInfo", MODE_PRIVATE);
+                if (loginInfo.contains("payoutMethodChoosen")) {
+                    if (loginInfo.getString("payoutMethodChoosen", "").equals("imps")) {
+                        amountToBeSend = Double.parseDouble(orderAmount);
+                        amountToBeSend = amountToBeSend - 5;
+                        new MakePayout().execute();
+                    } else {
+                        DatabaseReference updatePayoutOrder = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid());
+                        updatePayoutOrder.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                if (snapshot.hasChild("totalPayoutAmount")) {
+                                    double current = Double.parseDouble(String.valueOf(snapshot.child("totalPayoutAmount").getValue()));
+                                    current += Double.parseDouble(orderAmount);
+                                    updatePayoutOrder.child("totalPayoutAmount").setValue(String.valueOf(current));
+                                } else {
+                                    updatePayoutOrder.child("totalPayoutAmount").setValue(String.valueOf(orderAmount));
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+
+                            }
+                        });
                     }
-                    map.put(month, myMap);
-                    gson = new Gson();
-                    dishAnalysis.putString("DishAnalysisMonthBasis", gson.toJson(map));
-                }
-                dishAnalysis.apply();
-            }
-
-
-
-            updateTotalAmount(orderAmount);
-            RequestQueue requestQueue = Volley.newRequestQueue(ApproveCurrentOrder.this);
-            JSONObject main = new JSONObject();
-            FirebaseAuth auth = FirebaseAuth.getInstance();
-            totalOrders.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    if(snapshot.hasChild("totalOrdersMade")){
-                        int totalOrder = Integer.parseInt(String.valueOf(snapshot.child("totalOrdersMade").getValue()));
-                        totalOrder = totalOrder + 1;
-                        totalOrders.child("totalOrdersMade").setValue(totalOrder);
-                    }else{
-                        totalOrders.child("totalOrdersMade").setValue("1");
-                    }
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-
-                }
-            });
-
-
-
-            if(restaurantDailyTrack.contains("totalOrdersToday")){
-                int val = Integer.parseInt(restaurantDailyTrack.getString("totalOrdersToday",""));
-                val = val + 1;
-                restaurantTrackEditor.putString("totalOrdersToday",String.valueOf(val));
-            }else{
-                restaurantTrackEditor.putString("totalOrdersToday",String.valueOf(1));
-            }
-            if(restaurantDailyTrack.contains("totalTransactionsToday")){
-                double val = Double.parseDouble(restaurantDailyTrack.getString("totalTransactionsToday",""));
-                val = val + Double.parseDouble(orderAmount);
-                restaurantTrackEditor.putString("totalTransactionsToday",String.valueOf(val));
-            }else{
-                restaurantTrackEditor.putString("totalTransactionsToday",String.valueOf(orderAmount));
-            }
-
-            String approveTime = String.valueOf(System.currentTimeMillis());
-            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(id).child("Recent Orders").child(time);
-            for(int i=0;i<dishNames.size();i++){
-                MyClass myClass = new MyClass(dishNames.get(i),dishPrices.get(i),image.get(i),type.get(i),""+approveTime,dishQuantity.get(i),dishHalfOr.get(i),state,String.valueOf(orderAmount),orderID,orderAndPayment.get(i),"Order Approved",sharedPreferences.getString("locality",""));
-                databaseReference.child(Objects.requireNonNull(auth.getUid())).child(dishNames.get(i)).setValue(myClass);
-            }
-
-
-            databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(sharedPreferences.getString("locality","")).child(auth.getUid());
-            for(int i=0;i<dishNames.size();i++){
-
-                MyClass myClass = new MyClass(dishNames.get(i),dishPrices.get(i),image.get(i),type.get(i),""+approveTime,dishQuantity.get(i),dishHalfOr.get(i),state,String.valueOf(orderAmount),orderID,orderAndPayment.get(i),"Order Approved",sharedPreferences.getString("locality",""));
-                databaseReference.child("Recent Orders").child("" + time).child(auth.getUid()).child(dishNames.get(i)).setValue(myClass);
-            }
-            restaurantTrackEditor.apply();
-            DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid())).child("Tables").child(table);
-            SharedPreferences loginInfo = getSharedPreferences("loginInfo",MODE_PRIVATE);
-            if (loginInfo.contains("payoutMethodChoosen")) {
-                if (loginInfo.getString("payoutMethodChoosen", "").equals("imps")) {
-                    amountToBeSend = Double.parseDouble(orderAmount);
-                    amountToBeSend = amountToBeSend - 5;
-                    new MakePayout().execute();
-                }
-                else {
+                } else {
+//                            Toast.makeText(this, "Defau", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "No payout method choosen\nDefault Method will be applicable", Toast.LENGTH_LONG).show();
                     DatabaseReference updatePayoutOrder = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid());
                     updatePayoutOrder.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
@@ -577,20 +603,69 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                         }
                     });
                 }
+                try {
+                    main.put("to", "/topics/" + id + "");
+                    JSONObject notification = new JSONObject();
+                    notification.put("title", "Order Approved");
+                    notification.put("click_action", "Table Frag");
+                    notification.put("body", "Your order is approved by the owner");
+                    main.put("notification", notification);
+
+                    JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, main, response -> {
+
+                    }, error -> Toast.makeText(ApproveCurrentOrder.this, error.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show()) {
+                        @Override
+                        public Map<String, String> getHeaders() {
+                            Map<String, String> header = new HashMap<>();
+                            header.put("content-type", "application/json");
+                            header.put("authorization", "key=AAAAsigSEMs:APA91bEUF9ZFwIu84Jctci56DQd0TQOepztGOIKIBhoqf7N3ueQrkClw0xBTlWZEWyvwprXZmZgW2MNywF1pNBFpq1jFBr0CmlrJ0wygbZIBOnoZ0jP1zZC6nPxqF2MAP6iF3wuBHD2R");
+                            return header;
+                        }
+                    };
+                    reference.child("Current Order").removeValue();
+                    requestQueue.add(jsonObjectRequest);
+                } catch (Exception e) {
+                    Toast.makeText(ApproveCurrentOrder.this, e.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
+                }
+                new Handler().postDelayed(() -> finish(), 1500);
             }else{
-//                            Toast.makeText(this, "Defau", Toast.LENGTH_SHORT).show();
-                Toast.makeText(this, "No payout method choosen\nDefault Method will be applicable", Toast.LENGTH_LONG).show();
-                DatabaseReference updatePayoutOrder = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid());
-                updatePayoutOrder.addListenerForSingleValueEvent(new ValueEventListener() {
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(sharedPreferences.getString("locality", "")).child(Objects.requireNonNull(auth.getUid())).child("Tables").child(table);
+                RequestQueue requestQueue = Volley.newRequestQueue(ApproveCurrentOrder.this);
+                JSONObject main = new JSONObject();
+                try {
+                    main.put("to", "/topics/" + id + "");
+                    JSONObject notification = new JSONObject();
+                    notification.put("title", "Order Approved");
+                    notification.put("click_action", "Table Frag");
+                    notification.put("body", "Your order is approved by the owner");
+                    main.put("notification", notification);
+
+                    JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, main, response -> {
+
+                    }, error -> Toast.makeText(ApproveCurrentOrder.this, error.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show()) {
+                        @Override
+                        public Map<String, String> getHeaders() {
+                            Map<String, String> header = new HashMap<>();
+                            header.put("content-type", "application/json");
+                            header.put("authorization", "key=AAAAsigSEMs:APA91bEUF9ZFwIu84Jctci56DQd0TQOepztGOIKIBhoqf7N3ueQrkClw0xBTlWZEWyvwprXZmZgW2MNywF1pNBFpq1jFBr0CmlrJ0wygbZIBOnoZ0jP1zZC6nPxqF2MAP6iF3wuBHD2R");
+                            return header;
+                        }
+                    };
+                    reference.child("Current Order").removeValue();
+                    requestQueue.add(jsonObjectRequest);
+                } catch (Exception e) {
+                    Toast.makeText(ApproveCurrentOrder.this, e.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
+                }
+                DatabaseReference addToTable = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(sharedPreferences.getString("locality","")).child(auth.getUid()).child("Tables").child(table);
+                addToTable.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if (snapshot.hasChild("totalPayoutAmount")) {
-                            double current = Double.parseDouble(String.valueOf(snapshot.child("totalPayoutAmount").getValue()));
-                            current += Double.parseDouble(orderAmount);
-                            updatePayoutOrder.child("totalPayoutAmount").setValue(String.valueOf(current));
-                        } else {
-                            updatePayoutOrder.child("totalPayoutAmount").setValue(String.valueOf(orderAmount));
-                        }
+                        if(snapshot.hasChild("amountToBePaid")){
+                            Double currentVal = Double.parseDouble(String.valueOf(snapshot.child("amountToBePaid").getValue()));
+                            currentVal += Double.parseDouble(orderAmount);
+                            addToTable.child("amountToBePaid").setValue(String.valueOf(currentVal));
+                        }else
+                            addToTable.child("amountToBePaid").setValue(String.valueOf(orderAmount));
                     }
 
                     @Override
@@ -598,34 +673,53 @@ public class ApproveCurrentOrder extends AppCompatActivity {
 
                     }
                 });
-            }
-            try{
-                main.put("to","/topics/"+id+"");
-                JSONObject notification = new JSONObject();
-                notification.put("title","Order Approved" );
-                notification.put("click_action","Table Frag");
-                notification.put("body","Your order is approved by the owner");
-                main.put("notification",notification);
 
-                JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, main, response -> {
-
-                }, error -> Toast.makeText(ApproveCurrentOrder.this, error.getLocalizedMessage()+"null", Toast.LENGTH_SHORT).show()){
+                AsyncTask.execute(new Runnable() {
                     @Override
-                    public Map<String, String> getHeaders() {
-                        Map<String,String> header = new HashMap<>();
-                        header.put("content-type","application/json");
-                        header.put("authorization","key=AAAAsigSEMs:APA91bEUF9ZFwIu84Jctci56DQd0TQOepztGOIKIBhoqf7N3ueQrkClw0xBTlWZEWyvwprXZmZgW2MNywF1pNBFpq1jFBr0CmlrJ0wygbZIBOnoZ0jP1zZC6nPxqF2MAP6iF3wuBHD2R");
-                        return header;
-                    }
-                };
-                reference.child("Current Order").removeValue();
-                requestQueue.add(jsonObjectRequest);
-            }
-            catch (Exception e){
-                Toast.makeText(ApproveCurrentOrder.this, e.getLocalizedMessage()+"null", Toast.LENGTH_SHORT).show();
-            }
-            new Handler().postDelayed(() -> finish(),1500);
+                    public void run() {
+                        reference.child("StoreOrdersCheckOut").addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                if(snapshot.exists()){
+                                 for(int i=0;i<dishNames.size();i++){
+                                     if(snapshot.hasChild(dishNames.get(i))){
+                                         int prev = Integer.parseInt(Objects.requireNonNull(snapshot.child(dishNames.get(i)).child("count").getValue(String.class)));
+                                         prev += Integer.parseInt(dishQuantity.get(i));
+                                         reference.child("StoreOrdersCheckOut").child(dishNames.get(i)).child("count").setValue(String.valueOf(prev));
+                                     }else{
+                                         reference.child("StoreOrdersCheckOut").child(dishNames.get(i)).child("image").setValue(image.get(i));
+                                         reference.child("StoreOrdersCheckOut").child(dishNames.get(i)).child("count").setValue(dishQuantity.get(i));
+                                         reference.child("StoreOrdersCheckOut").child(dishNames.get(i)).child("type").setValue(type.get(i));
+                                         reference.child("StoreOrdersCheckOut").child(dishNames.get(i)).child("halfOr").setValue(dishHalfOr.get(i));
+                                     }
+                                 }
+                                }else{
+                                    for(int i=0;i<dishNames.size();i++){
+                                        reference.child("StoreOrdersCheckOut").child(dishNames.get(i)).child("image").setValue(image.get(i));
+                                        reference.child("StoreOrdersCheckOut").child(dishNames.get(i)).child("count").setValue(dishQuantity.get(i));
+                                        reference.child("StoreOrdersCheckOut").child(dishNames.get(i)).child("type").setValue(type.get(i));
+                                        reference.child("StoreOrdersCheckOut").child(dishNames.get(i)).child("halfOr").setValue(dishHalfOr.get(i));
+                                    }
+                                }
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(ApproveCurrentOrder.this, "Completed", Toast.LENGTH_SHORT).show();
+                                        finish();
+                                    }
+                                });
+                            }
 
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+
+                            }
+                        });
+                    }
+                });
+
+
+            }
         });
 
         decline.setOnClickListener(v -> {
