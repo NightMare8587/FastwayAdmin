@@ -683,12 +683,16 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                                 if(snapshot.exists()){
                                  for(int i=0;i<dishNames.size();i++){
                                      if(snapshot.hasChild(dishNames.get(i))){
+                                         int prevAmt = Integer.parseInt(Objects.requireNonNull(snapshot.child(dishNames.get(i)).child("price").getValue(String.class)));
                                          int prev = Integer.parseInt(Objects.requireNonNull(snapshot.child(dishNames.get(i)).child("count").getValue(String.class)));
                                          prev += Integer.parseInt(dishQuantity.get(i));
+                                         prevAmt += Integer.parseInt(dishPrices.get(i));
                                          reference.child("StoreOrdersCheckOut").child(dishNames.get(i)).child("count").setValue(String.valueOf(prev));
+                                         reference.child("StoreOrdersCheckOut").child(dishNames.get(i)).child("price").setValue(String.valueOf(prevAmt));
                                      }else{
                                          reference.child("StoreOrdersCheckOut").child(dishNames.get(i)).child("image").setValue(image.get(i));
                                          reference.child("StoreOrdersCheckOut").child(dishNames.get(i)).child("count").setValue(dishQuantity.get(i));
+                                         reference.child("StoreOrdersCheckOut").child(dishNames.get(i)).child("price").setValue(dishPrices.get(i));
                                          reference.child("StoreOrdersCheckOut").child(dishNames.get(i)).child("type").setValue(type.get(i));
                                          reference.child("StoreOrdersCheckOut").child(dishNames.get(i)).child("halfOr").setValue(dishHalfOr.get(i));
                                      }
@@ -697,6 +701,7 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                                     for(int i=0;i<dishNames.size();i++){
                                         reference.child("StoreOrdersCheckOut").child(dishNames.get(i)).child("image").setValue(image.get(i));
                                         reference.child("StoreOrdersCheckOut").child(dishNames.get(i)).child("count").setValue(dishQuantity.get(i));
+                                        reference.child("StoreOrdersCheckOut").child(dishNames.get(i)).child("price").setValue(dishPrices.get(i));
                                         reference.child("StoreOrdersCheckOut").child(dishNames.get(i)).child("type").setValue(type.get(i));
                                         reference.child("StoreOrdersCheckOut").child(dishNames.get(i)).child("halfOr").setValue(dishHalfOr.get(i));
                                     }
