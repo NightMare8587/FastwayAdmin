@@ -188,16 +188,17 @@ public class MainActivity extends AppCompatActivity {
                         .progressText("Logging in using test... Please Wait")
                         .create();
                 fastDialog.show();
-                DatabaseAdmin user = new DatabaseAdmin(number,name,email);
-                editor.putString("name",name);
-                editor.putString("email",email);
+                DatabaseAdmin user = new DatabaseAdmin(phoneNumber.getText().toString(),fullName.getText().toString(),emailAddress.getText().toString());
+                editor.putString("name",fullName.getText().toString());
+                editor.putString("email",emailAddress.getText().toString());
+                editor.putString("number",phoneNumber.getText().toString());
                 editor.apply();
                 loginAuth.signInWithEmailAndPassword("foodinetest858784@gmail.com","FoodineTest858784").addOnCompleteListener(task -> {
                     if(task.isSuccessful()){
                         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Users");
                         databaseReference.child("8AzmseJgrNcYL7GcH05B3mYcDfp2").setValue(user);
                         fastDialog.dismiss();
-                        editor.putString("testUser","8AzmseJgrNcYL7GcH05B3mYcDfp2");
+                        editor.putString("testAdmin","8AzmseJgrNcYL7GcH05B3mYcDfp2");
                         editor.apply();
                         Toast.makeText(MainActivity.this, "Test Login Successfully", Toast.LENGTH_SHORT).show();
                         startActivity(new Intent(getApplicationContext(),HomeScreen.class));

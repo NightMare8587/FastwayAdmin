@@ -17,6 +17,11 @@
             app:summary=""/>
 
         <Preference
+            app:key="commisionAndFee"
+            app:title="Commision And Platform Fee"
+            app:summary=""/>
+
+        <Preference
             app:key="logoutNow"
             app:title="Logout"
             app:summary=""/>

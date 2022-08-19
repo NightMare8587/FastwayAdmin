@@ -6,8 +6,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.InputType;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -18,6 +20,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDialog;
 
+import com.consumers.fastwayadmin.NavFrags.FastwayPremiumActivites.FastwayPremiums;
 import com.consumers.fastwayadmin.R;
 import com.developer.kalert.KAlertDialog;
 import com.google.firebase.auth.FirebaseAuth;
@@ -120,9 +123,45 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
 
                                 dialog.setView(linearLayout);
                                 dialog.setPositiveButton("Exit", (dialog1, which) -> dialog1.dismiss()).create();
+                                dialog.create();
                                 dialog.show();
                             });
                             payCommissionNow.setOnClickListener(view -> {
+                                SharedPreferences acc = getSharedPreferences("loginInfo",MODE_PRIVATE);
+                                SharedPreferences.Editor acEdit = acc.edit();
+                                if(!acc.contains("number")) {
+                                    android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(CashTransactionCommissionActivity.this);
+                                    builder.setTitle("Contact").setMessage("You need to provide contact number for payment. No need to add +91");
+                                    LinearLayout linearLayout = new LinearLayout(CashTransactionCommissionActivity.this);
+                                    linearLayout.setOrientation(LinearLayout.VERTICAL);
+                                    EditText editText = new EditText(CashTransactionCommissionActivity.this);
+                                    editText.setInputType(InputType.TYPE_CLASS_NUMBER);
+                                    editText.setHint("Enter Number");
+                                    editText.setMaxLines(10);
+                                    linearLayout.addView(editText);
+                                    builder.setPositiveButton("Proceed", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            dialog.dismiss();
+                                            if(editText.length() == 10)
+                                            {
+                                                Toast.makeText(CashTransactionCommissionActivity.this, "Number Saved Successfully", Toast.LENGTH_SHORT).show();
+                                                acEdit.putString("number",editText.getText().toString());
+                                                acEdit.apply();
+
+                                                Intent intent = new Intent(CashTransactionCommissionActivity.this, CashFreeGateway.class);
+                                                intent.putExtra("amount","599.00");
+                                                startActivityForResult(intent,2);
+                                            }else
+                                                Toast.makeText(CashTransactionCommissionActivity.this, "Invalid Number", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }).setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss()).create();
+                                    builder.setCancelable(false);
+                                    builder.setView(linearLayout);
+                                    builder.show();
+                                    return;
+                                }
+
                                 if(commissionAmount != 0) {
                                     SharedPreferences cash = getSharedPreferences("CashCommission",MODE_PRIVATE);
                                     if(cash.contains("fine")) {
@@ -189,6 +228,40 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
                                         totalCommission.setText("Commission to be paid " + "\u20B9" + df.format(commissionAmount));
                                         payCommissionNow.setText("Pay \u20B9" + df.format(commissionAmount + platformFeeAmount) + " Now");
                                         payCommissionNow.setOnClickListener(view -> {
+                                            SharedPreferences acc = getSharedPreferences("loginInfo",MODE_PRIVATE);
+                                            SharedPreferences.Editor acEdit = acc.edit();
+                                            if(!acc.contains("number")) {
+                                                android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(CashTransactionCommissionActivity.this);
+                                                builder.setTitle("Contact").setMessage("You need to provide contact number for payment. No need to add +91");
+                                                LinearLayout linearLayout = new LinearLayout(CashTransactionCommissionActivity.this);
+                                                linearLayout.setOrientation(LinearLayout.VERTICAL);
+                                                EditText editText = new EditText(CashTransactionCommissionActivity.this);
+                                                editText.setInputType(InputType.TYPE_CLASS_NUMBER);
+                                                editText.setHint("Enter Number");
+                                                editText.setMaxLines(10);
+                                                linearLayout.addView(editText);
+                                                builder.setPositiveButton("Proceed", new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                        dialog.dismiss();
+                                                        if(editText.length() == 10)
+                                                        {
+                                                            Toast.makeText(CashTransactionCommissionActivity.this, "Number Saved Successfully", Toast.LENGTH_SHORT).show();
+                                                            acEdit.putString("number",editText.getText().toString());
+                                                            acEdit.apply();
+
+                                                            Intent intent = new Intent(CashTransactionCommissionActivity.this, CashFreeGateway.class);
+                                                            intent.putExtra("amount","599.00");
+                                                            startActivityForResult(intent,2);
+                                                        }else
+                                                            Toast.makeText(CashTransactionCommissionActivity.this, "Invalid Number", Toast.LENGTH_SHORT).show();
+                                                    }
+                                                }).setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss()).create();
+                                                builder.setCancelable(false);
+                                                builder.setView(linearLayout);
+                                                builder.show();
+                                                return;
+                                            }
                                             if(commissionAmount != 0) {
                                                 SharedPreferences cash = getSharedPreferences("CashCommission",MODE_PRIVATE);
                                                 if(cash.contains("fine")) {
@@ -252,6 +325,40 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
                             totalCommission.setText("Commission to be paid " + "\u20B9" + df.format(commissionAmount));
                             payCommissionNow.setText("Pay \u20B9" + df.format(commissionAmount + platformFeeAmount) + " Now");
                             payCommissionNow.setOnClickListener(view -> {
+                                SharedPreferences acc = getSharedPreferences("loginInfo",MODE_PRIVATE);
+                                SharedPreferences.Editor acEdit = acc.edit();
+                                if(!acc.contains("number")) {
+                                    android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(CashTransactionCommissionActivity.this);
+                                    builder.setTitle("Contact").setMessage("You need to provide contact number for payment. No need to add +91");
+                                    LinearLayout linearLayout = new LinearLayout(CashTransactionCommissionActivity.this);
+                                    linearLayout.setOrientation(LinearLayout.VERTICAL);
+                                    EditText editText = new EditText(CashTransactionCommissionActivity.this);
+                                    editText.setInputType(InputType.TYPE_CLASS_NUMBER);
+                                    editText.setHint("Enter Number");
+                                    editText.setMaxLines(10);
+                                    linearLayout.addView(editText);
+                                    builder.setPositiveButton("Proceed", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            dialog.dismiss();
+                                            if(editText.length() == 10)
+                                            {
+                                                Toast.makeText(CashTransactionCommissionActivity.this, "Number Saved Successfully", Toast.LENGTH_SHORT).show();
+                                                acEdit.putString("number",editText.getText().toString());
+                                                acEdit.apply();
+
+                                                Intent intent = new Intent(CashTransactionCommissionActivity.this, CashFreeGateway.class);
+                                                intent.putExtra("amount","599.00");
+                                                startActivityForResult(intent,2);
+                                            }else
+                                                Toast.makeText(CashTransactionCommissionActivity.this, "Invalid Number", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }).setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss()).create();
+                                    builder.setCancelable(false);
+                                    builder.setView(linearLayout);
+                                    builder.show();
+                                    return;
+                                }
                                 if(commissionAmount != 0) {
                                     SharedPreferences cash = getSharedPreferences("CashCommission",MODE_PRIVATE);
                                     if(cash.contains("fine")) {
@@ -300,15 +407,19 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
                                             platformFeeAmount = Double.parseDouble(Objects.requireNonNull(snapshot.child("totalMonthAmount").getValue(String.class)));
                                             if(platformFeeAmount == 0D){
                                                 platformFeeAmount = 0D;
-                                            }else if(platformFeeAmount >= 500000L){
-                                                platformFeeAmount = 5000D;
-                                            }else if(platformFeeAmount >= 350000L){
-                                                platformFeeAmount = 3500D;
-                                            }else if(platformFeeAmount >= 100000){
-                                                platformFeeAmount = 2000D;
-                                            }else{
-                                                platformFeeAmount = 1000D;
+                                            }else if(platformFeeAmount >= 400000L){
+                                                platformFeeAmount = (platformFeeAmount / 100) * 4;
+                                            }else if(platformFeeAmount >= 300000L){
+                                                platformFeeAmount = 12000D;
                                             }
+                                            else if(platformFeeAmount >= 200000L){
+                                                platformFeeAmount = 8000D;
+                                            }else if(platformFeeAmount >= 100000){
+                                                platformFeeAmount = 4000D;
+                                            }else if(platformFeeAmount >= 50000){
+                                                platformFeeAmount = 2000D;
+                                            }else
+                                                platformFeeAmount = 1000D;
                                             platformFee.setText("Platform Fee: " + "\u20B9" + df.format(platformFeeAmount));
                                             platformFeeBool = true;
                                         }else{
@@ -318,6 +429,40 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
                                         totalCommission.setText("Commission to be paid " + "\u20B9" + df.format(commissionAmount));
                                         payCommissionNow.setText("Pay \u20B9" + df.format(commissionAmount + platformFeeAmount) + " Now");
                                         payCommissionNow.setOnClickListener(view -> {
+                                            SharedPreferences acc = getSharedPreferences("loginInfo",MODE_PRIVATE);
+                                            SharedPreferences.Editor acEdit = acc.edit();
+                                            if(!acc.contains("number")) {
+                                                android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(CashTransactionCommissionActivity.this);
+                                                builder.setTitle("Contact").setMessage("You need to provide contact number for payment. No need to add +91");
+                                                LinearLayout linearLayout = new LinearLayout(CashTransactionCommissionActivity.this);
+                                                linearLayout.setOrientation(LinearLayout.VERTICAL);
+                                                EditText editText = new EditText(CashTransactionCommissionActivity.this);
+                                                editText.setInputType(InputType.TYPE_CLASS_NUMBER);
+                                                editText.setHint("Enter Number");
+                                                editText.setMaxLines(10);
+                                                linearLayout.addView(editText);
+                                                builder.setPositiveButton("Proceed", new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                        dialog.dismiss();
+                                                        if(editText.length() == 10)
+                                                        {
+                                                            Toast.makeText(CashTransactionCommissionActivity.this, "Number Saved Successfully", Toast.LENGTH_SHORT).show();
+                                                            acEdit.putString("number",editText.getText().toString());
+                                                            acEdit.apply();
+
+                                                            Intent intent = new Intent(CashTransactionCommissionActivity.this, CashFreeGateway.class);
+                                                            intent.putExtra("amount","599.00");
+                                                            startActivityForResult(intent,2);
+                                                        }else
+                                                            Toast.makeText(CashTransactionCommissionActivity.this, "Invalid Number", Toast.LENGTH_SHORT).show();
+                                                    }
+                                                }).setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss()).create();
+                                                builder.setCancelable(false);
+                                                builder.setView(linearLayout);
+                                                builder.show();
+                                                return;
+                                            }
                                             if(commissionAmount != 0) {
                                                 SharedPreferences cash = getSharedPreferences("CashCommission",MODE_PRIVATE);
                                                 if(cash.contains("fine")) {

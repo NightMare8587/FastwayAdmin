@@ -12,8 +12,6 @@ import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
-import androidx.preference.PreferenceManager;
-import androidx.preference.SwitchPreference;
 import androidx.preference.SwitchPreferenceCompat;
 
 import com.consumers.fastwayadmin.ListViewActivity.BlockedUsersList.BlockedUsers;
@@ -21,6 +19,7 @@ import com.consumers.fastwayadmin.ListViewActivity.CashTrans.CashTransactions;
 import com.consumers.fastwayadmin.ListViewActivity.MyAccount;
 import com.consumers.fastwayadmin.ListViewActivity.MyOrdersTransactions;
 import com.consumers.fastwayadmin.MyService;
+import com.consumers.fastwayadmin.NavFrags.CashCommission.CashTransactionCommissionActivity;
 import com.consumers.fastwayadmin.NavFrags.FastwayPremiumActivites.FastwayPremiums;
 import com.consumers.fastwayadmin.R;
 import com.consumers.fastwayadmin.SplashAndIntro.SplashScreen;
@@ -53,8 +52,14 @@ public class AccountSettingsFragment extends PreferenceFragmentCompat {
         Preference logout = findPreference("logoutNow");
         Preference premium = findPreference("premium");
         Preference terms = findPreference("termsConditions");
+        Preference comFee = findPreference("commisionAndFee");
         SwitchPreferenceCompat takeaway = findPreference("TakeAwaySwitch");
         SwitchPreferenceCompat tableOrder = findPreference("tableBookingAllowedSwitch");
+
+        comFee.setOnPreferenceClickListener(preference -> {
+            startActivity(new Intent(requireContext(), CashTransactionCommissionActivity.class));
+            return true;
+        });
 
         SharedPreferences sharedPreferences = requireContext().getSharedPreferences("loginInfo",MODE_PRIVATE);
         SharedPreferences.Editor sharedEdit = sharedPreferences.edit();

@@ -2,10 +2,10 @@ package com.consumers.fastwayadmin.NavFrags.FastwayPremiumActivites;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -65,7 +65,7 @@ public class FastwayPremiums extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         sharedPreferences = getSharedPreferences("AdminPremiumDetails",MODE_PRIVATE);
         editor = sharedPreferences.edit();
-        databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid());
+        databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @SuppressLint("SetTextI18n")
             @Override
@@ -80,6 +80,40 @@ public class FastwayPremiums extends AppCompatActivity {
                         button.setVisibility(View.VISIBLE);
                         button.setText("Subscribe Now");
                         button.setOnClickListener(click -> {
+                            SharedPreferences acc = getSharedPreferences("loginInfo",MODE_PRIVATE);
+                            SharedPreferences.Editor acEdit = acc.edit();
+                            if(!acc.contains("number")) {
+                                android.app.AlertDialog.Builder builder = new AlertDialog.Builder(FastwayPremiums.this);
+                                builder.setTitle("Contact").setMessage("You need to provide contact number for payment. No need to add +91");
+                                LinearLayout linearLayout = new LinearLayout(FastwayPremiums.this);
+                                linearLayout.setOrientation(LinearLayout.VERTICAL);
+                                EditText editText = new EditText(FastwayPremiums.this);
+                                editText.setInputType(InputType.TYPE_CLASS_NUMBER);
+                                editText.setHint("Enter Number");
+                                editText.setMaxLines(10);
+                                linearLayout.addView(editText);
+                                builder.setPositiveButton("Proceed", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                        if(editText.length() == 10)
+                                        {
+                                            Toast.makeText(FastwayPremiums.this, "Number Saved Successfully", Toast.LENGTH_SHORT).show();
+                                            acEdit.putString("number",editText.getText().toString());
+                                            acEdit.apply();
+                                            freeTrial = true;
+                                            Intent intent = new Intent(FastwayPremiums.this, CashFreeGateway.class);
+                                            intent.putExtra("amount","599.00");
+                                            startActivityForResult(intent,2);
+                                        }else
+                                            Toast.makeText(FastwayPremiums.this, "Invalid Number", Toast.LENGTH_SHORT).show();
+                                    }
+                                }).setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss()).create();
+                                builder.setCancelable(false);
+                                builder.setView(linearLayout);
+                                builder.show();
+                                return;
+                            }
                             freeTrial = true;
                             Intent intent = new Intent(FastwayPremiums.this, CashFreeGateway.class);
                             intent.putExtra("amount","599.00");

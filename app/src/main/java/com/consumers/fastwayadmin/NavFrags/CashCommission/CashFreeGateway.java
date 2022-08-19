@@ -16,11 +16,8 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.cashfree.pg.CFPaymentService;
@@ -43,8 +40,12 @@ public class CashFreeGateway extends AppCompatActivity {
     DecimalFormat df = new DecimalFormat("0.00");
     int ran;
     String orderId;
+    SharedPreferences acInfo;
     String universalOrderID;
+    String name,email,number;
+    String appID,stage,finalUrl;
     String ranV;
+    SharedPreferences.Editor editor;
 
     enum SeamlessMode {
         CARD, WALLET, NET_BANKING, UPI_COLLECT, PAY_PAL
@@ -57,6 +58,23 @@ public class CashFreeGateway extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cash_free_gateway);
         amount = getIntent().getStringExtra("amount");
+        acInfo = getSharedPreferences("loginInfo",MODE_PRIVATE);
+        editor = acInfo.edit();
+        editor.putString("testAdmin","112233");
+        editor.apply();
+        name = acInfo.getString("name","");
+        email = acInfo.getString("email","");
+        number = acInfo.getString("number","");
+
+        if(acInfo.contains("testAdmin")){
+            appID = "61532dad5cd9ca634ae8ca59d23516";
+            finalUrl = test;
+            stage = "TEST";
+        }else{
+            finalUrl = urls;
+            appID = "107263678b9b7b22cd717e2519362701";
+            stage = "PROD";
+        }
 //        Double am = Double.parseDouble(amount);
 //        platformFee = getIntent().getStringExtra("platformFee");
 //        if(!platformFee.equals("0")){
@@ -86,7 +104,7 @@ public class CashFreeGateway extends AppCompatActivity {
 //       JSONObject jsonObject = new JSONObject();
         RequestQueue requestQueue = Volley.newRequestQueue(this);
         try {
-            StringRequest stringRequest = new StringRequest(Request.Method.POST, test, response -> {
+            StringRequest stringRequest = new StringRequest(Request.Method.POST, finalUrl, response -> {
                 if (response == null)
                     Log.i("null", "response");
                 else {
@@ -94,19 +112,19 @@ public class CashFreeGateway extends AppCompatActivity {
                     token = response;
                     Map<String, String> map = new HashMap<>();
 
-                    map.put(PARAM_APP_ID, "61532dad5cd9ca634ae8ca59d23516");
+                    map.put(PARAM_APP_ID, appID);
                     map.put(PARAM_ORDER_ID, orderId);
                     map.put(PARAM_ORDER_AMOUNT, "" + df.format(Double.parseDouble(amount)));
                     map.put(PARAM_ORDER_CURRENCY, "INR");
-                    map.put(PARAM_CUSTOMER_NAME, "Pulkit Loya");
-                    map.put(PARAM_CUSTOMER_EMAIL, "maheshwariloya@gmail.com");
-                    map.put(PARAM_CUSTOMER_PHONE, "8076531395");
+                    map.put(PARAM_CUSTOMER_NAME, name);
+                    map.put(PARAM_CUSTOMER_EMAIL, email);
+                    map.put(PARAM_CUSTOMER_PHONE, number);
                     Log.i("here", "success");
                     CFPaymentService cfPaymentService = CFPaymentService.getCFPaymentServiceInstance();
-                    cfPaymentService.doPayment(CashFreeGateway.this, map, token, "TEST");
+                    cfPaymentService.doPayment(CashFreeGateway.this, map, token, stage);
                 }
             }, error -> {
-                Log.i("error", "error");
+                Log.i("error", "error: " + error.toString());
                 KAlertDialog dialog = new KAlertDialog(CashFreeGateway.this, KAlertDialog.ERROR_TYPE)
                         .setTitleText("Error")
                         .setContentText("Payment can't be processed. try again later :(")
