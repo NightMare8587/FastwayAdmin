@@ -272,6 +272,7 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                         databaseReference.child("Recent Orders").child("" + time).child(auth.getUid()).child(dishNames.get(i)).setValue(myClass);
                     }
                     DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid())).child("Tables").child(table);
+                    if(!paymentType.equals("endCheckOut"))
                     new InitiateRefund().execute();
                     try {
                         main.put("to", "/topics/" + id + "");
@@ -627,7 +628,7 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                 } catch (Exception e) {
                     Toast.makeText(ApproveCurrentOrder.this, e.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
                 }
-                new Handler().postDelayed(() -> finish(), 1500);
+                new Handler().postDelayed(this::finish, 1500);
             }else{
                 DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(sharedPreferences.getString("locality", "")).child(Objects.requireNonNull(auth.getUid())).child("Tables").child(table);
                 RequestQueue requestQueue = Volley.newRequestQueue(ApproveCurrentOrder.this);
@@ -674,54 +675,89 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                     }
                 });
 
-                AsyncTask.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        reference.child("StoreOrdersCheckOut").addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                if(snapshot.exists()){
-                                 for(int i=0;i<dishNames.size();i++){
-                                     if(snapshot.hasChild(dishNames.get(i))){
-                                         int prevAmt = Integer.parseInt(Objects.requireNonNull(snapshot.child(dishNames.get(i)).child("price").getValue(String.class)));
-                                         int prev = Integer.parseInt(Objects.requireNonNull(snapshot.child(dishNames.get(i)).child("count").getValue(String.class)));
-                                         prev += Integer.parseInt(dishQuantity.get(i));
-                                         prevAmt += Integer.parseInt(dishPrices.get(i));
-                                         reference.child("StoreOrdersCheckOut").child(dishNames.get(i)).child("count").setValue(String.valueOf(prev));
-                                         reference.child("StoreOrdersCheckOut").child(dishNames.get(i)).child("price").setValue(String.valueOf(prevAmt));
-                                     }else{
-                                         reference.child("StoreOrdersCheckOut").child(dishNames.get(i)).child("image").setValue(image.get(i));
-                                         reference.child("StoreOrdersCheckOut").child(dishNames.get(i)).child("count").setValue(dishQuantity.get(i));
-                                         reference.child("StoreOrdersCheckOut").child(dishNames.get(i)).child("price").setValue(dishPrices.get(i));
-                                         reference.child("StoreOrdersCheckOut").child(dishNames.get(i)).child("type").setValue(type.get(i));
-                                         reference.child("StoreOrdersCheckOut").child(dishNames.get(i)).child("halfOr").setValue(dishHalfOr.get(i));
-                                     }
-                                 }
-                                }else{
-                                    for(int i=0;i<dishNames.size();i++){
-                                        reference.child("StoreOrdersCheckOut").child(dishNames.get(i)).child("image").setValue(image.get(i));
-                                        reference.child("StoreOrdersCheckOut").child(dishNames.get(i)).child("count").setValue(dishQuantity.get(i));
-                                        reference.child("StoreOrdersCheckOut").child(dishNames.get(i)).child("price").setValue(dishPrices.get(i));
-                                        reference.child("StoreOrdersCheckOut").child(dishNames.get(i)).child("type").setValue(type.get(i));
-                                        reference.child("StoreOrdersCheckOut").child(dishNames.get(i)).child("halfOr").setValue(dishHalfOr.get(i));
-                                    }
+                SharedPreferences checkPrem = getSharedPreferences("AdminPremiumDetails", MODE_PRIVATE);
+                if (checkPrem.contains("status") && checkPrem.getString("status", "").equals("active")) {
+                    String month = monthName[calendar.get(Calendar.MONTH)];
+                    if (storeForDishAnalysis.contains("DishAnalysisMonthBasis")) {
+                        gson = new Gson();
+                        Type type = new TypeToken<HashMap<String, HashMap<String, String>>>() {
+                        }.getType();
+                        String storedHash = storeForDishAnalysis.getString("DishAnalysisMonthBasis", "");
+                        HashMap<String, HashMap<String, String>> myMap = gson.fromJson(storedHash, type);
+                        HashMap<String, String> map;
+                        if (myMap.containsKey(month)) {
+                            map = new HashMap<>(myMap.get(month));
+                            Log.i("checking", map.toString());
+                            for (int k = 0; k < dishNames.size(); k++) {
+                                if (map.containsKey(dishNames.get(k))) {
+                                    int val = Integer.parseInt(map.get(dishNames.get(k)));
+                                    val++;
+                                    map.put(dishNames.get(k), String.valueOf(val));
+                                } else {
+                                    map.put(dishNames.get(k), "1");
                                 }
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        Toast.makeText(ApproveCurrentOrder.this, "Completed", Toast.LENGTH_SHORT).show();
-                                        finish();
-                                    }
-                                });
                             }
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError error) {
-
+                        } else {
+                            map = new HashMap<>();
+                            for (int i = 0; i < dishNames.size(); i++) {
+                                map.put(dishNames.get(i), "1");
                             }
+                        }
+                        myMap.put(month, map);
+                        dishAnalysis.putString("DishAnalysisMonthBasis", gson.toJson(myMap));
+                    } else {
+                        HashMap<String, HashMap<String, String>> map = new HashMap<>();
+                        HashMap<String, String> myMap = new HashMap<>();
+                        for (int j = 0; j < dishNames.size(); j++) {
+                            myMap.put(dishNames.get(j), "1");
+                        }
+                        map.put(month, myMap);
+                        gson = new Gson();
+                        dishAnalysis.putString("DishAnalysisMonthBasis", gson.toJson(map));
+                    }
+                    dishAnalysis.apply();
+                }
+
+                AsyncTask.execute(() -> reference.child("StoreOrdersCheckOut").addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if(snapshot.exists()){
+                         for(int i=0;i<dishNames.size();i++){
+                             if(snapshot.hasChild(dishNames.get(i))){
+                                 int prevAmt = Integer.parseInt(Objects.requireNonNull(snapshot.child(dishNames.get(i)).child("price").getValue(String.class)));
+                                 int prev = Integer.parseInt(Objects.requireNonNull(snapshot.child(dishNames.get(i)).child("count").getValue(String.class)));
+                                 prev += Integer.parseInt(dishQuantity.get(i));
+                                 prevAmt += Integer.parseInt(dishPrices.get(i));
+                                 reference.child("StoreOrdersCheckOut").child(dishNames.get(i)).child("count").setValue(String.valueOf(prev));
+                                 reference.child("StoreOrdersCheckOut").child(dishNames.get(i)).child("price").setValue(String.valueOf(prevAmt));
+                             }else{
+                                 reference.child("StoreOrdersCheckOut").child(dishNames.get(i)).child("image").setValue(image.get(i));
+                                 reference.child("StoreOrdersCheckOut").child(dishNames.get(i)).child("count").setValue(dishQuantity.get(i));
+                                 reference.child("StoreOrdersCheckOut").child(dishNames.get(i)).child("price").setValue(dishPrices.get(i));
+                                 reference.child("StoreOrdersCheckOut").child(dishNames.get(i)).child("type").setValue(type.get(i));
+                                 reference.child("StoreOrdersCheckOut").child(dishNames.get(i)).child("halfOr").setValue(dishHalfOr.get(i));
+                             }
+                         }
+                        }else{
+                            for(int i=0;i<dishNames.size();i++){
+                                reference.child("StoreOrdersCheckOut").child(dishNames.get(i)).child("image").setValue(image.get(i));
+                                reference.child("StoreOrdersCheckOut").child(dishNames.get(i)).child("count").setValue(dishQuantity.get(i));
+                                reference.child("StoreOrdersCheckOut").child(dishNames.get(i)).child("price").setValue(dishPrices.get(i));
+                                reference.child("StoreOrdersCheckOut").child(dishNames.get(i)).child("type").setValue(type.get(i));
+                                reference.child("StoreOrdersCheckOut").child(dishNames.get(i)).child("halfOr").setValue(dishHalfOr.get(i));
+                            }
+                        }
+                        runOnUiThread(() -> {
+                            Toast.makeText(ApproveCurrentOrder.this, "Completed", Toast.LENGTH_SHORT).show();
+                            finish();
                         });
                     }
-                });
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                }));
 
 
             }
@@ -752,7 +788,7 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                     DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(id).child("Recent Orders").child(time);
                     for(int i=0;i<dishNames.size();i++){
                         MyClass myClass = new MyClass(dishNames.get(i),dishPrices.get(i),image.get(i),type.get(i),""+approveTime,dishQuantity.get(i),dishHalfOr.get(i),state,String.valueOf(orderAmount),orderID,orderAndPayment.get(i),"Order Declined",sharedPreferences.getString("locality",""));
-                        databaseReference.child(auth.getUid()).child(dishNames.get(i)).setValue(myClass);
+                        databaseReference.child(Objects.requireNonNull(auth.getUid())).child(dishNames.get(i)).setValue(myClass);
                     }
 
 
@@ -762,6 +798,7 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                         databaseReference.child("Recent Orders").child("" + time).child(auth.getUid()).child(dishNames.get(i)).setValue(myClass);
                     }
                     DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid())).child("Tables").child(table);
+                    if(!paymentType.equals("endCheckOut"))
                     new InitiateRefund().execute();
                     try {
                         main.put("to", "/topics/" + id + "");

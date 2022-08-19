@@ -12,6 +12,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
@@ -28,16 +29,19 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class homeFragClass extends RecyclerView.Adapter<homeFragClass.ViewHolder> {
     List<String> tableNum = new ArrayList<>();
     List<String> seats = new ArrayList<>();
     List<String> resId = new ArrayList<>();
+    List<String> amountPending = new ArrayList<>();
     List<String> isCurrentOrder = new ArrayList<>();
-    public homeFragClass(List<String> tableNum,List<String> seats,List<String> resId,List<String> isCurrentOrder){
+    public homeFragClass(List<String> tableNum,List<String> seats,List<String> resId,List<String> isCurrentOrder,List<String> amountPending){
         this.seats = seats;
         this.resId = resId;
         this.tableNum = tableNum;
+        this.amountPending = amountPending;
         this.isCurrentOrder = isCurrentOrder;
     }
     @NonNull
@@ -52,7 +56,10 @@ public class homeFragClass extends RecyclerView.Adapter<homeFragClass.ViewHolder
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, @SuppressLint("RecyclerView") int position) {
         holder.tables.setText("Table Num: " + tableNum.get(position));
-        holder.seats.setText("Seats: " + seats.get(position));
+        if(amountPending.get(position).equals("1"))
+        holder.seats.setText("Seats: " + seats.get(position) + " (Payment Pending)");
+        else
+            holder.seats.setText("Seats: " + seats.get(position));
         holder.chat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -80,45 +87,87 @@ public class homeFragClass extends RecyclerView.Adapter<homeFragClass.ViewHolder
             holder.isCurrentOrderMade.setVisibility(View.INVISIBLE);
 
         holder.cardView.setOnClickListener(view -> {
-            FirebaseAuth auth = FirebaseAuth.getInstance();
-            SharedPreferences sharedPreferences = view.getContext().getSharedPreferences("loginInfo",Context.MODE_PRIVATE);
-            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(auth.getUid()).child("Tables").child(tableNum.get(position)).child("CurrentOrdersMade");
-            databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    if(snapshot.exists()){
-                        List<String> time = new ArrayList<>();
-                        List<String> dishName = new ArrayList<>();
-                        List<String> dishQ = new ArrayList<>();
-                        for(DataSnapshot dataSnapshot : snapshot.getChildren()){
-                            time.add(dataSnapshot.getKey());
-                            for(DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()){
-                                dishName.add(dataSnapshot1.getKey());
-                                dishQ.add(dataSnapshot1.child("quantity").getValue(String.class));
+            if(amountPending.get(position).equals("1")){
+                FirebaseAuth auth = FirebaseAuth.getInstance();
+                SharedPreferences sharedPreferences = view.getContext().getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
+                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state", "")).child(sharedPreferences.getString("locality", "")).child(Objects.requireNonNull(auth.getUid())).child("Tables").child(tableNum.get(position)).child("StoreOrdersCheckOut");
+                databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (snapshot.exists()) {
+//                            List<String> time = new ArrayList<>();
+                            List<String> dishName = new ArrayList<>();
+                            List<String> dishQ = new ArrayList<>();
+                            for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+//                                time.add(dataSnapshot.getKey());
+                                dishName.add(dataSnapshot.getKey());
+                                dishQ.add(dataSnapshot.child("count").getValue(String.class));
                             }
-                        }
-                        AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
-                        builder.setTitle("Orders Made");
-                        LayoutInflater inflater = (LayoutInflater) view.getContext().getSystemService( Context.LAYOUT_INFLATER_SERVICE );
-                        View view = inflater.inflate(R.layout.res_info_dialog_layout,null);
+                            AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
+                            builder.setTitle("Orders Made");
+                            LayoutInflater inflater = (LayoutInflater) view.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                            View view = inflater.inflate(R.layout.res_info_dialog_layout, null);
 
-                        ArrayAdapter<String> arrayAdapter1 = new ArrayAdapter<>(view.getContext(), android.R.layout.simple_list_item_1, dishName);
-                        ArrayAdapter<String> arrayAdapter2 = new ArrayAdapter<>(view.getContext(), android.R.layout.simple_list_item_1, dishQ);
-                        ListView listView1 = view.findViewById(R.id.listDishNamesResInfo);
-                        listView1.setAdapter(arrayAdapter1);
-                        ListView listView2 = view.findViewById(R.id.listDishNamesQuantityInfo);
-                        listView2.setAdapter(arrayAdapter2);
-                        builder.setView(view);
+                            ArrayAdapter<String> arrayAdapter1 = new ArrayAdapter<>(view.getContext(), android.R.layout.simple_list_item_1, dishName);
+                            ArrayAdapter<String> arrayAdapter2 = new ArrayAdapter<>(view.getContext(), android.R.layout.simple_list_item_1, dishQ);
+                            ListView listView1 = view.findViewById(R.id.listDishNamesResInfo);
+                            listView1.setAdapter(arrayAdapter1);
+                            ListView listView2 = view.findViewById(R.id.listDishNamesQuantityInfo);
+                            listView2.setAdapter(arrayAdapter2);
+                            builder.setView(view);
 //                builder.setItems(array, (dialogInterface, i) -> Log.i("list",array.toString()));
-                        builder.setPositiveButton("exit", (dialogInterface, i) -> dialogInterface.dismiss()).create().show();
+                            builder.setPositiveButton("exit", (dialogInterface, i) -> dialogInterface.dismiss()).create().show();
+                        }else
+                            Toast.makeText(view.getContext(), "No Order's Made", Toast.LENGTH_SHORT).show();
                     }
-                }
 
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
 
-                }
-            });
+                    }
+                });
+            }else {
+                FirebaseAuth auth = FirebaseAuth.getInstance();
+                SharedPreferences sharedPreferences = view.getContext().getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
+                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state", "")).child(sharedPreferences.getString("locality", "")).child(auth.getUid()).child("Tables").child(tableNum.get(position)).child("CurrentOrdersMade");
+                databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (snapshot.exists()) {
+                            List<String> time = new ArrayList<>();
+                            List<String> dishName = new ArrayList<>();
+                            List<String> dishQ = new ArrayList<>();
+                            for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                                time.add(dataSnapshot.getKey());
+                                for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
+                                    dishName.add(dataSnapshot1.getKey());
+                                    dishQ.add(dataSnapshot1.child("quantity").getValue(String.class));
+                                }
+                            }
+                            AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
+                            builder.setTitle("Orders Made");
+                            LayoutInflater inflater = (LayoutInflater) view.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                            View view = inflater.inflate(R.layout.res_info_dialog_layout, null);
+
+                            ArrayAdapter<String> arrayAdapter1 = new ArrayAdapter<>(view.getContext(), android.R.layout.simple_list_item_1, dishName);
+                            ArrayAdapter<String> arrayAdapter2 = new ArrayAdapter<>(view.getContext(), android.R.layout.simple_list_item_1, dishQ);
+                            ListView listView1 = view.findViewById(R.id.listDishNamesResInfo);
+                            listView1.setAdapter(arrayAdapter1);
+                            ListView listView2 = view.findViewById(R.id.listDishNamesQuantityInfo);
+                            listView2.setAdapter(arrayAdapter2);
+                            builder.setView(view);
+//                builder.setItems(array, (dialogInterface, i) -> Log.i("list",array.toString()));
+                            builder.setPositiveButton("exit", (dialogInterface, i) -> dialogInterface.dismiss()).create().show();
+                        }else
+                            Toast.makeText(view.getContext(), "No Order's Made", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+            }
         });
     }
 

@@ -163,6 +163,7 @@ public class HomeFrag extends Fragment {
     FusedLocationProviderClient client;
     List<String> resId = new ArrayList<>();
     List<String> tableNum = new ArrayList<>();
+    List<String> amountPaymentPending = new ArrayList<>();
     List<String> seats = new ArrayList<>();
     int count = 0;
     boolean pressed = false;
@@ -571,6 +572,7 @@ public class HomeFrag extends Fragment {
                         resId.clear();
                         seats.clear();
                         currentOrdersIfAvailable.clear();
+                        amountPaymentPending.clear();
                         isCurrentOrder.clear();
                         tableNum.clear();
 //                    Toast.makeText(view.getContext(), ""+snapshot.getChildrenCount(), Toast.LENGTH_SHORT).show();
@@ -580,6 +582,10 @@ public class HomeFrag extends Fragment {
                                 resId.add(dataSnapshot.child("customerId").getValue(String.class));
                                 tableNum.add(dataSnapshot.child("tableNum").getValue(String.class));
                                 seats.add(dataSnapshot.child("numSeats").getValue(String.class));
+                                if(dataSnapshot.hasChild("amountToBePaid"))
+                                    amountPaymentPending.add("1");
+                                else
+                                    amountPaymentPending.add("0");
                                 if(dataSnapshot.hasChild("Current Order")){
                                     isCurrentOrder.add("1");
                                 }else
@@ -588,7 +594,7 @@ public class HomeFrag extends Fragment {
                         }
                         recyclerView.setLayoutManager(horizonatl);
 //                    Toast.makeText(view.getContext(), ""+seats.toString(), Toast.LENGTH_SHORT).show();
-                        recyclerView.setAdapter(new homeFragClass(tableNum,seats,resId,isCurrentOrder));
+                        recyclerView.setAdapter(new homeFragClass(tableNum,seats,resId,isCurrentOrder,amountPaymentPending));
                     }
                 }
 
@@ -919,6 +925,7 @@ public class HomeFrag extends Fragment {
                     tableNum.clear();
                     seats.clear();
                     isCurrentOrder.clear();
+                    amountPaymentPending.clear();
                     resId.clear();
 //                    Toast.makeText(view.getContext(), "I am invoked", Toast.LENGTH_SHORT).show();
 //                    Toast.makeText(view.getContext(), ""+snapshot.getChildrenCount(), Toast.LENGTH_SHORT).show();
@@ -928,7 +935,10 @@ public class HomeFrag extends Fragment {
                             resId.add(dataSnapshot.child("customerId").getValue(String.class));
                             tableNum.add(dataSnapshot.child("tableNum").getValue(String.class));
                             seats.add(dataSnapshot.child("numSeats").getValue(String.class));
-
+                            if(dataSnapshot.hasChild("amountToBePaid"))
+                                amountPaymentPending.add("1");
+                            else
+                                amountPaymentPending.add("0");
                             if(dataSnapshot.hasChild("Current Order")){
                                 isCurrentOrder.add("1");
                             }else
@@ -937,7 +947,7 @@ public class HomeFrag extends Fragment {
                     }
                     recyclerView.setLayoutManager(horizonatl);
 //                    Toast.makeText(view.getContext(), ""+seats.toString(), Toast.LENGTH_SHORT).show();
-                    recyclerView.setAdapter(new homeFragClass(tableNum,seats,resId,isCurrentOrder));
+                    recyclerView.setAdapter(new homeFragClass(tableNum,seats,resId,isCurrentOrder,amountPaymentPending));
                 }
             }
 
@@ -1015,13 +1025,17 @@ public class HomeFrag extends Fragment {
                         tableNum.clear();
                         seats.clear();
                         resId.clear();
+                        amountPaymentPending.clear();
                         isCurrentOrder.clear();
                         for(DataSnapshot dataSnapshot : snapshot.getChildren()){
                             if(Objects.equals(dataSnapshot.child("status").getValue(String.class), "unavailable")){
                                 resId.add(dataSnapshot.child("customerId").getValue(String.class));
                                 tableNum.add(dataSnapshot.child("tableNum").getValue(String.class));
                                 seats.add(dataSnapshot.child("numSeats").getValue(String.class));
-
+                                if(dataSnapshot.hasChild("amountToBePaid"))
+                                    amountPaymentPending.add("1");
+                                else
+                                    amountPaymentPending.add("0");
                                 if(dataSnapshot.hasChild("Current Order")){
                                     isCurrentOrder.add("1");
                                 }else
@@ -1030,7 +1044,7 @@ public class HomeFrag extends Fragment {
                         }
                         recyclerView.setLayoutManager(horizonatl);
 //                    Toast.makeText(view.getContext(), ""+seats.toString(), Toast.LENGTH_SHORT).show();
-                        recyclerView.setAdapter(new homeFragClass(tableNum,seats,resId,isCurrentOrder));
+                        recyclerView.setAdapter(new homeFragClass(tableNum,seats,resId,isCurrentOrder,amountPaymentPending));
                     }
                 }
 
