@@ -21,10 +21,10 @@ import java.util.List;
 
 public class recyclerAllDish extends RecyclerView.Adapter<recyclerAllDish.holder> {
     List<String> dishNames;
-    List<String> dishTotalCount;
+    List<Integer> dishTotalCount;
     Context context;
 
-    public recyclerAllDish(List<String> dishNames, List<String> dishTotalCount,Context context) {
+    public recyclerAllDish(List<String> dishNames, List<Integer> dishTotalCount,Context context) {
         this.dishNames = dishNames;
         this.context = context;
         this.dishTotalCount = dishTotalCount;

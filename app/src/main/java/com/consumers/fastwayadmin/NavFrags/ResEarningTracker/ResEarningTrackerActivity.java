@@ -49,12 +49,15 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 public class ResEarningTrackerActivity extends AppCompatActivity  {
     SharedPreferences resTrackInfo;
@@ -201,10 +204,9 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
         recyclerView = findViewById(R.id.monthNamesListViewRes);
         allMonthsNames = new ArrayList<>(Arrays.asList(monthName));
         currentDay = calendar.get(Calendar.DAY_OF_MONTH);
-        ValueLineChart mBarChart = (ValueLineChart) findViewById(R.id.barchart);
+        BarChart mBarChart = (BarChart) findViewById(R.id.barchart);
 
-        ValueLineSeries series = new ValueLineSeries();
-        series.setColor(0xFF56B7F1);
+
         recyclerView = findViewById(R.id.monthNamesListViewRes);
 
         recyclerView.setLayoutManager(linearLayoutManager);
@@ -214,6 +216,10 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
         LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
                 new IntentFilter("custom-message"));
 
+//        BarChart mBarChart = (BarChart) findViewById(R.id.barchart);
+
+//            ValueLineSeries series = new ValueLineSeries();
+//            series.setColor(0xFF56B7F1);
         SharedPreferences storeOrder = getSharedPreferences("RestaurantDailyStoreForAnalysis",MODE_PRIVATE);
         if(storeOrder.contains(month)){
             json = storeOrder.getString(month, "");
@@ -226,9 +232,9 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
                 List<String> orderAmountList = new ArrayList<>(mainDataList.get(1));
 
                 for(int i=0;i<orderAmountList.size();i++){
-                    series.addPoint(new ValueLinePoint(date.get(i) + "",(float) Double.parseDouble(orderAmountList.get(i))));
+                    mBarChart.addBar(new BarModel(Float.parseFloat(orderAmountList.get(i)),0xFF1BA4E6));
                 }
-                mBarChart.addSeries(series);
+
                 mBarChart.startAnimation();
 //                mBarChart.setOnClickListener(new View.OnClickListener() {
 //                    @Override
@@ -237,7 +243,10 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
 //
 //                    }
 //                });
-            }
+            }else
+                mBarChart.clearChart();
+        }else {
+            mBarChart.clearChart();
         }
 //        for(int i=0;i<12;i++){
 //            if(storeOrdersForAdminInfo.contains(monthName[i])) {
@@ -261,37 +270,43 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
 
         if(dish.contains("DishAnalysisMonthBasis")){
             gson = new Gson();
-            java.lang.reflect.Type types = new TypeToken<HashMap<String, HashMap<String,String>>>(){}.getType();
+            java.lang.reflect.Type types = new TypeToken<HashMap<String, HashMap<String,Integer>>>(){}.getType();
             String storedHash = dish.getString("DishAnalysisMonthBasis","");
-            HashMap<String,HashMap<String,String>> myMap = gson.fromJson(storedHash,types);
+            HashMap<String,HashMap<String,Integer>> myMap = gson.fromJson(storedHash,types);
             if(myMap.containsKey(month)){
-                HashMap<String,String> map = new HashMap<>(myMap.get(month));
-                List<String> values = new ArrayList<String>(map.values());
-                Log.i("info",values.toString());
-                Collections.sort(values);
-                Log.i("info",values.toString());
+                HashMap<String,Integer> map = new HashMap<>(Objects.requireNonNull(myMap.get(month)));
 
-               Map<String,String> sorted = map
-                        .entrySet()
-                        .stream()
-                        .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
-                        .collect(
-                                toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2,
-                                        LinkedHashMap::new));
 
-               Log.i("info",map.toString());
-               Log.i("info",sorted.toString());
+                Log.i("Dishinfo",map.toString());
+                
+                HashMap<String,Integer> map1 = sortByValue(map);
+                Log.i("Dishinfo",map1.toString());
+//               Map<String,String> sorted = map
+//                        .entrySet()
+//                        .stream()
+//                        .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
+//                        .collect(
+//                                toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2,
+//                                        LinkedHashMap::new));
+//
+//               Log.i("Dishinfo",map.toString());
+//               Log.i("Dishinfo",sorted.toString());
+//
+               ArrayList<String> keysName = new ArrayList<>(map1.keySet());
+               ArrayList<Integer> valuesName = new ArrayList<>(map1.values());
 
-               ArrayList<String> keysName = new ArrayList<>();
-               ArrayList<String> valuesName = new ArrayList<>();
-
-               for(int i=0;i<sorted.size();i++){
-                   valuesName.add("" + sorted.values().toArray()[i]);
-                   keysName.add("" + sorted.keySet().toArray()[i]);
-               }
-
-                Log.i("info",keysName.toString());
-                Log.i("info",valuesName.toString());
+               Log.i("info",keysName.toString());
+               Log.i("info",valuesName.toString());
+//
+                Collections.reverse(keysName);
+                Collections.reverse(valuesName);
+//               for(int i=0;i<sorted.size();i++){
+//                   valuesName.add("" + sorted.values().toArray()[i]);
+//                   keysName.add("" + sorted.keySet().toArray()[i]);
+//               }
+//
+//                Log.i("Dishinfo",keysName.toString());
+//                Log.i("Dishinfo",valuesName.toString());
                 seeMoreDetails.setVisibility(View.VISIBLE);
                 dishRecyclerView.setVisibility(View.VISIBLE);
                 seeMoreDetails.setOnClickListener(view -> {
@@ -349,10 +364,10 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
                 totalTransactionsMade.setText("Total Transactions Made: \u20B9" + 0);
                 Toast.makeText(context, "No transactions made in Month " + MonthName, Toast.LENGTH_SHORT).show();
             }
-            ValueLineChart mBarChart = (ValueLineChart) findViewById(R.id.barchart);
+            BarChart mBarChart = (BarChart) findViewById(R.id.barchart);
 
-            ValueLineSeries series = new ValueLineSeries();
-            series.setColor(0xFF56B7F1);
+//            ValueLineSeries series = new ValueLineSeries();
+//            series.setColor(0xFF56B7F1);
             SharedPreferences storeOrder = getSharedPreferences("RestaurantDailyStoreForAnalysis",MODE_PRIVATE);
             if(storeOrder.contains(MonthName)){
                 java.lang.reflect.Type type = new TypeToken<List<List<String>>>() {
@@ -367,9 +382,9 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
                     List<String> orderAmountList = new ArrayList<>(mainDataList.get(1));
 
                     for(int i=0;i<orderAmountList.size();i++){
-                        series.addPoint(new ValueLinePoint(date.get(i) + "",(float) Double.parseDouble(orderAmountList.get(i))));
+                        mBarChart.addBar(new BarModel(Float.parseFloat(orderAmountList.get(i)),0xFF1BA4E6));
                     }
-                    mBarChart.addSeries(series);
+
                     mBarChart.startAnimation();
 //                mBarChart.setOnClickListener(new View.OnClickListener() {
 //                    @Override
@@ -381,7 +396,6 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
                 }else
                     mBarChart.clearChart();
             }else {
-                mBarChart.clearStandardValues();
                 mBarChart.clearChart();
             }
 
@@ -413,37 +427,39 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
 
             if(dish.contains("DishAnalysisMonthBasis")){
                 gson = new Gson();
-                java.lang.reflect.Type types = new TypeToken<HashMap<String, HashMap<String,String>>>(){}.getType();
+                java.lang.reflect.Type types = new TypeToken<HashMap<String, HashMap<String,Integer>>>(){}.getType();
                 String storedHash = dish.getString("DishAnalysisMonthBasis","");
-                HashMap<String,HashMap<String,String>> myMap = gson.fromJson(storedHash,types);
+                HashMap<String,HashMap<String,Integer>> myMap = gson.fromJson(storedHash,types);
                 if(myMap.containsKey(MonthName)){
-                    HashMap<String,String> map = new HashMap<>(myMap.get(MonthName));
-                    List<String> values = new ArrayList<String>(map.values());
-                    Log.i("info",values.toString());
-                    Collections.sort(values,Collections.reverseOrder());
-                    Log.i("info",values.toString());
+                    HashMap<String,Integer> map = new HashMap<>(Objects.requireNonNull(myMap.get(MonthName)));
 
-                    Map<String,String> sorted = map
-                            .entrySet()
-                            .stream()
-                            .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
-                            .collect(
-                                    toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2,
-                                            LinkedHashMap::new));
 
-                    Log.i("info",map.toString());
-                    Log.i("info",sorted.toString());
+                    Log.i("Dishinfo",map.toString());
 
-                    ArrayList<String> keysName = new ArrayList<>();
-                    ArrayList<String> valuesName = new ArrayList<>();
+                    HashMap<String,Integer> map1 = sortByValue(map);
+                    Log.i("Dishinfo",map1.toString());
+//               Map<String,String> sorted = map
+//                        .entrySet()
+//                        .stream()
+//                        .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
+//                        .collect(
+//                                toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2,
+//                                        LinkedHashMap::new));
+//
+//               Log.i("Dishinfo",map.toString());
+//               Log.i("Dishinfo",sorted.toString());
+//
+                    ArrayList<String> keysName = new ArrayList<>(map1.keySet());
+                    ArrayList<Integer> valuesName = new ArrayList<>(map1.values());
 
-                    for(int i=0;i<sorted.size();i++){
-                        valuesName.add("" + sorted.values().toArray()[i]);
-                        keysName.add("" + sorted.keySet().toArray()[i]);
-                    }
+                    Collections.reverse(keysName);
+                    Collections.reverse(valuesName);
 
                     Log.i("info",keysName.toString());
                     Log.i("info",valuesName.toString());
+
+
+
                     seeMoreDetails.setVisibility(View.VISIBLE);
                     dishRecyclerView.setVisibility(View.VISIBLE);
                     seeMoreDetails.setOnClickListener(click -> {
@@ -558,5 +574,28 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
             Log.i("info","here there iam");
 
         }
+    }
+
+    public static HashMap<String, Integer>
+    sortByValue(HashMap<String, Integer> hm)
+    {
+        // Create a list from elements of HashMap
+        List<Map.Entry<String, Integer> > list
+                = new LinkedList<Map.Entry<String, Integer> >(
+                hm.entrySet());
+
+        // Sort the list using lambda expression
+        Collections.sort(
+                list,
+                (i1,
+                 i2) -> i1.getValue().compareTo(i2.getValue()));
+
+        // put data from sorted list to hashmap
+        HashMap<String, Integer> temp
+                = new LinkedHashMap<String, Integer>();
+        for (Map.Entry<String, Integer> aa : list) {
+            temp.put(aa.getKey(), aa.getValue());
+        }
+        return temp;
     }
 }

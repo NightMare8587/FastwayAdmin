@@ -463,36 +463,36 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                     String month = monthName[calendar.get(Calendar.MONTH)];
                     if (storeForDishAnalysis.contains("DishAnalysisMonthBasis")) {
                         gson = new Gson();
-                        Type type = new TypeToken<HashMap<String, HashMap<String, String>>>() {
+                        Type type = new TypeToken<HashMap<String, HashMap<String, Integer>>>() {
                         }.getType();
                         String storedHash = storeForDishAnalysis.getString("DishAnalysisMonthBasis", "");
-                        HashMap<String, HashMap<String, String>> myMap = gson.fromJson(storedHash, type);
-                        HashMap<String, String> map;
+                        HashMap<String, HashMap<String, Integer>> myMap = gson.fromJson(storedHash, type);
+                        HashMap<String, Integer> map;
                         if (myMap.containsKey(month)) {
                             map = new HashMap<>(myMap.get(month));
                             Log.i("checking", map.toString());
                             for (int k = 0; k < dishNames.size(); k++) {
                                 if (map.containsKey(dishNames.get(k))) {
-                                    int val = Integer.parseInt(map.get(dishNames.get(k)));
+                                    int val = map.get(dishNames.get(k));
                                     val++;
-                                    map.put(dishNames.get(k), String.valueOf(val));
+                                    map.put(dishNames.get(k), val);
                                 } else {
-                                    map.put(dishNames.get(k), "1");
+                                    map.put(dishNames.get(k), 1);
                                 }
                             }
                         } else {
                             map = new HashMap<>();
                             for (int i = 0; i < dishNames.size(); i++) {
-                                map.put(dishNames.get(i), "1");
+                                map.put(dishNames.get(i), 1);
                             }
                         }
                         myMap.put(month, map);
                         dishAnalysis.putString("DishAnalysisMonthBasis", gson.toJson(myMap));
                     } else {
-                        HashMap<String, HashMap<String, String>> map = new HashMap<>();
-                        HashMap<String, String> myMap = new HashMap<>();
+                        HashMap<String, HashMap<String, Integer>> map = new HashMap<>();
+                        HashMap<String, Integer> myMap = new HashMap<>();
                         for (int j = 0; j < dishNames.size(); j++) {
-                            myMap.put(dishNames.get(j), "1");
+                            myMap.put(dishNames.get(j), 1);
                         }
                         map.put(month, myMap);
                         gson = new Gson();

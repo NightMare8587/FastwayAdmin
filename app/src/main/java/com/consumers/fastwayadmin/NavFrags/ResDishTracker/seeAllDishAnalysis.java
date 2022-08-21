@@ -14,13 +14,13 @@ import java.util.List;
  public class seeAllDishAnalysis extends AppCompatActivity {
     RecyclerView recyclerView;
     ArrayList<String> dishName = new ArrayList<>();
-    ArrayList<String> dishValue = new ArrayList<>();
+    ArrayList<Integer> dishValue = new ArrayList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_see_all_dish_analysis);
         dishName = (ArrayList<String>) getIntent().getSerializableExtra("dishName");
-        dishValue = (ArrayList<String>) getIntent().getSerializableExtra("dishValue");
+        dishValue = (ArrayList<Integer>) getIntent().getSerializableExtra("dishValue");
         recyclerView = findViewById(R.id.recyclerViewSeeAllDishAnalysis);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(new recyclerAllDish(dishName,dishValue,seeAllDishAnalysis.this));
