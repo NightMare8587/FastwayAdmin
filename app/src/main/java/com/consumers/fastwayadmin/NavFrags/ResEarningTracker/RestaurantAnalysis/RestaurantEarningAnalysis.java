@@ -50,6 +50,7 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
     Button moreDays;
     RecyclerView recyclerView;
     double totalAmountOrdersText;
+    TextView highestSalesDayText,highestSalesAmountThatDay,highestSalesOrderThatDay;
     TextView totalOrders,totalAmount;
     int totalOrdersMade;
     TextView textView,totalOrderThatDay,totalAmountThatDay;
@@ -69,6 +70,9 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
         setContentView(R.layout.activity_restaurant_earning_analysis);
         storedOrders = getSharedPreferences("RestaurantDailyStoreForAnalysis",MODE_PRIVATE);
         storeEditor = storedOrders.edit();
+        highestSalesDayText = findViewById(R.id.highestSalesDayOrdersTextView);
+        highestSalesAmountThatDay = findViewById(R.id.highestDateNameDay);
+        highestSalesOrderThatDay = findViewById(R.id.highestSalesAmountTextViewDay);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false);
         recyclerView = findViewById(R.id.restaurantEarningAnalysisRecyclerView);
         textView = findViewById(R.id.textView33);
@@ -90,18 +94,32 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
                 List<String> totalORders = new ArrayList<>(mainDataList.get(2));
                 List<String> orderAmountList = new ArrayList<>(mainDataList.get(1));
 
-                if(date.size() < 7) {
+                if(date.size() != 0) {
+                    double highestSalesDay = 0D;
+                    String dateName = "";
+                    int highestOrderAtDay = 0;
                     moreDays.setVisibility(View.INVISIBLE);
+                    int loopTill = 0;
+                    if(date.size() > 7)
+                        loopTill = date.size() - 7;
                     daysLeftToShow = 6;
-                    for (int i = date.size() - 1; i >= 0; i--) {
+                    for (int i = date.size() - 1; i >= loopTill; i--) {
                         daysLeftToShow--;
                         days.add(date.get(i) + "th " + month);
                         orders.add(totalORders.get(i) + "");
                         amounts.add(orderAmountList.get(i));
+                        if(Double.parseDouble(orderAmountList.get(i)) > highestSalesDay){
+                            dateName = date.get(i) + "th " + month;
+                            highestSalesDay = Double.parseDouble(orderAmountList.get(i));
+                            highestOrderAtDay = Integer.parseInt(totalORders.get(i));
+                        }
                         totalOrdersMade += Integer.parseInt(totalORders.get(i));
                         totalAmountOrdersText += Double.parseDouble(orderAmountList.get(i));
                         mBarChart.addBar(new BarModel(Float.parseFloat(orderAmountList.get(i)), 0xFF1BA4E6));
                     }
+                    highestSalesDayText.setText("Date: " + dateName);
+                    highestSalesAmountThatDay.setText("Amount: \u20b9" + highestSalesDay);
+                    highestSalesOrderThatDay.setText("Order's: " + highestOrderAtDay + "");
                     totalAmount.setText("Total Transaction Amount: \u20b9" + totalAmountOrdersText);
                     totalOrders.setText("Total Order's: " + totalOrdersMade + "");
                     recyclerView.setLayoutManager(linearLayoutManager);

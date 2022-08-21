@@ -604,6 +604,26 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                                     }
                                     userFedit.putString(month,json);
                                     userFedit.apply();
+
+
+//                                    SharedPreferences dailyUserFrequencyShared = getSharedPreferences("DailyUserFrequencyPref",MODE_PRIVATE);
+//                                    SharedPreferences.Editor dailyUserEdit = dailyUserFrequencyShared.edit();
+//
+//                                    if(dailyUserFrequencyShared.contains(month)){
+//                                        java.lang.reflect.Type type = new TypeToken<HashMap<String,String>>() {
+//                                        }.getType();
+//
+//                                        gson = new Gson();
+//                                        json = userFrequency.getString(month,"");
+//                                        HashMap<String,String> map = gson.fromJson(json,type);
+//                                        int day = calendar.get(Calendar.DAY_OF_MONTH);
+//
+//                                        if(map.containsKey(day + "")){
+//                                            int val = Integer.parseInt(map.get(day + ""));
+//                                            val++;
+//                                        }
+//                                    }
+                                    
                                 }).start();
                                 if (storeOrdersForAdminInfo.contains(month)) {
                                     java.lang.reflect.Type type = new TypeToken<List<List<String>>>() {
