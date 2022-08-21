@@ -1,7 +1,5 @@
 package com.consumers.fastwayadmin.NavFrags.ResEarningTracker;
 
-import static java.util.stream.Collectors.toMap;
-
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -40,16 +38,12 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 
 import org.eazegraph.lib.charts.BarChart;
-import org.eazegraph.lib.charts.ValueLineChart;
 import org.eazegraph.lib.models.BarModel;
-import org.eazegraph.lib.models.ValueLinePoint;
-import org.eazegraph.lib.models.ValueLineSeries;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -57,7 +51,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 
 public class ResEarningTrackerActivity extends AppCompatActivity  {
     SharedPreferences resTrackInfo;
