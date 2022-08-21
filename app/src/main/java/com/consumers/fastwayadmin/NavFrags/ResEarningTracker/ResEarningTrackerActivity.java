@@ -40,7 +40,10 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 
 import org.eazegraph.lib.charts.BarChart;
+import org.eazegraph.lib.charts.ValueLineChart;
 import org.eazegraph.lib.models.BarModel;
+import org.eazegraph.lib.models.ValueLinePoint;
+import org.eazegraph.lib.models.ValueLineSeries;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -198,7 +201,10 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
         recyclerView = findViewById(R.id.monthNamesListViewRes);
         allMonthsNames = new ArrayList<>(Arrays.asList(monthName));
         currentDay = calendar.get(Calendar.DAY_OF_MONTH);
-        BarChart mBarChart = (BarChart) findViewById(R.id.barchart);
+        ValueLineChart mBarChart = (ValueLineChart) findViewById(R.id.barchart);
+
+        ValueLineSeries series = new ValueLineSeries();
+        series.setColor(0xFF56B7F1);
         recyclerView = findViewById(R.id.monthNamesListViewRes);
 
         recyclerView.setLayoutManager(linearLayoutManager);
@@ -208,24 +214,49 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
         LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
                 new IntentFilter("custom-message"));
 
-        for(int i=0;i<12;i++){
-            if(storeOrdersForAdminInfo.contains(monthName[i])) {
-                json = storeOrdersForAdminInfo.getString(monthName[i],"");
-                List<List<String>> mainDataList = gson.fromJson(json, type);
-                List<String> date = new ArrayList<>(mainDataList.get(0));
-                List<String> transID = new ArrayList<>(mainDataList.get(1));
-                List<String> userID = new ArrayList<>(mainDataList.get(2));
-                List<String> orderAmountList = new ArrayList<>(mainDataList.get(3));
-                float orderAmountTotal = 0;
-                for(int ij=0;ij<orderAmountList.size();ij++)
-                    orderAmountTotal += Float.parseFloat(orderAmountList.get(ij));
+        SharedPreferences storeOrder = getSharedPreferences("RestaurantDailyStoreForAnalysis",MODE_PRIVATE);
+        if(storeOrder.contains(month)){
+            json = storeOrder.getString(month, "");
+            List<List<String>> mainDataList = gson.fromJson(json, type);
+            Log.i("info",mainDataList.toString());
 
-                mBarChart.addBar(new BarModel(orderAmountTotal, 0xFF1BA4E6));
-            }else{
-                mBarChart.addBar(new BarModel(0.f, 0xFF123456));
+            if (!mainDataList.isEmpty()) {
+                List<String> date = new ArrayList<>(mainDataList.get(0));
+                List<String> totalORders = new ArrayList<>(mainDataList.get(2));
+                List<String> orderAmountList = new ArrayList<>(mainDataList.get(1));
+
+                for(int i=0;i<orderAmountList.size();i++){
+                    series.addPoint(new ValueLinePoint(date.get(i) + "",(float) Double.parseDouble(orderAmountList.get(i))));
+                }
+                mBarChart.addSeries(series);
+                mBarChart.startAnimation();
+//                mBarChart.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View v) {
+//                        Toast.makeText(ResEarningTrackerActivity.this, "Clcked", Toast.LENGTH_SHORT).show();
+//
+//                    }
+//                });
             }
         }
-        mBarChart.startAnimation();
+//        for(int i=0;i<12;i++){
+//            if(storeOrdersForAdminInfo.contains(monthName[i])) {
+//                json = storeOrdersForAdminInfo.getString(monthName[i],"");
+//                List<List<String>> mainDataList = gson.fromJson(json, type);
+//                List<String> date = new ArrayList<>(mainDataList.get(0));
+//                List<String> transID = new ArrayList<>(mainDataList.get(1));
+//                List<String> userID = new ArrayList<>(mainDataList.get(2));
+//                List<String> orderAmountList = new ArrayList<>(mainDataList.get(3));
+//                float orderAmountTotal = 0;
+//                for(int ij=0;ij<orderAmountList.size();ij++)
+//                    orderAmountTotal += Float.parseFloat(orderAmountList.get(ij));
+//
+//                mBarChart.addBar(new BarModel(orderAmountTotal, 0xFF1BA4E6));
+//            }else{
+//                mBarChart.addBar(new BarModel(0.f, 0xFF123456));
+//            }
+//        }
+//        mBarChart.startAnimation();
 
 
         if(dish.contains("DishAnalysisMonthBasis")){
@@ -317,6 +348,41 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
                 totalOrdersMade.setText("Total Transactions Made: " + 0);
                 totalTransactionsMade.setText("Total Transactions Made: \u20B9" + 0);
                 Toast.makeText(context, "No transactions made in Month " + MonthName, Toast.LENGTH_SHORT).show();
+            }
+            ValueLineChart mBarChart = (ValueLineChart) findViewById(R.id.barchart);
+
+            ValueLineSeries series = new ValueLineSeries();
+            series.setColor(0xFF56B7F1);
+            SharedPreferences storeOrder = getSharedPreferences("RestaurantDailyStoreForAnalysis",MODE_PRIVATE);
+            if(storeOrder.contains(MonthName)){
+                java.lang.reflect.Type type = new TypeToken<List<List<String>>>() {
+                }.getType();
+                json = storeOrder.getString(MonthName, "");
+                List<List<String>> mainDataList = gson.fromJson(json, type);
+                Log.i("info",mainDataList.toString());
+
+                if (!mainDataList.isEmpty()) {
+                    List<String> date = new ArrayList<>(mainDataList.get(0));
+                    List<String> totalORders = new ArrayList<>(mainDataList.get(2));
+                    List<String> orderAmountList = new ArrayList<>(mainDataList.get(1));
+
+                    for(int i=0;i<orderAmountList.size();i++){
+                        series.addPoint(new ValueLinePoint(date.get(i) + "",(float) Double.parseDouble(orderAmountList.get(i))));
+                    }
+                    mBarChart.addSeries(series);
+                    mBarChart.startAnimation();
+//                mBarChart.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View v) {
+//                        Toast.makeText(ResEarningTrackerActivity.this, "Clcked", Toast.LENGTH_SHORT).show();
+//
+//                    }
+//                });
+                }else
+                    mBarChart.clearChart();
+            }else {
+                mBarChart.clearStandardValues();
+                mBarChart.clearChart();
             }
 
             if(usersFrequencyPref.contains(MonthName)){

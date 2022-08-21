@@ -11,15 +11,18 @@
     android:layout_height="wrap_content"
     tools:context=".NavFrags.ResEarningTracker.ResEarningTrackerActivity">
 
-    <org.eazegraph.lib.charts.BarChart
+    <org.eazegraph.lib.charts.ValueLineChart
         android:id="@+id/barchart"
-        android:layout_width="match_parent"
-        android:layout_height="250dp"
-        android:orientation="vertical"
-        android:padding="10dp"
-        app:egBarWidth="20dp"
-        app:egFixedBarWidth="true"
+        android:layout_width="0dp"
+        android:layout_height="200dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        app:egCurveSmoothness="0.4"
+        app:egIndicatorLineColor="#FE6DA8"
         app:egLegendHeight="40dp"
+        app:egShowDecimal="true"
+        app:egUseOverlapFill="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -29,7 +32,7 @@
         android:layout_width="0dp"
         android:layout_height="50dp"
         android:layout_marginStart="1dp"
-        android:layout_marginTop="1dp"
+        android:layout_marginTop="10dp"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
