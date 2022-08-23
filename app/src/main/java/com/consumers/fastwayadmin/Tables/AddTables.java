@@ -111,7 +111,7 @@ public class AddTables extends AppCompatActivity {
                     .setValue(tableClass)
                     .addOnCompleteListener(task -> {
                         if(task.isSuccessful()){
-                            Toast.makeText(AddTables.this, "Table added Successfully", Toast.LENGTH_SHORT).show();
+//                            Toast.makeText(AddTables.this, "Table added Successfully", Toast.LENGTH_SHORT).show();
                             progressBar.setVisibility(View.INVISIBLE);
                         }
                     }).addOnFailureListener(e -> {
@@ -143,157 +143,159 @@ public class AddTables extends AppCompatActivity {
                 String fileName = String.format("Table " + tableNumber.getText().toString() + ".jpg", "Table " + tableNumber.getText().toString());
                 File outFile = new File(dir, fileName);
                 File checkIfExist = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM) + "/" + fileName);
-                if(outFile.exists())
-                    outFile.delete();
-
+                if(checkIfExist.exists()) {
+                    Log.i("infoMy","yes");
+                   boolean var = checkIfExist.delete();
+                   Log.i("infoMy",var + "");
+                }else
+                    Log.i("infoMy","ofcourse");
+                boolean proceed = true;
                 try {
                     outStream = new FileOutputStream(outFile);
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                }
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outStream);
-                try {
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outStream);
                     assert outStream != null;
                     outStream.flush();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                try {
                     outStream.close();
+
                 } catch (IOException e) {
+                    proceed = false;
                     e.printStackTrace();
                 }
 
+                if(proceed) {
+                    Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+                    intent.setData(Uri.fromFile(outFile));
+                    sendBroadcast(intent);
+                    Toast.makeText(AddTables.this, "Image and PDF saved in Root directory. Check your Internal Storage", Toast.LENGTH_SHORT).show();
 
-                Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-                intent.setData(Uri.fromFile(outFile));
-                sendBroadcast(intent);
-                Toast.makeText(AddTables.this, "Image and PDF saved in Root directory. Check your Internal Storage", Toast.LENGTH_SHORT).show();
+                    Document document = new Document();
 
-                Document document = new Document();
+                    String directoryPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).toString();
 
-                String directoryPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).toString();
-
-                try {
-                    PdfWriter.getInstance(document, new FileOutputStream(directoryPath + "/Table " + tableNumber.getText().toString() +".pdf")); //  Change pdf name.
-                } catch (DocumentException | FileNotFoundException e) {
-                    Toast.makeText(AddTables.this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
-                }
-
-                document.open();
-
-                Image image = null;  // Change image's name and extension.
-                try {
-                    image = Image.getInstance(directoryPath + "/Table " + tableNumber.getText().toString() + ".jpg");
-                } catch (BadElementException | IOException e) {
-                    Toast.makeText(AddTables.this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
-                }
-
-                float scaler = ((document.getPageSize().getWidth() - document.leftMargin()
-                        - document.rightMargin() - 0) / image.getWidth()) * 100; // 0 means you have no indentation. If you have any, change it.
-                image.scalePercent(scaler);
-                image.setAlignment(Image.ALIGN_CENTER | Image.ALIGN_TOP);
-
-                try {
-                    document.add(image);
-                } catch (DocumentException e) {
-                    Toast.makeText(AddTables.this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
-                }
-                document.close();
-
-                imageView.setDrawingCacheEnabled(true);
-                imageView.buildDrawingCache();
-//                Bitmap map = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-                byte[] data = baos.toByteArray();
-
-                UploadTask uploadTask = reference.child(tableAuth.getUid()+"/"+tableNumber.getText().toString()).putBytes(data);
-                uploadTask.addOnFailureListener(exception -> Toast.makeText(AddTables.this, "" + exception.getLocalizedMessage(), Toast.LENGTH_SHORT).show()).addOnSuccessListener(taskSnapshot -> {
-                    // taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
-                    // ...
-                });
-
-                PdfDocument pdfDocument = new PdfDocument();
-                Paint myPaint = new Paint();
-                PdfDocument.PageInfo myPage = new  PdfDocument.PageInfo.Builder(1240,980,1).create();
-                PdfDocument.Page page = pdfDocument.startPage(myPage);
-
-                Paint text = new Paint();
-
-                Canvas canvas = page.getCanvas();
-
-                canvas.drawBitmap(bitmap,345,180,myPaint);
-                text.setTypeface(Typeface.create(Typeface.DEFAULT,Typeface.BOLD));
-                text.setTextSize(85);
-                SharedPreferences resNamePref = getSharedPreferences("RestaurantInfo",MODE_PRIVATE);
-                text.setTextAlign(Paint.Align.LEFT);
-                canvas.drawText("Name: " + resNamePref.getString("hotelName",""),300,90,text);
-                text.setTextAlign(Paint.Align.LEFT);
-                text.setTextSize(70);
-                canvas.drawText("Table Number: " + tableNumber.getText().toString(),345,215,text);
-                canvas.drawText("Seats: " + numberOfSeats.getText().toString(),475,710,text);
-                canvas.drawBitmap(scaled,950,700,myPaint);
-
-                pdfDocument.finishPage(page);
-
-                String fileNames = "/Table " + tableNumber.getText().toString() + ".pdf";
-                File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS) + fileNames);
-
-                try{
-                    pdfDocument.writeTo(new FileOutputStream(file));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                StorageReference storageReference = reference.child(tableAuth.getUid() + "/" + "Tables" + fileNames);
-                storageReference.putFile(Uri.fromFile(file)).addOnCompleteListener(task -> {
-                    if(task.isSuccessful())
-                        Toast.makeText(AddTables.this, "PDF Uploaded", Toast.LENGTH_SHORT).show();
-                });
-
-                pdfDocument.close();
-                if(file.exists()){
-                    Uri selectedUri = Uri.fromFile(file);
-                    Intent intents = new Intent(Intent.ACTION_VIEW);
-                    intents.setDataAndType(FileProvider.getUriForFile(AddTables.this, AddTables.this.getApplicationContext().getPackageName() + ".provider",file), "application/pdf"); // here we set correct type for PDF
-                    intents.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    Log.i("info",selectedUri.toString());
-                    PendingIntent pendingIntent;
-                    pendingIntent = PendingIntent.getActivity(AddTables.this, 698, intents, PendingIntent.FLAG_IMMUTABLE
-                    );
-
-
-                    String channel_id = "notification_channel";
-                    NotificationCompat.Builder builder
-                            = new NotificationCompat
-                            .Builder(getApplicationContext(),
-                            channel_id)
-                            .setPriority(NotificationManager.IMPORTANCE_MAX)
-                            .setSmallIcon(R.drawable.foodinelogo)
-                            .setAutoCancel(true)
-                            .setVibrate(new long[]{1000, 1000, 1000,
-                                    1000, 1000})
-                            .setOnlyAlertOnce(true)
-                            .setContentIntent(pendingIntent);
-                    builder = builder.setContent(
-                            getCustomDesign());
-                    NotificationManager notificationManager
-                            = (NotificationManager) getSystemService(
-                            Context.NOTIFICATION_SERVICE);
-                    // Check if the Android Version is greater than Oreo
-                    if (Build.VERSION.SDK_INT
-                            >= Build.VERSION_CODES.O) {
-                        NotificationChannel notificationChannel
-                                = new NotificationChannel(
-                                channel_id, "web_app",
-                                NotificationManager.IMPORTANCE_HIGH);
-                        notificationManager.createNotificationChannel(
-                                notificationChannel);
+                    try {
+                        PdfWriter.getInstance(document, new FileOutputStream(directoryPath + "/Table " + tableNumber.getText().toString() + ".pdf")); //  Change pdf name.
+                    } catch (DocumentException | FileNotFoundException e) {
+                        Toast.makeText(AddTables.this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                     }
 
-                    notificationManager.notify(10101, builder.build());
-                }
+                    document.open();
+
+                    Image image = null;  // Change image's name and extension.
+                    try {
+                        image = Image.getInstance(directoryPath + "/Table " + tableNumber.getText().toString() + ".jpg");
+                    } catch (BadElementException | IOException e) {
+                        Toast.makeText(AddTables.this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                    }
+
+                    float scaler = ((document.getPageSize().getWidth() - document.leftMargin()
+                            - document.rightMargin() - 0) / image.getWidth()) * 100; // 0 means you have no indentation. If you have any, change it.
+                    image.scalePercent(scaler);
+                    image.setAlignment(Image.ALIGN_CENTER | Image.ALIGN_TOP);
+
+                    try {
+                        document.add(image);
+                    } catch (DocumentException e) {
+                        Toast.makeText(AddTables.this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                    document.close();
+
+                    imageView.setDrawingCacheEnabled(true);
+                    imageView.buildDrawingCache();
+//                Bitmap map = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+                    byte[] data = baos.toByteArray();
+
+                    UploadTask uploadTask = reference.child(tableAuth.getUid() + "/" + tableNumber.getText().toString()).putBytes(data);
+                    uploadTask.addOnFailureListener(exception -> Toast.makeText(AddTables.this, "" + exception.getLocalizedMessage(), Toast.LENGTH_SHORT).show()).addOnSuccessListener(taskSnapshot -> {
+                        // taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
+                        // ...
+                    });
+
+                    PdfDocument pdfDocument = new PdfDocument();
+                    Paint myPaint = new Paint();
+                    PdfDocument.PageInfo myPage = new PdfDocument.PageInfo.Builder(1240, 980, 1).create();
+                    PdfDocument.Page page = pdfDocument.startPage(myPage);
+
+                    Paint text = new Paint();
+
+                    Canvas canvas = page.getCanvas();
+
+                    canvas.drawBitmap(bitmap, 345, 180, myPaint);
+                    text.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+                    text.setTextSize(80);
+                    SharedPreferences resNamePref = getSharedPreferences("RestaurantInfo", MODE_PRIVATE);
+                    text.setTextAlign(Paint.Align.CENTER);
+                    canvas.drawText(resNamePref.getString("hotelName", ""), 610, 90, text);
+                    text.setTextAlign(Paint.Align.LEFT);
+                    text.setTextSize(70);
+                    canvas.drawText("Table Number: " + tableNumber.getText().toString(), 345, 215, text);
+                    canvas.drawText("Seats: " + numberOfSeats.getText().toString(), 475, 710, text);
+                    canvas.drawBitmap(scaled, 950, 700, myPaint);
+
+                    pdfDocument.finishPage(page);
+
+                    String fileNames = "/Table " + tableNumber.getText().toString() + ".pdf";
+                    File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS) + fileNames);
+
+                    try {
+                        pdfDocument.writeTo(new FileOutputStream(file));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    StorageReference storageReference = reference.child(tableAuth.getUid() + "/" + "Tables" + fileNames);
+                    storageReference.putFile(Uri.fromFile(file)).addOnCompleteListener(task -> {
+                        if (task.isSuccessful())
+                            Toast.makeText(AddTables.this, "PDF Uploaded", Toast.LENGTH_SHORT).show();
+                    });
+
+                    pdfDocument.close();
+
+                    if (file.exists()) {
+                        Uri selectedUri = Uri.fromFile(file);
+                        Intent intents = new Intent(Intent.ACTION_VIEW);
+                        intents.setDataAndType(FileProvider.getUriForFile(AddTables.this, AddTables.this.getApplicationContext().getPackageName() + ".provider", file), "application/pdf"); // here we set correct type for PDF
+                        intents.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        Log.i("info", selectedUri.toString());
+                        PendingIntent pendingIntent;
+                        pendingIntent = PendingIntent.getActivity(AddTables.this, 698, intents, PendingIntent.FLAG_IMMUTABLE
+                        );
+
+
+                        String channel_id = "notification_channel";
+                        NotificationCompat.Builder builder
+                                = new NotificationCompat
+                                .Builder(getApplicationContext(),
+                                channel_id)
+                                .setPriority(NotificationManager.IMPORTANCE_MAX)
+                                .setSmallIcon(R.drawable.foodinelogo)
+                                .setAutoCancel(true)
+                                .setVibrate(new long[]{1000, 1000, 1000,
+                                        1000, 1000})
+                                .setOnlyAlertOnce(true)
+                                .setContentIntent(pendingIntent);
+                        builder = builder.setContent(
+                                getCustomDesign());
+                        NotificationManager notificationManager
+                                = (NotificationManager) getSystemService(
+                                Context.NOTIFICATION_SERVICE);
+                        // Check if the Android Version is greater than Oreo
+                        if (Build.VERSION.SDK_INT
+                                >= Build.VERSION_CODES.O) {
+                            NotificationChannel notificationChannel
+                                    = new NotificationChannel(
+                                    channel_id, "web_app",
+                                    NotificationManager.IMPORTANCE_HIGH);
+                            notificationManager.createNotificationChannel(
+                                    notificationChannel);
+                        }
+
+                        notificationManager.notify(10101, builder.build());
+                    }
+                }else
+                    Toast.makeText(this, "Error Occurred Creating QR", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Check if File Already Exist", Toast.LENGTH_SHORT).show();
             } catch (WriterException e) {
                 e.printStackTrace();
             }
