@@ -192,14 +192,49 @@ public class MainActivity extends AppCompatActivity {
                 editor.putString("name",fullName.getText().toString());
                 editor.putString("email",emailAddress.getText().toString());
                 editor.putString("number",phoneNumber.getText().toString());
+                editor.putString("state","TestRes");
+                editor.putString("locality","Test");
                 editor.apply();
                 loginAuth.signInWithEmailAndPassword("foodinetest858784@gmail.com","FoodineTest858784").addOnCompleteListener(task -> {
                     if(task.isSuccessful()){
-                        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Users");
+                        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin");
                         databaseReference.child("8AzmseJgrNcYL7GcH05B3mYcDfp2").setValue(user);
+                        databaseReference.child("8AzmseJgrNcYL7GcH05B3mYcDfp2").child("Restaurant Documents").child("verified").setValue("yes");
                         fastDialog.dismiss();
                         editor.putString("testAdmin","8AzmseJgrNcYL7GcH05B3mYcDfp2");
                         editor.apply();
+                        AsyncTask.execute(() -> {
+                            DatabaseReference addResTest = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child("TestRes").child("Test").child("8AzmseJgrNcYL7GcH05B3mYcDfp2");
+                            addResTest.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                    if(snapshot.exists()){
+
+                                    }else
+                                    {
+                                        addResTest.child("DisplayImage").setValue("https://firebasestorage.googleapis.com/v0/b/fastway-e3c4a.appspot.com/o/BKkZjAAB9fQmleexouAb2zSRtQm2%2FresImages%2FDisplayImage?alt=media&token=02bd9e2d-fd2f-4570-97f5-4213c5ad4a87");
+                                        addResTest.child("TakeAwayAllowed").setValue("yes");
+                                        addResTest.child("acceptingOrders").setValue("yes");
+                                        addResTest.child("address").setValue("1234qwert");
+                                        addResTest.child("name").setValue("Chaudari Dhaba");
+                                        addResTest.child("number").setValue("1234567892");
+                                        addResTest.child("nearby").setValue("near ratan park");
+                                        addResTest.child("status").setValue("online");
+                                        addResTest.child("pin").setValue("110015");
+                                        addResTest.child("totalRate").setValue("0");
+                                        addResTest.child("totalReports").setValue("0");
+                                        addResTest.child("location").child("lat").setValue("28.647849374299167");
+                                        addResTest.child("location").child("lon").setValue("77.13484514504671");
+                                        addResTest.child("count").setValue("1");
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError error) {
+
+                                }
+                            });
+                        });
                         Toast.makeText(MainActivity.this, "Test Login Successfully", Toast.LENGTH_SHORT).show();
                         startActivity(new Intent(getApplicationContext(),HomeScreen.class));
                         finish();
