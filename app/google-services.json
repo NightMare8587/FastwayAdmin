@@ -1,46 +1,50 @@
 {
   "project_info": {
-    "project_number": "765176451275",
-    "firebase_url": "https://fastway-e3c4a-default-rtdb.firebaseio.com",
-    "project_id": "fastway-e3c4a",
-    "storage_bucket": "fastway-e3c4a.appspot.com"
+    "project_number": "612835438715",
+    "firebase_url": "https://foodinedatabase-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "foodinedatabase",
+    "storage_bucket": "foodinedatabase.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:765176451275:android:a65cade903c3b0ef738b4e",
+        "mobilesdk_app_id": "1:612835438715:android:88d437315c1268531c32de",
         "android_client_info": {
           "package_name": "com.consumers.fastway"
         }
       },
       "oauth_client": [
         {
-          "client_id": "765176451275-1b06r3pe8pacmdl68kvh40sv314jn1gq.apps.googleusercontent.com",
+          "client_id": "612835438715-42c5nuqvr6pisuufbrtncphi646i3sh1.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.consumers.fastway",
-            "certificate_hash": "5078284dc58db754eb15270db0bae67bfd1e74a4"
+            "certificate_hash": "877b9920cdea1cc6c608d298a7870606764de36b"
           }
         },
         {
-          "client_id": "765176451275-gjbr60095ljes4fqn1vs85qrtbfsslq5.apps.googleusercontent.com",
+          "client_id": "612835438715-95s2su6ch0a0q32agi9s7mp8772g6i8m.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.consumers.fastway",
-            "certificate_hash": "b62395d1c6afbe0a4ed799574d4f2ebf62a32e27"
+            "certificate_hash": "789b4d76a12fea467ae9cd5a2a2c624a6b62a11a"
           }
+        },
+        {
+          "client_id": "612835438715-j32tb5kclhj87kditf5ea86i0j0c3gc4.apps.googleusercontent.com",
+          "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyAWW-EGcjGEjQ5PkmsndI2n1wHvx1qGwVE"
+          "current_key": "AIzaSyAUybtYxoKRz5asNdvJ8tXGLk3PuJfpYw4"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "765176451275-u1ati379eiinc9b21472ml968chmlsqh.apps.googleusercontent.com",
+              "client_id": "612835438715-9560p1fhto5ber96usm1gjt8fbi6k4da.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
@@ -49,14 +53,14 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:765176451275:android:3986e1becff38b2b738b4e",
+        "mobilesdk_app_id": "1:612835438715:android:853bdbc5ff79bf901c32de",
         "android_client_info": {
           "package_name": "com.consumers.fastwayadmin"
         }
       },
       "oauth_client": [
         {
-          "client_id": "765176451275-59hkvjem3cjk0j6fs5njf8boget394f3.apps.googleusercontent.com",
+          "client_id": "612835438715-a19lmm4j0vmf5g5uh5p7oalvm6p7p0ob.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.consumers.fastwayadmin",
@@ -64,24 +68,57 @@
           }
         },
         {
-          "client_id": "765176451275-vu40ngd47ki9r4n0p7aadvvqhn8op88a.apps.googleusercontent.com",
+          "client_id": "612835438715-g1gl0gsg946n9ofurqk6nct6eulqhprr.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.consumers.fastwayadmin",
-            "certificate_hash": "5078284dc58db754eb15270db0bae67bfd1e74a4"
+            "certificate_hash": "877b9920cdea1cc6c608d298a7870606764de36b"
           }
+        },
+        {
+          "client_id": "612835438715-j32tb5kclhj87kditf5ea86i0j0c3gc4.apps.googleusercontent.com",
+          "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyAWW-EGcjGEjQ5PkmsndI2n1wHvx1qGwVE"
+          "current_key": "AIzaSyAUybtYxoKRz5asNdvJ8tXGLk3PuJfpYw4"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "765176451275-u1ati379eiinc9b21472ml968chmlsqh.apps.googleusercontent.com",
+              "client_id": "612835438715-9560p1fhto5ber96usm1gjt8fbi6k4da.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:612835438715:android:3ead1431a803676e1c32de",
+        "android_client_info": {
+          "package_name": "com.example.fastwayquerysolutions"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "612835438715-j32tb5kclhj87kditf5ea86i0j0c3gc4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAUybtYxoKRz5asNdvJ8tXGLk3PuJfpYw4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "612835438715-9560p1fhto5ber96usm1gjt8fbi6k4da.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

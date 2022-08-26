@@ -437,7 +437,7 @@ public class MainActivity extends AppCompatActivity {
         signInButton = findViewById(R.id.signInButton);
 
         gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken("765176451275-u1ati379eiinc9b21472ml968chmlsqh.apps.googleusercontent.com")
+                .requestIdToken("612835438715-9560p1fhto5ber96usm1gjt8fbi6k4da.apps.googleusercontent.com")
                 .requestEmail()
                 .requestProfile()
                 .build();

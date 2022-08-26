@@ -51,6 +51,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.io.IOException;
 import java.util.List;
@@ -117,9 +118,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         proceed.setOnClickListener(view -> {
             SharedPreferences locationShared = getSharedPreferences("LocationMaps",MODE_PRIVATE);
             SharedPreferences.Editor editor = locationShared.edit();
-            ref = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid()));
-            RestLocation restLocation = new RestLocation(String.valueOf(longitude),String.valueOf(latitude));
-            ref.child("location").setValue(restLocation);
+//            ref = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid()));
+//            RestLocation restLocation = new RestLocation(String.valueOf(longitude),String.valueOf(latitude));
+//            ref.child("location").setValue(restLocation);
+            FirebaseFirestore fb = FirebaseFirestore.getInstance();
+            SharedPreferences loginInfo = getSharedPreferences("loginInfo",MODE_PRIVATE);
+            fb.collection("Restaurants").document(loginInfo.getString("state","") + "," + loginInfo.getString("locality","")).update("location", longitude + "/" + latitude);
             startActivity(new Intent(getApplicationContext(), HomeScreen.class));
             editor.putString("location","yes");
             client.removeLocationUpdates(mLocationCallback);
@@ -138,7 +142,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             String location = editText.getText().toString();
             Geocoder geocoder = new Geocoder(getApplicationContext());
             try {
-                addressList = geocoder.getFromLocationName(location, 1);
+                addressList = geocoder.getFromLocationName(location, 5);
 
             } catch (IOException e) {
                 e.printStackTrace();
