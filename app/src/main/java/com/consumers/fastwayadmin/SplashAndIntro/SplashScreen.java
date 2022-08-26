@@ -196,11 +196,11 @@ public class SplashScreen extends AppCompatActivity {
             String postalCode;
 
             try {
-                addresses = geocoder.getFromLocation(lati, longi, 1);
+                addresses = geocoder.getFromLocation(lati, longi, 5);
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            cityName = Objects.requireNonNull(addresses).get(0).getAdminArea();
+            cityName = Objects.requireNonNull(addresses).get(0).getLocality();
             if(addresses.get(0).getSubAdminArea() != null)
                 subAdmin = addresses.get(0).getSubAdminArea();
             else
