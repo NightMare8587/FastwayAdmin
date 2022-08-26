@@ -200,7 +200,7 @@ public class SplashScreen extends AppCompatActivity {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            cityName = Objects.requireNonNull(addresses).get(0).getLocality();
+            cityName = Objects.requireNonNull(addresses).get(0).getAdminArea();
             if(addresses.get(0).getSubAdminArea() != null)
                 subAdmin = addresses.get(0).getSubAdminArea();
             else
