@@ -445,7 +445,7 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
                    .setTitleText("Success")
                    .setContentText("Location Changes Successfully")
                    .setConfirmText("Great")
-                   .setConfirmClickListener(kAlertDialog -> kAlertDialog.dismissWithAnimation()).show();
+                   .setConfirmClickListener(KAlertDialog::dismissWithAnimation).show();
         }else if(resultCode == 100){
             new KAlertDialog(MyAccount.this,KAlertDialog.SUCCESS_TYPE)
                     .setTitleText("Success")
