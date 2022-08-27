@@ -47,6 +47,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
@@ -121,8 +122,9 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
                 view.getContext().startActivity(intent);
             });
             holder.cancel.setOnClickListener(view -> {
+                FirebaseFirestore firestore = FirebaseFirestore.getInstance();
                 SharedPreferences sharedPreferences = view.getContext().getSharedPreferences("loginInfo",Context.MODE_PRIVATE);
-                reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid())).child("Tables");
+//                reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid())).child("Tables");
                         new KAlertDialog(view.getContext(),KAlertDialog.WARNING_TYPE)
                         .setTitleText("Warning!!!")
                         .setContentText("Do you sure wanna remove this reserved table??")
@@ -171,13 +173,19 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
                                         Toast.makeText(view.getContext(), e.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
                                     }
 
-                                    reference.child(tables.get(position)).child("customerId").removeValue();
-                                    reference.child(tables.get(position)).child("timeOfUnavailability").removeValue();
-                                    reference.child(tables.get(position)).child("CurrentOrdersMade").removeValue();
-                                    reference.child(tables.get(position)).child("StoreOrdersCheckOut").removeValue();
-                                    reference.child(tables.get(position)).child("foodOrdered").removeValue();
-                                    reference.child(tables.get(position)).child("status").setValue("available");
+//                                    reference.child(tables.get(position)).child("customerId").removeValue();
+//                                    reference.child(tables.get(position)).child("timeOfUnavailability").removeValue();
+//                                    reference.child(tables.get(position)).child("CurrentOrdersMade").removeValue();
+//                                    reference.child(tables.get(position)).child("StoreOrdersCheckOut").removeValue();
+//                                    reference.child(tables.get(position)).child("foodOrdered").removeValue();
+//                                    reference.child(tables.get(position)).child("status").setValue("available");
 //                                    reference.child(tables.get(position)).child("time").removeValue();
+                                    HashMap<String,String> myMap = new HashMap<>();
+                                    myMap.put("status","available");
+                                    myMap.put("tableNum",tables.get(position));
+                                    myMap.put("seats",seats.get(position));
+                                    firestore.collection(sharedPreferences.getString("state","")).document("Restaurants").collection(sharedPreferences.getString("locality","")).document(auth.getUid())
+                                                    .collection("Tables").document(tables.get(position)).set(myMap);
                                     holder.chatWith.setVisibility(View.INVISIBLE);
                                     holder.cancel.setVisibility(View.INVISIBLE);
                                     holder.status.setText("available");
@@ -213,13 +221,19 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
         }
 
         holder.checkBox.setOnCheckedChangeListener((compoundButton, b) -> {
+
+            FirebaseFirestore firestore = FirebaseFirestore.getInstance();
             SharedPreferences sharedPreferences = compoundButton.getContext().getSharedPreferences("loginInfo",Context.MODE_PRIVATE);
             DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid())).child("Tables").child(tables.get(position));
             if(b){
+                firestore.collection(sharedPreferences.getString("state","")).document("Restaurants").collection(sharedPreferences.getString("locality","")).document(auth.getUid())
+                                .collection("Tables").document(tables.get(position)).update("status","available");
                 databaseReference.child("status").setValue("available");
                 holder.checkBox.setText("Enabled");
             }else{
                 databaseReference.child("status").setValue("NotAvailable");
+                firestore.collection(sharedPreferences.getString("state","")).document("Restaurants").collection(sharedPreferences.getString("locality","")).document(auth.getUid())
+                        .collection("Tables").document(tables.get(position)).update("status","NotAvailable");
                 holder.checkBox.setText("Disabled");
             }
         });
@@ -368,11 +382,18 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
 
                                         }
                                     });
-                                    reference.child(tables.get(position)).child("customerId").removeValue();
-                                    reference.child(tables.get(position)).child("status").setValue("available");
-                                    reference.child(tables.get(position)).child("time").removeValue();
-                                    reference.child(tables.get(position)).child("timeInMillis").removeValue();
-                                    reference.child(tables.get(position)).child("timeOfBooking").removeValue();
+                                    FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+                                    HashMap<String,String> myMap = new HashMap<>();
+                                    myMap.put("status","available");
+                                    myMap.put("tableNum",tables.get(position));
+                                    myMap.put("seats",seats.get(position));
+                                    firestore.collection(sharedPreferences.getString("state","")).document("Restaurants").collection(sharedPreferences.getString("locality","")).document(auth.getUid())
+                                            .collection("Tables").document(tables.get(position)).set(myMap);
+//                                    reference.child(tables.get(position)).child("customerId").removeValue();
+//                                    reference.child(tables.get(position)).child("status").setValue("available");
+//                                    reference.child(tables.get(position)).child("time").removeValue();
+//                                    reference.child(tables.get(position)).child("timeInMillis").removeValue();
+//                                    reference.child(tables.get(position)).child("timeOfBooking").removeValue();
 //                                    reference.child(tables.get(position)).child("time").removeValue();
                                     holder.chatWith.setVisibility(View.INVISIBLE);
                                     holder.cancel.setVisibility(View.INVISIBLE);
@@ -751,6 +772,9 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
                     SharedPreferences sharedPreferences1 = v.getContext().getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
                     reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences1.getString("state", "")).child(sharedPreferences1.getString("locality","")).child(Objects.requireNonNull(auth.getUid())).child("Tables");
                     reference.child(tables.get(position)).removeValue();
+                    FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+                    firestore.collection(sharedPreferences.getString("state","")).document("Restaurants").collection(sharedPreferences.getString("locality","")).document(auth.getUid())
+                            .collection("Tables").document(tables.get(position)).delete();
                     new KAlertDialog(v.getContext(),KAlertDialog.SUCCESS_TYPE)
                             .setTitleText("Success")
                             .setContentText("Table Deleted Successfully")

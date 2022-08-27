@@ -36,12 +36,18 @@ import com.example.flatdialoglibrary.dialog.FlatDialog;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -83,23 +89,37 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
         if(resInfoSharedPref.contains("hotelName")) {
             resNameText.setText(resInfoSharedPref.getString("hotelName", ""));
         }else{
-            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(UID));
-            databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    if(snapshot.exists()){
-                        SharedPreferences.Editor editor = resInfoSharedPref.edit();
-                        editor.putString("hotelName",snapshot.child("name").getValue(String.class));
-                        editor.apply();
-                        resNameText.setText(resInfoSharedPref.getString("hotelName", ""));
-                    }
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-
-                }
-            });
+            FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+            firestore.collection(sharedPreferences.getString("state","")).document("Restaurants").collection(sharedPreferences.getString("locality","")).document(auth.getUid())
+                    .get().addOnCompleteListener(task -> {
+                        if(task.isSuccessful()){
+                            DocumentSnapshot documentSnapshot = task.getResult();
+                            Map<String,Object> map = documentSnapshot.getData();
+                            if(map.containsKey("name")){
+                                SharedPreferences.Editor editor = resInfoSharedPref.edit();
+                    editor.putString("hotelName", (String) map.get("name"));
+                    editor.apply();
+                    resNameText.setText(resInfoSharedPref.getString("hotelName", ""));
+                            }
+                        }
+                    });
+//            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(UID));
+//            databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+//                @Override
+//                public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                    if(snapshot.exists()){
+//                        SharedPreferences.Editor editor = resInfoSharedPref.edit();
+//                        editor.putString("hotelName",snapshot.child("name").getValue(String.class));
+//                        editor.apply();
+//                        resNameText.setText(resInfoSharedPref.getString("hotelName", ""));
+//                    }
+//                }
+//
+//                @Override
+//                public void onCancelled(@NonNull DatabaseError error) {
+//
+//                }
+//            });
         }
         textView.setText("Hi, " + sharedPreferences.getString("name",""));
         listView.setOnItemClickListener((adapterView, view, i, l) -> {
@@ -272,7 +292,10 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
                                         Toast.makeText(MyAccount.this, "Field can't be empty", Toast.LENGTH_SHORT).show();
                                         return;
                                     }else {
-                                        reference.child("name").setValue(flatDialog.getFirstTextField().toString());
+                                        FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+                                        firestore.collection(sharedPreferences.getString("state","")).document("Restaurants").collection(sharedPreferences.getString("locality","")).document(auth.getUid())
+                                                .update("name",flatDialog.getFirstTextField().toString());
+//                                        reference.child("name").setValue(flatDialog.getFirstTextField().toString());
                                         resNameText.setText(flatDialog.getFirstTextField());
                                         Toast.makeText(MyAccount.this, "Name Changed Successfully", Toast.LENGTH_SHORT).show();
                                         editor.putString("hotelName",flatDialog.getFirstTextField());
@@ -315,7 +338,10 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
                                         Toast.makeText(MyAccount.this, "Field can't be empty", Toast.LENGTH_SHORT).show();
                                         return;
                                     }else {
-                                        reference.child("email").setValue(flatDialog1.getFirstTextField().toString());
+//                                        reference.child("email").setValue(flatDialog1.getFirstTextField().toString());
+                                        FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+                                        firestore.collection(sharedPreferences.getString("state","")).document("Restaurants").collection(sharedPreferences.getString("locality","")).document(auth.getUid())
+                                                .update("email",flatDialog1.getFirstTextField().toString());
                                         Toast.makeText(MyAccount.this, "Email Changed Successfully", Toast.LENGTH_SHORT).show();
                                         flatDialog1.dismiss();
                                     }
@@ -354,7 +380,10 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
                                         Toast.makeText(MyAccount.this, "Field can't be empty", Toast.LENGTH_SHORT).show();
                                         return;
                                     }else {
-                                        reference.child("number").setValue(flatDialog2.getFirstTextField().toString());
+//                                        reference.child("number").setValue(flatDialog2.getFirstTextField().toString());
+                                        FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+                                        firestore.collection(sharedPreferences.getString("state","")).document("Restaurants").collection(sharedPreferences.getString("locality","")).document(auth.getUid())
+                                                .update("number",flatDialog2.getFirstTextField().toString());
                                         Toast.makeText(MyAccount.this, "Number Changed Successfully", Toast.LENGTH_SHORT).show();
                                         flatDialog2.dismiss();
                                     }

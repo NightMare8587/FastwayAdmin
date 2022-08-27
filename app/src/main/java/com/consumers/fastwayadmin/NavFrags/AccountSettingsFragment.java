@@ -29,6 +29,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.Objects;
@@ -88,9 +89,12 @@ public class AccountSettingsFragment extends PreferenceFragmentCompat {
                     .setMessage("Do you wanna logout?")
                     .setPositiveButton("Yes", (dialogInterface, i1) -> {
                         SharedPreferences settings = requireContext().getSharedPreferences("loginInfo", MODE_PRIVATE);
-                        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(settings.getString("state","")).child(settings.getString("locality","")).child(UID);
-                        databaseReference.child("status").setValue("offline");
-                        databaseReference.child("acceptingOrders").setValue("no");
+//                        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(settings.getString("state","")).child(settings.getString("locality","")).child(UID);
+//                        databaseReference.child("status").setValue("offline");
+//                        databaseReference.child("acceptingOrders").setValue("no");
+                        FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+                        firestore.collection(settings.getString("state","")).document("Restaurants").collection(settings.getString("locality","")).document(UID)
+                                        .update("status","offline","acceptingOrders","no");
                         FirebaseMessaging.getInstance().unsubscribeFromTopic(Objects.requireNonNull(UID));
                         requireContext().stopService(new Intent(requireContext(), MyService.class));
                         SharedPreferences stopServices = requireActivity().getSharedPreferences("Stop Services", MODE_PRIVATE);
@@ -171,14 +175,19 @@ public class AccountSettingsFragment extends PreferenceFragmentCompat {
             SharedPreferences login = requireContext().getSharedPreferences("loginInfo",MODE_PRIVATE);
             Toast.makeText(requireContext(), "" + newValue, Toast.LENGTH_SHORT).show();
 
-            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(login.getString("state","")).child(login.getString("locality","")).child(UID);
+            FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+//            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(login.getString("state","")).child(login.getString("locality","")).child(UID);
             boolean isChecked = (boolean) newValue;
             if(isChecked){
-                databaseReference.child("TakeAwayAllowed").setValue("yes");
+                firestore.collection(login.getString("state","")).document("Restaurants").collection(login.getString("locality","")).document(UID)
+                        .update("TakeAwayAllowed","yes");
+//                databaseReference.child("TakeAwayAllowed").setValue("yes");
 //                        takeaway.setChecked(true);
                 sharedEdit.putString("TakeAwayAllowed","yes");
             }else{
-                databaseReference.child("TakeAwayAllowed").setValue("no");
+                firestore.collection(login.getString("state","")).document("Restaurants").collection(login.getString("locality","")).document(UID)
+                        .update("TakeAwayAllowed","no");
+//                databaseReference.child("TakeAwayAllowed").setValue("no");
 //                        takeaway.setChecked(false);
                 sharedEdit.putString("TakeAwayAllowed","no");
 
@@ -192,17 +201,21 @@ public class AccountSettingsFragment extends PreferenceFragmentCompat {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
 //                Toast.makeText(requireContext(), "" + UID, Toast.LENGTH_SHORT).show();
-
+                    FirebaseFirestore firestore = FirebaseFirestore.getInstance();
                     SharedPreferences login = requireContext().getSharedPreferences("loginInfo",MODE_PRIVATE);
 //                    Toast.makeText(requireContext(), "" + newValue, Toast.LENGTH_SHORT).show();
-                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(login.getString("state","")).child(login.getString("locality","")).child(UID);
+//                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(login.getString("state","")).child(login.getString("locality","")).child(UID);
                     boolean isChecked = (boolean) newValue;
                     if(isChecked){
-                        databaseReference.child("TableBookAllowed").setValue("yes");
+                        firestore.collection(login.getString("state","")).document("Restaurants").collection(login.getString("locality","")).document(UID)
+                                .update("TableBookAllowed","yes");
+//                        databaseReference.child("TableBookAllowed").setValue("yes");
 //                        takeaway.setChecked(true);
                         sharedEdit.putString("TableBookAllowed","yes");
                     }else{
-                        databaseReference.child("TableBookAllowed").setValue("no");
+                        firestore.collection(login.getString("state","")).document("Restaurants").collection(login.getString("locality","")).document(UID)
+                                .update("TableBookAllowed","no");
+//                        databaseReference.child("TableBookAllowed").setValue("no");
 //                        takeaway.setChecked(false);
                         sharedEdit.putString("TableBookAllowed","no");
 

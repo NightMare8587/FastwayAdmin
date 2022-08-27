@@ -28,6 +28,8 @@ import com.consumers.fastwayadmin.Tables.TableView;
 import com.elconfidencial.bubbleshowcase.BubbleShowCase;
 import com.elconfidencial.bubbleshowcase.BubbleShowCaseBuilder;
 import com.elconfidencial.bubbleshowcase.BubbleShowCaseListener;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
@@ -36,10 +38,14 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 public class TablesFrag extends Fragment {
@@ -58,6 +64,7 @@ public class TablesFrag extends Fragment {
     List<String> timeInMillis  = new ArrayList<>();
     List<String> timeOfBooking  = new ArrayList<>();
     List<String> timeOfUnavailability  = new ArrayList<>();
+    FirebaseFirestore firestore = FirebaseFirestore.getInstance();
     RecyclerView table;
     SharedPreferences.Editor editor;
     int count = 0;
@@ -101,7 +108,7 @@ public class TablesFrag extends Fragment {
         table = view.findViewById(R.id.tableRecyclerView);
         table.setLayoutManager(new LinearLayoutManager(view.getContext()));
         tableAuth = FirebaseAuth.getInstance();
-        tableRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(tableAuth.getUid())).child("Tables");
+//        tableRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(tableAuth.getUid())).child("Tables");
         tableNumber.clear();
         status.clear();
 
@@ -109,101 +116,148 @@ public class TablesFrag extends Fragment {
             initialise();
         }
 
-//        new backGroundWork().execute();
-        tableRef.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                updateChild();
-                called++;
-                Log.i("call",called + "");
-            }
+        firestore.collection(sharedPreferences.getString("state","")).document("Restaurants").collection(sharedPreferences.getString("locality","")).document(tableAuth.getUid())
+                .collection("Tables").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if(task.isSuccessful()){
+                            HashMap<String,List<String>> maps = new HashMap<>();
+                            for(QueryDocumentSnapshot documentSnapshot : task.getResult()){
+                                Map<String,Object> map = documentSnapshot.getData();
 
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                updateChild();
-                called++;
-                Log.i("call",called + "");
-            }
+                                tableNumber.add((String) map.get("tableNum"));
+                                status.add((String) map.get("status"));
+                                seats.add((String) map.get("status"));
 
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
-                updateChild();
-                called++;
-                Log.i("call",called + "");
-            }
+                                if(map.containsKey("customerId")) {
+                                    List<String> list = new ArrayList<>();
+                                list.add(String.valueOf(map.get("customerId")));
+                                list.add(String.valueOf(map.get("time")));
+                                maps.put(String.valueOf(map.get("tableNum")), list);
+                                    if (map.containsKey("timeInMillis")) {
+                                        timeInMillis.add((String) map.get("timeInMillis"));
+                                        timeOfBooking.add((String) map.get("timeOfBooking"));
+                                    } else {
+                                        timeInMillis.add("");
+                                        timeOfBooking.add("");
+                                    }
 
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-        addTable.setOnClickListener(view1 -> startActivity(new Intent(getActivity(), AddTables.class)));
-
-        layout.setOnRefreshListener(() -> {
-
-            tableNumber.clear();
-            status.clear();
-            tableRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    if(snapshot.exists()){
-                        tableNumber.clear();
-                        status.clear();
-                        seats.clear();
-                        timeOfBooking.clear();
-                        timeInMillis.clear();
-                        timeOfUnavailability.clear();
-                        HashMap<String,List<String>> map = new HashMap<>();
-                        for(DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                            tableNumber.add(Objects.requireNonNull(dataSnapshot.child("tableNum").getValue()).toString());
-                            seats.add(Objects.requireNonNull(dataSnapshot.child("numSeats").getValue()).toString());
-                            status.add(dataSnapshot.child("status").getValue().toString());
-                            if (dataSnapshot.hasChild("customerId")) {
-                                List<String> list = new ArrayList<>();
-                                list.add(String.valueOf(dataSnapshot.child("customerId").getValue()));
-                                list.add(String.valueOf(dataSnapshot.child("time").getValue()));
-                                map.put(String.valueOf(dataSnapshot.child("tableNum").getValue(String.class)), list);
-                                if (dataSnapshot.hasChild("timeInMillis")) {
-                                    timeInMillis.add(String.valueOf(dataSnapshot.child("timeInMillis").getValue()));
-                                    timeOfBooking.add(String.valueOf(dataSnapshot.child("timeOfBooking").getValue()));
-                                } else {
+                                    if (map.containsKey("timeOfUnavailability"))
+                                        timeOfUnavailability.add((String) map.get("timeOfUnavailability"));
+                                    else
+                                        timeOfUnavailability.add("");
+                                }else
+                                {
                                     timeInMillis.add("");
+                                    timeOfUnavailability.add("");
                                     timeOfBooking.add("");
                                 }
 
-                                if(dataSnapshot.hasChild("timeOfUnavailability")){
-                                    timeOfUnavailability.add(String.valueOf(dataSnapshot.child("timeOfUnavailability").getValue()));
-                                }else
-                                    timeOfUnavailability.add("");
-                            } else {
-                                timeOfBooking.add("");
-                                timeInMillis.add("");
-                                timeOfUnavailability.add("");
                             }
-                        }
-                        tableView = new TableView(tableNumber,status,map,getContext(),timeInMillis,timeOfBooking,timeOfUnavailability,seats);
+
+
+                            tableView = new TableView(tableNumber,status,maps,getContext(),timeInMillis,timeOfBooking,timeOfUnavailability,seats);
                         table.setAdapter(tableView);
                         tableView.notifyDataSetChanged();
-
-                    }else{
-                        Toast.makeText(view.getContext(), "Add Some Tables!!!", Toast.LENGTH_SHORT).show();
+                        }
                     }
+                });
 
-                }
+////        new backGroundWork().execute();
+//        tableRef.addChildEventListener(new ChildEventListener() {
+//            @Override
+//            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+//                updateChild();
+//                called++;
+//                Log.i("call",called + "");
+//            }
+//
+//            @Override
+//            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+//                updateChild();
+//                called++;
+//                Log.i("call",called + "");
+//            }
+//
+//            @Override
+//            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+//                updateChild();
+//                called++;
+//                Log.i("call",called + "");
+//            }
+//
+//            @Override
+//            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+//
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//
+//            }
+//        });
+        addTable.setOnClickListener(view1 -> startActivity(new Intent(getActivity(), AddTables.class)));
 
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-
-                }
-            });
-
-            layout.setRefreshing(false);
-        });
+//        layout.setOnRefreshListener(() -> {
+//
+//            tableNumber.clear();
+//            status.clear();
+//            tableRef.addListenerForSingleValueEvent(new ValueEventListener() {
+//                @Override
+//                public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                    if(snapshot.exists()){
+//                        tableNumber.clear();
+//                        status.clear();
+//                        seats.clear();
+//                        timeOfBooking.clear();
+//                        timeInMillis.clear();
+//                        timeOfUnavailability.clear();
+//                        HashMap<String,List<String>> map = new HashMap<>();
+//                        for(DataSnapshot dataSnapshot : snapshot.getChildren()) {
+//                            tableNumber.add(Objects.requireNonNull(dataSnapshot.child("tableNum").getValue()).toString());
+//                            seats.add(Objects.requireNonNull(dataSnapshot.child("numSeats").getValue()).toString());
+//                            status.add(dataSnapshot.child("status").getValue().toString());
+//                            if (dataSnapshot.hasChild("customerId")) {
+//                                List<String> list = new ArrayList<>();
+//                                list.add(String.valueOf(dataSnapshot.child("customerId").getValue()));
+//                                list.add(String.valueOf(dataSnapshot.child("time").getValue()));
+//                                map.put(String.valueOf(dataSnapshot.child("tableNum").getValue(String.class)), list);
+//                                if (dataSnapshot.hasChild("timeInMillis")) {
+//                                    timeInMillis.add(String.valueOf(dataSnapshot.child("timeInMillis").getValue()));
+//                                    timeOfBooking.add(String.valueOf(dataSnapshot.child("timeOfBooking").getValue()));
+//                                } else {
+//                                    timeInMillis.add("");
+//                                    timeOfBooking.add("");
+//                                }
+//
+//                                if(dataSnapshot.hasChild("timeOfUnavailability")){
+//                                    timeOfUnavailability.add(String.valueOf(dataSnapshot.child("timeOfUnavailability").getValue()));
+//                                }else
+//                                    timeOfUnavailability.add("");
+//                            } else {
+//                                timeOfBooking.add("");
+//                                timeInMillis.add("");
+//                                timeOfUnavailability.add("");
+//                            }
+//                        }
+//                        tableView = new TableView(tableNumber,status,map,getContext(),timeInMillis,timeOfBooking,timeOfUnavailability,seats);
+//                        table.setAdapter(tableView);
+//                        tableView.notifyDataSetChanged();
+//
+//                    }else{
+//                        Toast.makeText(view.getContext(), "Add Some Tables!!!", Toast.LENGTH_SHORT).show();
+//                    }
+//
+//                }
+//
+//                @Override
+//                public void onCancelled(@NonNull DatabaseError error) {
+//
+//                }
+//            });
+//
+//            layout.setRefreshing(false);
+//        });
     }
 
     private void initialise() {
@@ -237,94 +291,87 @@ public class TablesFrag extends Fragment {
         editor.apply();
     }
 
-    private void updateChild() {
-        new Thread(() -> tableRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @SuppressLint("NotifyDataSetChanged")
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(snapshot.exists()){
-                    tableNumber.clear();
-                    timeOfUnavailability.clear();
-                    status.clear();
-                    timeOfBooking.clear();
-                    seats.clear();
-                    timeInMillis.clear();
-                    HashMap<String,List<String>> map = new HashMap<>();
-                    for(DataSnapshot dataSnapshot : snapshot.getChildren()) {
+//    private void updateChild() {
+//        new Thread(() -> tableRef.addListenerForSingleValueEvent(new ValueEventListener() {
+//            @SuppressLint("NotifyDataSetChanged")
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                if(snapshot.exists()){
+//                    tableNumber.clear();
+//                    timeOfUnavailability.clear();
+//                    status.clear();
+//                    timeOfBooking.clear();
+//                    seats.clear();
+//                    timeInMillis.clear();
+//                    HashMap<String,List<String>> map = new HashMap<>();
+//                    for(DataSnapshot dataSnapshot : snapshot.getChildren()) {
+//
+//                        tableNumber.add(Objects.requireNonNull(dataSnapshot.child("tableNum").getValue()).toString());
+//                        seats.add(Objects.requireNonNull(dataSnapshot.child("numSeats").getValue()).toString());
+//                        status.add(dataSnapshot.child("status").getValue().toString());
+//                        if (dataSnapshot.hasChild("customerId")) {
+//                            List<String> list = new ArrayList<>();
+//                            list.add(String.valueOf(dataSnapshot.child("customerId").getValue()));
+//                            list.add(String.valueOf(dataSnapshot.child("time").getValue()));
+//                            map.put(String.valueOf(dataSnapshot.child("tableNum").getValue(String.class)), list);
+//                            if(dataSnapshot.hasChild("timeInMillis")) {
+//                                timeInMillis.add(String.valueOf(dataSnapshot.child("timeInMillis").getValue()));
+//                                timeOfBooking.add(String.valueOf(dataSnapshot.child("timeOfBooking").getValue()));
+//                            }
+//                            else {
+//                                timeInMillis.add("");
+//                                timeOfBooking.add("");
+//                            }
+//
+//                            if(dataSnapshot.hasChild("timeOfUnavailability")){
+//                                timeOfUnavailability.add(dataSnapshot.child("timeOfUnavailability").getValue(String.class));
+//                            }else
+//                                timeOfUnavailability.add("");
+//                        }else {
+//                            timeInMillis.add("");
+//                            timeOfBooking.add("");
+//                            timeOfUnavailability.add("");
+//                        }
+//                    }
+//                    tableView = new TableView(tableNumber,status,map,getContext(),timeInMillis,timeOfBooking,timeOfUnavailability,seats);
+//                    table.setAdapter(tableView);
+//                    table.addOnScrollListener(new RecyclerView.OnScrollListener() {
+//                        @Override
+//                        public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+//                            super.onScrolled(recyclerView, dx, dy);
+//                            if(dy > 0)
+//                                addTable.hide();
+//                            else if(dy < 0)
+//                                addTable.show();
+//                        }
+//                    });
+//                    Log.i("info",timeOfBooking.toString());
+//                    tableView.notifyDataSetChanged();
+//
+//                }else{
+//                    tableNumber.clear();
+//                    timeOfUnavailability.clear();
+//                    status.clear();
+//                    timeOfBooking.clear();
+//                    seats.clear();
+//                    timeInMillis.clear();
+//                    HashMap<String,List<String>> map = new HashMap<>();
+//                    tableView = new TableView(tableNumber,status,map,getContext(),timeInMillis,timeOfBooking,timeOfUnavailability,seats);
+//                    table.setAdapter(tableView);
+//                    Log.i("info",timeOfBooking.toString());
+//                    tableView.notifyDataSetChanged();
+//                }
+//
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//
+//            }
+//        })).start();
+//
+//    }
 
-                        tableNumber.add(Objects.requireNonNull(dataSnapshot.child("tableNum").getValue()).toString());
-                        seats.add(Objects.requireNonNull(dataSnapshot.child("numSeats").getValue()).toString());
-                        status.add(dataSnapshot.child("status").getValue().toString());
-                        if (dataSnapshot.hasChild("customerId")) {
-                            List<String> list = new ArrayList<>();
-                            list.add(String.valueOf(dataSnapshot.child("customerId").getValue()));
-                            list.add(String.valueOf(dataSnapshot.child("time").getValue()));
-                            map.put(String.valueOf(dataSnapshot.child("tableNum").getValue(String.class)), list);
-                            if(dataSnapshot.hasChild("timeInMillis")) {
-                                timeInMillis.add(String.valueOf(dataSnapshot.child("timeInMillis").getValue()));
-                                timeOfBooking.add(String.valueOf(dataSnapshot.child("timeOfBooking").getValue()));
-                            }
-                            else {
-                                timeInMillis.add("");
-                                timeOfBooking.add("");
-                            }
 
-                            if(dataSnapshot.hasChild("timeOfUnavailability")){
-                                timeOfUnavailability.add(dataSnapshot.child("timeOfUnavailability").getValue(String.class));
-                            }else
-                                timeOfUnavailability.add("");
-                        }else {
-                            timeInMillis.add("");
-                            timeOfBooking.add("");
-                            timeOfUnavailability.add("");
-                        }
-                    }
-                    tableView = new TableView(tableNumber,status,map,getContext(),timeInMillis,timeOfBooking,timeOfUnavailability,seats);
-                    table.setAdapter(tableView);
-                    table.addOnScrollListener(new RecyclerView.OnScrollListener() {
-                        @Override
-                        public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                            super.onScrolled(recyclerView, dx, dy);
-                            if(dy > 0)
-                                addTable.hide();
-                            else if(dy < 0)
-                                addTable.show();
-                        }
-                    });
-                    Log.i("info",timeOfBooking.toString());
-                    tableView.notifyDataSetChanged();
-
-                }else{
-                    tableNumber.clear();
-                    timeOfUnavailability.clear();
-                    status.clear();
-                    timeOfBooking.clear();
-                    seats.clear();
-                    timeInMillis.clear();
-                    HashMap<String,List<String>> map = new HashMap<>();
-                    tableView = new TableView(tableNumber,status,map,getContext(),timeInMillis,timeOfBooking,timeOfUnavailability,seats);
-                    table.setAdapter(tableView);
-                    Log.i("info",timeOfBooking.toString());
-                    tableView.notifyDataSetChanged();
-                }
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        })).start();
-
-    }
-
-    public class backGroundWork extends AsyncTask<Void,Void,Void>{
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-
-            return null;
-        }
-    }
 
 }

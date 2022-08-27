@@ -43,6 +43,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -70,6 +71,7 @@ public class AddTables extends AppCompatActivity {
 
     Uri filePath;
     EditText numberOfSeats;
+    FirebaseFirestore firestore = FirebaseFirestore.getInstance();
     Button generateQrCode;
     SharedPreferences sharedPreferences;
     FirebaseAuth tableAuth;
@@ -118,6 +120,9 @@ public class AddTables extends AppCompatActivity {
                         Toast.makeText(AddTables.this, e.getMessage()+"", Toast.LENGTH_SHORT).show();
                         progressBar.setVisibility(View.INVISIBLE);
                     });
+
+            firestore.collection(sharedPreferences.getString("state","")).document("Restaurants").collection(sharedPreferences.getString("locality",""))
+                    .document(Objects.requireNonNull(tableAuth.getUid())).collection("Tables").document(tableNumber.getText().toString()).set(tableClass);
 
             QRCodeWriter writer = new QRCodeWriter();
             try {
