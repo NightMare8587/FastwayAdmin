@@ -127,6 +127,7 @@ public class MapsActivity2 extends FragmentActivity implements OnMapReadyCallbac
 //                RestLocation restLocation = new RestLocation(String.valueOf(latitude),String.valueOf(longitude));
 //                ref.child("location").setValue(restLocation);
 //                setResult(69);
+                client.removeLocationUpdates(mLocationCallback);
                 Intent intent = new Intent();
                 intent.putExtra("lon",String.valueOf(lon));
                 intent.putExtra("lat",String.valueOf(lat));
@@ -371,6 +372,7 @@ public class MapsActivity2 extends FragmentActivity implements OnMapReadyCallbac
     public void onBackPressed() {
         super.onBackPressed();
         Intent intent = new Intent();
+        client.removeLocationUpdates(mLocationCallback);
         setResult(Activity.RESULT_CANCELED,intent);
         finish();
     }

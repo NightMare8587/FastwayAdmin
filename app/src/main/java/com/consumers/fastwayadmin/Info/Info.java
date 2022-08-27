@@ -47,6 +47,10 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -58,6 +62,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import karpuzoglu.enes.com.fastdialog.Animations;
@@ -68,8 +74,10 @@ import karpuzoglu.enes.com.fastdialog.Type;
 public class Info extends AppCompatActivity {
     EditText nameOfRestaurant,AddressOfRestaurant,nearbyPlace,pinCode,contactNumber;
     Button proceed;
+    boolean resCreated = false;
     FastDialog loading;
 //    LocationRequest locationRequest;
+    FirebaseFirestore infoStore;
     Bitmap bitmap;
     StorageReference storageReference;
     AlertDialog.Builder builder;
@@ -123,7 +131,9 @@ public class Info extends AppCompatActivity {
         checkPermissions();
         sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
         SharedPreferences location = getSharedPreferences("LocationMaps",MODE_PRIVATE);
-        infoRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(this.sharedPreferences.getString("state", "")).child(this.sharedPreferences.getString("locality","")).child(Objects.requireNonNull(infoAuth.getUid()));
+        infoStore = FirebaseFirestore.getInstance();
+
+//        infoRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(this.sharedPreferences.getString("state", "")).child(this.sharedPreferences.getString("locality","")).child(Objects.requireNonNull(infoAuth.getUid()));
         if(location.contains("location")){
             startActivity(new Intent(Info.this, HomeScreen.class));
             finish();
@@ -135,60 +145,82 @@ public class Info extends AppCompatActivity {
             return;
         }
         alertDialog.show();
-        checkRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state", "")).child(sharedPreferences.getString("locality",""));
-        checkRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(snapshot.hasChild(Objects.requireNonNull(infoAuth.getUid()))){
-                    if(snapshot.child(infoAuth.getUid()).child("TableBookAllowed").getValue(String.class).equals("yes")){
-                        editor.putString("TableBookAllowed", "yes");
+        FirebaseFirestore checkStore = FirebaseFirestore.getInstance();
+        checkStore.collection(sharedPreferences.getString("state","")).document("Restaurants").collection(sharedPreferences.getString("locality","")).document(infoAuth.getUid())
+                .addSnapshotListener((value, error) -> {
+                    if(value.exists()){
+                        Map<String,Object> map = value.getData();
+                        editor.putString("TableBookAllowed", (String) map.get("TableBookAllowed"));
+                        editor.putString("TakeAwayAllowed", (String) map.get("TableBookAllowed"));
+                        editor.apply();
+
+                        SharedPreferences resInfoShared = getSharedPreferences("RestaurantInfo", MODE_PRIVATE);
+                        SharedPreferences.Editor editor = resInfoShared.edit();
+                        editor.putString("hotelName", (String) map.get("name"));
+                        editor.putString("hotelAddress", (String) map.get("address"));
+                        editor.putString("hotelNumber", (String) map.get("number"));
+                        editor.apply();
+
+                        if(!resCreated){
+                            startActivity(new Intent(Info.this,UploadRequiredDocuments.class));
+                            finish();
+                        }
                     }
-                    else
-                        editor.putString("TableBookAllowed", "no");
-
-                    if(snapshot.child(infoAuth.getUid()).child("TakeAwayAllowed").getValue(String.class).equals("yes")){
-                        editor.putString("TakeAwayAllowed", "yes");
-                    }
-                    else
-                        editor.putString("TakeAwayAllowed", "no");
-
-                    editor.apply();
-
-                    SharedPreferences resInfoShared = getSharedPreferences("RestaurantInfo", MODE_PRIVATE);
-                            SharedPreferences.Editor editor = resInfoShared.edit();
-                            editor.putString("hotelName", snapshot.child(infoAuth.getUid()).child("name").getValue(String.class));
-                            editor.putString("hotelAddress", snapshot.child(infoAuth.getUid()).child("address").getValue(String.class));
-                            editor.putString("hotelNumber", snapshot.child(infoAuth.getUid()).child("number").getValue(String.class));
-                            editor.apply();
-                    AlertDialog.Builder alert = new AlertDialog.Builder(Info.this);
-                    alert.setTitle("Images");
-                    alert.setMessage("Do you wanna add images of your restaurant!!\nYou can skip this step and add image later");
-                    alert.setPositiveButton("Add Image", (dialogInterface, i) -> {
-                        Intent intent = new Intent(Info.this, AddRestaurantImages.class);
-                        intent.putExtra("state", sharedPreferences.getString("state", ""));
-                        intent.putExtra("locality", sharedPreferences.getString("locality", ""));
-                        alertDialog.dismiss();
-                        startActivity(intent);
-                        finish();
-                    }).setNegativeButton("Skip", (dialogInterface, i) -> {
-                        dialogInterface.dismiss();
-                        infoRef.child("DisplayImage").setValue("");
-                        startActivity(new Intent(Info.this, UploadRequiredDocuments.class));
-                        alertDialog.dismiss();
-                        finish();
-                    }).create();
-
-                    alert.setCancelable(false);
-                    alert.show();
-                    return;
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
+                });
+//        checkRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state", "")).child(sharedPreferences.getString("locality",""));
+//        checkRef.addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                if(snapshot.hasChild(Objects.requireNonNull(infoAuth.getUid()))){
+//                    if(snapshot.child(infoAuth.getUid()).child("TableBookAllowed").getValue(String.class).equals("yes")){
+//                        editor.putString("TableBookAllowed", "yes");
+//                    }
+//                    else
+//                        editor.putString("TableBookAllowed", "no");
+//
+//                    if(snapshot.child(infoAuth.getUid()).child("TakeAwayAllowed").getValue(String.class).equals("yes")){
+//                        editor.putString("TakeAwayAllowed", "yes");
+//                    }
+//                    else
+//                        editor.putString("TakeAwayAllowed", "no");
+//
+//                    editor.apply();
+//
+//                    SharedPreferences resInfoShared = getSharedPreferences("RestaurantInfo", MODE_PRIVATE);
+//                            SharedPreferences.Editor editor = resInfoShared.edit();
+//                            editor.putString("hotelName", snapshot.child(infoAuth.getUid()).child("name").getValue(String.class));
+//                            editor.putString("hotelAddress", snapshot.child(infoAuth.getUid()).child("address").getValue(String.class));
+//                            editor.putString("hotelNumber", snapshot.child(infoAuth.getUid()).child("number").getValue(String.class));
+//                            editor.apply();
+//                    AlertDialog.Builder alert = new AlertDialog.Builder(Info.this);
+//                    alert.setTitle("Images");
+//                    alert.setMessage("Do you wanna add images of your restaurant!!\nYou can skip this step and add image later");
+//                    alert.setPositiveButton("Add Image", (dialogInterface, i) -> {
+//                        Intent intent = new Intent(Info.this, AddRestaurantImages.class);
+//                        intent.putExtra("state", sharedPreferences.getString("state", ""));
+//                        intent.putExtra("locality", sharedPreferences.getString("locality", ""));
+//                        alertDialog.dismiss();
+//                        startActivity(intent);
+//                        finish();
+//                    }).setNegativeButton("Skip", (dialogInterface, i) -> {
+//                        dialogInterface.dismiss();
+//                        infoRef.child("DisplayImage").setValue("");
+//                        startActivity(new Intent(Info.this, UploadRequiredDocuments.class));
+//                        alertDialog.dismiss();
+//                        finish();
+//                    }).create();
+//
+//                    alert.setCancelable(false);
+//                    alert.show();
+//                    return;
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//
+//            }
+//        });
 
 
         if(!sharedPreferences.getString("locality","").equals(""))
@@ -219,7 +251,7 @@ public class Info extends AppCompatActivity {
                                         dialogInterface.dismiss();
                                        finish();
                                     }
-                                },600);
+                                },150);
                             }
                         }).create();
                 info.setCancelable(false);
@@ -337,33 +369,51 @@ public class Info extends AppCompatActivity {
             this.editor.putString("restaurantCreated", "yes");
             editor.apply();
 
-            infoRef.child("name").setValue(name);
-            infoRef.child("address").setValue(address);
-            infoRef.child("number").setValue(number);
-            infoRef.child("nearby").setValue(nearby);
-            infoRef.child("pin").setValue(pin);
-            infoRef.child("rating").setValue("0");
-            infoRef.child("DisplayImage").setValue("");
-            infoRef.child("totalRate").setValue("0");
-            infoRef.child("count").setValue("0");
-            infoRef.child("status").setValue("online");
-            infoRef.child("acceptingOrders").setValue("yes");
-            infoRef.child("totalReports").setValue("0");
+            Map<String,String> map = new HashMap<>();
+            map.put("name",name);
+            map.put("address",address);
+            map.put("number",number);
+            map.put("nearby",nearby);
+            map.put("pin",pin);
+            map.put("rating","0");
+            map.put("DisplayImage","");
+            map.put("totalRate","0");
+            map.put("count","0");
+            map.put("status","online");
+            map.put("acceptingOrders","yes");
+            map.put("totalReports","0");
+
+//            infoRef.child("name").setValue(name);
+//            infoRef.child("address").setValue(address);
+//            infoRef.child("number").setValue(number);
+//            infoRef.child("nearby").setValue(nearby);
+//            infoRef.child("pin").setValue(pin);
+//            infoRef.child("rating").setValue("0");
+//            infoRef.child("DisplayImage").setValue("");
+//            infoRef.child("totalRate").setValue("0");
+//            infoRef.child("count").setValue("0");
+//            infoRef.child("status").setValue("online");
+//            infoRef.child("acceptingOrders").setValue("yes");
+//            infoRef.child("totalReports").setValue("0");
 
 
             if (optForTakeaway.isChecked()) {
-                infoRef.child("TakeAwayAllowed").setValue("yes");
+                map.put("TakeAwayAllowed","yes");
+//                infoRef.child("TakeAwayAllowed").setValue("yes");
                 this.editor.putString("TakeAwayAllowed", "yes");
             } else {
-                infoRef.child("TakeAwayAllowed").setValue("no");
+                map.put("TakeAwayAllowed","no");
+//                infoRef.child("TakeAwayAllowed").setValue("no");
                 this.editor.putString("TakeAwayAllowed", "no");
             }
 
             if (optForTableBook.isChecked()) {
-                infoRef.child("TableBookAllowed").setValue("yes");
+                map.put("TableBookAllowed","yes");
+//                infoRef.child("TableBookAllowed").setValue("yes");
                 this.editor.putString("TableBookAllowed", "yes");
             } else {
-                infoRef.child("TableBookAllowed").setValue("no");
+                map.put("TableBookAllowed","no");
+//                infoRef.child("TableBookAllowed").setValue("no");
                 this.editor.putString("TableBookAllowed", "no");
             }
 
@@ -373,9 +423,10 @@ public class Info extends AppCompatActivity {
             if(mapLocations){
                 this.editor.putString("state",cityName);
                 this.editor.putString("locality",subAdminArea);
-                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(cityName).child(subAdminArea).child(infoAuth.getUid());
-                RestLocation restLocation = new RestLocation(String.valueOf(lon),String.valueOf(lat));
-                databaseReference.child("location").setValue(restLocation);
+//                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(cityName).child(subAdminArea).child(infoAuth.getUid());
+//                RestLocation restLocation = new RestLocation(String.valueOf(lon),String.valueOf(lat));
+//                databaseReference.child("location").setValue(restLocation);
+                map.put("location",lon + "/" + lat);
                 SharedPreferences sharedPreferences1 = getSharedPreferences("LocationMaps",MODE_PRIVATE);
                 SharedPreferences.Editor editor1 = sharedPreferences1.edit();
                 editor1.putString("location","yes");
@@ -383,6 +434,9 @@ public class Info extends AppCompatActivity {
             }
 //            this.editor.putString("firstTimeRestaurant")
             this.editor.apply();
+            resCreated = true;
+            infoStore.collection(this.sharedPreferences.getString("state","")).document("Restaurants").collection(this.sharedPreferences.getString("locality","")).document(Objects.requireNonNull(infoAuth.getUid())).set(map);
+
 //            clientsLocation.removeLocationUpdates(mLocationCallback);
             AlertDialog.Builder alert = new AlertDialog.Builder(Info.this);
             alert.setTitle("Images");
@@ -395,7 +449,7 @@ public class Info extends AppCompatActivity {
                 startActivity(intent);
             }).setNegativeButton("Skip", (dialogInterface, i) -> {
                 dialogInterface.dismiss();
-                infoRef.child("DisplayImage").setValue("");
+//                infoRef.child("DisplayImage").setValue("");
                 startActivity(new Intent(Info.this, UploadRequiredDocuments.class));
                 finish();
             }).create();

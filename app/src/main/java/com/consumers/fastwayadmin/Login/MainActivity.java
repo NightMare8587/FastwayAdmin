@@ -469,13 +469,15 @@ public class MainActivity extends AppCompatActivity {
                         verifyCodeDialog.dismiss();
                         loginAuth = FirebaseAuth.getInstance();
 //                                reference.child("Admin").child(Objects.requireNonNull(loginAuth.getUid())).setValue(user);
-                        reference.child("Admin").addListenerForSingleValueEvent(new ValueEventListener() {
+                        AsyncTask.execute(() -> reference.child("Admin").addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot snapshot) {
                                 if(!snapshot.hasChild(Objects.requireNonNull(loginAuth.getUid()))){
                                     sendEmailFunction(email);
                                     reference.child("Admin").child(Objects.requireNonNull(loginAuth.getUid())).setValue(user);
                                     reference.child("Admin").child(loginAuth.getUid()).child("registrationDate").setValue(System.currentTimeMillis() + "");
+                                    FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+                                    firestore.collection("Admin").document(loginAuth.getUid()).set(user);
                                 }
                             }
 
@@ -483,7 +485,7 @@ public class MainActivity extends AppCompatActivity {
                             public void onCancelled(@NonNull DatabaseError error) {
 
                             }
-                        });
+                        }));
                         clientsLocation.removeLocationUpdates(mLocationCallback);
                         startActivity(new Intent(getApplicationContext(),Info.class));
                         finish();
@@ -605,22 +607,33 @@ public class MainActivity extends AppCompatActivity {
                         FirebaseUser user = loginAuth.getCurrentUser();
                         assert user != null;
                         loginAuth.updateCurrentUser(user);
-                        reference.child("Admin").addListenerForSingleValueEvent(new ValueEventListener() {
+                        AsyncTask.execute(new Runnable() {
                             @Override
-                            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                if(!snapshot.hasChild(Objects.requireNonNull(loginAuth.getUid()))){
-                                    sendEmailFunction(account.getEmail());
-                                    GoogleSignInDB googleSignInDB = new GoogleSignInDB(account.getDisplayName(),account.getEmail());
-                                    reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(user.getUid());
-                                    reference.setValue(googleSignInDB);
-                                }
-                            }
+                            public void run() {
+                                reference.child("Admin").addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                        if(!snapshot.hasChild(Objects.requireNonNull(loginAuth.getUid()))){
+                                            sendEmailFunction(account.getEmail());
+                                            GoogleSignInDB googleSignInDB = new GoogleSignInDB(account.getDisplayName(),account.getEmail());
+                                            reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(user.getUid());
+                                            reference.setValue(googleSignInDB);
+                                            Map<String,String> map = new HashMap<>();
+                                            map.put("name",account.getDisplayName());
+                                            map.put("email",account.getEmail());
+                                            FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+                                            firestore.collection("Admin").document(loginAuth.getUid()).set(map);
+                                        }
+                                    }
 
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError error) {
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError error) {
 
+                                    }
+                                });
                             }
                         });
+
                         clientsLocation.removeLocationUpdates(mLocationCallback);
                         startActivity(new Intent(MainActivity.this,Info.class));
                         finish();

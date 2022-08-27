@@ -28,6 +28,8 @@ public class AddDishToCurrentCombo extends AppCompatActivity {
     FancyButton mainCourse,breads,snacks,deserts,drinks;
     SharedPreferences sharedPreferences;
     DatabaseReference reference;
+    List<String> dishNames;
+    List<String> dishQuan;
     FirebaseAuth auth;
     String comboName;
     LinearLayoutManager horizonatl;
@@ -36,6 +38,8 @@ public class AddDishToCurrentCombo extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_dish_to_current_combo);
         comboName = getIntent().getStringExtra("name");
+        dishNames = getIntent().getStringArrayListExtra("dishName");
+        dishQuan = getIntent().getStringArrayListExtra("dishQuan");
         auth = FirebaseAuth.getInstance();
         sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
         reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid()));
@@ -54,6 +58,8 @@ public class AddDishToCurrentCombo extends AppCompatActivity {
                     intent.putExtra("dishType","Main Course");
                     intent.putExtra("comboName",comboName);
                     intent.putExtra("state",sharedPreferences.getString("state",""));
+                    intent.putStringArrayListExtra("dishName", (ArrayList<String>) dishNames);
+                    intent.putStringArrayListExtra("dishQuan", (ArrayList<String>) dishQuan);
                     intent.putExtra("locality",sharedPreferences.getString("locality",""));
                     startActivity(intent);
                 }).show());
@@ -67,6 +73,8 @@ public class AddDishToCurrentCombo extends AppCompatActivity {
                     intent.putExtra("dishType","Breads");
                     intent.putExtra("comboName",comboName);
                     intent.putExtra("state",sharedPreferences.getString("state",""));
+                    intent.putStringArrayListExtra("dishName", (ArrayList<String>) dishNames);
+                    intent.putStringArrayListExtra("dishQuan", (ArrayList<String>) dishQuan);
                     intent.putExtra("locality",sharedPreferences.getString("locality",""));
                     startActivity(intent);
 
@@ -82,6 +90,8 @@ public class AddDishToCurrentCombo extends AppCompatActivity {
                     intent.putExtra("dishType","Deserts");
                     intent.putExtra("comboName",comboName);
                     intent.putExtra("state",sharedPreferences.getString("state",""));
+                    intent.putStringArrayListExtra("dishName", (ArrayList<String>) dishNames);
+                    intent.putStringArrayListExtra("dishQuan", (ArrayList<String>) dishQuan);
                     intent.putExtra("locality",sharedPreferences.getString("locality",""));
                     startActivity(intent);
 //                                kAlertDialog.dismissWithAnimation();
@@ -96,6 +106,8 @@ public class AddDishToCurrentCombo extends AppCompatActivity {
                     intent.putExtra("dishType","Snacks");
                     intent.putExtra("comboName",comboName);
                     intent.putExtra("state",sharedPreferences.getString("state",""));
+                    intent.putStringArrayListExtra("dishName", (ArrayList<String>) dishNames);
+                    intent.putStringArrayListExtra("dishQuan", (ArrayList<String>) dishQuan);
                     intent.putExtra("locality",sharedPreferences.getString("locality",""));
                     startActivity(intent);
 //                                kAlertDialog.dismissWithAnimation();
@@ -110,6 +122,8 @@ public class AddDishToCurrentCombo extends AppCompatActivity {
                     intent.putExtra("dishType","Drinks");
                     intent.putExtra("comboName",comboName);
                     intent.putExtra("state",sharedPreferences.getString("state",""));
+                    intent.putStringArrayListExtra("dishName", (ArrayList<String>) dishNames);
+                    intent.putStringArrayListExtra("dishQuan", (ArrayList<String>) dishQuan);
                     intent.putExtra("locality",sharedPreferences.getString("locality",""));
                     startActivity(intent);
 //                                kAlertDialog.dismissWithAnimation();

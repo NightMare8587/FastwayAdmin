@@ -1,5 +1,7 @@
 package com.consumers.fastwayadmin.Dish.SearchDishFastway;
 
+import static android.content.Context.MODE_PRIVATE;
+
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -29,6 +31,7 @@ import com.consumers.fastwayadmin.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -38,6 +41,7 @@ import java.util.Objects;
 public class SearchFastwayClass extends RecyclerView.Adapter<SearchFastwayClass.Holder> {
     List<String> dishName = new ArrayList<>();
     List<String> dishImage = new ArrayList<>();
+    FirebaseFirestore firestore = FirebaseFirestore.getInstance();
     String dishType = "Veg";
     String dish;
 
@@ -62,7 +66,7 @@ public class SearchFastwayClass extends RecyclerView.Adapter<SearchFastwayClass.
         holder.cardView.setOnClickListener(v -> {
 
             FirebaseAuth auth = FirebaseAuth.getInstance();
-            SharedPreferences sharedPreferences = v.getContext().getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
+            SharedPreferences sharedPreferences = v.getContext().getSharedPreferences("loginInfo", MODE_PRIVATE);
             DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid())).child("List of Dish").child(dish);
             AlertDialog.Builder alertDialog = new AlertDialog.Builder(v.getContext());
             alertDialog.setTitle("Important");
@@ -120,12 +124,16 @@ public class SearchFastwayClass extends RecyclerView.Adapter<SearchFastwayClass.
                     String full = fullPrice.getText().toString();
 
                     if(ownDishName.getText().toString().equals("")) {
-                        DishInfo info = new DishInfo(dishName.get(position), half, full, dishImage.get(position), mrpChecked, "0", "0", "0", "yes",dishDescription.getText().toString(),dishType);
+                        DishInfo info = new DishInfo(dishName.get(position), half, full, dishImage.get(position), mrpChecked, "0", "0", "0", "yes",dishDescription.getText().toString(),dishType,dish);
                         reference.child(dishName.get(position)).setValue(info);
+                        firestore.collection(sharedPreferences.getString("state","")).document("Restaurants").collection(sharedPreferences.getString("locality","")).document(auth.getUid())
+                                .collection("List of Dish").document(dishName.get(position)).set(info);
                         dishNameToAdd = dishName.get(position);
                     }else{
-                        DishInfo info = new DishInfo(ownDishName.getText().toString(), half, full, dishImage.get(position), mrpChecked, "0", "0", "0", "yes",dishDescription.getText().toString(),dishType);
+                        DishInfo info = new DishInfo(ownDishName.getText().toString(), half, full, dishImage.get(position), mrpChecked, "0", "0", "0", "yes",dishDescription.getText().toString(),dishType,dish);
                         reference.child(ownDishName.getText().toString()).setValue(info);
+                        firestore.collection(sharedPreferences.getString("state","")).document("Restaurants").collection(sharedPreferences.getString("locality","")).document(auth.getUid())
+                                .collection("List of Dish").document(ownDishName.getText().toString()).set(info);
                         dishNameToAdd = ownDishName.getText().toString();
                     }
                     Toast.makeText(v.getContext(), "Dish Added successfully", Toast.LENGTH_SHORT).show();
@@ -141,7 +149,15 @@ public class SearchFastwayClass extends RecyclerView.Adapter<SearchFastwayClass.
                     intent.putExtra("type",dish);
                     intent.putExtra("dishName", finalDishNameToAdd);
                     v.getContext().startActivity(intent);
-                }).setNegativeButton("Use Fastway Image", (dialogInterface1, i1) -> dialogInterface1.dismiss()).create();
+                }).setNegativeButton("Use Fastway Image", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        SharedPreferences storeImages = v.getContext().getSharedPreferences("storeImages",MODE_PRIVATE);
+                        SharedPreferences.Editor imageEdit = storeImages.edit();
+                        imageEdit.putString(finalDishNameToAdd,dishImage.get(position) + "");
+                        imageEdit.apply();
+                    }
+                }).create();
 
                 alert.show();
             });

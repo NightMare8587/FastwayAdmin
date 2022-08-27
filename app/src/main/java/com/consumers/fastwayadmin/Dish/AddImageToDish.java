@@ -28,6 +28,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -180,10 +181,13 @@ public class AddImageToDish extends AppCompatActivity {
                    StorageReference ref1 = storageReference.child(dishAuth.getUid() + "/" + "image" + "/"  + dishName);
                    ref1.getDownloadUrl().addOnSuccessListener(uri -> {
                        Toast.makeText(AddImageToDish.this, "New Image Uploaded", Toast.LENGTH_SHORT).show();
-                       reference.child("image").setValue(uri + "");
+                       FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+                       firestore.collection(sharedPreferences.getString("state","")).document("Restaurants").collection(sharedPreferences.getString("locality","")).document(dishAuth.getUid())
+                               .collection("List of Dish").document(dishName).update("image",uri + "");
                        SharedPreferences storeImages = getSharedPreferences("storeImages",MODE_PRIVATE);
                        SharedPreferences.Editor imageEdit = storeImages.edit();
                        imageEdit.putString(dishName,uri + "");
+                       reference.child("image").setValue(uri + "");
                        imageEdit.apply();
                        fastDialog.dismiss();
                        finish();

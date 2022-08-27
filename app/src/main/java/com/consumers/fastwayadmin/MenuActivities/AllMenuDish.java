@@ -18,6 +18,8 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.consumers.fastwayadmin.Dish.DishView;
 import com.consumers.fastwayadmin.Dish.SearchDishFastway.SearchFastwayDatabase;
 import com.consumers.fastwayadmin.R;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
@@ -26,9 +28,18 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 public class AllMenuDish extends AppCompatActivity {
@@ -40,9 +51,11 @@ public class AllMenuDish extends AppCompatActivity {
     DatabaseReference menuRef;
     RecyclerView recyclerView;
     String dish;
+    FirebaseFirestore firestore = FirebaseFirestore.getInstance();
     String state;
     ProgressBar loading;
     List<String> names = new ArrayList<String>();
+    CollectionReference collectionReference;
     List<String> before = new ArrayList<>();
     List<String> enableOr = new ArrayList<>();
     List<String> after = new ArrayList<>();
@@ -55,80 +68,112 @@ public class AllMenuDish extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_all_menu_dish);
         initialise();
-        menuRef.child(Objects.requireNonNull(menuAuth.getUid())).child("List of Dish").child(dish).addListenerForSingleValueEvent(new ValueEventListener() {
+        collectionReference = firestore.collection(sharedPreferences.getString("state","")).document("Restaurants").collection(sharedPreferences.getString("locality","")).document(menuAuth.getUid()).collection("List of Dish");
+        Query query = collectionReference.whereEqualTo("menuType",dish);
+        query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(!snapshot.exists()){
-                    Toast.makeText(AllMenuDish.this, "Empty!! Add Some Dish", Toast.LENGTH_SHORT).show();
-                    loading.setVisibility(View.INVISIBLE);
-                }else{
-                    names.clear();
-                    halfPrice.clear();
-                    enableOr.clear();
-                    image.clear();
-                    before.clear();
-                    after.clear();
-                    discount.clear();
-                    fullPrice.clear();
-                    for(DataSnapshot dataSnapshot : snapshot.getChildren()){
-                        if(dataSnapshot.child("Discount").child(dataSnapshot.child("name").getValue().toString()).child("dis").exists()){
-                            Log.d("hola","yes");
-                            before.add(String.valueOf(dataSnapshot.child("Discount").child(Objects.requireNonNull(dataSnapshot.child("name").getValue(String.class))).child("before").getValue(String.class)));
-                            after.add(String.valueOf(dataSnapshot.child("Discount").child(Objects.requireNonNull(dataSnapshot.child("name").getValue(String.class))).child("after").getValue(String.class)));
-                            discount.add(String.valueOf(dataSnapshot.child("Discount").child(Objects.requireNonNull(dataSnapshot.child("name").getValue(String.class))).child("dis").getValue(String.class)));
-                        }else {
-                            Log.d("hola", "no");
-                            before.add("");
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if(task.isSuccessful()) {
+                    for(QueryDocumentSnapshot documentSnapshot : task.getResult()){
+//                        Log.i("getDt",documentSnapshot.ge());
+                        Map<String,Object> map = documentSnapshot.getData();
+                        names.add((String) map.get("name"));
+                        halfPrice.add((String) map.get("half"));
+                        fullPrice.add((String) map.get("full"));
+                        image.add((String) map.get("image"));
+                        enableOr.add((String) map.get("enable"));
+                        before.add("");
                             after.add("");
                             discount.add("");
-                        }
-                        names.add(dataSnapshot.child("name").getValue().toString());
-                        halfPrice.add(dataSnapshot.child("half").getValue().toString());
-                        fullPrice.add(dataSnapshot.child("full").getValue().toString());
-                        image.add(dataSnapshot.child("image").getValue().toString());
-                        enableOr.add(dataSnapshot.child("enable").getValue(String.class));
+
                     }
+                    DishView dishView = new DishView(names,fullPrice,halfPrice,dish,image,before,after,discount,enableOr);
+//                loading.setVisibility(View.INVISIBLE);
+                    Toast.makeText(AllMenuDish.this, "Click on image icon for adding new image", Toast.LENGTH_SHORT).show();
+                    recyclerView.setAdapter(dishView);
                 }
-                DishView dishView = new DishView(names,fullPrice,halfPrice,dish,image,before,after,discount,enableOr);
+                else {
+                    Toast.makeText(AllMenuDish.this, "No Dish Available", Toast.LENGTH_SHORT).show();
+
+                }
                 loading.setVisibility(View.INVISIBLE);
-                Toast.makeText(AllMenuDish.this, "Click on image icon for adding new image", Toast.LENGTH_SHORT).show();
-                recyclerView.setAdapter(dishView);
-                dishView.notifyDataSetChanged();
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
             }
         });
-        DatabaseReference childref = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(menuAuth.getUid()).child("List of Dish");
-        menuRef.child(Objects.requireNonNull(menuAuth.getUid())).child("List of Dish").child(dish).addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(@NonNull  DataSnapshot snapshot, @Nullable  String previousChildName) {
-                updateChild();
-            }
-
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                updateChild();
-            }
-
-            @Override
-            public void onChildRemoved(@NonNull  DataSnapshot snapshot) {
-                updateChild();
-            }
-
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable  String previousChildName) {
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
+//        Query query = firestore.collection(sharedPreferences.getString("state","")).document("Restaurants").collection(sharedPreferences.getString("locality","")).document(menuAuth.getUid()).collection("List of Dish");
+//        menuRef.child(Objects.requireNonNull(menuAuth.getUid())).child("List of Dish").child(dish).addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                if(!snapshot.exists()){
+//                    Toast.makeText(AllMenuDish.this, "Empty!! Add Some Dish", Toast.LENGTH_SHORT).show();
+//                    loading.setVisibility(View.INVISIBLE);
+//                }else{
+//                    names.clear();
+//                    halfPrice.clear();
+//                    enableOr.clear();
+//                    image.clear();
+//                    before.clear();
+//                    after.clear();
+//                    discount.clear();
+//                    fullPrice.clear();
+//                    for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+//                        if(dataSnapshot.child("Discount").child(dataSnapshot.child("name").getValue().toString()).child("dis").exists()){
+//                            Log.d("hola","yes");
+//                            before.add(String.valueOf(dataSnapshot.child("Discount").child(Objects.requireNonNull(dataSnapshot.child("name").getValue(String.class))).child("before").getValue(String.class)));
+//                            after.add(String.valueOf(dataSnapshot.child("Discount").child(Objects.requireNonNull(dataSnapshot.child("name").getValue(String.class))).child("after").getValue(String.class)));
+//                            discount.add(String.valueOf(dataSnapshot.child("Discount").child(Objects.requireNonNull(dataSnapshot.child("name").getValue(String.class))).child("dis").getValue(String.class)));
+//                        }else {
+//                            Log.d("hola", "no");
+//                            before.add("");
+//                            after.add("");
+//                            discount.add("");
+//                        }
+//                        names.add(dataSnapshot.child("name").getValue().toString());
+//                        halfPrice.add(dataSnapshot.child("half").getValue().toString());
+//                        fullPrice.add(dataSnapshot.child("full").getValue().toString());
+//                        image.add(dataSnapshot.child("image").getValue().toString());
+//                        enableOr.add(dataSnapshot.child("enable").getValue(String.class));
+//                    }
+//                }
+//                DishView dishView = new DishView(names,fullPrice,halfPrice,dish,image,before,after,discount,enableOr);
+//                loading.setVisibility(View.INVISIBLE);
+//                Toast.makeText(AllMenuDish.this, "Click on image icon for adding new image", Toast.LENGTH_SHORT).show();
+//                recyclerView.setAdapter(dishView);
+//                dishView.notifyDataSetChanged();
+//
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//
+//            }
+//        });
+//        DatabaseReference childref = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(menuAuth.getUid()).child("List of Dish");
+//        menuRef.child(Objects.requireNonNull(menuAuth.getUid())).child("List of Dish").child(dish).addChildEventListener(new ChildEventListener() {
+//            @Override
+//            public void onChildAdded(@NonNull  DataSnapshot snapshot, @Nullable  String previousChildName) {
+//                updateChild();
+//            }
+//
+//            @Override
+//            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+//                updateChild();
+//            }
+//
+//            @Override
+//            public void onChildRemoved(@NonNull  DataSnapshot snapshot) {
+//                updateChild();
+//            }
+//
+//            @Override
+//            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable  String previousChildName) {
+//
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//
+//            }
+//        });
         search.setOnClickListener(view -> {
             Intent intent = new Intent(getApplicationContext(),CreateDish.class);
             intent.putExtra("Dish",getIntent().getStringExtra("Dish"));
@@ -138,7 +183,7 @@ public class AllMenuDish extends AppCompatActivity {
 
         });
 
-        Toast.makeText(this, "Swipe down to refresh if new dish added", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(this, "Swipe down to refresh if new dish added", Toast.LENGTH_SHORT).show();
 
 //        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
 //            @Override

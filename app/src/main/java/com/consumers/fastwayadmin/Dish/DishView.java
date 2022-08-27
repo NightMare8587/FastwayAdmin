@@ -29,6 +29,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
@@ -158,15 +159,20 @@ public class DishView extends RecyclerView.Adapter<DishView.DishAdapter> {
         holder.checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
             sharedPreferences = buttonView.getContext().getSharedPreferences("loginInfo",Context.MODE_PRIVATE);
             FirebaseAuth auth = FirebaseAuth.getInstance();
-            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid())).child("List of Dish").child(type);
+            FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+//            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid())).child("List of Dish").child(type);
             if(isChecked){
-                databaseReference.child(names.get(position)).child("enable").setValue("yes");
+//                databaseReference.child(names.get(position)).child("enable").setValue("yes");
                 holder.checkBox.setText("Enabled");
+                firestore.collection(sharedPreferences.getString("state","")).document("Restaurants").collection(sharedPreferences.getString("locality",""))
+                        .document(auth.getUid()).collection("List of Dish").document(names.get(position)).update("enable","yes");
 //                holder.checkBox.setChecked(true);
             }else{
                 holder.checkBox.setText("Disabled");
+                firestore.collection(sharedPreferences.getString("state","")).document("Restaurants").collection(sharedPreferences.getString("locality",""))
+                        .document(auth.getUid()).collection("List of Dish").document(names.get(position)).update("enable","no");
 //                holder.checkBox.setChecked(false);
-                databaseReference.child(names.get(position)).child("enable").setValue("no");
+//                databaseReference.child(names.get(position)).child("enable").setValue("no");
             }
         });
 
@@ -221,8 +227,11 @@ public class DishView extends RecyclerView.Adapter<DishView.DishAdapter> {
                     .setPositiveButton("Yes", (dialogInterface, i) -> {
                        auth = FirebaseAuth.getInstance();
                         sharedPreferences = view.getContext().getSharedPreferences("loginInfo",Context.MODE_PRIVATE);
-                       ref = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
+                       ref = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid()));
                        ref.child("List of Dish").child(type).child(names.get(position)).removeValue();
+                        FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+                        firestore.collection(sharedPreferences.getString("state","")).document("Restaurants").collection(sharedPreferences.getString("locality","")).document(auth.getUid()).collection("List of Dish")
+                                        .document(names.get(position)).delete();
                         fullPrice.remove(position);
                         names.remove(position);
                         auth = FirebaseAuth.getInstance();

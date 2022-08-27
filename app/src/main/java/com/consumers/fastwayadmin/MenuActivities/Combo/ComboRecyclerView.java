@@ -29,6 +29,7 @@ import com.consumers.fastwayadmin.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -38,15 +39,18 @@ import java.util.Objects;
 public class ComboRecyclerView extends RecyclerView.Adapter<ComboRecyclerView.Holder> {
     List<String> comboName;
     List<List<String>> dishName;
+    List<List<String>> dishQuan;
     List<String> price;
     List<String> enabled;
     List<String> comboImage;
     List<String> description;
     Context context;
-    public ComboRecyclerView(List<String> comboName, List<List<String>> dishName, List<String> price, Context context,List<String> comboImage,List<String> description,List<String> enabled) {
+    public ComboRecyclerView(List<String> comboName, List<List<String>> dishName, List<String> price, Context context,
+                             List<String> comboImage,List<String> description,List<String> enabled,List<List<String>> dishQuan) {
         this.comboName = comboName;
         this.description = description;
         this.comboImage = comboImage;
+        this.dishQuan = dishQuan;
         this.enabled = enabled;
         this.dishName = dishName;
         this.price = price;
@@ -120,8 +124,11 @@ dialogInterface.dismiss();
                 }
                 SharedPreferences sharedPreferences = v.getContext().getSharedPreferences("loginInfo",Context.MODE_PRIVATE);
                 FirebaseAuth auth = FirebaseAuth.getInstance();
-                DatabaseReference reference =  FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid())).child("List of Dish").child("Combo").child(comboName.get(position));
-                reference.child("description").setValue(editText.getText().toString());
+                FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+                firestore.collection(sharedPreferences.getString("state","")).document("Restaurants").collection(sharedPreferences.getString("locality","")).document(auth.getUid()).collection("List of Dish").document(comboName.get(position))
+                        .update("description",editText.getText().toString());
+//                DatabaseReference reference =  FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid())).child("List of Dish").child("Combo").child(comboName.get(position));
+//                reference.child("description").setValue(editText.getText().toString());
                 Toast.makeText(v.getContext(), "Description Changed Successfully", Toast.LENGTH_SHORT).show();
                 dialogInterface1.dismiss();
             }).setNegativeButton("Cancel", (dialogInterface, i) -> dialogInterface.dismiss()).create();
@@ -143,6 +150,7 @@ dialogInterface.dismiss();
                 intent.putExtra("name",comboName.get(position));
                 dialog.dismiss();
                 intent.putStringArrayListExtra("dishName", (ArrayList<String>) dishName.get(position));
+                intent.putStringArrayListExtra("dishQuan", (ArrayList<String>) dishQuan.get(position));
                 v.getContext().startActivity(intent);
 
             }).setNeutralButton("Cancel", (dialog, which) -> dialog.dismiss()).setNegativeButton("Change Price", (dialogInterface, i) -> {
@@ -160,8 +168,11 @@ dialogInterface.dismiss();
                     }
                     SharedPreferences sharedPreferences = v.getContext().getSharedPreferences("loginInfo",Context.MODE_PRIVATE);
                     FirebaseAuth auth = FirebaseAuth.getInstance();
-                    DatabaseReference reference =  FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid())).child("List of Dish").child("Combo").child(comboName.get(position));
-                    reference.child("price").setValue(editText.getText().toString());
+                    FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+                    firestore.collection(sharedPreferences.getString("state","")).document("Restaurants").collection(sharedPreferences.getString("locality","")).document(auth.getUid()).collection("List of Dish").document(comboName.get(position))
+                            .update("price",editText.getText().toString());
+//                    DatabaseReference reference =  FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid())).child("List of Dish").child("Combo").child(comboName.get(position));
+//                    reference.child("price").setValue(editText.getText().toString());
                     Toast.makeText(v.getContext(), "Price Changed Successfully", Toast.LENGTH_SHORT).show();
                     dialogInterface1.dismiss();
                 }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -181,11 +192,16 @@ dialogInterface.dismiss();
             FirebaseAuth auth = FirebaseAuth.getInstance();
             SharedPreferences sharedPreferences = buttonView.getContext().getSharedPreferences("loginInfo",Context.MODE_PRIVATE);
             DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid())).child("List of Dish").child("Combo");
+            FirebaseFirestore firestore = FirebaseFirestore.getInstance();
             if(isChecked){
-                databaseReference.child(comboName.get(position)).child("enable").setValue("yes");
+//                databaseReference.child(comboName.get(position)).child("enable").setValue("yes");
+                firestore.collection(sharedPreferences.getString("state","")).document("Restaurants").collection(sharedPreferences.getString("locality","")).document(auth.getUid()).collection("List of Dish").document(comboName.get(position))
+                        .update("enable","yes");
                 holder.checkBox.setText("Enabled");
             }else{
-                databaseReference.child(comboName.get(position)).child("enable").setValue("no");
+//                databaseReference.child(comboName.get(position)).child("enable").setValue("no");
+                firestore.collection(sharedPreferences.getString("state","")).document("Restaurants").collection(sharedPreferences.getString("locality","")).document(auth.getUid()).collection("List of Dish").document(comboName.get(position))
+                        .update("enable","no");
                 holder.checkBox.setText("Disabled");
             }
         });

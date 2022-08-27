@@ -17,6 +17,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -52,6 +53,26 @@ public class EditMenu extends AppCompatActivity {
                              editRef.child("Discount").removeValue();
                          }
                          editRef.child("full").setValue(fullPlate.getText().toString());
+                         FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+                         if(halfPlate.length() != 0){
+                             editRef.child("half").setValue(halfPlate.getText().toString());
+                                if(newDescription.length() != 0) {
+                                    editRef.child("description").setValue(newDescription.getText().toString());
+                                    firestore.collection(sharedPreferences.getString("state", "")).document("Restaurants").collection(sharedPreferences.getString("locality", "")).document(editAuth.getUid()).collection("List of Dish")
+                                            .document(dish).update("full", fullPlate.getText().toString(), "half", halfPlate.getText().toString(),"description",newDescription.getText().toString());
+                                }else{
+                                    firestore.collection(sharedPreferences.getString("state", "")).document("Restaurants").collection(sharedPreferences.getString("locality", "")).document(editAuth.getUid()).collection("List of Dish")
+                                            .document(dish).update("full", fullPlate.getText().toString(), "half", halfPlate.getText().toString());
+                                }
+                         }else {
+                             if(newDescription.length() != 0) {
+                                 editRef.child("description").setValue(newDescription.getText().toString());
+                                 firestore.collection(sharedPreferences.getString("state", "")).document("Restaurants").collection(sharedPreferences.getString("locality", "")).document(editAuth.getUid()).collection("List of Dish")
+                                         .document(dish).update("full", fullPlate.getText().toString(),"description",newDescription.getText().toString());
+                             }
+                             firestore.collection(sharedPreferences.getString("state", "")).document("Restaurants").collection(sharedPreferences.getString("locality", "")).document(editAuth.getUid()).collection("List of Dish")
+                                     .document(dish).update("full", fullPlate.getText().toString());
+                         }
                      }
 
                      @Override
@@ -61,13 +82,11 @@ public class EditMenu extends AppCompatActivity {
                  });
                 }
 
-                if(halfPlate.length() != 0){
-                    editRef.child("half").setValue(halfPlate.getText().toString());
-                }
 
-                if(newDescription.length() != 0){
-                    editRef.child("description").setValue(newDescription.getText().toString());
-                }
+
+//                if(newDescription.length() != 0){
+//                    editRef.child("description").setValue(newDescription.getText().toString());
+//                }
                 Toast.makeText(EditMenu.this, "Changes saved successfully", Toast.LENGTH_SHORT).show();
                 finish();
             }

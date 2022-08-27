@@ -27,6 +27,8 @@ public class SelectDishForCurrentCombo extends AppCompatActivity {
     FirebaseAuth auth;
     Toolbar toolbar;
     List<String> name = new ArrayList<>();
+    List<String> dishNames;
+    List<String> dishQuan;
     String state;
     List<String> image = new ArrayList<>();
     List<String> price = new ArrayList<>();
@@ -40,6 +42,8 @@ public class SelectDishForCurrentCombo extends AppCompatActivity {
         setContentView(R.layout.activity_select_dish_for_current_combo);
         comboName = getIntent().getStringExtra("comboName");
         toolbar = findViewById(R.id.recyclerViewCurrentComboToolBar);
+        dishNames = getIntent().getStringArrayListExtra("dishName");
+        dishQuan = getIntent().getStringArrayListExtra("dishQuan");
         setSupportActionBar(toolbar);
         recyclerView = findViewById(R.id.selectDishCurrentComboRecyclerView);
         auth = FirebaseAuth.getInstance();
@@ -57,7 +61,7 @@ public class SelectDishForCurrentCombo extends AppCompatActivity {
                         price.add(String.valueOf(dataSnapshot.child("full").getValue()));
                     }
                     recyclerView.setLayoutManager(new LinearLayoutManager(SelectDishForCurrentCombo.this));
-                    recyclerView.setAdapter(new selectCurrentDishAdapter(name,image,SelectDishForCurrentCombo.this,comboName,state,locality,price));
+                    recyclerView.setAdapter(new selectCurrentDishAdapter(name,image,SelectDishForCurrentCombo.this,comboName,state,locality,price,dishNames,dishQuan));
                 }
             }
 

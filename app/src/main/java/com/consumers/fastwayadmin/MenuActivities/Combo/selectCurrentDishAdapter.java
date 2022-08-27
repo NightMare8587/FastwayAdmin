@@ -23,6 +23,7 @@ import com.developer.kalert.KAlertDialog;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -33,14 +34,18 @@ public class selectCurrentDishAdapter extends RecyclerView.Adapter<selectCurrent
         List<String> name = new ArrayList<>();
         List<String> image = new ArrayList<>();
         List<String> price = new ArrayList<>();
+        List<String> dishNames = new ArrayList<>();
+        List<String> dishQuan = new ArrayList<>();
         Context context;
         String comboName;
         String state;
         String locality;
 
-public selectCurrentDishAdapter(List<String> name, List<String> image,Context context,String comboName,String state,String locality,List<String> price) {
+public selectCurrentDishAdapter(List<String> name, List<String> image,Context context,String comboName,String state,String locality,List<String> price,List<String> dishNames,List<String> dishQuan) {
         this.name = name;
+        this.dishQuan = dishQuan;
         this.image = image;
+        this.dishNames = dishNames;
         this.price = price;
         this.context = context;
         this.locality = locality;
@@ -82,10 +87,25 @@ public void onBindViewHolder(@NonNull holder holder, @SuppressLint("RecyclerView
                             Toast.makeText(view.getContext(), "Invalid Input", Toast.LENGTH_SHORT).show();
                             return;
                         }
-                        reference.child("Combo").child(comboName).child(name.get(position)).child("name").child("name").setValue(name.get(position));
-                        reference.child("Combo").child(comboName).child(name.get(position)).child("name").child("quantity").setValue(editText.getText().toString());
+
+                        if(dishNames.contains(name.get(position))){
+                            Toast.makeText(context, "Dish Already Exists", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        dishQuan.add(editText.getText().toString());
+                        dishNames.add(name.get(position));
+
+                        String dishArr = dishNames.toString().replace("[","").replace("]","").trim();
+                        String quanArr = dishQuan.toString().replace("[","").replace("]","").trim();
+
+                        FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+                        firestore.collection(state).document("Restaurants").collection(locality).document(auth.getUid()).collection("List of Dish").document(comboName)
+                                .update("dishNamesArr",dishArr,"dishQuantityArr",quanArr);
+//                        reference.child("Combo").child(comboName).child(name.get(position)).child("name").child("name").setValue(name.get(position));
+//                        reference.child("Combo").child(comboName).child(name.get(position)).child("name").child("quantity").setValue(editText.getText().toString());
                         kAlertDialog.dismissWithAnimation();
-                        Toast.makeText(view.getContext(), "Quantity Changed Successfully", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(view.getContext(), "Dish Added", Toast.LENGTH_SHORT).show();
                         dialogInterface1.dismiss();
                     }).setNegativeButton("Cancel", (dialogInterface, i) -> dialogInterface.dismiss()).create();
                     linearLayout.addView(editText);

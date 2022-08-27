@@ -34,6 +34,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -45,6 +46,7 @@ public class CreateDish extends AppCompatActivity {
     FirebaseAuth dishAuth;
     String descriptionToSubmit;
     CheckBox checkBox;
+    FirebaseFirestore firestore = FirebaseFirestore.getInstance();
     DatabaseReference dish;
     String dishType = "Veg";
     String locality;
@@ -135,8 +137,10 @@ public class CreateDish extends AppCompatActivity {
                                             finish();
                                         }
                                     }).setNegativeButton("Skip", (dialogInterface, i) -> {
-                                        DishInfo info = new DishInfo(name,half,full,image,mrp,"0","0","0","yes","",dishType);
+                                        DishInfo info = new DishInfo(name,half,full,image,mrp,"0","0","0","yes","",dishType,menuType);
                                         dish.child("Restaurants").child(state).child(locality).child(Objects.requireNonNull(dishAuth.getUid())).child("List of Dish").child(menuType).child(name).setValue(info);
+
+                                        firestore.collection(state).document("Restaurants").collection(locality).document(Objects.requireNonNull(dishAuth.getUid())).collection("List of Dish").document(name).set(info);
                                         Toast.makeText(CreateDish.this, "Dish Added Successfully", Toast.LENGTH_SHORT).show();
                                         imageAddedOr = false;
                                         finish();
@@ -160,8 +164,10 @@ public class CreateDish extends AppCompatActivity {
                                             if(editText.getText().toString().equals("")){
                                                 Toast.makeText(CreateDish.this, "Field can't be empty", Toast.LENGTH_SHORT).show();
                                             }else{
-                                                DishInfo info = new DishInfo(name,half,full,image,mrp,"0","0","0","yes",editText.getText().toString(),dishType);
+                                                DishInfo info = new DishInfo(name,half,full,image,mrp,"0","0","0","yes",editText.getText().toString(),dishType,menuType);
+
                                                 dish.child("Restaurants").child(state).child(locality).child(Objects.requireNonNull(dishAuth.getUid())).child("List of Dish").child(menuType).child(name).setValue(info);
+                                                firestore.collection(state).document("Restaurants").collection(locality).document(dishAuth.getUid()).collection("List of Dish").document(name).set(info);
                                                 Toast.makeText(CreateDish.this, "Dish Added Successfully", Toast.LENGTH_SHORT).show();
                                                 imageAddedOr = false;
                                                 finish();
@@ -170,8 +176,9 @@ public class CreateDish extends AppCompatActivity {
                                     }).setNegativeButton("Skip", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i) {
-                                    DishInfo info = new DishInfo(name,half,full,image,mrp,"0","0","0","yes","",dishType);
+                                    DishInfo info = new DishInfo(name,half,full,image,mrp,"0","0","0","yes","",dishType,menuType);
                                     dish.child("Restaurants").child(state).child(locality).child(Objects.requireNonNull(dishAuth.getUid())).child("List of Dish").child(menuType).child(name).setValue(info);
+                                    firestore.collection(state).document("Restaurants").collection(locality).document(dishAuth.getUid()).collection("List of Dish").document(name).set(info);
                                     Toast.makeText(CreateDish.this, "Dish Added Successfully", Toast.LENGTH_SHORT).show();
                                     imageAddedOr = false;
                                     finish();
@@ -226,9 +233,11 @@ public class CreateDish extends AppCompatActivity {
     }
 
     private void addToDatabase(String name, String half, String full,String image,String mrp) {
-        DishInfo info = new DishInfo(name,half,full,image,mrp,"0","0","0","yes",descriptionToSubmit,dishType);
+
         try {
-            dish.child("Restaurants").child(state).child(locality).child(Objects.requireNonNull(dishAuth.getUid())).child("List of Dish").child(menuType).child(name).setValue(info);
+
+
+//            dish.child("Restaurants").child(state).child(locality).child(Objects.requireNonNull(dishAuth.getUid())).child("List of Dish").child(menuType).child(name).setValue(info);
             StorageReference reference = storageReference.child(dishAuth.getUid() + "/" + "image" + "/"  + nameOfDish.getText().toString());
             reference.getDownloadUrl().addOnSuccessListener(uri -> {
                 DatabaseReference dish = FirebaseDatabase.getInstance().getReference().getRoot();
@@ -236,7 +245,8 @@ public class CreateDish extends AppCompatActivity {
                 SharedPreferences.Editor imageEdit = storeImages.edit();
                 imageEdit.putString(name,uri + "");
                 imageEdit.apply();
-                dish.child("Restaurants").child(state).child(locality).child(Objects.requireNonNull(dishAuth.getUid())).child("List of Dish").child(menuType).child(name).child("image").setValue(uri + "");
+                DishInfo info = new DishInfo(name,half,full,uri + "",mrp,"0","0","0","yes",descriptionToSubmit,dishType,menuType);
+                firestore.collection(state).document("Restaurants").collection(locality).document(dishAuth.getUid()).collection("List of Dish").document(name).set(info);
             });
             Toast.makeText(this, "Dish Added Successfully", Toast.LENGTH_SHORT).show();
         }catch (Exception e){
