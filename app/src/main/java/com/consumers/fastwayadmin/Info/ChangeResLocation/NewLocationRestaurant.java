@@ -45,6 +45,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -167,12 +169,16 @@ public class NewLocationRestaurant extends AppCompatActivity {
                     databaseReference.child("lat").setValue(String.valueOf(lati));
                     databaseReference.child("lon").setValue(String.valueOf(longi));
 
+                    FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+                    firestore.collection(cityName).document("Restaurants").collection(subAdminArea).document(auth.getUid())
+                            .update("address",newAddress.getText().toString(),"location",longi + "/" + lati);
+
                     databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Registered Restaurants").child(cityName).child(auth.getUid());
                     databaseReference.child("locationChange").setValue("yes");
 
                     Toast.makeText(this, "Location Changed Successfully", Toast.LENGTH_SHORT).show();
                     Toast.makeText(this, "New Location will be verified by Fastway...", Toast.LENGTH_SHORT).show();
-                    new Handler().postDelayed(this::finish, 550);
+                    new Handler().postDelayed(this::finish, 500);
 
                 }else if(stateChange){
                     if (newAddress.getText().toString().equals("")) {
@@ -200,6 +206,12 @@ public class NewLocationRestaurant extends AppCompatActivity {
                         }
                     });
 
+                    FirebaseFirestore prevLocation = FirebaseFirestore.getInstance();
+                    FirebaseFirestore newLocation = FirebaseFirestore.getInstance();
+
+
+
+
                     DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(oldState).child(oldLocal).child(auth.getUid());
                     DatabaseReference newPath = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(cityName).child(subAdminArea).child(auth.getUid());
                     DatabaseReference finalNewPath = newPath;
@@ -218,12 +230,34 @@ public class NewLocationRestaurant extends AppCompatActivity {
 
                         }
                     });
+                    prevLocation.collection(oldState).document("Restaurants").collection(oldLocal).document(Objects.requireNonNull(auth.getUid()))
+                            .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                    if(task.isSuccessful()){
+                                        DocumentSnapshot documentSnapshot = task.getResult();
+                                        newLocation.collection(cityName).document("Restaurants").collection(subAdminArea).document(auth.getUid())
+                                                .set(documentSnapshot.getData()).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                    @Override
+                                                    public void onComplete(@NonNull Task<Void> task) {
+                                                        prevLocation.collection(oldState).document("Restaurants").collection(oldLocal).document(Objects.requireNonNull(auth.getUid()))
+                                                                .delete();
+                                                        Toast.makeText(NewLocationRestaurant.this, "Location Changes", Toast.LENGTH_SHORT).show();
+                                                    }
+                                                });
+                                    }
+                                }
+                            });
+
 
                     newPath = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(cityName).child(subAdminArea).child(auth.getUid());
                     newPath.child("address").setValue(newAddress.getText().toString());
                     newPath = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(cityName).child(subAdminArea).child(auth.getUid()).child("location");
                     newPath.child("lat").setValue(lati + "");
                     newPath.child("lon").setValue(longi + "");
+
+                    newLocation.collection(cityName).document("Restaurants").collection(subAdminArea).document(auth.getUid())
+                            .update("address",newAddress.getText().toString(),"location",longi + "/" + lati);
                     DatabaseReference changeFastwayDB = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Registered Restaurants").child(oldState).child(auth.getUid());
                     changeFastwayDB.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
@@ -244,8 +278,6 @@ public class NewLocationRestaurant extends AppCompatActivity {
                         }
                     });
 
-                    Toast.makeText(this, "Location Changed Successfully", Toast.LENGTH_SHORT).show();
-                    Toast.makeText(this, "New Location will be verified by Fastway...", Toast.LENGTH_SHORT).show();
                     new Handler().postDelayed(this::finish, 550);
                 }else if(localChange){
                     if (newAddress.getText().toString().equals("")) {
@@ -271,6 +303,8 @@ public class NewLocationRestaurant extends AppCompatActivity {
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putString("locality",subAdminArea);
                     editor.apply();
+                    FirebaseFirestore oldStore = FirebaseFirestore.getInstance();
+                    FirebaseFirestore newStore = FirebaseFirestore.getInstance();
                     DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(oldState).child(oldLocal).child(Objects.requireNonNull(auth.getUid()));
                     DatabaseReference newPath = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(oldState).child(subAdminArea).child(auth.getUid());
                     DatabaseReference finalNewPath = newPath;
@@ -289,12 +323,29 @@ public class NewLocationRestaurant extends AppCompatActivity {
 
                         }
                     });
+
+                    oldStore.collection(oldState).document("Restaurants").collection(oldLocal).document(auth.getUid()).get()
+                            .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                    if(task.isSuccessful()){
+                                        DocumentSnapshot documentSnapshot = task.getResult();
+                                        newStore.collection(oldState).document("Restaurants").collection(subAdminArea).document(auth.getUid())
+                                                .set(Objects.requireNonNull(documentSnapshot.getData()));
+                                    }
+                                }
+                            });
+
                     newPath = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(oldState).child(subAdminArea).child(auth.getUid());
                     newPath.child("address").setValue(newAddress.getText().toString());
                     newPath = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(oldState).child(subAdminArea).child(auth.getUid()).child("location");
                     DatabaseReference changeFastwayDB = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Registered Restaurants").child(oldState).child(auth.getUid());
                     newPath.child("lat").setValue(lati + "");
                     newPath.child("lon").setValue(longi + "");
+
+                    newStore.collection(oldState).document("Restaurants").collection(subAdminArea).document(auth.getUid())
+                                    .update("address",newAddress.getText().toString(),"location",longi + "/" + lati);
+
                     changeFastwayDB.child("locality").setValue(subAdminArea);
                     changeFastwayDB.child("locationChange").setValue("yes");
                     Toast.makeText(this, "Location Changed Successfully", Toast.LENGTH_SHORT).show();
@@ -369,7 +420,7 @@ public class NewLocationRestaurant extends AppCompatActivity {
             List<Address> addresses = null;
 
             try {
-                addresses = geocoder.getFromLocation(lati, longi, 1);
+                addresses = geocoder.getFromLocation(lati, longi, 5);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -382,7 +433,7 @@ public class NewLocationRestaurant extends AppCompatActivity {
                 newLocality.setEnabled(false);
                 local = true;
             }
-            if(addresses.get(0).getSubAdminArea() != null) {
+            if(addresses.get(0).getPostalCode() != null) {
                 pinCode = addresses.get(0).getPostalCode();
                 newPinCode.setText(pinCode);
                 newPinCode.setEnabled(false);
