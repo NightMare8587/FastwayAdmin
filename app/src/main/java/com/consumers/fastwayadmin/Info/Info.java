@@ -35,6 +35,8 @@ import com.consumers.fastwayadmin.Info.ChangeResLocation.MapsActivity2;
 import com.consumers.fastwayadmin.Info.RestaurantDocuments.UploadRequiredDocuments;
 import com.consumers.fastwayadmin.Info.RestaurantImages.AddRestaurantImages;
 import com.consumers.fastwayadmin.R;
+import com.firebase.geofire.GeoFireUtils;
+import com.firebase.geofire.GeoLocation;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -146,7 +148,7 @@ public class Info extends AppCompatActivity {
         }
         alertDialog.show();
         FirebaseFirestore checkStore = FirebaseFirestore.getInstance();
-        checkStore.collection(sharedPreferences.getString("state","")).document("Restaurants").collection(sharedPreferences.getString("locality","")).document(infoAuth.getUid())
+        checkStore.collection(sharedPreferences.getString("state","")).document("Restaurants").collection(sharedPreferences.getString("locality","")).document(Objects.requireNonNull(infoAuth.getUid()))
                 .addSnapshotListener((value, error) -> {
                     if(value.exists()){
                         Map<String,Object> map = value.getData();
@@ -160,7 +162,7 @@ public class Info extends AppCompatActivity {
                         editor.putString("hotelAddress", (String) map.get("address"));
                         editor.putString("hotelNumber", (String) map.get("number"));
                         editor.apply();
-
+                        checkStore.terminate();
                         if(!resCreated){
                             startActivity(new Intent(Info.this,UploadRequiredDocuments.class));
                             finish();
@@ -236,27 +238,18 @@ public class Info extends AppCompatActivity {
             public void onClick(DialogInterface dialogInterface, int i) {
                 dialogInterface.dismiss();
             }
-        }).setNegativeButton("No", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                AlertDialog.Builder info = new AlertDialog.Builder(Info.this);
-                info.setTitle("Location").setMessage("For better accuracy you need to be at restaurant location to proceed further\nDo you wanna manually input data??")
-                        .setPositiveButton("Ok", (dialogInterface1, i1) -> startActivityForResult(new Intent(Info.this, MapsActivity2.class),510)).setNegativeButton("No", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                Toast.makeText(Info.this, "Try again when present at restaurant", Toast.LENGTH_SHORT).show();
-                                new Handler().postDelayed(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        dialogInterface.dismiss();
-                                       finish();
-                                    }
-                                },150);
-                            }
-                        }).create();
-                info.setCancelable(false);
-                info.show();
-            }
+        }).setNegativeButton("No", (dialogInterface, i) -> {
+            AlertDialog.Builder info = new AlertDialog.Builder(Info.this);
+            info.setTitle("Location").setMessage("For better accuracy you need to be at restaurant location to proceed further\nDo you wanna manually input data??")
+                    .setPositiveButton("Ok", (dialogInterface1, i1) -> startActivityForResult(new Intent(Info.this, MapsActivity2.class),510)).setNegativeButton("No", (dialogInterface12, i12) -> {
+                        Toast.makeText(Info.this, "Try again when present at restaurant", Toast.LENGTH_SHORT).show();
+                        new Handler().postDelayed(() -> {
+                            dialogInterface12.dismiss();
+                           finish();
+                        },150);
+                    }).create();
+            info.setCancelable(false);
+            info.show();
         }).create();
         builder.setCancelable(false);
         builder.show();
@@ -427,6 +420,8 @@ public class Info extends AppCompatActivity {
 //                RestLocation restLocation = new RestLocation(String.valueOf(lon),String.valueOf(lat));
 //                databaseReference.child("location").setValue(restLocation);
                 map.put("location",lon + "/" + lat);
+                String hash = GeoFireUtils.getGeoHashForLocation(new GeoLocation(Double.parseDouble(lat), Double.parseDouble(lon)));
+                map.put("geoHash",hash);
                 SharedPreferences sharedPreferences1 = getSharedPreferences("LocationMaps",MODE_PRIVATE);
                 SharedPreferences.Editor editor1 = sharedPreferences1.edit();
                 editor1.putString("location","yes");
@@ -593,9 +588,7 @@ public class Info extends AppCompatActivity {
                         intent.setType("image/*");
                         intent.setAction(Intent.ACTION_GET_CONTENT);
                         startActivityForResult(Intent.createChooser(intent, "Select Picture"), 1);
-                    }).setNegativeButton("Cancel", (dialogInterface, i) -> {
-                        dialogInterface.dismiss();
-                    }).create();
+                    }).setNegativeButton("Cancel", (dialogInterface, i) -> dialogInterface.dismiss()).create();
 
             newDialog.setCancelable(false);
             newDialog.show();
@@ -657,23 +650,17 @@ public class Info extends AppCompatActivity {
             }
             try {
                 StorageReference reference = storageReference.child(infoAuth.getUid() + "/" + "image" + "/"  + "DisplayImage");
-                reference.putFile(Uri.fromFile(file)).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-                        StorageReference reference = storageReference.child(infoAuth.getUid() + "/" + "image" + "/"  + "DisplayImage");
-                        reference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                            @Override
-                            public void onSuccess(@NonNull Uri uri) {
-                                Toast.makeText(Info.this, "Upload Complete and image saved in phone successfully", Toast.LENGTH_SHORT).show();
-                                loading.dismiss();
-                                DatabaseReference dish = FirebaseDatabase.getInstance().getReference().getRoot();
-                                dish.child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(infoAuth.getUid())).child("DisplayImage").setValue(uri + "");
-                                startActivity(new Intent(Info.this, UploadRequiredDocuments.class));
-                                finish();
-                            }
-                        });
+                reference.putFile(Uri.fromFile(file)).addOnCompleteListener(task -> {
+                    StorageReference reference1 = storageReference.child(infoAuth.getUid() + "/" + "image" + "/"  + "DisplayImage");
+                    reference1.getDownloadUrl().addOnSuccessListener(uri -> {
+                        Toast.makeText(Info.this, "Upload Complete and image saved in phone successfully", Toast.LENGTH_SHORT).show();
+                        loading.dismiss();
+                        DatabaseReference dish = FirebaseDatabase.getInstance().getReference().getRoot();
+                        dish.child("Restaurants").child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(infoAuth.getUid())).child("DisplayImage").setValue(uri + "");
+                        startActivity(new Intent(Info.this, UploadRequiredDocuments.class));
+                        finish();
+                    });
 
-                    }
                 }).addOnFailureListener(e -> {
                     Toast.makeText(Info.this,
                             "Something went wrong", Toast.LENGTH_SHORT).show();

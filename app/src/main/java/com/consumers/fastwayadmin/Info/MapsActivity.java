@@ -26,6 +26,8 @@ import androidx.fragment.app.FragmentActivity;
 
 import com.consumers.fastwayadmin.HomeScreen.HomeScreen;
 import com.consumers.fastwayadmin.R;
+import com.firebase.geofire.GeoFireUtils;
+import com.firebase.geofire.GeoLocation;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -124,7 +126,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //            ref.child("location").setValue(restLocation);
             FirebaseFirestore fb = FirebaseFirestore.getInstance();
             SharedPreferences loginInfo = getSharedPreferences("loginInfo",MODE_PRIVATE);
-            fb.collection(loginInfo.getString("state","")).document("Restaurants").collection(loginInfo.getString("locality","")).document(Objects.requireNonNull(auth.getUid())).update("location",longitude + "/" + latitude);
+            String hash = GeoFireUtils.getGeoHashForLocation(new GeoLocation(latitude, longitude));
+            fb.collection(loginInfo.getString("state","")).document("Restaurants").collection(loginInfo.getString("locality","")).document(Objects.requireNonNull(auth.getUid())).update("location",longitude + "/" + latitude,"geoHash",hash);
 //            fb.collection("Restaurants").document(loginInfo.getString("state","") + "," + loginInfo.getString("locality","")).update("location", longitude + "/" + latitude);
             startActivity(new Intent(getApplicationContext(), HomeScreen.class));
             editor.putString("location","yes");
