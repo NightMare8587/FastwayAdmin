@@ -466,7 +466,7 @@ public class HomeScreen extends AppCompatActivity {
                                     if (dataSnapshot.hasChild("timeInMillis")) {
                                         String tableNum = dataSnapshot.child("tableNum").getValue(String.class);
                                         String time = String.valueOf(dataSnapshot.child("timeInMillis").getValue());
-                                        String seats = dataSnapshot.child("seats").getValue(String.class);
+                                        String seats = dataSnapshot.child("numSeats").getValue(String.class);
                                         final String id = String.valueOf(dataSnapshot.child("customerId").getValue());
                                         int result = time.compareTo(String.valueOf(System.currentTimeMillis()));
                                         if (result < 0) {
@@ -476,13 +476,13 @@ public class HomeScreen extends AppCompatActivity {
                                             databaseReference.child(tableNum).child("timeInMillis").removeValue();
                                             databaseReference.child(tableNum).child("timeOfBooking").removeValue();
                                             databaseReference.child(tableNum).child("status").setValue("available");
-
+                                            Toast.makeText(HomeScreen.this, "" + seats, Toast.LENGTH_SHORT).show();
                                             HashMap<String,String> myMap = new HashMap<>();
                                             myMap.put("status","available");
                                             myMap.put("tableNum",tableNum);
                                             myMap.put("seats",seats);
                                             FirebaseFirestore firestore = FirebaseFirestore.getInstance();
-                                            firestore.collection(sharedPreferences.getString("state","")).document("Restaurants").collection(sharedPreferences.getString("locality","")).document(auth.getUid())
+                                            firestore.collection(sharedPreferences.getString("state","")).document("Restaurants").collection(sharedPreferences.getString("locality","")).document(Objects.requireNonNull(auth.getUid()))
                                                     .collection("Tables").document(tableNum).set(myMap);
 
                                             DatabaseReference removeFromUser = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(id).child("Reserve Tables").child(UID);
