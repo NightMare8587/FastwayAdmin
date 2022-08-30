@@ -295,7 +295,7 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
                                         FirebaseFirestore firestore = FirebaseFirestore.getInstance();
                                         firestore.collection(sharedPreferences.getString("state","")).document("Restaurants").collection(sharedPreferences.getString("locality","")).document(auth.getUid())
                                                 .update("name",flatDialog.getFirstTextField().toString());
-//                                        reference.child("name").setValue(flatDialog.getFirstTextField().toString());
+                                        reference.child("name").setValue(flatDialog.getFirstTextField().toString());
                                         resNameText.setText(flatDialog.getFirstTextField());
                                         Toast.makeText(MyAccount.this, "Name Changed Successfully", Toast.LENGTH_SHORT).show();
                                         editor.putString("hotelName",flatDialog.getFirstTextField());
@@ -338,7 +338,7 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
                                         Toast.makeText(MyAccount.this, "Field can't be empty", Toast.LENGTH_SHORT).show();
                                         return;
                                     }else {
-//                                        reference.child("email").setValue(flatDialog1.getFirstTextField().toString());
+                                        reference.child("email").setValue(flatDialog1.getFirstTextField().toString());
                                         FirebaseFirestore firestore = FirebaseFirestore.getInstance();
                                         firestore.collection(sharedPreferences.getString("state","")).document("Restaurants").collection(sharedPreferences.getString("locality","")).document(auth.getUid())
                                                 .update("email",flatDialog1.getFirstTextField().toString());
@@ -380,7 +380,7 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
                                         Toast.makeText(MyAccount.this, "Field can't be empty", Toast.LENGTH_SHORT).show();
                                         return;
                                     }else {
-//                                        reference.child("number").setValue(flatDialog2.getFirstTextField().toString());
+                                        reference.child("number").setValue(flatDialog2.getFirstTextField().toString());
                                         FirebaseFirestore firestore = FirebaseFirestore.getInstance();
                                         firestore.collection(sharedPreferences.getString("state","")).document("Restaurants").collection(sharedPreferences.getString("locality","")).document(auth.getUid())
                                                 .update("number",flatDialog2.getFirstTextField().toString());

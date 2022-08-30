@@ -376,18 +376,18 @@ public class Info extends AppCompatActivity {
             map.put("acceptingOrders","yes");
             map.put("totalReports","0");
 
-//            infoRef.child("name").setValue(name);
-//            infoRef.child("address").setValue(address);
-//            infoRef.child("number").setValue(number);
-//            infoRef.child("nearby").setValue(nearby);
-//            infoRef.child("pin").setValue(pin);
-//            infoRef.child("rating").setValue("0");
-//            infoRef.child("DisplayImage").setValue("");
-//            infoRef.child("totalRate").setValue("0");
-//            infoRef.child("count").setValue("0");
-//            infoRef.child("status").setValue("online");
-//            infoRef.child("acceptingOrders").setValue("yes");
-//            infoRef.child("totalReports").setValue("0");
+            infoRef.child("name").setValue(name);
+            infoRef.child("address").setValue(address);
+            infoRef.child("number").setValue(number);
+            infoRef.child("nearby").setValue(nearby);
+            infoRef.child("pin").setValue(pin);
+            infoRef.child("rating").setValue("0");
+            infoRef.child("DisplayImage").setValue("");
+            infoRef.child("totalRate").setValue("0");
+            infoRef.child("count").setValue("0");
+            infoRef.child("status").setValue("online");
+            infoRef.child("acceptingOrders").setValue("yes");
+            infoRef.child("totalReports").setValue("0");
 
 
             if (optForTakeaway.isChecked()) {

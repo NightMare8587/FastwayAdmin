@@ -216,29 +216,30 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                 dishNamePdf = new ArrayList<>(dishNames);
 
 
-                AsyncTask.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        for(int i=0;i<type.size();i++){
+                AsyncTask.execute(() -> {
+                    for(int i=0;i<type.size();i++){
 
-                            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(sharedPreferences.getString("locality","")).child(auth.getUid()).child("List of Dish");
-                            databaseReference.child(type.get(i)).child(dishNames.get(i)).addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                    if(snapshot.child("dishType").getValue(String.class).equals("Veg"))
-                                        veg++;
-                                    else if(snapshot.child("dishType").getValue(String.class).equals("NonVeg"))
-                                        nonVeg++;
-                                    else
-                                        vegan++;
-                                }
+                        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(sharedPreferences.getString("locality","")).child(auth.getUid()).child("List of Dish");
+                        databaseReference.child(type.get(i)).child(dishNames.get(i)).addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot1) {
 
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError error) {
+                                if(!snapshot1.hasChild("dishType"))
+                                    return;
 
-                                }
-                            });
-                        }
+                                if(snapshot1.child("dishType").getValue(String.class).equals("Veg"))
+                                    veg++;
+                                else if(snapshot1.child("dishType").getValue(String.class).equals("NonVeg"))
+                                    nonVeg++;
+                                else
+                                    vegan++;
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+
+                            }
+                        });
                     }
                 });
 
