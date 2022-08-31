@@ -1,5 +1,6 @@
 package com.consumers.fastwayadmin.DiscountCombo;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -59,6 +60,7 @@ public class ComboAndOffers extends AppCompatActivity {
     FirebaseAuth auth;
     String state;
     LinearLayoutManager horizonatl;
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
