@@ -196,9 +196,6 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                     databaseReference.child(type.get(i)).child(dishName.get(i)).addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            if(!snapshot.hasChild("dishType")){
-
-                            }
 
 
                             if(snapshot.child("dishType").getValue(String.class).equals("Veg"))

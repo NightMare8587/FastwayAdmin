@@ -224,8 +224,8 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot snapshot1) {
 
-                                if(!snapshot1.hasChild("dishType"))
-                                    return;
+//                                if(!snapshot1.hasChild("dishType"))
+//                                    return;
 
                                 if(snapshot1.child("dishType").getValue(String.class).equals("Veg"))
                                     veg++;
