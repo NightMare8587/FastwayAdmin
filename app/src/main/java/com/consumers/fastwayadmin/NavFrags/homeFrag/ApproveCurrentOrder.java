@@ -38,9 +38,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-//import com.aspose.cells.Workbook;
 import com.consumers.fastwayadmin.CancelClass;
-import com.consumers.fastwayadmin.NavFrags.CurrentTakeAwayOrders.ApproveCurrentTakeAway;
 import com.consumers.fastwayadmin.NavFrags.CurrentTakeAwayOrders.MyClass;
 import com.consumers.fastwayadmin.PaymentClass;
 import com.consumers.fastwayadmin.R;
@@ -263,11 +261,11 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                     DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(id).child("Recent Orders").child(time);
                     for(int i=0;i<dishNames.size();i++){
                         MyClass myClass = new MyClass(dishNames.get(i),dishPrices.get(i),image.get(i),type.get(i),""+approveTime,dishQuantity.get(i),dishHalfOr.get(i),state,String.valueOf(orderAmount),orderID,orderAndPayment.get(i),"Order Declined",sharedPreferences.getString("locality",""));
-                        databaseReference.child(auth.getUid()).child(dishNames.get(i)).setValue(myClass);
+                        databaseReference.child(Objects.requireNonNull(auth.getUid())).child(dishNames.get(i)).setValue(myClass);
                     }
 
 
-                    databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(sharedPreferences.getString("locality","")).child(auth.getUid());
+                    databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid()));
                     for(int i=0;i<dishNames.size();i++){
                         MyClass myClass = new MyClass(dishNames.get(i),dishPrices.get(i),image.get(i),type.get(i),""+approveTime,dishQuantity.get(i),dishHalfOr.get(i),state,String.valueOf(orderAmount),orderID,orderAndPayment.get(i),"Order Declined",sharedPreferences.getString("locality",""));
                         databaseReference.child("Recent Orders").child("" + time).child(auth.getUid()).child(dishNames.get(i)).setValue(myClass);
@@ -684,11 +682,11 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                         HashMap<String, HashMap<String, String>> myMap = gson.fromJson(storedHash, type);
                         HashMap<String, String> map;
                         if (myMap.containsKey(month)) {
-                            map = new HashMap<>(myMap.get(month));
+                            map = new HashMap<>(Objects.requireNonNull(myMap.get(month)));
                             Log.i("checking", map.toString());
                             for (int k = 0; k < dishNames.size(); k++) {
                                 if (map.containsKey(dishNames.get(k))) {
-                                    int val = Integer.parseInt(map.get(dishNames.get(k)));
+                                    int val = Integer.parseInt(Objects.requireNonNull(map.get(dishNames.get(k))));
                                     val++;
                                     map.put(dishNames.get(k), String.valueOf(val));
                                 } else {
