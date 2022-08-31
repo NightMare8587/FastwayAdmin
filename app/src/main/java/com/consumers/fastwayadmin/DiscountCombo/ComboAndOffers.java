@@ -173,7 +173,7 @@ public class ComboAndOffers extends AppCompatActivity {
                                             }
                                             reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid()));
                                             reference.child("Current combo").removeValue();
-//                                            reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid())).child("List of Dish");
+                                            reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid())).child("List of Dish");
 
                                             String dishNameArray = name.toString().replace("[","").replace("]","");
                                             String dishQuanArray = dishQuantity.toString().replace("[","").replace("]","");
@@ -195,12 +195,15 @@ public class ComboAndOffers extends AppCompatActivity {
 
                                             firestore.collection(sharedPreferences.getString("state","")).document("Restaurants").collection(sharedPreferences.getString("locality",""))
                                                     .document(auth.getUid()).collection("List of Dish").document(comboName).set(map);
-//                                            reference.child("Combo").child(comboName).child("price").setValue(priceDialog.getInputText());
-//                                            reference.child("Combo").child(comboName).child("count").setValue("0");
-//                                            reference.child("Combo").child(comboName).child("enable").setValue("yes");
-//                                            reference.child("Combo").child(comboName).child("rating").setValue("0");
-//                                            reference.child("Combo").child(comboName).child("dishType").setValue(dishType);
-//                                            reference.child("Combo").child(comboName).child("totalRate").setValue("0");
+                                            new Thread(() -> {
+                                                reference.child("Combo").child(comboName).child("price").setValue(priceDialog.getInputText());
+                                                reference.child("Combo").child(comboName).child("count").setValue("0");
+                                                reference.child("Combo").child(comboName).child("enable").setValue("yes");
+                                                reference.child("Combo").child(comboName).child("rating").setValue("0");
+                                                reference.child("Combo").child(comboName).child("dishType").setValue(dishType);
+                                                reference.child("Combo").child(comboName).child("totalRate").setValue("0");
+                                            }).start();
+
                                             Toast.makeText(ComboAndOffers.this, "You can add image to combo later", Toast.LENGTH_SHORT).show();
 
                                             name.clear();
@@ -225,8 +228,8 @@ public class ComboAndOffers extends AppCompatActivity {
                                                 firestore.collection(sharedPreferences.getString("state","")).document("Restaurants").collection(sharedPreferences.getString("locality",""))
                                                         .document(Objects.requireNonNull(auth.getUid())).collection("List of Dish").document(comboName).update("description",editText.getText().toString());
 
-//                                                DatabaseReference reference =  FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid())).child("List of Dish").child("Combo").child(comboName);
-//                                                reference.child("description").setValue(editText.getText().toString());
+                                                DatabaseReference reference =  FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid())).child("List of Dish").child("Combo").child(comboName);
+                                                reference.child("description").setValue(editText.getText().toString());
                                                 Toast.makeText(ComboAndOffers.this, "Description Added Successfully", Toast.LENGTH_SHORT).show();
                                                 dialogInterface1.dismiss();
                                                 new KAlertDialog(ComboAndOffers.this, KAlertDialog.SUCCESS_TYPE)

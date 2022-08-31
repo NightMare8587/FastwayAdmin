@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -29,6 +30,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
@@ -61,8 +63,8 @@ public class AllMenuDish extends AppCompatActivity {
     List<String> after = new ArrayList<>();
     List<String> discount = new ArrayList<>();
     List<String> image = new ArrayList<>();
-    List<String> fullPrice = new ArrayList<String>();
-    List<String> halfPrice = new ArrayList<String>();
+    List<String> fullPrice = new ArrayList<>();
+    List<String> halfPrice = new ArrayList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,12 +72,20 @@ public class AllMenuDish extends AppCompatActivity {
         initialise();
         collectionReference = firestore.collection(sharedPreferences.getString("state","")).document("Restaurants").collection(sharedPreferences.getString("locality","")).document(menuAuth.getUid()).collection("List of Dish");
         Query query = collectionReference.whereEqualTo("menuType",dish);
-        query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+
+        query.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if(task.isSuccessful()) {
-                    for(QueryDocumentSnapshot documentSnapshot : task.getResult()){
-//                        Log.i("getDt",documentSnapshot.ge());
+            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                if(!value.isEmpty()){
+                    names.clear();
+                    halfPrice.clear();
+                    fullPrice.clear();
+                    image.clear();
+                    enableOr.clear();
+                    before.clear();
+                    after.clear();
+                    discount.clear();
+                    for(DocumentSnapshot documentSnapshot : value.getDocuments()){
                         Map<String,Object> map = documentSnapshot.getData();
                         names.add((String) map.get("name"));
                         halfPrice.add((String) map.get("half"));
@@ -83,22 +93,48 @@ public class AllMenuDish extends AppCompatActivity {
                         image.add((String) map.get("image"));
                         enableOr.add((String) map.get("enable"));
                         before.add("");
-                            after.add("");
-                            discount.add("");
+                        after.add("");
+                        discount.add("");
 
                     }
                     DishView dishView = new DishView(names,fullPrice,halfPrice,dish,image,before,after,discount,enableOr);
-//                loading.setVisibility(View.INVISIBLE);
-                    Toast.makeText(AllMenuDish.this, "Click on image icon for adding new image", Toast.LENGTH_SHORT).show();
-                    recyclerView.setAdapter(dishView);
-                }
-                else {
-                    Toast.makeText(AllMenuDish.this, "No Dish Available", Toast.LENGTH_SHORT).show();
-
-                }
                 loading.setVisibility(View.INVISIBLE);
-            }
+                    recyclerView.setAdapter(dishView);
+                    }
+                }
         });
+
+        Toast.makeText(AllMenuDish.this, "Click on image icon for adding new image", Toast.LENGTH_SHORT).show();
+
+//        query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+//            @Override
+//            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+//                if(task.isSuccessful()) {
+//                    for(QueryDocumentSnapshot documentSnapshot : task.getResult()){
+////                        Log.i("getDt",documentSnapshot.ge());
+//                        Map<String,Object> map = documentSnapshot.getData();
+//                        names.add((String) map.get("name"));
+//                        halfPrice.add((String) map.get("half"));
+//                        fullPrice.add((String) map.get("full"));
+//                        image.add((String) map.get("image"));
+//                        enableOr.add((String) map.get("enable"));
+//                        before.add("");
+//                            after.add("");
+//                            discount.add("");
+//
+//                    }
+//                    DishView dishView = new DishView(names,fullPrice,halfPrice,dish,image,before,after,discount,enableOr);
+////                loading.setVisibility(View.INVISIBLE);
+//                    Toast.makeText(AllMenuDish.this, "Click on image icon for adding new image", Toast.LENGTH_SHORT).show();
+//                    recyclerView.setAdapter(dishView);
+//                }
+//                else {
+//                    Toast.makeText(AllMenuDish.this, "No Dish Available", Toast.LENGTH_SHORT).show();
+//
+//                }
+//                loading.setVisibility(View.INVISIBLE);
+//            }
+//        });
 //        Query query = firestore.collection(sharedPreferences.getString("state","")).document("Restaurants").collection(sharedPreferences.getString("locality","")).document(menuAuth.getUid()).collection("List of Dish");
 //        menuRef.child(Objects.requireNonNull(menuAuth.getUid())).child("List of Dish").child(dish).addListenerForSingleValueEvent(new ValueEventListener() {
 //            @Override
@@ -251,50 +287,54 @@ public class AllMenuDish extends AppCompatActivity {
         swipeRefreshLayout = findViewById(R.id.swipe);
     }
 
-    private void updateChild(){
-
-        menuRef.child(Objects.requireNonNull(menuAuth.getUid())).child("List of Dish").child(dish).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(!snapshot.exists()){
-                    loading.setVisibility(View.INVISIBLE);
-                }else{
-                    names.clear();
-                    halfPrice.clear();
-                    enableOr.clear();
-                    image.clear();
-                    before.clear();
-                    after.clear();
-                    discount.clear();
-                    fullPrice.clear();
-                    for(DataSnapshot dataSnapshot : snapshot.getChildren()){
-                        if(dataSnapshot.child("Discount").child(dataSnapshot.child("name").getValue().toString()).child("dis").exists()){
-                            Log.d("hola","yes");
-                            before.add(String.valueOf(dataSnapshot.child("Discount").child(Objects.requireNonNull(dataSnapshot.child("name").getValue(String.class))).child("before").getValue(String.class)));
-                            after.add(String.valueOf(dataSnapshot.child("Discount").child(Objects.requireNonNull(dataSnapshot.child("name").getValue(String.class))).child("after").getValue(String.class)));
-                            discount.add(String.valueOf(dataSnapshot.child("Discount").child(Objects.requireNonNull(dataSnapshot.child("name").getValue(String.class))).child("dis").getValue(String.class)));
-                        }else {
-                            Log.d("hola", "no");
-                            before.add("");
-                            after.add("");
-                            discount.add("");
-                        }
-                        names.add(dataSnapshot.child("name").getValue().toString());
-                        halfPrice.add(dataSnapshot.child("half").getValue().toString());
-                        fullPrice.add(dataSnapshot.child("full").getValue().toString());
-                        image.add(dataSnapshot.child("image").getValue().toString());
-                        enableOr.add(dataSnapshot.child("enable").getValue().toString());
-                    }
-                }
-                loading.setVisibility(View.INVISIBLE);
-                recyclerView.setAdapter(new DishView(names,fullPrice,halfPrice,dish,image,before,after,discount,enableOr));
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
+//    private void updateChild(){
+//
+//        menuRef.child(Objects.requireNonNull(menuAuth.getUid())).child("List of Dish").child(dish).addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                if(!snapshot.exists()){
+//                    loading.setVisibility(View.INVISIBLE);
+//                }else{
+//                    names.clear();
+//                    halfPrice.clear();
+//                    enableOr.clear();
+//                    image.clear();
+//                    before.clear();
+//                    after.clear();
+//                    discount.clear();
+//                    fullPrice.clear();
+//                    for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+//                        if(dataSnapshot.child("Discount").child(dataSnapshot.child("name").getValue().toString()).child("dis").exists()){
+//                            Log.d("hola","yes");
+//                            before.add(String.valueOf(dataSnapshot.child("Discount").child(Objects.requireNonNull(dataSnapshot.child("name").getValue(String.class))).child("before").getValue(String.class)));
+//                            after.add(String.valueOf(dataSnapshot.child("Discount").child(Objects.requireNonNull(dataSnapshot.child("name").getValue(String.class))).child("after").getValue(String.class)));
+//                            discount.add(String.valueOf(dataSnapshot.child("Discount").child(Objects.requireNonNull(dataSnapshot.child("name").getValue(String.class))).child("dis").getValue(String.class)));
+//                        }else {
+//                            Log.d("hola", "no");
+//                            before.add("");
+//                            after.add("");
+//                            discount.add("");
+//                        }
+//                        names.add(dataSnapshot.child("name").getValue().toString());
+//                        halfPrice.add(dataSnapshot.child("half").getValue().toString());
+//                        fullPrice.add(dataSnapshot.child("full").getValue().toString());
+//                        image.add(dataSnapshot.child("image").getValue().toString());
+//                        enableOr.add(dataSnapshot.child("enable").getValue().toString());
+//                    }
+//                }
+//                loading.setVisibility(View.INVISIBLE);
+//                recyclerView.setAdapter(new DishView(names,fullPrice,halfPrice,dish,image,before,after,discount,enableOr));
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//
+//            }
+//        });
+//    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.notification,menu);
+        return true;
     }
-
 }

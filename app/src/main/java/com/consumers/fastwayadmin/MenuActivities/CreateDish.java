@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -26,10 +27,12 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import com.consumers.fastwayadmin.Dish.AddImageToDish;
 import com.consumers.fastwayadmin.Dish.DishInfo;
 import com.consumers.fastwayadmin.Dish.SearchDishFastway.SearchFastwayDatabase;
 import com.consumers.fastwayadmin.R;
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
@@ -37,21 +40,27 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.util.Objects;
+import java.util.concurrent.ExecutorService;
 
 public class CreateDish extends AppCompatActivity {
     EditText nameOfDish,halfPlate,fullPlate;
     FirebaseAuth dishAuth;
     String descriptionToSubmit;
     CheckBox checkBox;
+    Uri filePath;
     FirebaseFirestore firestore = FirebaseFirestore.getInstance();
     DatabaseReference dish;
     String dishType = "Veg";
     String locality;
     RadioGroup radioGroup;
     boolean imageAddedOr = false;
+
     String mrp;
     FirebaseStorage storage;
     File outputFile;
@@ -69,6 +78,7 @@ public class CreateDish extends AppCompatActivity {
         setContentView(R.layout.activity_create_dish);
         initialise();
         CheckPermission();
+
         StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
         StrictMode.setVmPolicy(builder.build());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -96,7 +106,7 @@ public class CreateDish extends AppCompatActivity {
                 Toast.makeText(CreateDish.this, "Please enter name of dish", Toast.LENGTH_SHORT).show();
             else {
 
-                dispatchTakePictureIntent();
+                showDialogBox();
             }
 //               showDialogBox();
         });
@@ -121,7 +131,7 @@ public class CreateDish extends AppCompatActivity {
                         else
                             mrp = "no";
 
-                        if(imageAddedOr && outputFile.exists()) {
+                        if(imageAddedOr) {
                             AlertDialog.Builder myAlert = new AlertDialog.Builder(CreateDish.this);
                             LinearLayout linearLayout = new LinearLayout(CreateDish.this);
                             EditText editText = new EditText(CreateDish.this);
@@ -137,12 +147,13 @@ public class CreateDish extends AppCompatActivity {
                                             finish();
                                         }
                                     }).setNegativeButton("Skip", (dialogInterface, i) -> {
-                                        DishInfo info = new DishInfo(name,half,full,image,mrp,"0","0","0","yes","",dishType,menuType);
-                                        dish.child("Restaurants").child(state).child(locality).child(Objects.requireNonNull(dishAuth.getUid())).child("List of Dish").child(menuType).child(name).setValue(info);
-
-                                        firestore.collection(state).document("Restaurants").collection(locality).document(Objects.requireNonNull(dishAuth.getUid())).collection("List of Dish").document(name).set(info);
-                                        Toast.makeText(CreateDish.this, "Dish Added Successfully", Toast.LENGTH_SHORT).show();
-                                        imageAddedOr = false;
+//                                        DishInfo info = new DishInfo(name,half,full,image,mrp,"0","0","0","yes","",dishType,menuType);
+//                                        dish.child("Restaurants").child(state).child(locality).child(Objects.requireNonNull(dishAuth.getUid())).child("List of Dish").child(menuType).child(name).setValue(info);
+//                                        firestore.collection(state).document("Restaurants").collection(locality).document(Objects.requireNonNull(dishAuth.getUid())).collection("List of Dish").document(name).set(info);
+//                                        Toast.makeText(CreateDish.this, "Dish Added Successfully", Toast.LENGTH_SHORT).show();
+//                                        imageAddedOr = false;
+                                descriptionToSubmit = "";
+                                        new Upload().execute();
                                         finish();
                                     }).create();
                             myAlert.setCancelable(false);
@@ -173,17 +184,14 @@ public class CreateDish extends AppCompatActivity {
                                                 finish();
                                             }
                                         }
-                                    }).setNegativeButton("Skip", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    DishInfo info = new DishInfo(name,half,full,image,mrp,"0","0","0","yes","",dishType,menuType);
-                                    dish.child("Restaurants").child(state).child(locality).child(Objects.requireNonNull(dishAuth.getUid())).child("List of Dish").child(menuType).child(name).setValue(info);
-                                    firestore.collection(state).document("Restaurants").collection(locality).document(dishAuth.getUid()).collection("List of Dish").document(name).set(info);
-                                    Toast.makeText(CreateDish.this, "Dish Added Successfully", Toast.LENGTH_SHORT).show();
-                                    imageAddedOr = false;
-                                    finish();
-                                }
-                            }).create();
+                                    }).setNegativeButton("Skip", (dialogInterface, i) -> {
+                                        DishInfo info = new DishInfo(name,half,full,image,mrp,"0","0","0","yes","",dishType,menuType);
+                                        dish.child("Restaurants").child(state).child(locality).child(Objects.requireNonNull(dishAuth.getUid())).child("List of Dish").child(menuType).child(name).setValue(info);
+                                        firestore.collection(state).document("Restaurants").collection(locality).document(dishAuth.getUid()).collection("List of Dish").document(name).set(info);
+                                        Toast.makeText(CreateDish.this, "Dish Added Successfully", Toast.LENGTH_SHORT).show();
+                                        imageAddedOr = false;
+                                        finish();
+                                    }).create();
                             myAlert.setCancelable(false);
                             linearLayout.addView(editText);
                             myAlert.setView(linearLayout);
@@ -215,19 +223,15 @@ public class CreateDish extends AppCompatActivity {
     private void showDialogBox() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Choose Image").setMessage("Select Any One Option")
-                .setPositiveButton("Search Online", new DialogInterface.OnClickListener() {
+                .setPositiveButton("Use Gallery", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         dialogInterface.dismiss();
-//                        String nameDish = nameOfDish.getText().toString();
-//                        Intent intent = new Intent(getApplicationContext(),CustomDishImageSearch.class);
-//                        intent.putExtra("name",nameDish);
-//                        startActivity(intent);
+                        Intent intent = new Intent();
+                        intent.setType("image/*");
+                        intent.setAction("android.intent.action.PICK");
+                        startActivityForResult(Intent.createChooser(intent, "Select Picture"), 1);
                     }
-                }).setNegativeButton("Take Photo", (dialogInterface, i) -> {
-                    dialogInterface.dismiss();
-                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE); //IMAGE CAPTURE CODE
-                    startActivityForResult(intent, 20);
                 }).create();
         builder.show();
     }
@@ -235,10 +239,7 @@ public class CreateDish extends AppCompatActivity {
     private void addToDatabase(String name, String half, String full,String image,String mrp) {
 
         try {
-
-
-//            dish.child("Restaurants").child(state).child(locality).child(Objects.requireNonNull(dishAuth.getUid())).child("List of Dish").child(menuType).child(name).setValue(info);
-            StorageReference reference = storageReference.child(dishAuth.getUid() + "/" + "image" + "/"  + nameOfDish.getText().toString());
+            StorageReference reference = storageReference.child(dishAuth.getUid() + "/" + "image" + "/"  + name);
             reference.getDownloadUrl().addOnSuccessListener(uri -> {
                 DatabaseReference dish = FirebaseDatabase.getInstance().getReference().getRoot();
                 SharedPreferences storeImages = getSharedPreferences("storeImages",MODE_PRIVATE);
@@ -246,6 +247,7 @@ public class CreateDish extends AppCompatActivity {
                 imageEdit.putString(name,uri + "");
                 imageEdit.apply();
                 DishInfo info = new DishInfo(name,half,full,uri + "",mrp,"0","0","0","yes",descriptionToSubmit,dishType,menuType);
+                dish.child("Restaurants").child(state).child(locality).child(Objects.requireNonNull(dishAuth.getUid())).child("List of Dish").child(menuType).child(name).setValue(info);
                 firestore.collection(state).document("Restaurants").collection(locality).document(dishAuth.getUid()).collection("List of Dish").document(name).set(info);
             });
             Toast.makeText(this, "Dish Added Successfully", Toast.LENGTH_SHORT).show();
@@ -272,7 +274,12 @@ public class CreateDish extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == 20 && resultCode == RESULT_OK && data != null){
+        if(requestCode == 1 && resultCode == RESULT_OK && data != null){
+             filePath = data.getData();
+            Uri selectedImageUri = data.getData();
+
+            imageAddedOr = true;
+
         }
     }
 
@@ -298,22 +305,45 @@ public class CreateDish extends AppCompatActivity {
         @Override
         protected Void doInBackground(Void... voids) {
 
+            Bitmap bmp = null;
             try {
-
-                StorageReference reference = storageReference.child(dishAuth.getUid() + "/" + "image" + "/"  + nameOfDish.getText().toString());
-                reference.putFile(Uri.fromFile(outputFile)).addOnCompleteListener(task -> {
-                    SharedPreferences sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
-                    if(sharedPreferences.getString("storeInDevice","").equals("no"))
-                        outputFile.delete();
-
-                    Toast.makeText(CreateDish.this, "Upload Complete", Toast.LENGTH_SHORT).show();
-                    addToDatabase(name,half,full,image,mrp);
-                }).addOnFailureListener(e -> {
-
-                });
-            }catch (Exception e){
-                Toast.makeText(CreateDish.this, ""+e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                bmp = MediaStore.Images.Media.getBitmap(getContentResolver(), filePath);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+            //here you can choose quality factor in third parameter(ex. i choosen 25)
+            bmp.compress(Bitmap.CompressFormat.JPEG, 25, baos);
+            byte[] fileInBytes = baos.toByteArray();
+            StorageReference ref = storageReference.child(Objects.requireNonNull(dishAuth.getUid()) + "/" + "image" + "/"  + name);
+            UploadTask uploadTask = ref.putBytes(fileInBytes);
+            uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    Toast.makeText(CreateDish.this, "File Uploaded", Toast.LENGTH_SHORT).show();
+                    SharedPreferences sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
+                    DatabaseReference reference;
+                    reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(dishAuth.getUid()))
+                            .child("List of Dish").child(menuType).child(name);
+
+                    StorageReference ref1 = storageReference.child(dishAuth.getUid() + "/" + "image" + "/"  + name);
+                    ref1.getDownloadUrl().addOnSuccessListener(uri -> {
+//                        Toast.makeText(CreateDish.this, "New Image Uploaded", Toast.LENGTH_SHORT).show();
+//                        FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+//                        firestore.collection(sharedPreferences.getString("state","")).document("Restaurants").collection(sharedPreferences.getString("locality","")).document(dishAuth.getUid())
+//                                .collection("List of Dish").document(name).update("image",uri + "");
+//                        SharedPreferences storeImages = getSharedPreferences("storeImages",MODE_PRIVATE);
+//                        SharedPreferences.Editor imageEdit = storeImages.edit();
+//                        imageEdit.putString(name,uri + "");
+//                        reference.child("image").setValue(uri + "");
+                        addToDatabase(name,half,full,uri + "",mrp);
+//                        imageEdit.apply();
+////                fastDialog.dismiss();
+//                        finish();
+                    });
+                }
+            });
 
             return null;
         }
