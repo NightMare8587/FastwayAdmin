@@ -56,13 +56,15 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
     SharedPreferences resTrackInfo;
     SharedPreferences storeOrdersForAdminInfo;
     double totalValOver = 0;
+    double totalDineWayOverall = 0;
+    double totalResDineWayOverAll = 0;
     double totalResOver = 0;
     Calendar calendar;
 //    int overVeg = 0,overNon = 0,overVegan = 0,resVegVal = 0,resVeganVal = 0,resNonVal = 0;
     boolean resAvailable = false;
     boolean overallAvailable = false;
-    LinearLayout overall,restaurant;
-    TextView overallVeg,overallNon,overallVegan,resVeg,resNon,resVegan,resHeading,overallHeading;
+    LinearLayout overall,restaurant,overallDineAndWay,ResDineAndWayy;
+    TextView overallVeg,overallNon,overallVegan,resVeg,resNon,resVegan,resHeading,overallHeading,overAllDine,overAllTake,ResTake,ResDine;
     RecyclerView recyclerView,dishRecyclerView;
     TackerAdapter tackerAdapter;
     SharedPreferences loginInfoShared;
@@ -320,6 +322,8 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
     private void initialise() {
         overall = findViewById(R.id.linearLayoutResEarningOverall);
         restaurant = findViewById(R.id.linearLayoutResEarningRestaurant);
+        overallDineAndWay = findViewById(R.id.dineWayOverAllAnalysisLayout);
+        ResDineAndWayy = findViewById(R.id.restaurantOverAllDineAndTakeAway);
         overallVegan = findViewById(R.id.overallVegan);
         overallVeg = findViewById(R.id.overallVeg);
         overallNon = findViewById(R.id.overallNon);
@@ -328,6 +332,10 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
         resNon = findViewById(R.id.resNon);
         resVegan = findViewById(R.id.resVegan);
         resHeading = findViewById(R.id.textViewShowingDishTrackerRestaurant);
+        overAllDine = findViewById(R.id.overAllDining);
+        overAllTake = findViewById(R.id.overAllTakeAway);
+        ResDine = findViewById(R.id.ResAllDining);
+        ResTake = findViewById(R.id.ResAllTakeAway);
     }
 
     public BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
@@ -488,6 +496,8 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
                         double vegVal = 0;
                         double nonVegVal = 0;
                         double veganVal = 0;
+                        double foodDining = 0;
+                        double foodTakeAway = 0;
 
 
                         overallAvailable = true;
@@ -502,14 +512,69 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
                             veganVal =  Double.parseDouble(Objects.requireNonNull(snapshot.child("vegan").getValue(String.class)));
                         }
 
+                        if(snapshot.hasChild("foodDining"))
+                            foodDining = Double.parseDouble(String.valueOf(snapshot.child("foodDining").getValue()));
+                        if(snapshot.hasChild("foodTakeAway"))
+                            foodTakeAway = Double.parseDouble(String.valueOf(snapshot.child("foodTakeAway").getValue()));
+
                         totalValOver = vegVal + nonVegVal + veganVal;
+                        totalDineWayOverall = foodDining + foodTakeAway;
 
                         overall.setVisibility(View.VISIBLE);
                         overallHeading.setVisibility(View.VISIBLE);
+                        overallDineAndWay.setVisibility(View.VISIBLE);
                         overallHeading.setText(loginInfoShared.getString("locality","") + " Users Preferences");
                         overallVeg.setText("Veg: " + decimalFormat.format(vegVal * 100 / totalValOver)  + "%");
                         overallNon.setText("NonVeg: "  + decimalFormat.format(nonVegVal * 100 / totalValOver)  + "%");
                         overallVegan.setText("Vegan: " + decimalFormat.format(veganVal * 100 / totalValOver)  + "%");
+
+                        if(totalDineWayOverall != 0) {
+                            overAllDine.setText("Dining: " + decimalFormat.format(foodDining * 100 / totalDineWayOverall) + "%");
+                            overAllTake.setText("TakeAway: " + decimalFormat.format(foodTakeAway * 100 / totalDineWayOverall) + "%");
+                        }
+
+                        double ResTakeAway = 0;
+                        double ResDineVal = 0;
+                        SharedPreferences sharedPreferences = getSharedPreferences("AdminPremiumDetails",MODE_PRIVATE);
+                        if(sharedPreferences.contains("status") && sharedPreferences.getString("status","").equals("active")){
+                            String month = monthName[calendar.get(Calendar.MONTH)];
+                            ResDineAndWayy.setVisibility(View.VISIBLE);
+                            SharedPreferences trackingTakeAway = getSharedPreferences("TrackingOfTakeAway",MODE_PRIVATE);
+                            SharedPreferences trackingFoodDining = getSharedPreferences("TrackingOfFoodDining",MODE_PRIVATE);
+                            if(trackingTakeAway.contains(month)){
+                                java.lang.reflect.Type type = new TypeToken<HashMap<String,String>>() {
+                                }.getType();
+                                gson = new Gson();
+                                json = trackingTakeAway.getString(month,"");
+                                HashMap<String,String> map = gson.fromJson(json,type);
+
+                                for(String i : map.keySet()){
+                                    double val = Double.parseDouble(map.get(i));
+                                    ResTakeAway += val;
+                                }
+                            }
+
+                            if(trackingFoodDining.contains(month)){
+                                java.lang.reflect.Type type = new TypeToken<HashMap<String,String>>() {
+                                }.getType();
+                                gson = new Gson();
+                                json = trackingFoodDining.getString(month,"");
+                                HashMap<String,String> map = gson.fromJson(json,type);
+
+                                for(String i : map.keySet()){
+                                    double val = Double.parseDouble(map.get(i));
+                                    ResDineVal += val;
+                                }
+                            }
+
+                            totalResDineWayOverAll = ResDineVal + ResTakeAway;
+                            if(totalResDineWayOverAll != 0){
+                                ResDine.setText("Dining: " + decimalFormat.format(ResDineVal * 100 / totalResDineWayOverAll) + "%");
+                                ResTake.setText("TakeAway: " + decimalFormat.format(ResTakeAway * 100 / totalResDineWayOverAll) + "%");
+                            }
+
+                        }
+
 
                         DatabaseReference resRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("ResAnalysis").child(loginInfoShared.getString("state","")).child(loginInfoShared.getString("locality","")).child(auth.getUid());
                         resRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -520,6 +585,7 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
                                     double ResvegVal = 0;
                                     double ResnonVegVal = 0;
                                     double ResveganVal = 0;
+
                                     resAvailable = true;
 
                                     if(snapshot.hasChild("veg")){
@@ -531,6 +597,7 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
                                     if(snapshot.hasChild("vegan")){
                                         ResveganVal =  Double.parseDouble(Objects.requireNonNull(snapshot.child("vegan").getValue(String.class)));
                                     }
+
 
                                     totalResOver = ResvegVal + ResnonVegVal + ResveganVal;
 
