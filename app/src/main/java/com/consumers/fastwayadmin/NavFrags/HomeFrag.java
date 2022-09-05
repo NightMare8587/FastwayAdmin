@@ -39,6 +39,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.consumers.fastwayadmin.CreateShowCampaign.CampaignActivity;
 import com.consumers.fastwayadmin.DiscountCombo.ComboAndOffers;
 import com.consumers.fastwayadmin.DiscountCombo.DiscountActivity;
 import com.consumers.fastwayadmin.NavFrags.CurrentTakeAwayOrders.CurrentTakeAway;
@@ -302,12 +303,12 @@ public class HomeFrag extends Fragment {
                     .setBackgroundColor(Color.parseColor("#f9fce1"))
                     .setFirstButtonColor(Color.parseColor("#d3f6f3"))
                     .setFirstButtonTextColor(Color.parseColor("#000000"))
-                    .setFirstButtonText("DISCOUNT & OFFERS")
+                    .setFirstButtonText("CREATE/SHOW CAMPAIGN")
                     .setSecondButtonColor(Color.parseColor("#fee9b2"))
                     .setSecondButtonTextColor(Color.parseColor("#000000"))
                     .setSecondButtonText("COMBO/THALI")
                     .withFirstButtonListner(view11 -> {
-                        startActivity(new Intent(getContext(), DiscountActivity.class));
+                        startActivity(new Intent(getContext(), CampaignActivity.class));
                         flatDialog.dismiss();
                     })
                     .withSecondButtonListner(view112 -> {
