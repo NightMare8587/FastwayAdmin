@@ -549,7 +549,7 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
                                 HashMap<String,String> map = gson.fromJson(json,type);
 
                                 for(String i : map.keySet()){
-                                    double val = Double.parseDouble(map.get(i));
+                                    double val = Double.parseDouble(Objects.requireNonNull(map.get(i)));
                                     ResTakeAway += val;
                                 }
                             }
@@ -562,7 +562,7 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
                                 HashMap<String,String> map = gson.fromJson(json,type);
 
                                 for(String i : map.keySet()){
-                                    double val = Double.parseDouble(map.get(i));
+                                    double val = Double.parseDouble(Objects.requireNonNull(map.get(i)));
                                     ResDineVal += val;
                                 }
                             }
