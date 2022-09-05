@@ -58,6 +58,7 @@ public class RecyclerClassView extends RecyclerView.Adapter<RecyclerClassView.ho
             });
         }else{
             holder.progressBar.setVisibility(View.INVISIBLE);
+            Picasso.get().load("https://image.shutterstock.com/image-vector/no-image-vector-isolated-on-600w-1481369594.jpg").into(holder.imageView);
         }
 
         holder.dishName.setText(dishNames.get(position));
@@ -66,10 +67,7 @@ public class RecyclerClassView extends RecyclerView.Adapter<RecyclerClassView.ho
 
     @Override
     public int getItemCount() {
-        if(dishNames.size() >= 2)
-            return 2;
-        else
-            return dishNames.size();
+        return Math.min(dishNames.size(), 2);
     }
     public class holder extends RecyclerView.ViewHolder{
         ImageView imageView;

@@ -15,7 +15,7 @@
         android:id="@+id/barchart"
         android:layout_width="match_parent"
         android:layout_height="250dp"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="5dp"
         android:orientation="vertical"
         android:padding="10dp"
         app:egBarWidth="20dp"
@@ -30,265 +30,294 @@
         android:layout_width="0dp"
         android:layout_height="50dp"
         android:layout_marginStart="1dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="5dp"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/barchart" />
 
     <TextView
-        android:id="@+id/totalOrdersMadeTextViewResTransactions"
+        android:id="@+id/currentMonthNameBelowBarCharTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
+        android:layout_marginStart="5dp"
         android:layout_marginTop="7dp"
-        android:fontFamily="@font/merriweather_sans_bold"
-        android:text="Total Orders Made: "
+        android:fontFamily="@font/inter"
+        android:text="Month: "
+        android:textColor="#000000"
         android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/monthNamesListViewRes" />
 
     <TextView
+        android:id="@+id/totalOrdersMadeTextViewResTransactions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="5dp"
+        android:fontFamily="@font/inter"
+        android:text="Total Orders Made: "
+        android:textColor="#000000"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/currentMonthNameBelowBarCharTextView" />
+
+    <TextView
         android:id="@+id/totalTransactionAmountTextViewResTrans"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="7dp"
-        android:fontFamily="@font/merriweather_sans_bold"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="5dp"
+        android:fontFamily="@font/inter"
         android:text="Total Transaction Amount:"
+        android:textColor="#000000"
         android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/totalOrdersMadeTextViewResTransactions" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayout"
         android:layout_width="match_parent"
-        app:layout_constraintTop_toBottomOf="@+id/totalTransactionAmountTextViewResTrans"
         android:layout_height="wrap_content"
+        android:layout_marginTop="45dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteY="415dp">
+        app:layout_constraintTop_toBottomOf="@+id/totalTransactionAmountTextViewResTrans">
 
         <TextView
             android:id="@+id/totalCustomerInAMonthTracker"
             android:layout_width="wrap_content"
-            app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginStart="15dp"
-            android:layout_marginTop="5dp"
-            android:textSize="17sp"
-            android:textColor="@color/black"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@+id/seeRestaurantAnalysisButtonTracker"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
             android:text="Total Customers: "
-            tools:layout_editor_absoluteX="20dp"
-            tools:layout_editor_absoluteY="281dp" />
+            android:textColor="@color/black"
+            android:textSize="17sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/seeRestaurantAnalysisButtonTracker" />
 
         <TextView
             android:id="@+id/oneTimeCustomersTracker"
             android:layout_width="wrap_content"
-            app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginStart="15dp"
-            android:textSize="17sp"
-            android:layout_marginTop="5dp"
-            android:textColor="@color/black"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@+id/totalCustomerInAMonthTracker"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
             android:text="One Time Customer's: "
-            tools:layout_editor_absoluteX="20dp"
-            tools:layout_editor_absoluteY="281dp" />
+            android:textColor="@color/black"
+            android:textSize="17sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/totalCustomerInAMonthTracker" />
 
         <TextView
             android:id="@+id/recurringCustomersTracker"
             android:layout_width="wrap_content"
-            app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginStart="15dp"
-            android:textSize="17sp"
-            android:layout_marginTop="5dp"
-            android:textColor="@color/black"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@+id/oneTimeCustomersTracker"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
             android:text="Recurring Customer's: "
-            tools:layout_editor_absoluteX="20dp"
-            tools:layout_editor_absoluteY="281dp" />
+            android:textColor="@color/black"
+            android:textSize="17sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/oneTimeCustomersTracker" />
 
         <TextView
             android:id="@+id/textViewShowingDishTracker"
             android:layout_width="wrap_content"
-            app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginStart="15dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="5dp"
+            android:fontFamily="@font/inter"
+            android:text="Your Area"
+            android:textColor="@color/black"
             android:textSize="22sp"
             android:textStyle="bold"
-            android:layout_marginTop="5dp"
             android:visibility="invisible"
-            android:textColor="@color/black"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@+id/recurringCustomersTracker"
-            android:text="Your Area"
-            tools:layout_editor_absoluteX="20dp"
-            tools:layout_editor_absoluteY="281dp" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/recurringCustomersTracker" />
 
         <LinearLayout
             android:id="@+id/linearLayoutResEarningOverall"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:padding="3dp"
-            android:orientation="horizontal"
-            android:visibility="invisible"
-            app:layout_constraintTop_toBottomOf="@id/textViewShowingDishTracker"
             android:layout_width="match_parent"
-            android:layout_marginTop="5dp"
+            android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
             android:layout_marginEnd="10dp"
-            android:layout_height="wrap_content">
+            android:orientation="horizontal"
+            android:padding="3dp"
+            android:visibility="invisible"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/textViewShowingDishTracker">
 
             <TextView
-                android:layout_width="0dp"
-                android:text="veg"
-                android:textSize="17sp"
                 android:id="@+id/overallVeg"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="veg"
+                android:layout_gravity="start"
+                android:textAlignment="textStart"
                 android:textColor="@color/green_connectify"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"/>
+                android:textSize="15sp" />
+
             <TextView
-                android:layout_width="0dp"
-                android:text="nonVeg"
                 android:id="@+id/overallNon"
-                android:textSize="17sp"
-                android:textColor="@color/red_connectify"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"/>
-            <TextView
                 android:layout_width="0dp"
-                android:text="vegan"
-                android:id="@+id/overallVegan"
-                android:textColor="@color/purple_200"
-                android:textSize="17sp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"/>
+                android:layout_weight="1"
+                android:layout_gravity="start"
+                android:textAlignment="textStart"
+                android:text="nonVeg"
+                android:textColor="@color/red_connectify"
+                android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/overallVegan"
+                android:layout_width="0dp"
+                android:layout_gravity="start"
+                android:textAlignment="textStart"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="vegan"
+                android:textColor="@color/purple_200"
+                android:textSize="15sp" />
 
         </LinearLayout>
 
         <TextView
             android:id="@+id/textViewShowingDishTrackerRestaurant"
             android:layout_width="wrap_content"
-            android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginStart="15dp"
-            android:textSize="22sp"
-            android:layout_marginTop="5dp"
-            android:visibility="invisible"
-            android:textColor="@color/black"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@+id/dineWayOverAllAnalysisLayout"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="5dp"
+            android:fontFamily="@font/inter"
             android:text="Your Area"
-            tools:layout_editor_absoluteX="20dp"
-            tools:layout_editor_absoluteY="281dp" />
+            android:textColor="@color/black"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:visibility="invisible"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/dineWayOverAllAnalysisLayout" />
+
         <LinearLayout
             android:id="@+id/linearLayoutResEarningRestaurant"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="10dp"
             android:orientation="horizontal"
             android:padding="3dp"
-            app:layout_constraintTop_toBottomOf="@id/textViewShowingDishTrackerRestaurant"
-            android:layout_width="match_parent"
             android:visibility="invisible"
-            android:layout_marginTop="5dp"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
-            android:layout_height="wrap_content">
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/textViewShowingDishTrackerRestaurant">
 
             <TextView
-                android:layout_width="0dp"
-                android:text="veg"
                 android:id="@+id/resVeg"
-                android:textSize="17sp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_gravity="start"
+                android:textAlignment="textStart"
+                android:text="veg"
                 android:textColor="@color/green_connectify"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"/>
+                android:textSize="15sp" />
+
             <TextView
-                android:layout_width="0dp"
-                android:text="nonVeg"
                 android:id="@+id/resNon"
-                android:textSize="17sp"
-                android:textColor="@color/red_connectify"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"/>
-            <TextView
                 android:layout_width="0dp"
-                android:id="@+id/resVegan"
-                android:text="vegan"
-                android:textColor="@color/purple_200"
-                android:textSize="17sp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"/>
+                android:layout_weight="1"
+                android:text="nonVeg"
+                android:layout_gravity="start"
+                android:textAlignment="textStart"
+                android:textColor="@color/red_connectify"
+                android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/resVegan"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="vegan"
+                android:layout_gravity="start"
+                android:textAlignment="textStart"
+                android:textColor="@color/purple_200"
+                android:textSize="15sp" />
 
         </LinearLayout>
 
         <LinearLayout
             android:id="@+id/dineWayOverAllAnalysisLayout"
             android:layout_width="match_parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginTop="5dp"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
-            android:visibility="invisible"
-            android:padding="3dp"
-            app:layout_constraintTop_toBottomOf="@+id/linearLayoutResEarningOverall"
             android:layout_height="match_parent"
-            android:orientation="horizontal">
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="10dp"
+            android:orientation="horizontal"
+            android:padding="3dp"
+            android:visibility="invisible"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/linearLayoutResEarningOverall">
 
 
             <TextView
-                android:layout_width="0dp"
-                android:text="TakeAway"
                 android:id="@+id/overAllTakeAway"
-                android:textSize="17sp"
-                android:textColor="@color/blue_default"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"/>
-            <TextView
                 android:layout_width="0dp"
-                android:text="Restaurant"
-                android:id="@+id/overAllDining"
-                android:textSize="17sp"
-                android:textColor="@color/quantum_purple"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"/>
+                android:layout_weight="1"
+                android:text="TakeAway"
+                android:textColor="@color/blue_default"
+                android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/overAllDining"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Restaurant"
+                android:textColor="@color/quantum_purple"
+                android:textSize="15sp" />
         </LinearLayout>
 
         <LinearLayout
             android:id="@+id/restaurantOverAllDineAndTakeAway"
             android:layout_width="match_parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginTop="5dp"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
-            android:visibility="invisible"
-            android:padding="3dp"
-            app:layout_constraintTop_toBottomOf="@+id/linearLayoutResEarningRestaurant"
             android:layout_height="match_parent"
-            android:orientation="horizontal">
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="10dp"
+            android:orientation="horizontal"
+            android:padding="3dp"
+            android:visibility="invisible"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/linearLayoutResEarningRestaurant">
 
 
             <TextView
-                android:layout_width="0dp"
-                android:text="TakeAway"
                 android:id="@+id/ResAllTakeAway"
-                android:textSize="17sp"
-                android:textColor="@color/blue_default"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"/>
-            <TextView
                 android:layout_width="0dp"
-                android:text="Restaurant"
-                android:id="@+id/ResAllDining"
-                android:textSize="17sp"
-                android:textColor="@color/quantum_purple"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"/>
+                android:layout_weight="1"
+
+                android:text="TakeAway"
+                android:textColor="@color/blue_default"
+                android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/ResAllDining"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Restaurant"
+                android:textColor="@color/quantum_purple"
+                android:textSize="15sp" />
         </LinearLayout>
 
         <Button
@@ -296,12 +325,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
-            android:text="See Restaurant Analysis"
-            android:textStyle="bold"
-            android:textSize="18sp"
-            android:padding="10dp"
-            android:textColor="#000000"
             android:background="@drawable/edittext_back"
+            android:padding="10dp"
+            android:text="See Restaurant Analysis"
+            android:textColor="#000000"
+            android:textSize="18sp"
+            android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/seeMoreDishAnalysisDetails" />
@@ -316,20 +345,35 @@
 
         <Button
             android:id="@+id/seeMoreDishAnalysisDetails"
-            app:layout_constraintTop_toBottomOf="@+id/dishTrackerRecyclerViewAnalysis"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            android:layout_marginTop="5dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="See More Details"
-            android:textStyle="bold"
-            android:textSize="18sp"
+            android:layout_marginTop="5dp"
+            android:background="@drawable/edittext_back"
             android:padding="10dp"
+            android:text="See More Details"
             android:textColor="#000000"
-            android:background="@drawable/edittext_back"/>
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/dishTrackerRecyclerViewAnalysis" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <TextView
+        android:id="@+id/textView36"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="3dp"
+        android:fontFamily="@font/inter"
+        android:text="Most Ordered Dish"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/constraintLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/totalTransactionAmountTextViewResTrans" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 

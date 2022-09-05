@@ -149,23 +149,26 @@ public class Info extends AppCompatActivity {
         alertDialog.show();
         FirebaseFirestore checkStore = FirebaseFirestore.getInstance();
         checkStore.collection(sharedPreferences.getString("state","")).document("Restaurants").collection(sharedPreferences.getString("locality","")).document(Objects.requireNonNull(infoAuth.getUid()))
-                .addSnapshotListener((value, error) -> {
-                    if(value.exists()){
-                        Map<String,Object> map = value.getData();
-                        editor.putString("TableBookAllowed", (String) map.get("TableBookAllowed"));
-                        editor.putString("TakeAwayAllowed", (String) map.get("TableBookAllowed"));
-                        editor.apply();
+                .get().addOnCompleteListener(task -> {
+                    if(task.isSuccessful()){
+                        DocumentSnapshot documentSnapshot = task.getResult();
+                        if(documentSnapshot.exists()) {
+                            Map<String, Object> map = documentSnapshot.getData();
+                            editor.putString("TableBookAllowed", (String) map.get("TableBookAllowed"));
+                            editor.putString("TakeAwayAllowed", (String) map.get("TableBookAllowed"));
+                            editor.apply();
 
-                        SharedPreferences resInfoShared = getSharedPreferences("RestaurantInfo", MODE_PRIVATE);
-                        SharedPreferences.Editor editor = resInfoShared.edit();
-                        editor.putString("hotelName", (String) map.get("name"));
-                        editor.putString("hotelAddress", (String) map.get("address"));
-                        editor.putString("hotelNumber", (String) map.get("number"));
-                        editor.apply();
-                        checkStore.terminate();
-                        if(!resCreated){
-                            startActivity(new Intent(Info.this,UploadRequiredDocuments.class));
-                            finish();
+                            SharedPreferences resInfoShared = getSharedPreferences("RestaurantInfo", MODE_PRIVATE);
+                            SharedPreferences.Editor editor = resInfoShared.edit();
+                            editor.putString("hotelName", (String) map.get("name"));
+                            editor.putString("hotelAddress", (String) map.get("address"));
+                            editor.putString("hotelNumber", (String) map.get("number"));
+                            editor.apply();
+                            checkStore.terminate();
+                            if (!resCreated) {
+                                startActivity(new Intent(Info.this, UploadRequiredDocuments.class));
+                                finish();
+                            }
                         }
                     }
                 });

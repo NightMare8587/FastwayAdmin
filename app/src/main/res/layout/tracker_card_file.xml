@@ -3,7 +3,9 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_margin="5dp"
+    app:cardElevation="5dp"
     android:id="@+id/trackerMonthCardView"
+    app:cardCornerRadius="10dp"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -15,7 +17,9 @@
             app:layout_constraintTop_toBottomOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             android:text="Hello"
-            android:padding="5dp"
+            android:padding="6dp"
+            android:textColor="#000000"
+            android:fontFamily="@font/inter"
             android:id="@+id/monthNameTrackerCard"
             android:textSize="20sp"
             android:textStyle="bold"

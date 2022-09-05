@@ -2,10 +2,12 @@ package com.consumers.fastwayadmin.NavFrags.ResEarningTracker;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
@@ -43,6 +45,8 @@ public class TackerAdapter extends RecyclerView.Adapter<TackerAdapter.Holder> {
             oldPosition = holder.getAbsoluteAdapterPosition();
         }
         holder.monthName.setOnClickListener(click -> {
+
+//            Toast.makeText(click.getContext(), "" + holder.getOldPosition(), Toast.LENGTH_SHORT).show();
             Intent intent = new Intent("custom-message");
             //            intent.putExtra("quantity",Integer.parseInt(quantity.getText().toString()));
             intent.putExtra("month",monthNames.get(position));

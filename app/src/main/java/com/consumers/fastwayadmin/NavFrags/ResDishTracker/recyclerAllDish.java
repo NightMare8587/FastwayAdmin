@@ -54,8 +54,13 @@ public class recyclerAllDish extends RecyclerView.Adapter<recyclerAllDish.holder
                     holder.progressBar.setVisibility(View.INVISIBLE);
                 }
             });
-        }else
+        }else {
             holder.progressBar.setVisibility(View.INVISIBLE);
+            Picasso.get().load("https://image.shutterstock.com/image-vector/no-image-vector-isolated-on-600w-1481369594.jpg").into(holder.imageView);
+        }
+
+
+
         holder.dishName.setText(dishNames.get(position));
         holder.totalCount.setText("Times Ordered: " + dishTotalCount.get(position));
     }

@@ -4,6 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_margin="6dp"
+    app:cardElevation="5dp"
+    app:cardCornerRadius="10dp"
     android:layout_height="100dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -14,8 +16,9 @@
             android:id="@+id/totalPurchaseCountDishRecycler"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
+            android:layout_marginStart="8dp"
             android:layout_marginTop="5dp"
+            android:fontFamily="@font/inter"
             android:text="TextView"
             android:textSize="16sp"
             android:textStyle="bold"
@@ -26,6 +29,7 @@
             android:id="@+id/dishTrackerCardImageView"
             android:layout_width="90dp"
             android:layout_height="90dp"
+            android:layout_marginStart="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -34,8 +38,9 @@
             android:id="@+id/dishNameTrackerAnalysisRecycler"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
+            android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
+            android:fontFamily="@font/inter"
             android:text="TextView"
             android:textColor="#000000"
             android:textSize="18sp"

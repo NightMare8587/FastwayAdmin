@@ -56,6 +56,7 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
     SharedPreferences resTrackInfo;
     SharedPreferences storeOrdersForAdminInfo;
     double totalValOver = 0;
+    TextView currentMonthNameViewing;
     double totalDineWayOverall = 0;
     double totalResDineWayOverAll = 0;
     double totalResOver = 0;
@@ -102,7 +103,7 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
         oneTime = findViewById(R.id.oneTimeCustomersTracker);
         Recuuring = findViewById(R.id.recurringCustomersTracker);
         editor = loginInfoShared.edit();
-
+        currentMonthNameViewing = findViewById(R.id.currentMonthNameBelowBarCharTextView);
         seeAnalysis = findViewById(R.id.seeRestaurantAnalysisButtonTracker);
         if(adminPrem.contains("status")) {
             if (!adminPrem.getString("status", "").equals("active")) {
@@ -155,7 +156,7 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
         }.getType();
         gson = new Gson();
         seeMoreDetails = findViewById(R.id.seeMoreDishAnalysisDetails);
-
+        currentMonthNameViewing.setText("Month: " + month);
         if(usersFrequencyPref.contains(month)){
             java.lang.reflect.Type types = new TypeToken<HashMap<String,String>>() {
             }.getType();
@@ -189,20 +190,20 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
                 totalAmountPerMonth += Double.parseDouble(orderAmountListText.get(i));
             }
             totalOrdersMade.setText("Total Transactions Made: " + dateText.size());
-            totalTransactionsMade.setText("Total Transactions Made: \u20B9" + df.format(totalAmountPerMonth));
+            totalTransactionsMade.setText("Total Transactions Amount: \u20B9" + df.format(totalAmountPerMonth));
         }else{
             totalOrdersMade.setText("Total Transactions Made: " + 0);
-            totalTransactionsMade.setText("Total Transactions Made: \u20B9" + 0);
+            totalTransactionsMade.setText("Total Transactions Amount: \u20B9" + 0);
         }
 
 
         recyclerView = findViewById(R.id.monthNamesListViewRes);
         allMonthsNames = new ArrayList<>(Arrays.asList(monthName));
         currentDay = calendar.get(Calendar.DAY_OF_MONTH);
-        BarChart mBarChart = (BarChart) findViewById(R.id.barchart);
+        BarChart mBarChart = findViewById(R.id.barchart);
 
 
-        recyclerView = findViewById(R.id.monthNamesListViewRes);
+//        recyclerView = findViewById(R.id.monthNamesListViewRes);
 
         recyclerView.setLayoutManager(linearLayoutManager);
         tackerAdapter = new TackerAdapter(allMonthsNames,month);
@@ -345,6 +346,7 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
         public void onReceive(Context context, Intent intent) {
             // Get extra data included in the Intent
             String MonthName = intent.getStringExtra("month");
+            currentMonthNameViewing.setText("Month: " + MonthName);
             if(storeOrdersForAdminInfo.contains(MonthName)){
                 java.lang.reflect.Type type = new TypeToken<List<List<String>>>() {
                 }.getType();
@@ -359,16 +361,17 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
                     totalAmountPerMonth += Double.parseDouble(orderAmountListText.get(i));
                 }
                 totalOrdersMade.setText("Total Transactions Made: " + dateText.size());
-                totalTransactionsMade.setText("Total Transactions Made: \u20B9" + df.format(totalAmountPerMonth));
+                totalTransactionsMade.setText("Total Transactions Amount: \u20B9" + df.format(totalAmountPerMonth));
             }else{
                 totalOrdersMade.setText("Total Transactions Made: " + 0);
-                totalTransactionsMade.setText("Total Transactions Made: \u20B9" + 0);
+                totalTransactionsMade.setText("Total Transactions Amount: \u20B9" + 0);
                 Toast.makeText(context, "No transactions made in Month " + MonthName, Toast.LENGTH_SHORT).show();
             }
-            BarChart mBarChart = (BarChart) findViewById(R.id.barchart);
+            BarChart mBarChart = findViewById(R.id.barchart);
 
 //            ValueLineSeries series = new ValueLineSeries();
 //            series.setColor(0xFF56B7F1);
+
             SharedPreferences storeOrder = getSharedPreferences("RestaurantDailyStoreForAnalysis",MODE_PRIVATE);
             if(storeOrder.contains(MonthName)){
                 java.lang.reflect.Type type = new TypeToken<List<List<String>>>() {
