@@ -60,6 +60,7 @@ public class CampaignActivity extends AppCompatActivity {
     DatabaseReference checkPrevCamp;
     RecyclerView recyclerView;
     FirebaseAuth auth = FirebaseAuth.getInstance();
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -159,45 +160,42 @@ public class CampaignActivity extends AppCompatActivity {
                 linearLayoutCamp.addView(campDiscount);
 
                 builder.setView(linearLayoutCamp);
-                builder.setPositiveButton("Create Campaign", new DialogInterface.OnClickListener() {
-                    @SuppressLint("SetTextI18n")
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if(campName.length() == 0)
-                            return;
-                        if(campDiscount.length() == 0)
-                            return;
-                        if(campDiscount.getText().toString().equals("0"))
-                            return;
-                        DatabaseReference addCamp = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid());
-                        Map<String,String> map = new HashMap<>();
-                        map.put("campName",campName.getText().toString());
-                        map.put("campDiscount",campDiscount.getText().toString());
-                        map.put("totalCustomers","0");
-                        map.put("totalOrders","0");
-                        map.put("totalTransAmount","0");
+                builder.setPositiveButton("Create Campaign", (dialog, which) -> {
+                    if(campName.length() == 0)
+                        return;
+                    if(campDiscount.length() == 0)
+                        return;
+                    if(campDiscount.getText().toString().equals("0"))
+                        return;
+                    DatabaseReference addCamp = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid());
+                    Map<String,String> map = new HashMap<>();
+                    map.put("campName",campName.getText().toString());
+                    map.put("campDiscount",campDiscount.getText().toString());
+                    map.put("totalCustomers","0");
+                    map.put("totalOrders","0");
+                    map.put("totalTransAmount","0");
 
-                        currentMap.put("campName",campName.getText().toString());
+                    currentMap.put("campName",campName.getText().toString());
 //                        currentMap.put("campDiscount",campDiscount.getText().toString());
-                        currentMap.put("totalCustomers","0");
-                        currentMap.put("totalOrders","0");
-                        currentMap.put("totalTransAmount","0");
-                        addCamp.child("Current Campaign").setValue(map);
-                        Toast.makeText(CampaignActivity.this, "Campaign Created Successfully", Toast.LENGTH_SHORT).show();
-                        createNewCamp.setVisibility(View.VISIBLE);
-                        currentCampText.setVisibility(View.VISIBLE);
-                        linearLayout.setVisibility(View.VISIBLE);
+                    currentMap.put("totalCustomers","0");
+                    currentMap.put("totalOrders","0");
+                    currentMap.put("totalTransAmount","0");
+                    addCamp.child("Current Campaign").setValue(map);
+                    Toast.makeText(CampaignActivity.this, "Campaign Created Successfully", Toast.LENGTH_SHORT).show();
+                    createNewCamp.setVisibility(View.VISIBLE);
+                    currentCampText.setVisibility(View.VISIBLE);
+                    linearLayout.setVisibility(View.VISIBLE);
 
 
-                        campCurrentName.setText(campName.getText().toString());
-                        campCurrentCustomers.setText("Total Customers: 0");
-                        campCurrentOrders.setText("Total Orders: 0");
-                        campCurrentTransactions.setText("Total Transaction: \u20b90");
-                        RequestQueue requestQueue = Volley.newRequestQueue(CampaignActivity.this);
-                        JSONObject main = new JSONObject();
-                        isCurr = true;
+                    campCurrentName.setText(campName.getText().toString());
+                    campCurrentCustomers.setText("Total Customers: 0");
+                    campCurrentOrders.setText("Total Orders: 0");
+                    campCurrentTransactions.setText("Total Transaction: \u20b90");
+                    AsyncTask.execute(() -> {
                         try {
-                            main.put("to", "/topics/" + locality + "");
+                            RequestQueue requestQueue = Volley.newRequestQueue(CampaignActivity.this);
+                            JSONObject main = new JSONObject();
+                            main.put("to", "/topics/" + locality.replaceAll("\\s+","") + "");
                             JSONObject notification = new JSONObject();
                             notification.put("title", resName);
                             notification.put("click_action", "Table Frag");
@@ -220,7 +218,10 @@ public class CampaignActivity extends AppCompatActivity {
                         } catch (Exception e) {
                             Toast.makeText(CampaignActivity.this, e.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
                         }
-                    }
+                    });
+
+                    isCurr = true;
+
                 }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
