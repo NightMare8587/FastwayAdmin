@@ -192,6 +192,25 @@ public class CampaignActivity extends AppCompatActivity {
                     campCurrentOrders.setText("Total Orders: 0");
                     campCurrentTransactions.setText("Total Transaction: \u20b90");
                     AsyncTask.execute(() -> {
+                        DatabaseReference addAmount = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid());
+                        addAmount.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                if(snapshot.hasChild("totalMonthAmount")){
+                                    double val = Double.parseDouble(String.valueOf(snapshot.child("totalMonthAmount").getValue()));
+                                    val += 15;
+                                    addAmount.child("totalMonthAmount").setValue(String.valueOf(val));
+                                }else {
+                                    double val = 15D;
+                                    addAmount.child("totalMonthAmount").setValue(String.valueOf(val));
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+
+                            }
+                        });
                         try {
                             RequestQueue requestQueue = Volley.newRequestQueue(CampaignActivity.this);
                             JSONObject main = new JSONObject();
