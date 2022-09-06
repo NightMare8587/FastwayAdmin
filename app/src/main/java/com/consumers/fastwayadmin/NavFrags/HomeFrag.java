@@ -51,6 +51,8 @@ import com.elconfidencial.bubbleshowcase.BubbleShowCaseBuilder;
 import com.elconfidencial.bubbleshowcase.BubbleShowCaseListener;
 import com.elconfidencial.bubbleshowcase.BubbleShowCaseSequence;
 import com.example.flatdialoglibrary.dialog.FlatDialog;
+import com.firebase.geofire.GeoFire;
+import com.firebase.geofire.GeoLocation;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -234,6 +236,19 @@ public class HomeFrag extends Fragment {
         seeMoreDetails.setOnClickListener(click -> {
             view.getContext().startActivity(new Intent(requireContext(), ResEarningTrackerActivity.class));
         });
+
+
+
+        AsyncTask.execute(() -> {
+            DatabaseReference addToRTDB = FirebaseDatabase.getInstance().getReference().getRoot().child("Offers").child(resInfoShared.getString("state","")).child(resInfoShared.getString("locality",""));
+            if(!resInfoShared.contains("addedToRTDB")){
+                GeoFire geoFire = new GeoFire(addToRTDB);
+                geoFire.setLocation(auth.getUid(),new GeoLocation(Double.parseDouble(resInfoShared.getString("lati","")),Double.parseDouble(resInfoShared.getString("longi",""))));
+                resInfoSharedEdit.putString("addedToRTDB","yes");
+                resInfoSharedEdit.apply();
+            }
+        });
+
         SharedPreferences dish = requireContext().getSharedPreferences("DishAnalysis",Context.MODE_PRIVATE);
 //        if(dish.contains("DishAnalysisMonthBasis")){
 //            gson = new Gson();

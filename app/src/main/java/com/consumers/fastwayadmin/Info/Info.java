@@ -10,6 +10,7 @@ import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -393,6 +394,7 @@ public class Info extends AppCompatActivity {
             infoRef.child("totalReports").setValue("0");
 
 
+
             if (optForTakeaway.isChecked()) {
                 map.put("TakeAwayAllowed","yes");
 //                infoRef.child("TakeAwayAllowed").setValue("yes");
@@ -419,9 +421,9 @@ public class Info extends AppCompatActivity {
             if(mapLocations){
                 this.editor.putString("state",cityName);
                 this.editor.putString("locality",subAdminArea);
-//                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(cityName).child(subAdminArea).child(infoAuth.getUid());
-//                RestLocation restLocation = new RestLocation(String.valueOf(lon),String.valueOf(lat));
-//                databaseReference.child("location").setValue(restLocation);
+                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(cityName).child(subAdminArea).child(infoAuth.getUid());
+                RestLocation restLocation = new RestLocation(String.valueOf(lon),String.valueOf(lat));
+                databaseReference.child("location").setValue(restLocation);
                 map.put("location",lon + "/" + lat);
                 String hash = GeoFireUtils.getGeoHashForLocation(new GeoLocation(Double.parseDouble(lat), Double.parseDouble(lon)));
                 map.put("geoHash",hash);

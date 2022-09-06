@@ -121,9 +121,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         proceed.setOnClickListener(view -> {
             SharedPreferences locationShared = getSharedPreferences("LocationMaps",MODE_PRIVATE);
             SharedPreferences.Editor editor = locationShared.edit();
-//            ref = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid()));
-//            RestLocation restLocation = new RestLocation(String.valueOf(longitude),String.valueOf(latitude));
-//            ref.child("location").setValue(restLocation);
+            ref = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid()));
+            RestLocation restLocation = new RestLocation(String.valueOf(longitude),String.valueOf(latitude));
+            ref.child("location").setValue(restLocation);
             FirebaseFirestore fb = FirebaseFirestore.getInstance();
             SharedPreferences loginInfo = getSharedPreferences("loginInfo",MODE_PRIVATE);
             String hash = GeoFireUtils.getGeoHashForLocation(new GeoLocation(latitude, longitude));

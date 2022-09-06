@@ -187,7 +187,7 @@ public class CampaignActivity extends AppCompatActivity {
                     linearLayout.setVisibility(View.VISIBLE);
 
 
-                    campCurrentName.setText(campName.getText().toString());
+                    campCurrentName.setText("Campaign Name: " + campName.getText().toString());
                     campCurrentCustomers.setText("Total Customers: 0");
                     campCurrentOrders.setText("Total Orders: 0");
                     campCurrentTransactions.setText("Total Transaction: \u20b90");
@@ -211,6 +211,12 @@ public class CampaignActivity extends AppCompatActivity {
 
                             }
                         });
+                        SharedPreferences sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
+                        DatabaseReference addToRTDB = FirebaseDatabase.getInstance().getReference().getRoot().child("Offers").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(auth.getUid());
+                        HashMap<String,String> mapCamInfo = new HashMap<>();
+                        mapCamInfo.put("campName",campName.getText().toString());
+                        mapCamInfo.put("campDiscount",campDiscount.getText().toString());
+                        addToRTDB.child("CampaignInfo").setValue(mapCamInfo);
                         try {
                             RequestQueue requestQueue = Volley.newRequestQueue(CampaignActivity.this);
                             JSONObject main = new JSONObject();
@@ -253,6 +259,9 @@ public class CampaignActivity extends AppCompatActivity {
         });
 
         removeCampButton.setOnClickListener(click -> {
+            SharedPreferences sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
+            DatabaseReference addToRTDB = FirebaseDatabase.getInstance().getReference().getRoot().child("Offers").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(auth.getUid());
+            addToRTDB.child("CampaignInfo").removeValue();
             Toast.makeText(this, "Campaign Removed Successfully", Toast.LENGTH_SHORT).show();
             isCurr = false;
             linearLayout.setVisibility(View.INVISIBLE);
