@@ -237,13 +237,18 @@ public class HomeFrag extends Fragment {
             view.getContext().startActivity(new Intent(requireContext(), ResEarningTrackerActivity.class));
         });
 
-
+        SharedPreferences resInfo = requireContext().getSharedPreferences("RestaurantInfo",Context.MODE_PRIVATE);
 
         AsyncTask.execute(() -> {
             DatabaseReference addToRTDB = FirebaseDatabase.getInstance().getReference().getRoot().child("Offers").child(resInfoShared.getString("state","")).child(resInfoShared.getString("locality",""));
             if(!resInfoShared.contains("addedToRTDB")){
                 GeoFire geoFire = new GeoFire(addToRTDB);
                 geoFire.setLocation(auth.getUid(),new GeoLocation(Double.parseDouble(resInfoShared.getString("lati","")),Double.parseDouble(resInfoShared.getString("longi",""))));
+                HashMap<String,String> map = new HashMap<>();
+                map.put("resName",resInfo.getString("hotelName",""));
+                map.put("resAddress",resInfo.getString("hotelAddress",""));
+                map.put("resContact",resInfo.getString("hotelNumber",""));
+                addToRTDB.child(Objects.requireNonNull(auth.getUid())).child("ResInfo").setValue(map);
                 resInfoSharedEdit.putString("addedToRTDB","yes");
                 resInfoSharedEdit.apply();
             }
