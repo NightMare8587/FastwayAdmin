@@ -68,8 +68,11 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -322,6 +325,7 @@ public class ApproveCurrentOrder extends AppCompatActivity {
         });
 
         approve.setOnClickListener(v -> {
+            new hugeBackgroundWork().execute();
             AsyncTask.execute(() -> {
                 DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("ResAnalysis").child(state).child(sharedPreferences.getString("locality", ""));
                 databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -1028,6 +1032,8 @@ public class ApproveCurrentOrder extends AppCompatActivity {
         }
     }
 
+
+
     public class MakePaymentToVendor extends AsyncTask<Void,Void,Void>{
 
         @Override
@@ -1379,5 +1385,182 @@ public class ApproveCurrentOrder extends AppCompatActivity {
             }
             return null;
         }
+    }
+
+    public class hugeBackgroundWork extends AsyncTask<Void,Void,Void>{
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            String[] monthName = {"January", "February",
+                    "March", "April", "May", "June", "July",
+                    "August", "September", "October", "November",
+                    "December"};
+
+            Calendar calendar = Calendar.getInstance();
+            String month = monthName[calendar.get(Calendar.MONTH)];
+            SharedPreferences dish = getSharedPreferences("DishAnalysis",Context.MODE_PRIVATE);
+
+            if(dish.contains("DishAnalysisMonthBasis")){
+                gson = new Gson();
+                java.lang.reflect.Type types = new TypeToken<HashMap<String, HashMap<String,Integer>>>(){}.getType();
+                String storedHash = dish.getString("DishAnalysisMonthBasis","");
+                HashMap<String,HashMap<String,Integer>> myMap = gson.fromJson(storedHash,types);
+                if(myMap.containsKey(month)){
+                    HashMap<String,Integer> map = new HashMap<>(Objects.requireNonNull(myMap.get(month)));
+
+
+                    Log.i("Dishinfo",map.toString());
+
+                    HashMap<String,Integer> map1 = sortByValue(map);
+                    Log.i("Dishinfo",map1.toString());
+//               Map<String,String> sorted = map
+//                        .entrySet()
+//                        .stream()
+//                        .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
+//                        .collect(
+//                                toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2,
+//                                        LinkedHashMap::new));
+//
+//               Log.i("Dishinfo",map.toString());
+//               Log.i("Dishinfo",sorted.toString());
+//
+                    ArrayList<String> keysName = new ArrayList<>(map1.keySet());
+                    ArrayList<Integer> valuesName = new ArrayList<>(map1.values());
+
+                    Log.i("info",keysName.toString());
+                    Log.i("info",valuesName.toString());
+//
+                    Collections.reverse(keysName);
+                    Collections.reverse(valuesName);
+
+                    String dishName = keysName.get(0);
+                    int timesOrderedDish = valuesName.get(0);
+
+                    SharedPreferences sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
+                    DatabaseReference addToRTDB = FirebaseDatabase.getInstance().getReference().getRoot().child("Offers").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid()));
+                    addToRTDB.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            addToRTDB.child("BestDish").child("name").setValue(dishName);
+                            addToRTDB.child("BestDish").child("timesOrdered").setValue(timesOrderedDish + "");
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
+                        }
+                    });
+//               for(int i=0;i<sorted.size();i++){
+//                   valuesName.add("" + sorted.values().toArray()[i]);
+//                   keysName.add("" + sorted.keySet().toArray()[i]);
+//               }
+//
+//                Log.i("Dishinfo",keysName.toString());
+//                Log.i("Dishinfo",valuesName.toString());
+
+                }
+            }
+
+
+            SharedPreferences sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
+            DatabaseReference storeForFoodineAnalysis = FirebaseDatabase.getInstance().getReference().getRoot().child("FoodineRestaurantDB").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(auth.getUid())
+                    .child(month);
+            storeForFoodineAnalysis.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if(snapshot.exists()){
+                        HashMap<String, String> map = new HashMap<>();
+                        if(snapshot.hasChild("SalesInfo")){
+                            for(DataSnapshot dataSnapshot : snapshot.child("SalesInfo").getChildren()){
+                                map.put(dataSnapshot.getKey(),dataSnapshot.getValue(String.class));
+                            }
+                            int day = calendar.get(Calendar.DAY_OF_MONTH);
+                            if(map.containsKey(day + "")){
+                                double oldVal = Double.parseDouble(map.get(day + ""));
+                                oldVal += Double.parseDouble(orderAmount);
+                                map.put(day + "",oldVal + "");
+                            }else
+                                map.put(day + "",orderAmount + "");
+
+                        }else{
+                            int day = calendar.get(Calendar.DAY_OF_MONTH);
+                            map.put(day + "",orderAmount + "");
+                        }
+                        storeForFoodineAnalysis.child("SalesInfo").setValue(map);
+
+
+                        if(dish.contains("DishAnalysisMonthBasis")) {
+                            gson = new Gson();
+                            java.lang.reflect.Type types = new TypeToken<HashMap<String, HashMap<String, Integer>>>() {
+                            }.getType();
+                            String storedHash = dish.getString("DishAnalysisMonthBasis", "");
+                            HashMap<String, HashMap<String, Integer>> myMap = gson.fromJson(storedHash, types);
+
+                            HashMap<String,Integer> dishmap = new HashMap<>(Objects.requireNonNull(myMap.get(month)));
+
+
+                            Log.i("Dishinfo",dishmap.toString());
+
+                            HashMap<String,Integer> map1 = sortByValue(dishmap);
+                            storeForFoodineAnalysis.child("DishInfo").setValue(map1);
+                        }
+                    }else{
+                        HashMap<String, String> map = new HashMap<>();
+                        int day = calendar.get(Calendar.DAY_OF_MONTH);
+                        map.put(day + "",orderAmount + "");
+                        storeForFoodineAnalysis.child("SalesInfo").setValue(map);
+
+
+                        if(dish.contains("DishAnalysisMonthBasis")) {
+                            gson = new Gson();
+                            java.lang.reflect.Type types = new TypeToken<HashMap<String, HashMap<String, Integer>>>() {
+                            }.getType();
+                            String storedHash = dish.getString("DishAnalysisMonthBasis", "");
+                            HashMap<String, HashMap<String, Integer>> myMap = gson.fromJson(storedHash, types);
+
+                            HashMap<String,Integer> dishmap = new HashMap<>(Objects.requireNonNull(myMap.get(month)));
+
+
+                            Log.i("Dishinfo",dishmap.toString());
+
+                            HashMap<String,Integer> map1 = sortByValue(dishmap);
+                            storeForFoodineAnalysis.child("DishInfo").setValue(map1);
+                        }
+
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+
+
+            return null;
+        }
+    }
+
+    public static HashMap<String, Integer>
+    sortByValue(HashMap<String, Integer> hm)
+    {
+        // Create a list from elements of HashMap
+        List<Map.Entry<String, Integer> > list
+                = new LinkedList<Map.Entry<String, Integer> >(
+                hm.entrySet());
+
+        // Sort the list using lambda expression
+        Collections.sort(
+                list,
+                (i1,
+                 i2) -> i1.getValue().compareTo(i2.getValue()));
+
+        // put data from sorted list to hashmap
+        HashMap<String, Integer> temp
+                = new LinkedHashMap<String, Integer>();
+        for (Map.Entry<String, Integer> aa : list) {
+            temp.put(aa.getKey(), aa.getValue());
+        }
+        return temp;
     }
 }

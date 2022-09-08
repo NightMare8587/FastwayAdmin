@@ -130,7 +130,6 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
     String testPaymentToVendor = "https://intercellular-stabi.000webhostapp.com/CheckoutPayouts/test/testPayment.php";
     String prodPaymentToVendor = "https://intercellular-stabi.000webhostapp.com/CheckoutPayouts/PaymentToVendor.php";
     FirebaseAuth auth = FirebaseAuth.getInstance();
-    DatabaseReference databaseReference;
     List<String> halfOr;
     String url = "https://intercellular-stabi.000webhostapp.com/refunds/initiateRefund.php";
     DatabaseReference saveRefundInfo;
@@ -145,7 +144,6 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
     String time;
     ListView listView,dishNames,halfOrList;
     Button showCustom;
-    DatabaseReference checkForCustomisation;
     SharedPreferences.Editor userFedit;
     String id,orderId,orderAmount;
     String URL = "https://fcm.googleapis.com/fcm/send";
@@ -209,9 +207,9 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                      public void onDataChange(@NonNull DataSnapshot snapshot) {
 
 
-                         if(snapshot.child("dishType").getValue(String.class).equals("Veg"))
+                         if(Objects.equals(snapshot.child("dishType").getValue(String.class), "Veg"))
                              veg++;
-                         else if(snapshot.child("dishType").getValue(String.class).equals("NonVeg"))
+                         else if(Objects.equals(snapshot.child("dishType").getValue(String.class), "NonVeg"))
                              nonVeg++;
                          else
                              vegan++;
@@ -643,7 +641,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                                         json = trackingOfTakeAway.getString(month,"");
                                         HashMap<String,String> map = gson.fromJson(json,type);
                                         if(map.containsKey(calendar.get(Calendar.DAY_OF_MONTH) + "")){
-                                            int currentVal = Integer.parseInt(map.get(calendar.get(Calendar.DAY_OF_MONTH) + ""));
+                                            int currentVal = Integer.parseInt(Objects.requireNonNull(map.get(calendar.get(Calendar.DAY_OF_MONTH) + "")));
                                             currentVal++;
                                             map.put(calendar.get(Calendar.DAY_OF_MONTH) + "",currentVal + "");
                                         }else{
@@ -871,7 +869,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                                         public Map<String, String> getHeaders() {
                                             Map<String, String> header = new HashMap<>();
                                             header.put("content-type", "application/json");
-                                            header.put("authorization", "key=AAAAsigSEMs:APA91bEUF9ZFwIu84Jctci56DQd0TQOepztGOIKIBhoqf7N3ueQrkClw0xBTlWZEWyvwprXZmZgW2MNywF1pNBFpq1jFBr0CmlrJ0wygbZIBOnoZ0jP1zZC6nPxqF2MAP6iF3wuBHD2R");
+                                            header.put("authorization", "key=AAAAjq_WsHs:APA91bGZV-uH-NJddxIniy8h1tDGDHqxhgvFdyNRDaV_raxjvSM_FkKu7JSwtSp4Q_iSmPuTKGGIB2M_07c9rKgPXUH43-RzpK6zkaSaIaNgmeiwUO40rYxYUZAkKoLAQQVeVJ7mXboD");
                                             return header;
                                         }
                                     };
@@ -1128,7 +1126,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                             public Map<String, String> getHeaders() {
                                 Map<String, String> header = new HashMap<>();
                                 header.put("content-type", "application/json");
-                                header.put("authorization", "key=AAAAsigSEMs:APA91bEUF9ZFwIu84Jctci56DQd0TQOepztGOIKIBhoqf7N3ueQrkClw0xBTlWZEWyvwprXZmZgW2MNywF1pNBFpq1jFBr0CmlrJ0wygbZIBOnoZ0jP1zZC6nPxqF2MAP6iF3wuBHD2R");
+                                header.put("authorization", "key=AAAAjq_WsHs:APA91bGZV-uH-NJddxIniy8h1tDGDHqxhgvFdyNRDaV_raxjvSM_FkKu7JSwtSp4Q_iSmPuTKGGIB2M_07c9rKgPXUH43-RzpK6zkaSaIaNgmeiwUO40rYxYUZAkKoLAQQVeVJ7mXboD");
                                 return header;
                             }
                         };
@@ -1434,7 +1432,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                                 public Map<String, String> getHeaders() {
                                     Map<String, String> header = new HashMap<>();
                                     header.put("content-type", "application/json");
-                                    header.put("authorization", "key=AAAAsigSEMs:APA91bEUF9ZFwIu84Jctci56DQd0TQOepztGOIKIBhoqf7N3ueQrkClw0xBTlWZEWyvwprXZmZgW2MNywF1pNBFpq1jFBr0CmlrJ0wygbZIBOnoZ0jP1zZC6nPxqF2MAP6iF3wuBHD2R");
+                                    header.put("authorization", "key=AAAAjq_WsHs:APA91bGZV-uH-NJddxIniy8h1tDGDHqxhgvFdyNRDaV_raxjvSM_FkKu7JSwtSp4Q_iSmPuTKGGIB2M_07c9rKgPXUH43-RzpK6zkaSaIaNgmeiwUO40rYxYUZAkKoLAQQVeVJ7mXboD");
                                     return header;
                                 }
                             };
@@ -1510,7 +1508,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                                     public Map<String, String> getHeaders() throws AuthFailureError {
                                         Map<String, String> header = new HashMap<>();
                                         header.put("content-type", "application/json");
-                                        header.put("authorization", "key=AAAAsigSEMs:APA91bEUF9ZFwIu84Jctci56DQd0TQOepztGOIKIBhoqf7N3ueQrkClw0xBTlWZEWyvwprXZmZgW2MNywF1pNBFpq1jFBr0CmlrJ0wygbZIBOnoZ0jP1zZC6nPxqF2MAP6iF3wuBHD2R");
+                                        header.put("authorization", "key=AAAAjq_WsHs:APA91bGZV-uH-NJddxIniy8h1tDGDHqxhgvFdyNRDaV_raxjvSM_FkKu7JSwtSp4Q_iSmPuTKGGIB2M_07c9rKgPXUH43-RzpK6zkaSaIaNgmeiwUO40rYxYUZAkKoLAQQVeVJ7mXboD");
                                         return header;
                                     }
                                 };
@@ -1549,7 +1547,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                                     public Map<String, String> getHeaders() {
                                         Map<String, String> header = new HashMap<>();
                                         header.put("content-type", "application/json");
-                                        header.put("authorization", "key=AAAAsigSEMs:APA91bEUF9ZFwIu84Jctci56DQd0TQOepztGOIKIBhoqf7N3ueQrkClw0xBTlWZEWyvwprXZmZgW2MNywF1pNBFpq1jFBr0CmlrJ0wygbZIBOnoZ0jP1zZC6nPxqF2MAP6iF3wuBHD2R");
+                                        header.put("authorization", "key=AAAAjq_WsHs:APA91bGZV-uH-NJddxIniy8h1tDGDHqxhgvFdyNRDaV_raxjvSM_FkKu7JSwtSp4Q_iSmPuTKGGIB2M_07c9rKgPXUH43-RzpK6zkaSaIaNgmeiwUO40rYxYUZAkKoLAQQVeVJ7mXboD");
                                         return header;
                                     }
                                 };
@@ -2074,15 +2072,6 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
         }
     }
 
-    public static class UpdateTakeAwayOrders extends AsyncTask<Void,Void,Void>{
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-
-
-            return null;
-        }
-    }
 
 //    public String getFilePath(){
 //        ContextWrapper contextWrapper = new ContextWrapper(getApplicationContext());
@@ -2164,6 +2153,81 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
 
                 }
             }
+
+
+            SharedPreferences sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
+            DatabaseReference storeForFoodineAnalysis = FirebaseDatabase.getInstance().getReference().getRoot().child("FoodineRestaurantDB").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(auth.getUid())
+                    .child(month);
+            storeForFoodineAnalysis.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if(snapshot.exists()){
+                        HashMap<String, String> map = new HashMap<>();
+                        if(snapshot.hasChild("SalesInfo")){
+                            for(DataSnapshot dataSnapshot : snapshot.child("SalesInfo").getChildren()){
+                                map.put(dataSnapshot.getKey(),dataSnapshot.getValue(String.class));
+                            }
+                            int day = calendar.get(Calendar.DAY_OF_MONTH);
+                            if(map.containsKey(day + "")){
+                                double oldVal = Double.parseDouble(map.get(day + ""));
+                                oldVal += Double.parseDouble(orderAmount);
+                                map.put(day + "",oldVal + "");
+                            }else
+                                map.put(day + "",orderAmount + "");
+
+                        }else{
+                            int day = calendar.get(Calendar.DAY_OF_MONTH);
+                            map.put(day + "",orderAmount + "");
+                        }
+                        storeForFoodineAnalysis.child("SalesInfo").setValue(map);
+
+
+                        if(dish.contains("DishAnalysisMonthBasis")) {
+                            gson = new Gson();
+                            java.lang.reflect.Type types = new TypeToken<HashMap<String, HashMap<String, Integer>>>() {
+                            }.getType();
+                            String storedHash = dish.getString("DishAnalysisMonthBasis", "");
+                            HashMap<String, HashMap<String, Integer>> myMap = gson.fromJson(storedHash, types);
+
+                            HashMap<String,Integer> dishmap = new HashMap<>(Objects.requireNonNull(myMap.get(month)));
+
+
+                            Log.i("Dishinfo",dishmap.toString());
+
+                            HashMap<String,Integer> map1 = sortByValue(dishmap);
+                            storeForFoodineAnalysis.child("DishInfo").setValue(map1);
+                        }
+                    }else{
+                        HashMap<String, String> map = new HashMap<>();
+                        int day = calendar.get(Calendar.DAY_OF_MONTH);
+                        map.put(day + "",orderAmount + "");
+                        storeForFoodineAnalysis.child("SalesInfo").setValue(map);
+
+
+                        if(dish.contains("DishAnalysisMonthBasis")) {
+                            gson = new Gson();
+                            java.lang.reflect.Type types = new TypeToken<HashMap<String, HashMap<String, Integer>>>() {
+                            }.getType();
+                            String storedHash = dish.getString("DishAnalysisMonthBasis", "");
+                            HashMap<String, HashMap<String, Integer>> myMap = gson.fromJson(storedHash, types);
+
+                            HashMap<String,Integer> dishmap = new HashMap<>(Objects.requireNonNull(myMap.get(month)));
+
+
+                            Log.i("Dishinfo",dishmap.toString());
+
+                            HashMap<String,Integer> map1 = sortByValue(dishmap);
+                            storeForFoodineAnalysis.child("DishInfo").setValue(map1);
+                        }
+
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
 
 
             return null;
