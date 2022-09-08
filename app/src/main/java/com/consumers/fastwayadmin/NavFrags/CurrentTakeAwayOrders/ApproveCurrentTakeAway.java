@@ -2181,6 +2181,37 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                         }
                         storeForFoodineAnalysis.child("SalesInfo").setValue(map);
 
+                        DatabaseReference storeForFoodineDailyTrack = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("FoodineDailyTrack")
+                                .child(month);
+                        storeForFoodineDailyTrack.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                if(snapshot.exists()){
+                                    int day = calendar.get(Calendar.DAY_OF_MONTH);
+                                    HashMap<String,String> foodineTrack = (HashMap<String, String>) snapshot.getValue();
+                                    if(foodineTrack.containsKey(day + ""))
+                                    {
+                                        double oldVal = Double.parseDouble(foodineTrack.get(day + ""));
+                                        oldVal += Double.parseDouble(orderAmount);
+                                        foodineTrack.put(day + "",oldVal + "");
+                                    }else
+                                        foodineTrack.put(day + "",orderAmount + "");
+
+                                    storeForFoodineDailyTrack.setValue(foodineTrack);
+                                }else{
+                                    int day = calendar.get(Calendar.DAY_OF_MONTH);
+                                    HashMap<String,String> foodineTrack = new HashMap<>();
+                                    foodineTrack.put(day + "",orderAmount + "");
+                                    storeForFoodineDailyTrack.setValue(foodineTrack);
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+
+                            }
+                        });
+
 
                         if(dish.contains("DishAnalysisMonthBasis")) {
                             gson = new Gson();
@@ -2203,6 +2234,36 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                         map.put(day + "",orderAmount + "");
                         storeForFoodineAnalysis.child("SalesInfo").setValue(map);
 
+                        DatabaseReference storeForFoodineDailyTrack = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("FoodineDailyTrack")
+                                .child(month);
+                        storeForFoodineDailyTrack.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                if(snapshot.exists()){
+                                    int day = calendar.get(Calendar.DAY_OF_MONTH);
+                                    HashMap<String,String> foodineTrack = (HashMap<String, String>) snapshot.getValue();
+                                    if(foodineTrack.containsKey(day + ""))
+                                    {
+                                        double oldVal = Double.parseDouble(foodineTrack.get(day + ""));
+                                        oldVal += Double.parseDouble(orderAmount);
+                                        foodineTrack.put(day + "",oldVal + "");
+                                    }else
+                                        foodineTrack.put(day + "",orderAmount + "");
+
+                                    storeForFoodineDailyTrack.setValue(foodineTrack);
+                                }else{
+                                    int day = calendar.get(Calendar.DAY_OF_MONTH);
+                                    HashMap<String,String> foodineTrack = new HashMap<>();
+                                    foodineTrack.put(day + "",orderAmount + "");
+                                    storeForFoodineDailyTrack.setValue(foodineTrack);
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+
+                            }
+                        });
 
                         if(dish.contains("DishAnalysisMonthBasis")) {
                             gson = new Gson();

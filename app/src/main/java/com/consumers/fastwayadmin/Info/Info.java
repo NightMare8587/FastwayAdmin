@@ -397,21 +397,21 @@ public class Info extends AppCompatActivity {
 
             if (optForTakeaway.isChecked()) {
                 map.put("TakeAwayAllowed","yes");
-//                infoRef.child("TakeAwayAllowed").setValue("yes");
+                infoRef.child("TakeAwayAllowed").setValue("yes");
                 this.editor.putString("TakeAwayAllowed", "yes");
             } else {
                 map.put("TakeAwayAllowed","no");
-//                infoRef.child("TakeAwayAllowed").setValue("no");
+                infoRef.child("TakeAwayAllowed").setValue("no");
                 this.editor.putString("TakeAwayAllowed", "no");
             }
 
             if (optForTableBook.isChecked()) {
                 map.put("TableBookAllowed","yes");
-//                infoRef.child("TableBookAllowed").setValue("yes");
+                infoRef.child("TableBookAllowed").setValue("yes");
                 this.editor.putString("TableBookAllowed", "yes");
             } else {
                 map.put("TableBookAllowed","no");
-//                infoRef.child("TableBookAllowed").setValue("no");
+                infoRef.child("TableBookAllowed").setValue("no");
                 this.editor.putString("TableBookAllowed", "no");
             }
 
@@ -449,7 +449,7 @@ public class Info extends AppCompatActivity {
                 startActivity(intent);
             }).setNegativeButton("Skip", (dialogInterface, i) -> {
                 dialogInterface.dismiss();
-//                infoRef.child("DisplayImage").setValue("");
+                infoRef.child("DisplayImage").setValue("");
                 startActivity(new Intent(Info.this, UploadRequiredDocuments.class));
                 finish();
             }).create();

@@ -176,18 +176,18 @@ public class AccountSettingsFragment extends PreferenceFragmentCompat {
             Toast.makeText(requireContext(), "" + newValue, Toast.LENGTH_SHORT).show();
 
             FirebaseFirestore firestore = FirebaseFirestore.getInstance();
-//            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(login.getString("state","")).child(login.getString("locality","")).child(UID);
+            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(login.getString("state","")).child(login.getString("locality","")).child(UID);
             boolean isChecked = (boolean) newValue;
             if(isChecked){
                 firestore.collection(login.getString("state","")).document("Restaurants").collection(login.getString("locality","")).document(UID)
                         .update("TakeAwayAllowed","yes");
-//                databaseReference.child("TakeAwayAllowed").setValue("yes");
+                databaseReference.child("TakeAwayAllowed").setValue("yes");
 //                        takeaway.setChecked(true);
                 sharedEdit.putString("TakeAwayAllowed","yes");
             }else{
                 firestore.collection(login.getString("state","")).document("Restaurants").collection(login.getString("locality","")).document(UID)
                         .update("TakeAwayAllowed","no");
-//                databaseReference.child("TakeAwayAllowed").setValue("no");
+                databaseReference.child("TakeAwayAllowed").setValue("no");
 //                        takeaway.setChecked(false);
                 sharedEdit.putString("TakeAwayAllowed","no");
 
@@ -204,18 +204,18 @@ public class AccountSettingsFragment extends PreferenceFragmentCompat {
                     FirebaseFirestore firestore = FirebaseFirestore.getInstance();
                     SharedPreferences login = requireContext().getSharedPreferences("loginInfo",MODE_PRIVATE);
 //                    Toast.makeText(requireContext(), "" + newValue, Toast.LENGTH_SHORT).show();
-//                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(login.getString("state","")).child(login.getString("locality","")).child(UID);
+                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(login.getString("state","")).child(login.getString("locality","")).child(UID);
                     boolean isChecked = (boolean) newValue;
                     if(isChecked){
                         firestore.collection(login.getString("state","")).document("Restaurants").collection(login.getString("locality","")).document(UID)
                                 .update("TableBookAllowed","yes");
-//                        databaseReference.child("TableBookAllowed").setValue("yes");
+                        databaseReference.child("TableBookAllowed").setValue("yes");
 //                        takeaway.setChecked(true);
                         sharedEdit.putString("TableBookAllowed","yes");
                     }else{
                         firestore.collection(login.getString("state","")).document("Restaurants").collection(login.getString("locality","")).document(UID)
                                 .update("TableBookAllowed","no");
-//                        databaseReference.child("TableBookAllowed").setValue("no");
+                        databaseReference.child("TableBookAllowed").setValue("no");
 //                        takeaway.setChecked(false);
                         sharedEdit.putString("TableBookAllowed","no");
 
