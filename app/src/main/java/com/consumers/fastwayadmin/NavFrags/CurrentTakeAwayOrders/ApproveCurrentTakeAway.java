@@ -2167,7 +2167,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                             for(DataSnapshot dataSnapshot : snapshot.child("SalesInfo").getChildren()){
                                 map.put(dataSnapshot.getKey(),dataSnapshot.getValue(String.class));
                             }
-                            int day = calendar.get(Calendar.DAY_OF_MONTH);
+                            String day = "Day" + calendar.get(Calendar.DAY_OF_MONTH);
                             if(map.containsKey(day + "")){
                                 double oldVal = Double.parseDouble(map.get(day + ""));
                                 oldVal += Double.parseDouble(orderAmount);
@@ -2176,7 +2176,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                                 map.put(day + "",orderAmount + "");
 
                         }else{
-                            int day = calendar.get(Calendar.DAY_OF_MONTH);
+                            String day = "Day" +  calendar.get(Calendar.DAY_OF_MONTH);
                             map.put(day + "",orderAmount + "");
                         }
                         storeForFoodineAnalysis.child("SalesInfo").setValue(map);
@@ -2187,7 +2187,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot snapshot) {
                                 if(snapshot.exists()){
-                                    int day = calendar.get(Calendar.DAY_OF_MONTH);
+                                    String day = "Day" + calendar.get(Calendar.DAY_OF_MONTH);
                                     HashMap<String,String> foodineTrack = (HashMap<String, String>) snapshot.getValue();
                                     if(foodineTrack.containsKey(day + ""))
                                     {
@@ -2199,7 +2199,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
 
                                     storeForFoodineDailyTrack.setValue(foodineTrack);
                                 }else{
-                                    int day = calendar.get(Calendar.DAY_OF_MONTH);
+                                    String day = "Day" +  calendar.get(Calendar.DAY_OF_MONTH);
                                     HashMap<String,String> foodineTrack = new HashMap<>();
                                     foodineTrack.put(day + "",orderAmount + "");
                                     storeForFoodineDailyTrack.setValue(foodineTrack);
@@ -2230,7 +2230,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                         }
                     }else{
                         HashMap<String, String> map = new HashMap<>();
-                        int day = calendar.get(Calendar.DAY_OF_MONTH);
+                        String day = "Day" + calendar.get(Calendar.DAY_OF_MONTH);
                         map.put(day + "",orderAmount + "");
                         storeForFoodineAnalysis.child("SalesInfo").setValue(map);
 
@@ -2240,7 +2240,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot snapshot) {
                                 if(snapshot.exists()){
-                                    int day = calendar.get(Calendar.DAY_OF_MONTH);
+                                    String day = "Day" + calendar.get(Calendar.DAY_OF_MONTH);
                                     HashMap<String,String> foodineTrack = (HashMap<String, String>) snapshot.getValue();
                                     if(foodineTrack.containsKey(day + ""))
                                     {
@@ -2252,7 +2252,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
 
                                     storeForFoodineDailyTrack.setValue(foodineTrack);
                                 }else{
-                                    int day = calendar.get(Calendar.DAY_OF_MONTH);
+                                    String day = "Day" + calendar.get(Calendar.DAY_OF_MONTH);
                                     HashMap<String,String> foodineTrack = new HashMap<>();
                                     foodineTrack.put(day + "",orderAmount + "");
                                     storeForFoodineDailyTrack.setValue(foodineTrack);
