@@ -102,6 +102,8 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
     SharedPreferences storeDailyTotalOrdersMade;
     SharedPreferences.Editor storeDailyEditor;
     FirebaseStorage storage;
+    SharedPreferences dailyAverageOrder;
+    SharedPreferences.Editor averageEditor;
     Gson gson;
     String json;
     double amountToBeSend;
@@ -173,6 +175,8 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
         StrictMode.setVmPolicy(builders.build());
         scaled = Bitmap.createScaledBitmap(bmp,500,500,false);
         storeForDishAnalysis = getSharedPreferences("DishAnalysis",MODE_PRIVATE);
+        dailyAverageOrder = getSharedPreferences("DailyAverageOrderMonthly",MODE_PRIVATE);
+        averageEditor = dailyAverageOrder.edit();
         dishAnalysis = storeForDishAnalysis.edit();
         bmp1 = BitmapFactory.decodeResource(getResources(), R.drawable.orderdeclined);
         scaled1 = Bitmap.createScaledBitmap(bmp1,500,500,false);
@@ -568,6 +572,57 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                                         dishAnalysis.putString("DishAnalysisMonthBasis", gson.toJson(map));
                                     }
                                     dishAnalysis.apply();
+
+                                    if(dailyAverageOrder.contains(month)){
+                                        gson = new Gson();
+                                        java.lang.reflect.Type type = new TypeToken<List<List<String>>>() {
+                                        }.getType();
+                                        List<List<String>> mainList = gson.fromJson(dailyAverageOrder.getString(month,""),type);
+                                        List<String> day = new ArrayList<>(mainList.get(0));
+                                        List<String> times = new ArrayList<>(mainList.get(1));
+                                        List<String> amount = new ArrayList<>(mainList.get(2));
+                                        int dayCal = calendar.get(Calendar.DAY_OF_MONTH);
+                                        if(Integer.parseInt(day.get(day.size() - 1)) == dayCal){
+                                            int timesToday = Integer.parseInt(times.get(times.size() - 1));
+                                            timesToday++;
+                                            double prev = Double.parseDouble(amount.get(amount.size()-1));
+                                            prev += Double.parseDouble(orderAmount);
+
+                                            double newVal = prev / timesToday;
+
+                                            amount.set(amount.size()-1,String.valueOf(newVal));
+                                            times.set(times.size()-1,timesToday + "");
+                                        }else
+                                        {
+                                            day.add(dayCal + "");
+                                            amount.add(orderAmount);
+                                            times.add("1");
+                                        }
+
+                                        List<List<String>> newList = new ArrayList<>();
+                                        newList.add(day);
+                                        newList.add(times);
+                                        newList.add(amount);
+
+                                        averageEditor.putString(month,gson.toJson(newList));
+
+                                    }else{
+                                        int dayCal = calendar.get(Calendar.DAY_OF_MONTH);
+                                        List<List<String>> newList = new ArrayList<>();
+                                        List<String> day = new ArrayList<>();
+                                        day.add(dayCal + "");
+                                        List<String> times = new ArrayList<>();
+                                        times.add("1");
+                                        List<String> amount = new ArrayList<>();
+                                        amount.add(orderAmount);
+                                        newList.add(day);
+                                        newList.add(times);
+                                        newList.add(amount);
+
+                                        averageEditor.putString(month,gson.toJson(newList));
+                                    } averageEditor.apply();
+
+
                                     totalOrders.addListenerForSingleValueEvent(new ValueEventListener() {
                                         @Override
                                         public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -1872,6 +1927,55 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                         storeDailyEditor.apply();
                         Log.i("myInfo", mainDataList.toString() + " " + mainList.toString());
                     }
+
+                    if(dailyAverageOrder.contains(month)){
+                        gson = new Gson();
+                        java.lang.reflect.Type type = new TypeToken<List<List<String>>>() {
+                        }.getType();
+                        List<List<String>> mainList = gson.fromJson(dailyAverageOrder.getString(month,""),type);
+                        List<String> day = new ArrayList<>(mainList.get(0));
+                        List<String> times = new ArrayList<>(mainList.get(1));
+                        List<String> amount = new ArrayList<>(mainList.get(2));
+                        int dayCal = calendar.get(Calendar.DAY_OF_MONTH);
+                        if(Integer.parseInt(day.get(day.size() - 1)) == dayCal){
+                            int timesToday = Integer.parseInt(times.get(times.size() - 1));
+                            timesToday++;
+                            double prev = Double.parseDouble(amount.get(amount.size()-1));
+                            prev += Double.parseDouble(orderAmount);
+
+                            double newVal = prev / timesToday;
+
+                            amount.set(amount.size()-1,String.valueOf(newVal));
+                            times.set(times.size()-1,timesToday + "");
+                        }else
+                        {
+                            day.add(dayCal + "");
+                            amount.add(orderAmount);
+                            times.add("1");
+                        }
+
+                        List<List<String>> newList = new ArrayList<>();
+                        newList.add(day);
+                        newList.add(times);
+                        newList.add(amount);
+
+                        averageEditor.putString(month,gson.toJson(newList));
+
+                    }else{
+                        int dayCal = calendar.get(Calendar.DAY_OF_MONTH);
+                        List<List<String>> newList = new ArrayList<>();
+                        List<String> day = new ArrayList<>();
+                        day.add(dayCal + "");
+                        List<String> times = new ArrayList<>();
+                        times.add("1");
+                        List<String> amount = new ArrayList<>();
+                        amount.add(orderAmount);
+                        newList.add(day);
+                        newList.add(times);
+                        newList.add(amount);
+
+                        averageEditor.putString(month,gson.toJson(newList));
+                    } averageEditor.apply();
                     Log.i("here", "4444");
                     File file = new File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "RestaurantEarningTracker.xlsx");
                     try {

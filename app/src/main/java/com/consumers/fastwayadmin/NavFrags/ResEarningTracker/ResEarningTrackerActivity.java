@@ -61,6 +61,7 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
     double totalResDineWayOverAll = 0;
     double totalResOver = 0;
     Calendar calendar;
+    BarChart mBarChart;
 //    int overVeg = 0,overNon = 0,overVegan = 0,resVegVal = 0,resVeganVal = 0,resNonVal = 0;
     boolean resAvailable = false;
     boolean overallAvailable = false;
@@ -200,7 +201,7 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
         recyclerView = findViewById(R.id.monthNamesListViewRes);
         allMonthsNames = new ArrayList<>(Arrays.asList(monthName));
         currentDay = calendar.get(Calendar.DAY_OF_MONTH);
-        BarChart mBarChart = findViewById(R.id.barchart);
+         mBarChart = findViewById(R.id.barchart);
 
 
 //        recyclerView = findViewById(R.id.monthNamesListViewRes);
@@ -347,6 +348,7 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
             // Get extra data included in the Intent
             String MonthName = intent.getStringExtra("month");
             currentMonthNameViewing.setText("Month: " + MonthName);
+            mBarChart.clearChart();
             if(storeOrdersForAdminInfo.contains(MonthName)){
                 java.lang.reflect.Type type = new TypeToken<List<List<String>>>() {
                 }.getType();
@@ -367,7 +369,6 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
                 totalTransactionsMade.setText("Total Transactions Amount: \u20B9" + 0);
                 Toast.makeText(context, "No transactions made in Month " + MonthName, Toast.LENGTH_SHORT).show();
             }
-            BarChart mBarChart = findViewById(R.id.barchart);
 
 //            ValueLineSeries series = new ValueLineSeries();
 //            series.setColor(0xFF56B7F1);

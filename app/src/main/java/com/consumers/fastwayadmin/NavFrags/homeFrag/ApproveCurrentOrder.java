@@ -84,6 +84,8 @@ public class ApproveCurrentOrder extends AppCompatActivity {
     Gson gson;
     String json;
     SharedPreferences trackingOfTakeAway;
+    SharedPreferences dailyAverageOrder;
+    SharedPreferences.Editor averageEditor;
     SharedPreferences.Editor trackingDineAndWay;
     int veg = 0;
     int nonVeg = 0;
@@ -170,6 +172,8 @@ public class ApproveCurrentOrder extends AppCompatActivity {
         StrictMode.VmPolicy.Builder builders = new StrictMode.VmPolicy.Builder();
         StrictMode.setVmPolicy(builders.build());
         storeOrdersForAdminInfo = getSharedPreferences("StoreOrders",MODE_PRIVATE);
+        dailyAverageOrder = getSharedPreferences("DailyAverageOrderMonthly",MODE_PRIVATE);
+        averageEditor = dailyAverageOrder.edit();
         storeEditor = storeOrdersForAdminInfo.edit();
         showCustomisation = findViewById(R.id.showCustomisationButton);
         storeTotalAmountMonth = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid());
@@ -525,6 +529,55 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                     }
                     dishAnalysis.apply();
 
+
+                    if(dailyAverageOrder.contains(month)){
+                        gson = new Gson();
+                        java.lang.reflect.Type type = new TypeToken<List<List<String>>>() {
+                        }.getType();
+                        List<List<String>> mainList = gson.fromJson(dailyAverageOrder.getString(month,""),type);
+                        List<String> day = new ArrayList<>(mainList.get(0));
+                        List<String> times = new ArrayList<>(mainList.get(1));
+                        List<String> amount = new ArrayList<>(mainList.get(2));
+                        int dayCal = calendar.get(Calendar.DAY_OF_MONTH);
+                        if(Integer.parseInt(day.get(day.size() - 1)) == dayCal){
+                            int timesToday = Integer.parseInt(times.get(times.size() - 1));
+                            timesToday++;
+                            double prev = Double.parseDouble(amount.get(amount.size()-1));
+                            prev += Double.parseDouble(orderAmount);
+
+                            double newVal = prev / timesToday;
+
+                            amount.set(amount.size()-1,String.valueOf(newVal));
+                            times.set(times.size()-1,timesToday + "");
+                        }else
+                        {
+                            day.add(dayCal + "");
+                            amount.add(orderAmount);
+                            times.add("1");
+                        }
+
+                        List<List<String>> newList = new ArrayList<>();
+                        newList.add(day);
+                        newList.add(times);
+                        newList.add(amount);
+
+                        averageEditor.putString(month,gson.toJson(newList));
+
+                    }else{
+                        int dayCal = calendar.get(Calendar.DAY_OF_MONTH);
+                        List<List<String>> newList = new ArrayList<>();
+                        List<String> day = new ArrayList<>();
+                        day.add(dayCal + "");
+                        List<String> times = new ArrayList<>();
+                        times.add("1");
+                        List<String> amount = new ArrayList<>();
+                        amount.add(orderAmount);
+                        newList.add(day);
+                        newList.add(times);
+                        newList.add(amount);
+
+                        averageEditor.putString(month,gson.toJson(newList));
+                    } averageEditor.apply();
 
                     if(trackingOfTakeAway.contains(month)){
                         java.lang.reflect.Type type = new TypeToken<HashMap<String,String>>() {

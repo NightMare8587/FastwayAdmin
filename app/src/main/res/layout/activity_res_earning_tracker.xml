@@ -280,7 +280,9 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:layout_marginEnd="20dp"
                 android:text="Restaurant"
+                android:textAlignment="viewEnd"
                 android:textColor="@color/quantum_purple"
                 android:textSize="15sp" />
         </LinearLayout>
@@ -316,6 +318,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Restaurant"
+                android:layout_marginEnd="20dp"
+                android:textAlignment="viewEnd"
                 android:textColor="@color/quantum_purple"
                 android:textSize="15sp" />
         </LinearLayout>
