@@ -781,7 +781,7 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                 SharedPreferences storeTablePayInEnd = getSharedPreferences("StoreDataForPayInEnd",MODE_PRIVATE);
                 SharedPreferences.Editor storePayInEndEdit = storeTablePayInEnd.edit();
 
-                
+
 //                if(storeTablePayInEnd.contains(table) && storeTablePayInEnd.getString(table,"").equals(id)){
 //                    double val = Double.parseDouble(restaurantDailyTrack.getString("totalTransactionsToday", ""));
 //                    val = val + Double.parseDouble(orderAmount);
