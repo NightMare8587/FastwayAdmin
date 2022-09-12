@@ -778,6 +778,35 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                     }
                 });
 
+                SharedPreferences storeTablePayInEnd = getSharedPreferences("StoreDataForPayInEnd",MODE_PRIVATE);
+                SharedPreferences.Editor storePayInEndEdit = storeTablePayInEnd.edit();
+
+                
+//                if(storeTablePayInEnd.contains(table) && storeTablePayInEnd.getString(table,"").equals(id)){
+//                    double val = Double.parseDouble(restaurantDailyTrack.getString("totalTransactionsToday", ""));
+//                    val = val + Double.parseDouble(orderAmount);
+//                    restaurantTrackEditor.putString("totalTransactionsToday", String.valueOf(val));
+//                    restaurantTrackEditor.apply();
+//                }else {
+//                    storePayInEndEdit.putString(table,id);
+//                    storePayInEndEdit.apply();
+//                    if (restaurantDailyTrack.contains("totalOrdersToday")) {
+//                        int val = Integer.parseInt(restaurantDailyTrack.getString("totalOrdersToday", ""));
+//                        val = val + 1;
+//                        restaurantTrackEditor.putString("totalOrdersToday", String.valueOf(val));
+//                    } else {
+//                        restaurantTrackEditor.putString("totalOrdersToday", String.valueOf(1));
+//                    }
+//
+//                    if (restaurantDailyTrack.contains("totalTransactionsToday")) {
+//                        double val = Double.parseDouble(restaurantDailyTrack.getString("totalTransactionsToday", ""));
+//                        val = val + Double.parseDouble(orderAmount);
+//                        restaurantTrackEditor.putString("totalTransactionsToday", String.valueOf(val));
+//                    } else {
+//                        restaurantTrackEditor.putString("totalTransactionsToday", String.valueOf(orderAmount));
+//                    }
+//                }
+
                 SharedPreferences checkPrem = getSharedPreferences("AdminPremiumDetails", MODE_PRIVATE);
                 if (checkPrem.contains("status") && checkPrem.getString("status", "").equals("active")) {
                     String month = monthName[calendar.get(Calendar.MONTH)];
@@ -827,7 +856,7 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                         json = trackingOfTakeAway.getString(month,"");
                         HashMap<String,String> map = gson.fromJson(json,type);
                         if(map.containsKey(calendar.get(Calendar.DAY_OF_MONTH) + "")){
-                            int currentVal = Integer.parseInt(map.get(calendar.get(Calendar.DAY_OF_MONTH) + ""));
+                            int currentVal = Integer.parseInt(Objects.requireNonNull(map.get(calendar.get(Calendar.DAY_OF_MONTH) + "")));
                             currentVal++;
                             map.put(calendar.get(Calendar.DAY_OF_MONTH) + "",currentVal + "");
                         }else{
