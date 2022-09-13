@@ -156,6 +156,7 @@
                 android:id="@+id/overallVeg"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:textStyle="bold"
                 android:layout_weight="1"
                 android:text="veg"
                 android:layout_gravity="start"
@@ -167,6 +168,7 @@
                 android:id="@+id/overallNon"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:textStyle="bold"
                 android:layout_weight="1"
                 android:layout_gravity="start"
                 android:textAlignment="textStart"
@@ -182,6 +184,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="vegan"
+                android:textStyle="bold"
                 android:textColor="@color/purple_200"
                 android:textSize="15sp" />
 
@@ -193,6 +196,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
             android:layout_marginTop="5dp"
+
             android:fontFamily="@font/inter"
             android:text="Your Area"
             android:textColor="@color/black"
@@ -222,6 +226,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_gravity="start"
+                android:textStyle="bold"
                 android:textAlignment="textStart"
                 android:text="veg"
                 android:textColor="@color/green_connectify"
@@ -233,6 +238,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="nonVeg"
+                android:textStyle="bold"
                 android:layout_gravity="start"
                 android:textAlignment="textStart"
                 android:textColor="@color/red_connectify"
@@ -244,6 +250,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="vegan"
+                android:textStyle="bold"
                 android:layout_gravity="start"
                 android:textAlignment="textStart"
                 android:textColor="@color/purple_200"
@@ -272,6 +279,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="TakeAway"
+                android:textStyle="bold"
                 android:textColor="@color/blue_default"
                 android:textSize="15sp" />
 
@@ -282,6 +290,7 @@
                 android:layout_weight="1"
                 android:layout_marginEnd="20dp"
                 android:text="Restaurant"
+                android:textStyle="bold"
                 android:textAlignment="viewEnd"
                 android:textColor="@color/quantum_purple"
                 android:textSize="15sp" />
@@ -307,7 +316,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-
+                android:textStyle="bold"
                 android:text="TakeAway"
                 android:textColor="@color/blue_default"
                 android:textSize="15sp" />
@@ -318,6 +327,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Restaurant"
+                android:textStyle="bold"
                 android:layout_marginEnd="20dp"
                 android:textAlignment="viewEnd"
                 android:textColor="@color/quantum_purple"

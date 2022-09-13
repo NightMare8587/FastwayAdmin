@@ -34,7 +34,10 @@ import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.common.reflect.TypeToken;
 import com.google.firebase.auth.FirebaseAuth;
@@ -59,7 +62,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-public class ResEarningTrackerActivity extends AppCompatActivity  {
+public class ResEarningTrackerActivity extends AppCompatActivity{
     SharedPreferences resTrackInfo;
     SharedPreferences storeOrdersForAdminInfo;
     double totalValOver = 0;
@@ -276,6 +279,19 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
                 mBarChart.animateY(1900);
 
                 mBarChart.getLegend().setEnabled(false);
+
+                mBarChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
+                    @Override
+                    public void onValueSelected(Entry e, Highlight h) {
+                        mBarChart.highlightValue(h);
+                    }
+
+                    @Override
+                    public void onNothingSelected() {
+
+                    }
+                });
+
 
 //                mBarChart.startAnimation();
 //                mBarChart.setOnClickListener(new View.OnClickListener() {
