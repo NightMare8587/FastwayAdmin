@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".NavFrags.ResEarningTracker.RestaurantAnalysis.RestaurantEarningAnalysis">
 
-    <org.eazegraph.lib.charts.BarChart
+    <com.github.mikephil.charting.charts.BarChart
         android:id="@+id/barchartAnalysis"
         android:layout_width="match_parent"
         android:layout_height="250dp"
@@ -20,6 +20,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+
     <TextView
         android:id="@+id/textView33"
         android:layout_width="wrap_content"
@@ -27,6 +28,7 @@
         android:fontFamily="@font/merriweather_bold"
         android:text="Last 7 Days Analysis"
         android:textColor="#000000"
+        android:textSize="17sp"
         app:layout_constraintBottom_toTopOf="@+id/barchartAnalysis"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -46,9 +48,11 @@
         android:id="@+id/totalOrderdLastCoupleDays"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="15dp"
+        android:layout_marginStart="10dp"
         android:layout_marginTop="15dp"
+        android:fontFamily="@font/inter"
         android:text="Total Orders"
+        android:textColor="#000000"
         android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
@@ -58,10 +62,12 @@
         android:id="@+id/totalAmountLastCoupleDays"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="15dp"
+        android:layout_marginStart="10dp"
         android:layout_marginTop="6dp"
         android:layout_marginEnd="20dp"
+        android:fontFamily="@font/inter"
         android:text="Total Transaction Amount: "
+        android:textColor="#000000"
         android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
@@ -80,29 +86,47 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/totalAmountLastCoupleDays" />
 
+
+    <TextView
+        android:id="@+id/dateOfThatDayParticular"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="10dp"
+        android:fontFamily="@font/inter"
+        android:text="TextView"
+        android:textColor="#000000"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/restaurantEarningAnalysisRecyclerView" />
     <TextView
         android:id="@+id/totalOrdersPerticularDayaRecycler"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="15dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="8dp"
+        android:fontFamily="@font/inter"
         android:text="TextView"
+        android:textColor="#000000"
         android:textSize="16sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/restaurantEarningAnalysisRecyclerView" />
+        app:layout_constraintTop_toBottomOf="@+id/dateOfThatDayParticular" />
 
     <TextView
         android:id="@+id/highestSalesDayOrdersTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="15dp"
-        android:layout_marginTop="40dp"
+        android:fontFamily="@font/inter"
         android:text="TextView"
+        android:textColor="#000000"
         android:textSize="16sp"
+        android:layout_marginTop="7dp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/totalTransaAmountThatDayRecycler" />
+        app:layout_constraintTop_toBottomOf="@+id/textView35" />
 
     <TextView
         android:id="@+id/highestDateNameDay"
@@ -110,7 +134,9 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="15dp"
         android:layout_marginTop="8dp"
+        android:fontFamily="@font/inter"
         android:text="TextView"
+        android:textColor="#000000"
         android:textSize="16sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
@@ -122,7 +148,9 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="15dp"
         android:layout_marginTop="8dp"
+        android:fontFamily="@font/inter"
         android:text="TextView"
+        android:textColor="#000000"
         android:textSize="16sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
@@ -134,21 +162,36 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="15dp"
         android:layout_marginTop="8dp"
+        android:fontFamily="@font/inter"
         android:text="TextView"
+        android:textColor="#000000"
         android:textSize="16sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/totalOrdersPerticularDayaRecycler" />
 
     <TextView
+        android:id="@+id/averageOrderSizeThatPerticularDay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="8dp"
+        android:fontFamily="@font/inter"
+        android:text="TextView"
+        android:textColor="#000000"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/totalTransaAmountThatDayRecycler" />
+
+    <TextView
         android:id="@+id/textView35"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
         android:text="Highest Sales Info"
         android:textColor="#000000"
         android:textSize="21sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/totalTransaAmountThatDayRecycler" />
+        app:layout_constraintTop_toBottomOf="@+id/averageOrderSizeThatPerticularDay" />
 </androidx.constraintlayout.widget.ConstraintLayout>

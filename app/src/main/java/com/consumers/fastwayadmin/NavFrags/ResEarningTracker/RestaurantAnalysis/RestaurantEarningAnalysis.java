@@ -27,6 +27,13 @@ import com.consumers.fastwayadmin.NavFrags.ResDishTracker.seeAllDishAnalysis;
 import com.consumers.fastwayadmin.NavFrags.ResEarningTracker.ResEarningTrackerActivity;
 import com.consumers.fastwayadmin.NavFrags.ResEarningTracker.TackerAdapter;
 import com.consumers.fastwayadmin.R;
+import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
+import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 
@@ -34,6 +41,7 @@ import org.eazegraph.lib.charts.BarChart;
 import org.eazegraph.lib.models.BarModel;
 
 import java.lang.reflect.Type;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -48,7 +56,10 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
     Gson gson;
     int daysLeftToShow = 0;
     Button moreDays;
+    TextView dateThatDay;
+    TextView averageOrderThatDay;
     RecyclerView recyclerView;
+
     double totalAmountOrdersText;
     TextView highestSalesDayText,highestSalesAmountThatDay,highestSalesOrderThatDay;
     TextView totalOrders,totalAmount;
@@ -62,6 +73,7 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
             "August", "September", "October", "November",
             "December"};
     Calendar calendar = Calendar.getInstance();
+    com.github.mikephil.charting.charts.BarChart barChart;
     String json;
     @SuppressLint("SetTextI18n")
     @Override
@@ -73,10 +85,39 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
         highestSalesDayText = findViewById(R.id.highestSalesDayOrdersTextView);
         highestSalesAmountThatDay = findViewById(R.id.highestDateNameDay);
         highestSalesOrderThatDay = findViewById(R.id.highestSalesAmountTextViewDay);
+        barChart = findViewById(R.id.barchartAnalysis);
+        averageOrderThatDay = findViewById(R.id.averageOrderSizeThatPerticularDay);
+        barChart.getDescription().setEnabled(false);
+        dateThatDay = findViewById(R.id.dateOfThatDayParticular);
+        // if more than 60 entries are displayed in the chart, no values will be
+        // drawn
+        barChart.setMaxVisibleValueCount(60);
+
+        // scaling can now only be done on x- and y-axis separately
+        barChart.setPinchZoom(false);
+
+        barChart.setDrawBarShadow(true);
+        barChart.setDrawGridBackground(false);
+        XAxis xAxis = barChart.getXAxis();
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setDrawGridLines(false);
+
+        barChart.getAxisLeft().setDrawGridLines(false);
+        Legend l = barChart.getLegend();
+
+        l.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);
+        l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.LEFT);
+        l.setOrientation(Legend.LegendOrientation.HORIZONTAL);
+        l.setDrawInside(false);
+        l.setForm(Legend.LegendForm.SQUARE);
+        l.setFormSize(9f);
+        l.setTextSize(11f);
+        l.setXEntrySpace(4f);
+
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false);
         recyclerView = findViewById(R.id.restaurantEarningAnalysisRecyclerView);
         textView = findViewById(R.id.textView33);
-        BarChart mBarChart = (BarChart) findViewById(R.id.barchartAnalysis);
+//        BarChart mBarChart = (BarChart) findViewById(R.id.barchartAnalysis);
         moreDays = findViewById(R.id.moreThanSevenDaysAnalysisShow);
         totalOrderThatDay = findViewById(R.id.totalOrdersPerticularDayaRecycler);
         totalAmountThatDay = findViewById(R.id.totalTransaAmountThatDayRecycler);
@@ -103,6 +144,7 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
                     if(date.size() > 7)
                         loopTill = date.size() - 7;
                     daysLeftToShow = 6;
+                    ArrayList<BarEntry> values = new ArrayList<>();
                     for (int i = date.size() - 1; i >= loopTill; i--) {
                         daysLeftToShow--;
                         days.add(date.get(i) + "th " + month);
@@ -115,22 +157,40 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
                         }
                         totalOrdersMade += Integer.parseInt(totalORders.get(i));
                         totalAmountOrdersText += Double.parseDouble(orderAmountList.get(i));
-                        mBarChart.addBar(new BarModel(Float.parseFloat(orderAmountList.get(i)), 0xFF1BA4E6));
+//                        mBarChart.addBar(new BarModel(Float.parseFloat(orderAmountList.get(i)), 0xFF1BA4E6));
+                        values.add(new BarEntry(Integer.parseInt(date.get(i)),Float.parseFloat(orderAmountList.get(i))));
                     }
+                    BarDataSet barDataSet = new BarDataSet(values,"Month: " + month);
+                    barDataSet.setColors(ColorTemplate.VORDIPLOM_COLORS);
+                    barDataSet.setDrawValues(true);
+
+                    ArrayList<IBarDataSet> dataSets = new ArrayList<>();
+                    dataSets.add(barDataSet);
+                    BarData data = new BarData(dataSets);
+                    barChart.setData(data);
+                    barChart.setFitBars(true);
+
+                    barChart.animateY(2100);
+
+                    barChart.getLegend().setEnabled(false);
                     highestSalesDayText.setText("Date: " + dateName);
                     highestSalesAmountThatDay.setText("Amount: \u20b9" + highestSalesDay);
                     highestSalesOrderThatDay.setText("Order's: " + highestOrderAtDay + "");
-                    totalAmount.setText("Total Transaction Amount: \u20b9" + totalAmountOrdersText);
+                    totalAmount.setText("Total Transaction Amount: \u20b9" + new DecimalFormat("0.00").format(totalAmountOrdersText));
                     totalOrders.setText("Total Order's: " + totalOrdersMade + "");
                     recyclerView.setLayoutManager(linearLayoutManager);
                     recyclerView.setAdapter(new TackerAdapterAnalysis(days, days.get(0), orders, amounts));
                     totalAmountThatDay.setText("Total Transaction Amount: \u20b9" + orderAmountList.get(orderAmountList.size() - 1) + "");
                     totalOrderThatDay.setText("Total Order's: " + totalORders.get(totalORders.size() - 1) + "");
+                    averageOrderThatDay.setText("Average Order Size: \u20b9" + (Double.parseDouble(orderAmountList.get(orderAmountList.size()-1))/Integer.parseInt(totalORders.get(totalORders.size()-1))));
+                    dateThatDay.setText(date.get(date.size()-1) + "th " + month);
                     LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
                             new IntentFilter("custom-message-analysis"));
 
-                    for (int i = daysLeftToShow; i >= 0; i--)
-                        mBarChart.addBar(new BarModel(0.f, 0xFF1BA4E6));
+
+
+//                    for (int i = daysLeftToShow; i >= 0; i--)
+//                        mBarChart.addBar(new BarModel(0.f, 0xFF1BA4E6));
                 }
 //                }else{
 //                    int remainingDays = date.size() - 7;
@@ -211,6 +271,8 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
             List<String> orderAmountList = new ArrayList<>(mainDataList.get(1));
             totalAmountThatDay.setText("Total Transaction Amount: \u20b9" + amounts + "");
             totalOrderThatDay.setText("Total Order's: " + orders + "");
+            averageOrderThatDay.setText("Average Order Size: \u20b9" + new DecimalFormat("0.00").format(Double.parseDouble(amounts)/Integer.parseInt(orders)));
+            dateThatDay.setText( MonthName);
 //            Toast.makeText(context, "" + orders + " " + amounts + " " + MonthName, Toast.LENGTH_SHORT).show();
 
         }
