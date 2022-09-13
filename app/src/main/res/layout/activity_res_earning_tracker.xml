@@ -11,7 +11,7 @@
     android:layout_height="wrap_content"
     tools:context=".NavFrags.ResEarningTracker.ResEarningTrackerActivity">
 
-    <org.eazegraph.lib.charts.BarChart
+    <com.github.mikephil.charting.charts.BarChart
         android:id="@+id/barchart"
         android:layout_width="match_parent"
         android:layout_height="250dp"

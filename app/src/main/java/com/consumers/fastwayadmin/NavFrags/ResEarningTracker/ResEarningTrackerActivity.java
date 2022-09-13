@@ -28,6 +28,14 @@ import com.consumers.fastwayadmin.NavFrags.ResDishTracker.RecyclerClassView;
 import com.consumers.fastwayadmin.NavFrags.ResDishTracker.seeAllDishAnalysis;
 import com.consumers.fastwayadmin.NavFrags.ResEarningTracker.RestaurantAnalysis.RestaurantEarningAnalysis;
 import com.consumers.fastwayadmin.R;
+import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
+import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.common.reflect.TypeToken;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -37,7 +45,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 
-import org.eazegraph.lib.charts.BarChart;
 import org.eazegraph.lib.models.BarModel;
 
 import java.text.DecimalFormat;
@@ -204,6 +211,30 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
          mBarChart = findViewById(R.id.barchart);
 
 
+        mBarChart.setMaxVisibleValueCount(60);
+
+        // scaling can now only be done on x- and y-axis separately
+        mBarChart.setPinchZoom(false);
+        mBarChart.getDescription().setEnabled(false);
+        mBarChart.setDrawBarShadow(true);
+        mBarChart.setDrawGridBackground(false);
+        XAxis xAxis = mBarChart.getXAxis();
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setDrawGridLines(false);
+
+        mBarChart.getAxisLeft().setDrawGridLines(false);
+        Legend l = mBarChart.getLegend();
+
+        l.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);
+        l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.LEFT);
+        l.setOrientation(Legend.LegendOrientation.HORIZONTAL);
+        l.setDrawInside(false);
+        l.setForm(Legend.LegendForm.SQUARE);
+        l.setFormSize(9f);
+        l.setTextSize(11f);
+        l.setXEntrySpace(4f);
+
+
 //        recyclerView = findViewById(R.id.monthNamesListViewRes);
 
         recyclerView.setLayoutManager(linearLayoutManager);
@@ -222,17 +253,31 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
             json = storeOrder.getString(month, "");
             List<List<String>> mainDataList = gson.fromJson(json, type);
             Log.i("info",mainDataList.toString());
-
+            ArrayList<BarEntry> values = new ArrayList<>();
             if (!mainDataList.isEmpty()) {
                 List<String> date = new ArrayList<>(mainDataList.get(0));
                 List<String> totalORders = new ArrayList<>(mainDataList.get(2));
                 List<String> orderAmountList = new ArrayList<>(mainDataList.get(1));
 
                 for(int i=0;i<orderAmountList.size();i++){
-                    mBarChart.addBar(new BarModel(Float.parseFloat(orderAmountList.get(i)),0xFF1BA4E6));
+//                    mBarChart.addBar(new BarModel(Float.parseFloat(orderAmountList.get(i)),0xFF1BA4E6));
+                    values.add(new BarEntry(Integer.parseInt(date.get(i)),Float.parseFloat(orderAmountList.get(i))));
                 }
+                BarDataSet barDataSet = new BarDataSet(values,"Month: " + month);
+                barDataSet.setColors(ColorTemplate.VORDIPLOM_COLORS);
+                barDataSet.setDrawValues(true);
 
-                mBarChart.startAnimation();
+                ArrayList<IBarDataSet> dataSets = new ArrayList<>();
+                dataSets.add(barDataSet);
+                BarData data = new BarData(dataSets);
+                mBarChart.setData(data);
+                mBarChart.setFitBars(true);
+
+                mBarChart.animateY(1900);
+
+                mBarChart.getLegend().setEnabled(false);
+
+//                mBarChart.startAnimation();
 //                mBarChart.setOnClickListener(new View.OnClickListener() {
 //                    @Override
 //                    public void onClick(View v) {
@@ -240,10 +285,11 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
 //
 //                    }
 //                });
-            }else
-                mBarChart.clearChart();
+            }else {
+//                mBarChart.clearChart();
+            }
         }else {
-            mBarChart.clearChart();
+//            mBarChart.clearChart();
         }
 //        for(int i=0;i<12;i++){
 //            if(storeOrdersForAdminInfo.contains(monthName[i])) {
@@ -348,7 +394,8 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
             // Get extra data included in the Intent
             String MonthName = intent.getStringExtra("month");
             currentMonthNameViewing.setText("Month: " + MonthName);
-            mBarChart.clearChart();
+            mBarChart.clear();
+            mBarChart.invalidate();
             if(storeOrdersForAdminInfo.contains(MonthName)){
                 java.lang.reflect.Type type = new TypeToken<List<List<String>>>() {
                 }.getType();
@@ -375,6 +422,7 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
 
             SharedPreferences storeOrder = getSharedPreferences("RestaurantDailyStoreForAnalysis",MODE_PRIVATE);
             if(storeOrder.contains(MonthName)){
+                ArrayList<BarEntry> values = new ArrayList<>();
                 java.lang.reflect.Type type = new TypeToken<List<List<String>>>() {
                 }.getType();
                 json = storeOrder.getString(MonthName, "");
@@ -387,10 +435,24 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
                     List<String> orderAmountList = new ArrayList<>(mainDataList.get(1));
 
                     for(int i=0;i<orderAmountList.size();i++){
-                        mBarChart.addBar(new BarModel(Float.parseFloat(orderAmountList.get(i)),0xFF1BA4E6));
+//                    mBarChart.addBar(new BarModel(Float.parseFloat(orderAmountList.get(i)),0xFF1BA4E6));
+                        values.add(new BarEntry(Integer.parseInt(date.get(i)),Float.parseFloat(orderAmountList.get(i))));
                     }
+                    BarDataSet barDataSet = new BarDataSet(values,"Month: " + MonthName);
+                    barDataSet.setColors(ColorTemplate.VORDIPLOM_COLORS);
+                    barDataSet.setDrawValues(true);
 
-                    mBarChart.startAnimation();
+                    ArrayList<IBarDataSet> dataSets = new ArrayList<>();
+                    dataSets.add(barDataSet);
+                    BarData data = new BarData(dataSets);
+                    mBarChart.setData(data);
+                    mBarChart.setFitBars(true);
+
+                    mBarChart.animateY(1900);
+
+                    mBarChart.getLegend().setEnabled(false);
+
+//                    mBarChart.startAnimation();
 //                mBarChart.setOnClickListener(new View.OnClickListener() {
 //                    @Override
 //                    public void onClick(View v) {
@@ -398,10 +460,11 @@ public class ResEarningTrackerActivity extends AppCompatActivity  {
 //
 //                    }
 //                });
-                }else
-                    mBarChart.clearChart();
+                }else {
+//                    mBarChart.clearChart();
+                }
             }else {
-                mBarChart.clearChart();
+//                mBarChart.clearChart();
             }
 
             if(usersFrequencyPref.contains(MonthName)){
