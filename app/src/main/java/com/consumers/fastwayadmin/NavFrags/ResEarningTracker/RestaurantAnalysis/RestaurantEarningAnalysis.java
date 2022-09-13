@@ -91,7 +91,7 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
         dateThatDay = findViewById(R.id.dateOfThatDayParticular);
         // if more than 60 entries are displayed in the chart, no values will be
         // drawn
-        barChart.setMaxVisibleValueCount(60);
+        barChart.setMaxVisibleValueCount(10);
 
         // scaling can now only be done on x- and y-axis separately
         barChart.setPinchZoom(false);
@@ -167,10 +167,12 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
                     ArrayList<IBarDataSet> dataSets = new ArrayList<>();
                     dataSets.add(barDataSet);
                     BarData data = new BarData(dataSets);
+
                     barChart.setData(data);
                     barChart.setFitBars(true);
 
-                    barChart.animateY(2100);
+                    barChart.animateY(1650);
+
 
                     barChart.getLegend().setEnabled(false);
                     highestSalesDayText.setText("Date: " + dateName);

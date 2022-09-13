@@ -214,7 +214,7 @@ public class ResEarningTrackerActivity extends AppCompatActivity{
          mBarChart = findViewById(R.id.barchart);
 
 
-        mBarChart.setMaxVisibleValueCount(60);
+        mBarChart.setMaxVisibleValueCount(35);
 
         // scaling can now only be done on x- and y-axis separately
         mBarChart.setPinchZoom(false);
@@ -275,7 +275,10 @@ public class ResEarningTrackerActivity extends AppCompatActivity{
                 BarData data = new BarData(dataSets);
                 mBarChart.setData(data);
                 mBarChart.setFitBars(true);
-
+                if(values.size() > 6)
+                mBarChart.setVisibleXRangeMaximum(6);
+                else
+                    mBarChart.setVisibleXRangeMaximum(12);
                 mBarChart.animateY(1900);
 
                 mBarChart.getLegend().setEnabled(false);
@@ -463,10 +466,14 @@ public class ResEarningTrackerActivity extends AppCompatActivity{
                     BarData data = new BarData(dataSets);
                     mBarChart.setData(data);
                     mBarChart.setFitBars(true);
-
+                    if(values.size() > 6)
+                        mBarChart.setVisibleXRangeMaximum(6);
+                    else
+                        mBarChart.setVisibleXRangeMaximum(12);
                     mBarChart.animateY(1900);
 
                     mBarChart.getLegend().setEnabled(false);
+                    mBarChart.invalidate();
 
 //                    mBarChart.startAnimation();
 //                mBarChart.setOnClickListener(new View.OnClickListener() {
