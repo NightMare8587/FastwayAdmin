@@ -27,7 +27,7 @@
             android:id="@+id/comboDiscountImageView"
             android:layout_width="330dp"
             android:layout_height="120dp"
-            android:layout_marginTop="6dp"
+            android:layout_marginTop="4dp"
             android:scaleType="fitXY"
 
             app:layout_constraintEnd_toEndOf="parent"
@@ -38,7 +38,7 @@
         <LinearLayout
             android:id="@+id/mainFragLinearLayout"
             android:layout_width="0dp"
-            android:layout_height="190dp"
+            android:layout_height="200dp"
             android:layout_marginStart="10dp"
             android:layout_marginEnd="10dp"
             android:orientation="vertical"
@@ -109,7 +109,7 @@
         <LinearLayout
             android:id="@+id/secondFragLinearLayout"
             android:layout_width="0dp"
-            android:layout_height="190dp"
+            android:layout_height="200dp"
             android:layout_marginStart="10dp"
             android:layout_marginTop="3dp"
             android:layout_marginEnd="10dp"
@@ -200,7 +200,7 @@
             android:layout_marginEnd="25dp"
             android:layout_marginBottom="8dp"
             android:checked="true"
-            android:fontFamily="@font/merriweather_sans_bold"
+            android:fontFamily="@font/inter"
             android:text="Online"
             android:textSize="18sp"
             android:textStyle="bold"
@@ -217,7 +217,7 @@
             android:layout_marginTop="3dp"
             android:layout_marginBottom="8dp"
             android:checked="true"
-            android:fontFamily="@font/merriweather_sans_bold"
+            android:fontFamily="@font/inter"
             android:text="Accept Orders"
             android:textSize="18sp"
             android:textStyle="bold"
@@ -243,20 +243,22 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:textStyle="bold"
-                android:textAlignment="center"
+                android:fontFamily="@font/inter"
                 android:text="Total Orders Made Today"
-                android:textSize="20sp" />
+                android:textAlignment="center"
+                android:textSize="18sp"
+                android:textStyle="bold" />
 
             <TextView
-                android:layout_width="0dp"
                 android:id="@+id/totalTransactionsMadeTodayHomeFrag"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:textAlignment="center"
-                android:textStyle="bold"
+                android:layout_weight="1"
+                android:fontFamily="@font/inter"
                 android:text="Total Transactions Made Today"
-                android:layout_weight="1"/>
+                android:textAlignment="center"
+                android:textSize="18sp"
+                android:textStyle="bold" />
 
         </LinearLayout>
 
@@ -275,21 +277,23 @@
                 android:id="@+id/valueOfTotalOrdersMadeHome"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:textAlignment="center"
+                android:layout_weight="1"
+                android:fontFamily="@font/inter"
                 android:text="0"
-                android:layout_weight="1"/>
+                android:textAlignment="center"
+                android:textSize="20sp"
+                android:textStyle="bold" />
 
             <TextView
-                android:layout_width="0dp"
                 android:id="@+id/valueOfTotalTransactionsTodayHome"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:textStyle="bold"
+                android:layout_weight="1"
+                android:fontFamily="@font/inter"
                 android:text="0"
                 android:textAlignment="center"
-                android:layout_weight="1"/>
+                android:textSize="20sp"
+                android:textStyle="bold" />
 
         </LinearLayout>
 

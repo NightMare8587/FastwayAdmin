@@ -719,33 +719,37 @@ public class HomeFrag extends Fragment {
                         bubbleShowCase.dismiss();
                     }
                 });
-
-        bubbleShowCaseBuilder3 = new BubbleShowCaseBuilder(requireActivity());
-        bubbleShowCaseBuilder3.title("Total Order's And Transactions")
-                .description("Here all of your current day transactions and order's made will be shown")
-                .targetView(totalOrdersToday).listener(new BubbleShowCaseListener() {
-                    @Override
-                    public void onTargetClick(@NonNull BubbleShowCase bubbleShowCase) {
-
-                    }
-
-                    @Override
-                    public void onCloseActionImageClick(@NonNull BubbleShowCase bubbleShowCase) {
-
-                    }
-
-                    @Override
-                    public void onBackgroundDimClick(BubbleShowCase bubbleShowCase) {
-                        bubbleShowCase.dismiss();
-                    }
-
-                    @Override
-                    public void onBubbleClick(@NonNull BubbleShowCase bubbleShowCase) {
-                        bubbleShowCase.dismiss();
-                    }
-                });
         BubbleShowCaseSequence bubbleShowCaseSequence = new BubbleShowCaseSequence();
-        bubbleShowCaseSequence.addShowCase(bubbleShowCaseBuilder5).addShowCase(bubbleShowCaseBuilder1).addShowCase(bubbleShowCaseBuilder2).addShowCase(bubbleShowCaseBuilder3);
+        bubbleShowCaseSequence.addShowCase(bubbleShowCaseBuilder5).addShowCase(bubbleShowCaseBuilder1).addShowCase(bubbleShowCaseBuilder2);
+
+
+        if(totalOrdersToday.isShown()) {
+            bubbleShowCaseBuilder3 = new BubbleShowCaseBuilder(requireActivity());
+            bubbleShowCaseBuilder3.title("Total Order's And Transactions")
+                    .description("Here all of your current day transactions and order's made will be shown")
+                    .targetView(totalOrdersToday).listener(new BubbleShowCaseListener() {
+                        @Override
+                        public void onTargetClick(@NonNull BubbleShowCase bubbleShowCase) {
+
+                        }
+
+                        @Override
+                        public void onCloseActionImageClick(@NonNull BubbleShowCase bubbleShowCase) {
+
+                        }
+
+                        @Override
+                        public void onBackgroundDimClick(BubbleShowCase bubbleShowCase) {
+                            bubbleShowCase.dismiss();
+                        }
+
+                        @Override
+                        public void onBubbleClick(@NonNull BubbleShowCase bubbleShowCase) {
+                            bubbleShowCase.dismiss();
+                        }
+                    });
+            bubbleShowCaseSequence.addShowCase(bubbleShowCaseBuilder3);
+        }
 
         if(seeMoreDetails.isShown()) {
             bubbleShowCaseBuilder4 = new BubbleShowCaseBuilder(requireActivity());
