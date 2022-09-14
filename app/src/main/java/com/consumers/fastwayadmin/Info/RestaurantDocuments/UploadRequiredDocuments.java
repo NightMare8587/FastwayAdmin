@@ -1,12 +1,5 @@
 package com.consumers.fastwayadmin.Info.RestaurantDocuments;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
-
 import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -25,13 +18,19 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import com.consumers.fastwayadmin.HomeScreen.HomeScreen;
 import com.consumers.fastwayadmin.Info.MapsActivity;
@@ -84,6 +83,7 @@ public class UploadRequiredDocuments extends AppCompatActivity {
     boolean gst = false;
     boolean adhaar = false;
     RadioGroup gstinGroup;
+
     CheckBox haveFSSAI;
     boolean fssai = false;
     SharedPreferences.Editor editor;
@@ -197,13 +197,17 @@ public class UploadRequiredDocuments extends AppCompatActivity {
                     linearLayout.setOrientation(LinearLayout.VERTICAL);
                     EditText editText = new EditText(UploadRequiredDocuments.this);
                     editText.setHint("Enter GSTIN here");
+                    editText.setMaxLines(15);
                     linearLayout.addView(editText);
                     uploadGST.setView(linearLayout);
                     uploadGST.setPositiveButton("Proceed", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            if(editText.getText().toString().equals("")){
+                            if(editText.getText().toString().equals("") || editText.length() != 15){
                                 Toast.makeText(UploadRequiredDocuments.this, "Invalid Input", Toast.LENGTH_SHORT).show();
+                                haveGST = false;
+                                RadioButton radioButton = findViewById(R.id.noIdontHavrGSTIN);
+                                radioButton.setChecked(true);
                             }else{
                                 DatabaseReference uploadGSTIndetails = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid()).child("Restaurant Documents");
                                 uploadGSTIndetails.child("gstinNum").setValue(editText.getText().toString());
@@ -226,62 +230,59 @@ public class UploadRequiredDocuments extends AppCompatActivity {
         });
 
         proceedFurther.setOnClickListener(click -> {
-            if(!adhaar) {
+            if(!(adhaar && resProof && fssai)) {
                 AlertDialog.Builder builder1 = new AlertDialog.Builder(UploadRequiredDocuments.this);
-                builder1.setTitle("Important").setMessage("Looks like you have not uploaded aadhaar for verification\nYou can proceed further and can re-upload aadhaar within 30 days")
-                        .setPositiveButton("Proceed", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                DatabaseReference databaseReferenceCheck = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Registered Restaurants").child(sharedPreferences.getString("state", ""));
-                                databaseReferenceCheck.addListenerForSingleValueEvent(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                        if (dataSnapshot.hasChild(Objects.requireNonNull(auth.getUid()))) {
-                                            databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid()).child("Restaurant Documents");
-                                            databaseReference.child("verified").setValue("yes");
-                                            databaseReference.child("bankVerified").setValue("yes");
-                                            startActivity(new Intent(getApplicationContext(), MapsActivity.class));
-                                        } else {
-                                            ResDocuments resDocuments = new ResDocuments(panUrl, adhaarUrl, fssaiUrl, gstUrl, residentialProofSubmitUrl);
-                                            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Restaurant Registration");
-                                            databaseReference.child(Objects.requireNonNull(auth.getUid())).setValue(resDocuments);
-                                            databaseReference.child(auth.getUid()).child("allDocumentsNotUploaded").setValue("no");
-                                            SharedPreferences sharedPreferences = getSharedPreferences("RestaurantInfo", MODE_PRIVATE);
-                                            databaseReference.child(auth.getUid()).child("ResName").setValue(sharedPreferences.getString("hotelName", ""));
-                                            databaseReference.child(auth.getUid()).child("ResAddress").setValue(sharedPreferences.getString("hotelAddress", ""));
-                                            databaseReference.child(auth.getUid()).child("ResNumber").setValue(sharedPreferences.getString("hotelNumber", ""));
-                                            SharedPreferences loginShared = getSharedPreferences("loginInfo", MODE_PRIVATE);
-                                            databaseReference.child(auth.getUid()).child("state").setValue(loginShared.getString("state", ""));
-                                            databaseReference.child(auth.getUid()).child("locality").setValue(loginShared.getString("locality", ""));
-                                            databaseReference.child(auth.getUid()).child("fssaiDigits").setValue(fssaiNumDigits);
+                builder1.setTitle("Important").setMessage("Looks like you have not all documents for verification\nYou can proceed further and can re-upload documents within 60 days")
+                        .setPositiveButton("Proceed", (dialogInterface, i) -> {
+                            DatabaseReference databaseReferenceCheck = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Registered Restaurants").child(sharedPreferences.getString("state", ""));
+                            databaseReferenceCheck.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    if (dataSnapshot.hasChild(Objects.requireNonNull(auth.getUid()))) {
+                                        databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid()).child("Restaurant Documents");
+                                        databaseReference.child("verified").setValue("yes");
+                                        databaseReference.child("bankVerified").setValue("yes");
+                                        startActivity(new Intent(getApplicationContext(), MapsActivity.class));
+                                    } else {
+                                        ResDocuments resDocuments = new ResDocuments(panUrl, adhaarUrl, fssaiUrl, gstUrl, residentialProofSubmitUrl);
+                                        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Restaurant Registration");
+                                        databaseReference.child(Objects.requireNonNull(auth.getUid())).setValue(resDocuments);
+                                        databaseReference.child(auth.getUid()).child("allDocumentsNotUploaded").setValue("no");
+                                        SharedPreferences sharedPreferences = getSharedPreferences("RestaurantInfo", MODE_PRIVATE);
+                                        databaseReference.child(auth.getUid()).child("ResName").setValue(sharedPreferences.getString("hotelName", ""));
+                                        databaseReference.child(auth.getUid()).child("ResAddress").setValue(sharedPreferences.getString("hotelAddress", ""));
+                                        databaseReference.child(auth.getUid()).child("ResNumber").setValue(sharedPreferences.getString("hotelNumber", ""));
+                                        SharedPreferences loginShared = getSharedPreferences("loginInfo", MODE_PRIVATE);
+                                        databaseReference.child(auth.getUid()).child("state").setValue(loginShared.getString("state", ""));
+                                        databaseReference.child(auth.getUid()).child("locality").setValue(loginShared.getString("locality", ""));
+                                        databaseReference.child(auth.getUid()).child("fssaiDigits").setValue(fssaiNumDigits);
 
-                                            databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid()).child("Restaurant Documents");
-                                            databaseReference.child("verified").setValue("no");
-                                            databaseReference.child("bankVerified").setValue("no");
-                                            new KAlertDialog(UploadRequiredDocuments.this, KAlertDialog.SUCCESS_TYPE)
-                                                    .setTitleText("Documents Uploaded")
-                                                    .setContentText("Documents uploaded and will be verified by our fastway staff with an on-site verification")
-                                                    .setConfirmText("Continue")
-                                                    .setConfirmClickListener(click -> {
-                                                        click.dismissWithAnimation();
-                                                        SharedPreferences location = getSharedPreferences("LocationMaps", MODE_PRIVATE);
-                                                        if (!location.contains("location"))
-                                                            startActivity(new Intent(getApplicationContext(), MapsActivity.class));
-                                                        else
-                                                            startActivity(new Intent(getApplicationContext(), HomeScreen.class));
-                                                    }).show();
-                                        }
+                                        databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid()).child("Restaurant Documents");
+                                        databaseReference.child("verified").setValue("no");
+                                        databaseReference.child("bankVerified").setValue("no");
+                                        new KAlertDialog(UploadRequiredDocuments.this, KAlertDialog.SUCCESS_TYPE)
+                                                .setTitleText("Documents Uploaded")
+                                                .setContentText("Documents uploaded and will be verified by our fastway staff with an on-site verification")
+                                                .setConfirmText("Continue")
+                                                .setConfirmClickListener(click1 -> {
+                                                    click1.dismissWithAnimation();
+                                                    SharedPreferences location = getSharedPreferences("LocationMaps", MODE_PRIVATE);
+                                                    if (!location.contains("location"))
+                                                        startActivity(new Intent(getApplicationContext(), MapsActivity.class));
+                                                    else
+                                                        startActivity(new Intent(getApplicationContext(), HomeScreen.class));
+                                                }).show();
                                     }
+                                }
 
-                                    @Override
-                                    public void onCancelled(@NonNull DatabaseError databaseError) {
-                                    }
-                                });
-                                SharedPreferences sharedPreferences = getSharedPreferences("loginInfo", MODE_PRIVATE);
-                                SharedPreferences.Editor editor = sharedPreferences.edit();
-                                editor.putString("documentsUploadedAll", "yes");
-                                editor.apply();
-                            }
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+                                }
+                            });
+                            SharedPreferences sharedPreferences = getSharedPreferences("loginInfo", MODE_PRIVATE);
+                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                            editor.putString("documentsUploadedAll", "yes");
+                            editor.apply();
                         }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
@@ -414,8 +415,10 @@ public class UploadRequiredDocuments extends AppCompatActivity {
                                     }).create();
 
                             alert.show();
-                        }else
+                        }else {
                             Toast.makeText(UploadRequiredDocuments.this, "Check your input", Toast.LENGTH_LONG).show();
+
+                        }
                     }
                 }).setNegativeButton("Exit", new DialogInterface.OnClickListener() {
                     @Override
@@ -515,7 +518,7 @@ public class UploadRequiredDocuments extends AppCompatActivity {
     }
 
     private void checkIfAllUploaded() {
-        if(adhaar &&  fssai && resProof && haveGST){
+        if(adhaar &&  fssai && resProof){
             SharedPreferences location = getSharedPreferences("LocationMaps",MODE_PRIVATE);
             DatabaseReference databaseReferenceCheck = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Registered Restaurants").child(sharedPreferences.getString("state",""));
             databaseReferenceCheck.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -768,13 +771,10 @@ public class UploadRequiredDocuments extends AppCompatActivity {
                         });
 
                     }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(UploadRequiredDocuments.this,
-                                "Something went wrong", Toast.LENGTH_SHORT).show();
-                        loading.dismiss();
-                    }
+                }).addOnFailureListener(e -> {
+                    Toast.makeText(UploadRequiredDocuments.this,
+                            "Something went wrong", Toast.LENGTH_SHORT).show();
+                    loading.dismiss();
                 });
             }catch (Exception e){
                 Toast.makeText(UploadRequiredDocuments.this, ""+e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();

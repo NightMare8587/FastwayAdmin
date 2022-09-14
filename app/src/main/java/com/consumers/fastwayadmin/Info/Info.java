@@ -136,7 +136,7 @@ public class Info extends AppCompatActivity {
         SharedPreferences location = getSharedPreferences("LocationMaps",MODE_PRIVATE);
         infoStore = FirebaseFirestore.getInstance();
 
-//        infoRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(this.sharedPreferences.getString("state", "")).child(this.sharedPreferences.getString("locality","")).child(Objects.requireNonNull(infoAuth.getUid()));
+        infoRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(this.sharedPreferences.getString("state", "")).child(this.sharedPreferences.getString("locality","")).child(Objects.requireNonNull(infoAuth.getUid()));
         if(location.contains("location")){
             startActivity(new Intent(Info.this, HomeScreen.class));
             finish();

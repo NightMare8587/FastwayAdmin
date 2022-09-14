@@ -36,8 +36,11 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -95,7 +98,36 @@ public class ReUploadDocumentsAgain extends AppCompatActivity {
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
         sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
+        DatabaseReference checkWhichToUpload = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid()).child("Restaurant Documents");
+        checkWhichToUpload.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists()){
+                    if(snapshot.hasChild("adhaar")){
+                        adhaarCard.setClickable(false);
+                        adhaar = true;
+                        adhaarText.setVisibility(View.VISIBLE);
+                    }
 
+                    if(snapshot.hasChild("fssai")){
+                        fssaiCard.setClickable(false);
+                        fssai = true;
+                        FssaiText.setVisibility(View.VISIBLE);
+                    }
+
+                    if(snapshot.hasChild("resProof")){
+                        resProof = true;
+                        resProofCard.setClickable(false);
+                        resText.setVisibility(View.VISIBLE);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
 
 //        panCard.setOnClickListener(click -> {
 //            if(ContextCompat.checkSelfPermission(ReUploadDocumentsAgain.this, Manifest.permission.ACCESS_FINE_LOCATION) + ContextCompat.checkSelfPermission(ReUploadDocumentsAgain.this , Manifest.permission.CAMERA)
@@ -599,6 +631,8 @@ public class ReUploadDocumentsAgain extends AppCompatActivity {
                     loading.dismiss();
                     DatabaseReference dish = FirebaseDatabase.getInstance().getReference().getRoot();
                     dish.child("Admin").child(Objects.requireNonNull(auth.getUid())).child("Restaurant Documents").child(value).setValue(uri + "");
+                    if(value.equals("fssai"))
+                        dish.child("Admin").child(auth.getUid()).child("Restaurant Documents").child("fssaiDigits").setValue(fssaiDigitsNums);
                     checkIfAllUploaded();
                 });
             }).addOnFailureListener(e -> loading.dismiss());
@@ -607,7 +641,7 @@ public class ReUploadDocumentsAgain extends AppCompatActivity {
     }
 
     private void checkIfAllUploaded() {
-        if(adhaar){
+        if(adhaar && fssai && resProof){
 
             ResDocuments resDocuments = new ResDocuments(panUrl,adhaarUrl,fssaiUrl,gstUrl,resUrl);
             DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Restaurant Registration");
@@ -625,7 +659,7 @@ public class ReUploadDocumentsAgain extends AppCompatActivity {
             databaseReference.child("reasonForCancel").removeValue();
             new KAlertDialog(ReUploadDocumentsAgain.this,KAlertDialog.SUCCESS_TYPE)
                     .setTitleText("Documents Re-Uploaded")
-                    .setContentText("Documents Re-Uploaded and will be verified by our fastway staff with an on-site verification")
+                    .setContentText("Documents Re-Uploaded and will be verified by our Foodine staff with an on-site verification")
                     .setConfirmText("Exit")
                     .setConfirmClickListener(click -> {
                         click.dismissWithAnimation();

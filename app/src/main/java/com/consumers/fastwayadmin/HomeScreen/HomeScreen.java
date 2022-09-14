@@ -134,7 +134,7 @@ public class HomeScreen extends AppCompatActivity {
                 if(snapshot.exists() && snapshot.hasChild("reasonForCancel")){
                     AlertDialog.Builder alert = new AlertDialog.Builder(HomeScreen.this);
                     String reason = snapshot.child("reasonForCancel").getValue(String.class);
-                    alert.setTitle("Error").setMessage("Your restaurant registration is denied by fastway for following reason's:\n\n" + reason + "\n\nYou can submit another response for restaurant registration")
+                    alert.setTitle("Error").setMessage("Your restaurant registration is denied by Foodine for following reason's:\n\n" + reason + "\n\nYou can submit another response for restaurant registration")
                             .setPositiveButton("Re-Submit", (dialogInterface, i) -> {
                                 startActivity(new Intent(HomeScreen.this, ReUploadDocumentsAgain.class));
                                 dialogInterface.dismiss();
