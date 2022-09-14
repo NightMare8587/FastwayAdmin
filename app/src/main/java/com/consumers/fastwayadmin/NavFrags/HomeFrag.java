@@ -354,13 +354,10 @@ public class HomeFrag extends Fragment {
                         if(snapshot.hasChild("Current TakeAway")){
                             AlertDialog.Builder alert = new AlertDialog.Builder(requireContext());
                             alert.setTitle("Error").setMessage("You still have an current takeaway order in queue. Contact  user before closing restaurant");
-                            alert.setPositiveButton("Exit", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    onlineOrOffline.setChecked(true);
-                                    acceptOrders.setChecked(true);
-                                    dialogInterface.dismiss();
-                                }
+                            alert.setPositiveButton("Exit", (dialogInterface, i) -> {
+                                onlineOrOffline.setChecked(true);
+                                acceptOrders.setChecked(true);
+                                dialogInterface.dismiss();
                             }).create();
 
                             alert.show();
