@@ -100,7 +100,8 @@ public class AllMenuDish extends AppCompatActivity {
                     DishView dishView = new DishView(names,fullPrice,halfPrice,dish,image,before,after,discount,enableOr);
                 loading.setVisibility(View.INVISIBLE);
                     recyclerView.setAdapter(dishView);
-                    }
+                    }else
+                    loading.setVisibility(View.INVISIBLE);
                 }
         });
 

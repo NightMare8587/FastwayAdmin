@@ -1,17 +1,9 @@
 package com.consumers.fastwayadmin.SplashAndIntro;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
-
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Address;
@@ -27,13 +19,15 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+
 import com.consumers.fastwayadmin.Login.MainActivity;
 import com.consumers.fastwayadmin.R;
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -41,16 +35,13 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResponse;
-import com.google.android.gms.location.LocationSettingsStates;
-import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.location.Priority;
 import com.google.android.gms.location.SettingsClient;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.appcheck.FirebaseAppCheck;
-import com.google.firebase.appcheck.safetynet.SafetyNetAppCheckProviderFactory;
+import com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderFactory;
 
 import java.io.IOException;
 import java.util.List;
@@ -60,7 +51,6 @@ import java.util.Objects;
 public class SplashScreen extends AppCompatActivity {
     double longi,lati;
     LocationRequest locationRequest;
-    GoogleSignInOptions gso;
     FusedLocationProviderClient clientsLocation;
     SharedPreferences loginInfo;
     SharedPreferences.Editor loginEditor;
@@ -75,18 +65,15 @@ public class SplashScreen extends AppCompatActivity {
         FirebaseApp.initializeApp(/*context=*/ this);
         FirebaseAppCheck firebaseAppCheck = FirebaseAppCheck.getInstance();
         firebaseAppCheck.installAppCheckProviderFactory(
-                SafetyNetAppCheckProviderFactory.getInstance());
+                PlayIntegrityAppCheckProviderFactory.getInstance());
         boolean isConnected = activeNetwork != null &&
                 activeNetwork.isConnectedOrConnecting();
         //checking is app is connected to internet
         if(!isConnected){
             View parentLayout = findViewById(android.R.id.content);
             Snackbar.make(parentLayout, "Please connect to internet :)", Snackbar.LENGTH_LONG)
-                    .setAction("CLOSE", new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
+                    .setAction("CLOSE", view -> {
 
-                        }
                     })
                     .setActionTextColor(getResources().getColor(android.R.color.holo_red_light ))
                     .show();
@@ -129,53 +116,21 @@ public class SplashScreen extends AppCompatActivity {
         SettingsClient client = LocationServices.getSettingsClient(this);
         Task<LocationSettingsResponse> task = client.checkLocationSettings(builder.build());
 
-        task.addOnCompleteListener(new OnCompleteListener<LocationSettingsResponse>() {
-            @Override
-            public void onComplete(Task<LocationSettingsResponse> task) {
-                try {
-                    LocationSettingsResponse response = task.getResult(ApiException.class);
-                    // All location settings are satisfied. The client can initialize location
-                    // requests here.
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            if(sharedPreferences.contains("done")){
-                                startActivity(new Intent(SplashScreen.this, MainActivity.class));
-                            }else {
-                                startActivity(new Intent(SplashScreen.this, IntroActivity.class));
-                            }
-                            clientsLocation.removeLocationUpdates(mLocationCallback);
-                            finish();
-
-                            overridePendingTransition(R.anim.slide_in, R.anim.fade_out);
-                        }
-                    },500);
-                } catch (ApiException exception) {
-                    switch (exception.getStatusCode()) {
-                        case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
-                            // Location settings are not satisfied. But could be fixed by showing the
-                            // user a dialog.
-                            try {
-                                // Cast to a resolvable exception.
-                                ResolvableApiException resolvable = (ResolvableApiException) exception;
-                                // Show the dialog by calling startResolutionForResult(),
-                                // and check the result in onActivityResult().
-                                resolvable.startResolutionForResult(
-                                        SplashScreen.this,
-                                        101);
-                            } catch (IntentSender.SendIntentException e) {
-                                // Ignore the error.
-                            } catch (ClassCastException e) {
-                                // Ignore, should be an impossible error.
-                            }
-                            break;
-                        case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
-                            // Location settings are not satisfied. However, we have no way to fix the
-                            // settings so we won't show the dialog.
-                            break;
-                    }
+        task.addOnCompleteListener(task1 -> {
+            //                LocationSettingsResponse response = task1.getResult(ApiException.class);
+            // All location settings are satisfied. The client can initialize location
+            // requests here.
+            new Handler().postDelayed(() -> {
+                if(sharedPreferences.contains("done")){
+                    startActivity(new Intent(SplashScreen.this, MainActivity.class));
+                }else {
+                    startActivity(new Intent(SplashScreen.this, IntroActivity.class));
                 }
-            }
+                clientsLocation.removeLocationUpdates(mLocationCallback);
+                finish();
+
+                overridePendingTransition(R.anim.slide_in, R.anim.fade_out);
+            },500);
         });
     }
     //location callback for handling location
@@ -223,25 +178,22 @@ public class SplashScreen extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        final LocationSettingsStates states = LocationSettingsStates.fromIntent(data);
+
         if (requestCode == 101) {
             switch (resultCode) {
                 case Activity.RESULT_OK:
                     // All required changes were successfully made
 //                    Toast.makeText(MainActivity.this, states.isLocationPresent() + "", Toast.LENGTH_SHORT).show();
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            if(sharedPreferences.contains("done")){
-                                startActivity(new Intent(SplashScreen.this, MainActivity.class));
-                            }else {
-                                startActivity(new Intent(SplashScreen.this, IntroActivity.class));
-                            }
-                            clientsLocation.removeLocationUpdates(mLocationCallback);
-                            finish();
-
-                            overridePendingTransition(R.anim.slide_in, R.anim.fade_out);
+                    new Handler().postDelayed(() -> {
+                        if(sharedPreferences.contains("done")){
+                            startActivity(new Intent(SplashScreen.this, MainActivity.class));
+                        }else {
+                            startActivity(new Intent(SplashScreen.this, IntroActivity.class));
                         }
+                        clientsLocation.removeLocationUpdates(mLocationCallback);
+                        finish();
+
+                        overridePendingTransition(R.anim.slide_in, R.anim.fade_out);
                     },700);
                     break;
                 case Activity.RESULT_CANCELED:
@@ -255,6 +207,7 @@ public class SplashScreen extends AppCompatActivity {
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -266,18 +219,7 @@ public class SplashScreen extends AppCompatActivity {
                 AlertDialog.Builder builder = new AlertDialog.Builder(SplashScreen.this);
                 builder.setTitle("Important");
                 builder.setMessage("Location is required for this app to work properly");
-                builder.setPositiveButton("Allow", new DialogInterface.OnClickListener() {
-                    @RequiresApi(api = Build.VERSION_CODES.M)
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        checkPermissions();
-                    }
-                }).setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                    }
-                }).create();
+                builder.setPositiveButton("Allow", (dialogInterface, i) -> checkPermissions()).setNegativeButton("No", (dialogInterface, i) -> dialogInterface.dismiss()).create();
 
                 builder.show();
             }
