@@ -105,7 +105,7 @@ public class LiveChatActivity extends AppCompatActivity {
             if(editText.getText().toString().equals("")){
                 Toast.makeText(LiveChatActivity.this, "Enter Some Text :)", Toast.LENGTH_SHORT).show();
             }else{
-                String messa = editText.getText().toString();
+                String messa = editText.getText().toString().trim().toLowerCase();
                 if(connectedWithFastway){
                     String time = String.valueOf(System.currentTimeMillis());
                     liveChatClass liveChatClass = new liveChatClass(messa,time,"0");

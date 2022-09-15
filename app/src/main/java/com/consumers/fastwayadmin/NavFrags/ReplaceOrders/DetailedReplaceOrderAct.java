@@ -107,7 +107,7 @@ public class DetailedReplaceOrderAct extends AppCompatActivity {
 
         acceptOrder.setOnClickListener(click -> {
             FirebaseAuth auth = FirebaseAuth.getInstance();
-            DatabaseReference admin = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(auth.getUid()).child("ReplaceOrderRequests");
+            DatabaseReference admin = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(auth.getUid()).child("ReplaceOrderRequests");
             admin.child(getIntent().getStringExtra("reportTime")).removeValue();
             RequestQueue requestQueue = Volley.newRequestQueue(DetailedReplaceOrderAct.this);
             JSONObject main = new JSONObject();
@@ -140,7 +140,7 @@ public class DetailedReplaceOrderAct extends AppCompatActivity {
 
         declineOrder.setOnClickListener(click -> {
             FirebaseAuth auth = FirebaseAuth.getInstance();
-            DatabaseReference admin = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(auth.getUid()).child("ReplaceOrderRequests");
+            DatabaseReference admin = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(auth.getUid()).child("ReplaceOrderRequests");
             admin.child(getIntent().getStringExtra("reportTime")).removeValue();
             RequestQueue requestQueue = Volley.newRequestQueue(DetailedReplaceOrderAct.this);
             JSONObject main = new JSONObject();

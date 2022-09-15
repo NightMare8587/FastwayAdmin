@@ -19,6 +19,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class ReplaceOrderRequests extends AppCompatActivity {
     DatabaseReference databaseReference;
@@ -40,7 +41,7 @@ public class ReplaceOrderRequests extends AppCompatActivity {
         recyclerView = findViewById(R.id.ReplaceOrderRequestRecyclerView);
         sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(auth.getUid()).child("ReplaceOrderRequests");
+        databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid())).child("ReplaceOrderRequests");
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {

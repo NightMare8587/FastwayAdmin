@@ -70,8 +70,8 @@ public class RandomChatNoww extends AppCompatActivity {
                 }else{
                     count++;
                     KAlertDialog kAlertDialog = new KAlertDialog(RandomChatNoww.this,KAlertDialog.ERROR_TYPE);
-                    kAlertDialog.setTitleText("No Message From Fastway")
-                            .setContentText("We will notify you as soon as you got reply from fastway")
+                    kAlertDialog.setTitleText("No Message From Foodine")
+                            .setContentText("We will notify you as soon as you got reply from Foodine")
                             .setConfirmText("Exit")
                             .setConfirmClickListener(click -> {
                                 click.dismissWithAnimation();
