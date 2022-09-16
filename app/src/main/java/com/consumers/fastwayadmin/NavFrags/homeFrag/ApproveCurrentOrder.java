@@ -663,7 +663,7 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                 if (loginInfo.contains("payoutMethodChoosen")) {
                     if (loginInfo.getString("payoutMethodChoosen", "").equals("imps")) {
                         amountToBeSend = Double.parseDouble(orderAmount);
-                        amountToBeSend = amountToBeSend - 5;
+                        amountToBeSend = amountToBeSend - 2;
                         new MakePayout().execute();
                     } else {
                         DatabaseReference updatePayoutOrder = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid());

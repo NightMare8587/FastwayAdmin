@@ -132,7 +132,7 @@ public class InitiatePayoutForAdminNEFT extends AppCompatActivity {
             StringRequest stringRequest = new StringRequest(Request.Method.POST, testPayoutToken, response -> {
                 Log.i("response",response);
                 genratedToken = response.trim();
-                amount = amount - 8;
+                amount = amount - 7;
                 new AuthorizeToken().execute();
             }, error -> {
 
@@ -149,7 +149,7 @@ public class InitiatePayoutForAdminNEFT extends AppCompatActivity {
             RequestQueue requestQueue = Volley.newRequestQueue(InitiatePayoutForAdminNEFT.this);
             StringRequest stringRequest = new StringRequest(Request.Method.POST, testPayoutToken, response -> {
                 Log.i("response",response);
-                amount = amount - 3;
+                amount = amount - 5;
                 genratedToken = response.trim();
                 new AuthorizeToken().execute();
             }, error -> {
