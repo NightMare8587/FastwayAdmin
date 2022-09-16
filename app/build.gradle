@@ -32,6 +32,7 @@ android {
     lint {
         checkReleaseBuilds false
     }
+    namespace 'com.consumers.fastwayadmin'
 }
 
 dependencies {
