@@ -248,7 +248,8 @@ public class HomeFrag extends Fragment {
                 map.put("resName",resInfo.getString("hotelName",""));
                 map.put("resAddress",resInfo.getString("hotelAddress",""));
                 map.put("resContact",resInfo.getString("hotelNumber",""));
-                addToRTDB.child(Objects.requireNonNull(auth.getUid())).child("ResInfo").setValue(map);
+                DatabaseReference setToRTDB = FirebaseDatabase.getInstance().getReference().getRoot().child("Offers").child(resInfoShared.getString("state","")).child(resInfoShared.getString("locality","")).child(Objects.requireNonNull(auth.getUid()));
+                setToRTDB.child("ResInfo").setValue(map);
                 resInfoSharedEdit.putString("addedToRTDB","yes");
                 resInfoSharedEdit.apply();
             }
