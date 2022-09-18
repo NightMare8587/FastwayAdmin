@@ -37,6 +37,7 @@ public class homeFragClass extends RecyclerView.Adapter<homeFragClass.ViewHolder
     List<String> resId = new ArrayList<>();
     List<String> amountPending = new ArrayList<>();
     List<String> isCurrentOrder = new ArrayList<>();
+
     public homeFragClass(List<String> tableNum,List<String> seats,List<String> resId,List<String> isCurrentOrder,List<String> amountPending){
         this.seats = seats;
         this.resId = resId;
@@ -58,8 +59,12 @@ public class homeFragClass extends RecyclerView.Adapter<homeFragClass.ViewHolder
         holder.tables.setText("Table Num: " + tableNum.get(position));
         if(amountPending.get(position).equals("1"))
         holder.seats.setText("Seats: " + seats.get(position) + " (Payment Pending)");
-        else
+        else {
             holder.seats.setText("Seats: " + seats.get(position));
+            SharedPreferences sharedPreferences = holder.cardView.getContext().getSharedPreferences("StoreDataForPayInEnd",Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.remove(tableNum.get(position)).apply();
+        }
         holder.chat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

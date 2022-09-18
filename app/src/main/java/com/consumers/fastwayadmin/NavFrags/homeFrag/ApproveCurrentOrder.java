@@ -783,30 +783,65 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                     SharedPreferences.Editor storePayInEndEdit = storeTablePayInEnd.edit();
 
 
-//                if(storeTablePayInEnd.contains(table) && storeTablePayInEnd.getString(table,"").equals(id)){
-//                    double val = Double.parseDouble(restaurantDailyTrack.getString("totalTransactionsToday", ""));
-//                    val = val + Double.parseDouble(orderAmount);
-//                    restaurantTrackEditor.putString("totalTransactionsToday", String.valueOf(val));
-//                    restaurantTrackEditor.apply();
-//                }else {
-//                    storePayInEndEdit.putString(table,id);
-//                    storePayInEndEdit.apply();
-//                    if (restaurantDailyTrack.contains("totalOrdersToday")) {
-//                        int val = Integer.parseInt(restaurantDailyTrack.getString("totalOrdersToday", ""));
-//                        val = val + 1;
-//                        restaurantTrackEditor.putString("totalOrdersToday", String.valueOf(val));
-//                    } else {
-//                        restaurantTrackEditor.putString("totalOrdersToday", String.valueOf(1));
-//                    }
-//
-//                    if (restaurantDailyTrack.contains("totalTransactionsToday")) {
-//                        double val = Double.parseDouble(restaurantDailyTrack.getString("totalTransactionsToday", ""));
-//                        val = val + Double.parseDouble(orderAmount);
-//                        restaurantTrackEditor.putString("totalTransactionsToday", String.valueOf(val));
-//                    } else {
-//                        restaurantTrackEditor.putString("totalTransactionsToday", String.valueOf(orderAmount));
-//                    }
-//                }
+                if(storeTablePayInEnd.contains(table) && storeTablePayInEnd.getString(table,"").equals(id)){
+                    double val = Double.parseDouble(restaurantDailyTrack.getString("totalTransactionsToday", ""));
+                    val = val + Double.parseDouble(orderAmount);
+                    restaurantTrackEditor.putString("totalTransactionsToday", String.valueOf(val));
+                    restaurantTrackEditor.apply();
+                }else {
+                    String timePaying = System.currentTimeMillis() + "";
+                    String str = "ORDER_" + timePaying;
+                    storePayInEndEdit.putString(table,id);
+                    storePayInEndEdit.putString(table + "id",str);
+                    storePayInEndEdit.putString(table + "time",timePaying);
+                    storePayInEndEdit.apply();
+                    if (restaurantDailyTrack.contains("totalOrdersToday")) {
+                        int val = Integer.parseInt(restaurantDailyTrack.getString("totalOrdersToday", ""));
+                        val = val + 1;
+                        restaurantTrackEditor.putString("totalOrdersToday", String.valueOf(val));
+                    } else {
+                        restaurantTrackEditor.putString("totalOrdersToday", String.valueOf(1));
+                    }
+
+                    if (restaurantDailyTrack.contains("totalTransactionsToday")) {
+                        double val = Double.parseDouble(restaurantDailyTrack.getString("totalTransactionsToday", ""));
+                        val = val + Double.parseDouble(orderAmount);
+                        restaurantTrackEditor.putString("totalTransactionsToday", String.valueOf(val));
+                    } else {
+                        restaurantTrackEditor.putString("totalTransactionsToday", String.valueOf(orderAmount));
+                    }
+
+                    restaurantTrackEditor.apply();
+                    File file = new File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "RestaurantEarningTracker.xlsx");
+                    try {
+                        Cell cell;
+                        FileInputStream fileInputStream = new FileInputStream(file);
+                        XSSFWorkbook workbook = new XSSFWorkbook(fileInputStream);
+                        Sheet sheet = workbook.getSheetAt(0);
+                        int max = sheet.getLastRowNum();
+                        max = max + 1;
+                        Row row = sheet.createRow(max);
+                        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                        Date date = new Date(Long.parseLong(timePaying));
+                        cell = row.createCell(0);
+                        cell.setCellValue(dateFormat.format(date));
+                        cell = row.createCell(1);
+                        cell.setCellValue(str);
+                        cell = row.createCell(2);
+                        cell.setCellValue("PayInEnd");
+                        cell = row.createCell(3);
+                        cell.setCellValue("\u20B9" + orderAmount);
+                        Log.i("info", max + "");
+                        FileOutputStream fileOutputStream = new FileOutputStream(file);
+                        workbook.write(fileOutputStream);
+                        fileOutputStream.flush();
+                        fileOutputStream.close();
+                        Toast.makeText(ApproveCurrentOrder.this, "Completed", Toast.LENGTH_SHORT).show();
+                        workbook.close();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
 
                     SharedPreferences checkPrem = getSharedPreferences("AdminPremiumDetails", MODE_PRIVATE);
                     if (checkPrem.contains("status") && checkPrem.getString("status", "").equals("active")) {

@@ -19,11 +19,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="9dp"
-            android:layout_marginTop="5dp"
-            android:fontFamily="@font/amarante"
+            android:layout_marginTop="3dp"
+            android:fontFamily="@font/inter"
             android:text="Table Number: "
             android:textColor="@color/black"
-            android:textSize="16sp"
+            android:textSize="15sp"
             android:textStyle="bold" />
 
         <TextView
@@ -31,11 +31,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="9dp"
-            android:layout_marginTop="5dp"
-            android:fontFamily="@font/amarante"
+            android:layout_marginTop="3dp"
+            android:fontFamily="@font/inter"
             android:text="Seats: "
             android:textColor="@color/slate_black"
-            android:textSize="16sp"
+            android:textSize="15sp"
             android:textStyle="bold" />
 
         <Button
@@ -43,7 +43,7 @@
             android:layout_width="wrap_content"
             android:layout_height="34dp"
             android:layout_gravity="center"
-            android:layout_marginTop="5dp"
+            android:layout_marginTop="3dp"
             android:background="@drawable/chat_with_customer_button"
             android:padding="5dp"
             android:text="Chat With Customer"
@@ -56,7 +56,7 @@
             android:layout_width="wrap_content"
             android:layout_height="34dp"
             android:layout_gravity="center"
-            android:layout_marginTop="5dp"
+            android:layout_marginTop="3dp"
             android:background="@drawable/chat_with_customer_button"
             android:padding="8dp"
             android:text="Current Order"
