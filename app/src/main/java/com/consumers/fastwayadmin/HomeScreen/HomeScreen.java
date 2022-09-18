@@ -117,6 +117,7 @@ public class HomeScreen extends AppCompatActivity {
         {
             myEditor.putString("currentYear",year + "");
         }
+
         myEditor.apply();
         manager.beginTransaction().replace(R.id.homescreen,new HomeFrag()).commit();
         calenderForExcel = getSharedPreferences("CalenderForExcel",MODE_PRIVATE);
@@ -357,22 +358,81 @@ public class HomeScreen extends AppCompatActivity {
             } else {
 
                 if(year > Integer.parseInt(sharedPreferences.getString("currentYear",""))){
+
                     myEditor.putString("currentYear",year + "");
                     myEditor.apply();
-
+                    int whichY = year - 1;
+                    SharedPreferences previousYearStore = getSharedPreferences("PreviousYearAnalysisDish" + whichY,MODE_PRIVATE);
+                    SharedPreferences.Editor prevYearEdit = previousYearStore.edit();
                     SharedPreferences storeEditor = getSharedPreferences("DishAnalysis",MODE_PRIVATE);
+
+                    Map<String,?> storeMap = storeEditor.getAll();
+
+                    for(Map.Entry<String,?> entry : storeMap.entrySet()){
+                        Log.d("map values",entry.getKey() + ": " + entry.getValue().toString());
+                        String value = (String) entry.getValue();
+                        String key = entry.getKey();
+
+                        prevYearEdit.putString(key,value);
+
+                    }
+                    prevYearEdit.apply();
+
+//
                     SharedPreferences.Editor storeEdit = storeEditor.edit();
                     storeEdit.clear().apply();
 
                     SharedPreferences dailyStore = getSharedPreferences("RestaurantDailyStoreForAnalysis",MODE_PRIVATE);
+                    SharedPreferences prevDailyStore = getSharedPreferences("PyeviousYearDailyStoreAnalysis" + whichY,MODE_PRIVATE);
+                    SharedPreferences.Editor prevDailyEdit = prevDailyStore.edit();
+                    Map<String,?> storeMapDaily = dailyStore.getAll();
+
+                    for(Map.Entry<String,?> entry : storeMapDaily.entrySet()){
+                        Log.d("map values",entry.getKey() + ": " + entry.getValue().toString());
+                        String value = (String) entry.getValue();
+                        String key = entry.getKey();
+
+                        prevDailyEdit.putString(key,value);
+
+                    }
+                    prevDailyEdit.apply();
+
                     SharedPreferences.Editor dailyEdit = dailyStore.edit();
                     dailyEdit.clear().apply();
 
                     SharedPreferences storeOrder = getSharedPreferences("StoreOrders",MODE_PRIVATE);
+                    SharedPreferences prevStoreORder = getSharedPreferences("PreviousStoreORder" + whichY,MODE_PRIVATE);
+                    SharedPreferences.Editor prevEditorStoreOrder = prevStoreORder.edit();
+                    Map<String,?> storeMapOrder = storeOrder.getAll();
+
+                    for(Map.Entry<String,?> entry : storeMapOrder.entrySet()){
+                        Log.d("map values",entry.getKey() + ": " + entry.getValue().toString());
+                        String value = (String) entry.getValue();
+                        String key = entry.getKey();
+
+                        prevEditorStoreOrder.putString(key,value);
+
+                    }
+                    prevEditorStoreOrder.apply();
+
                     SharedPreferences.Editor storeEditORder = storeOrder.edit();
                     storeEditORder.clear().apply();
 
                     SharedPreferences usersF = getSharedPreferences("UsersFrequencyPerMonth",MODE_PRIVATE);
+                    SharedPreferences prevUserF = getSharedPreferences("PreviousUserFrequency" + whichY,MODE_PRIVATE);
+                    Map<String,?> prevF = usersF.getAll();
+                    SharedPreferences.Editor prevUserEdit = prevUserF.edit();
+                    for(Map.Entry<String,?> entry : prevF.entrySet()){
+                        Log.d("map values",entry.getKey() + ": " + entry.getValue().toString());
+                        String value = (String) entry.getValue();
+                        String key = entry.getKey();
+
+                        prevUserEdit.putString(key,value);
+
+                    }
+                    prevUserEdit.apply();
+
+
                     SharedPreferences.Editor userFEdit = usersF.edit();
                     userFEdit.clear().apply();
                 }
@@ -435,7 +495,7 @@ public class HomeScreen extends AppCompatActivity {
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
             }
-        }),60);
+        }),20);
 
 
 //        new Handler().postDelayed(() -> {
