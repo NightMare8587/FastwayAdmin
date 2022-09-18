@@ -587,7 +587,7 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                             json = trackingOfTakeAway.getString(month, "");
                             HashMap<String, String> map = gson.fromJson(json, type);
                             if (map.containsKey(calendar.get(Calendar.DAY_OF_MONTH) + "")) {
-                                int currentVal = Integer.parseInt(map.get(calendar.get(Calendar.DAY_OF_MONTH) + ""));
+                                int currentVal = Integer.parseInt(Objects.requireNonNull(map.get(calendar.get(Calendar.DAY_OF_MONTH) + "")));
                                 currentVal++;
                                 map.put(calendar.get(Calendar.DAY_OF_MONTH) + "", currentVal + "");
                             } else {
@@ -734,6 +734,7 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                     }
                     new Handler().postDelayed(this::finish, 1500);
                 } else {
+                    String month = monthName[calendar.get(Calendar.MONTH)];
                     DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(sharedPreferences.getString("locality", "")).child(Objects.requireNonNull(auth.getUid())).child("Tables").child(table);
                     RequestQueue requestQueue = Volley.newRequestQueue(ApproveCurrentOrder.this);
                     JSONObject main = new JSONObject();
@@ -784,10 +785,68 @@ public class ApproveCurrentOrder extends AppCompatActivity {
 
 
                 if(storeTablePayInEnd.contains(table) && storeTablePayInEnd.getString(table,"").equals(id)){
+                    String timeStr = storeTablePayInEnd.getString(table + "time","");
                     double val = Double.parseDouble(restaurantDailyTrack.getString("totalTransactionsToday", ""));
                     val = val + Double.parseDouble(orderAmount);
                     restaurantTrackEditor.putString("totalTransactionsToday", String.valueOf(val));
                     restaurantTrackEditor.apply();
+
+                    if (storeOrdersForAdminInfo.contains(month)) {
+
+                        Type type = new TypeToken<List<List<String>>>() {
+                        }.getType();
+                        gson = new Gson();
+                        json = storeOrdersForAdminInfo.getString(month, "");
+                        List<List<String>> mainDataList = gson.fromJson(json, type);
+                        List<String> date = new ArrayList<>(mainDataList.get(0));
+                        List<String> transID = new ArrayList<>(mainDataList.get(1));
+                        List<String> userID = new ArrayList<>(mainDataList.get(2));
+                        List<String> orderAmountList = new ArrayList<>(mainDataList.get(3));
+                        int pos = date.indexOf(timeStr);
+                        double valDouble = Double.parseDouble(orderAmountList.get(pos));
+                        valDouble += Double.parseDouble(orderAmount);
+                        orderAmountList.set(pos,String.valueOf(valDouble));
+                        List<List<String>> storeNewList = new ArrayList<>();
+                        storeNewList.add(date);
+                        storeNewList.add(transID);
+                        storeNewList.add(userID);
+                        storeNewList.add(orderAmountList);
+
+                        json = gson.toJson(storeNewList);
+                        storeEditor.putString(month, json);
+                        storeEditor.apply();
+                        int day = calendar.get(Calendar.DAY_OF_MONTH);
+                        type = new TypeToken<List<List<String>>>() {
+                        }.getType();
+                        gson = new Gson();
+                        json = storeDailyTotalOrdersMade.getString(month, "");
+                        List<List<String>> mainList = gson.fromJson(json, type);
+                        List<String> days = new ArrayList<>(mainList.get(0));
+                        List<String> totalAmounts = new ArrayList<>(mainList.get(1));
+                        List<String> totalOrdersPlaced = new ArrayList<>(mainList.get(2));
+
+                        if (Integer.parseInt(days.get(days.size() - 1)) == day) {
+                            Double totalAmount = Double.parseDouble(totalAmounts.get(totalAmounts.size() - 1));
+                            totalAmount += Double.parseDouble(orderAmount);
+                            totalAmounts.set(totalAmounts.size() - 1, String.valueOf(totalAmount));
+
+                        } else {
+                            days.add(String.valueOf(day));
+                            totalOrdersPlaced.add("1");
+                            totalAmounts.add(String.valueOf(orderAmount));
+                        }
+
+                        List<List<String>> newList = new ArrayList<>();
+                        newList.add(days);
+                        newList.add(totalAmounts);
+                        newList.add(totalOrdersPlaced);
+                        json = gson.toJson(newList);
+                        storeDailyEditor.putString(month, json);
+                        storeDailyEditor.apply();
+
+                        Log.i("myInfo", storeNewList.toString());
+                        Log.i("myInfo", newList.toString());
+                    }
                 }else {
                     String timePaying = System.currentTimeMillis() + "";
                     String str = "ORDER_" + timePaying;
@@ -812,8 +871,142 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                     }
 
                     restaurantTrackEditor.apply();
+
+                    if (storeOrdersForAdminInfo.contains(month)) {
+
+                        Type type = new TypeToken<List<List<String>>>() {
+                        }.getType();
+                        gson = new Gson();
+                        json = storeOrdersForAdminInfo.getString(month, "");
+                        List<List<String>> mainDataList = gson.fromJson(json, type);
+                        List<String> date = new ArrayList<>(mainDataList.get(0));
+                        List<String> transID = new ArrayList<>(mainDataList.get(1));
+                        List<String> userID = new ArrayList<>(mainDataList.get(2));
+                        List<String> orderAmountList = new ArrayList<>(mainDataList.get(3));
+
+                        date.add(timePaying);
+                        transID.add("ORDER_" + timePaying);
+                        userID.add(id);
+                        orderAmountList.add(orderAmount + "");
+
+                        List<List<String>> storeNewList = new ArrayList<>();
+                        storeNewList.add(date);
+                        storeNewList.add(transID);
+                        storeNewList.add(userID);
+                        storeNewList.add(orderAmountList);
+
+                        json = gson.toJson(storeNewList);
+                        storeEditor.putString(month, json);
+                        storeEditor.apply();
+                        int day = calendar.get(Calendar.DAY_OF_MONTH);
+                        type = new TypeToken<List<List<String>>>() {
+                        }.getType();
+                        gson = new Gson();
+                        json = storeDailyTotalOrdersMade.getString(month, "");
+                        List<List<String>> mainList = gson.fromJson(json, type);
+                        List<String> days = new ArrayList<>(mainList.get(0));
+                        List<String> totalAmounts = new ArrayList<>(mainList.get(1));
+                        List<String> totalOrdersPlaced = new ArrayList<>(mainList.get(2));
+
+                        if (Integer.parseInt(days.get(days.size() - 1)) == day) {
+                            Double totalAmount = Double.parseDouble(totalAmounts.get(totalAmounts.size() - 1));
+                            totalAmount += Double.parseDouble(orderAmount);
+                            totalAmounts.set(totalAmounts.size() - 1, String.valueOf(totalAmount));
+
+                            int totalOrder = Integer.parseInt(totalOrdersPlaced.get(totalOrdersPlaced.size() - 1));
+                            totalOrder += 1;
+                            totalOrdersPlaced.set(totalOrdersPlaced.size() - 1, String.valueOf(totalOrder));
+                        } else {
+                            days.add(String.valueOf(day));
+                            totalOrdersPlaced.add("1");
+                            totalAmounts.add(String.valueOf(orderAmount));
+                        }
+
+                        List<List<String>> newList = new ArrayList<>();
+                        newList.add(days);
+                        newList.add(totalAmounts);
+                        newList.add(totalOrdersPlaced);
+                        json = gson.toJson(newList);
+                        storeDailyEditor.putString(month, json);
+                        storeDailyEditor.apply();
+
+                        Log.i("myInfo", storeNewList.toString());
+                        Log.i("myInfo", newList.toString());
+                    } else {
+
+                        List<List<String>> mainDataList = new ArrayList<>();
+                        List<String> date = new ArrayList<>();
+                        List<String> transID = new ArrayList<>();
+                        List<String> userID = new ArrayList<>();
+                        List<String> orderAmountList = new ArrayList<>();
+                        int day = calendar.get(Calendar.DAY_OF_MONTH);
+                        date.add(timePaying);
+                        transID.add("ORDER_" + timePaying);
+                        userID.add(id);
+                        orderAmountList.add(orderAmount + "");
+                        mainDataList.add(date);
+                        mainDataList.add(transID);
+                        mainDataList.add(userID);
+                        mainDataList.add(orderAmountList);
+
+                        gson = new Gson();
+                        json = gson.toJson(mainDataList);
+                        storeEditor.putString(month, json);
+                        storeEditor.apply();
+
+                        List<List<String>> mainList = new ArrayList<>();
+                        List<String> days = new ArrayList<>();
+                        List<String> totalAmounts = new ArrayList<>();
+                        List<String> totalOrdersPlaced = new ArrayList<>();
+
+                        days.add(String.valueOf(day));
+                        totalAmounts.add(String.valueOf(orderAmount));
+                        totalOrdersPlaced.add(String.valueOf(1));
+
+                        mainList.add(days);
+                        mainList.add(totalAmounts);
+                        mainList.add(totalOrdersPlaced);
+
+                        gson = new Gson();
+                        json = gson.toJson(mainList);
+                        storeDailyEditor.putString(month, json);
+                        storeDailyEditor.apply();
+                        Log.i("myInfo", mainDataList.toString());
+                        Log.i("myInfo", mainList.toString());
+                    }
+
+                    if(userFrequency.contains(month)){
+                        java.lang.reflect.Type type = new TypeToken<HashMap<String,String>>() {
+                        }.getType();
+                        gson = new Gson();
+                        json = userFrequency.getString(month,"");
+                        HashMap<String,String> map = gson.fromJson(json,type);
+                        if(map.containsKey(id)){
+                            int val = Integer.parseInt(map.get(id) + "");
+                            val++;
+                            map.put(id,val + "");
+                        }else
+                        {
+                            map.put(id,"1");
+                        }
+
+                        json = gson.toJson(map);
+                    }else{
+                        HashMap<String,String> map = new HashMap<>();
+                        map.put(id,"1");
+
+                        gson = new Gson();
+                        json = gson.toJson(map);
+
+                    }
+                    userFedit.putString(month,json);
+                    userFedit.apply();
+
+                }
+
                     File file = new File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "RestaurantEarningTracker.xlsx");
                     try {
+                        String timePaying = System.currentTimeMillis() + "";
                         Cell cell;
                         FileInputStream fileInputStream = new FileInputStream(file);
                         XSSFWorkbook workbook = new XSSFWorkbook(fileInputStream);
@@ -826,7 +1019,7 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                         cell = row.createCell(0);
                         cell.setCellValue(dateFormat.format(date));
                         cell = row.createCell(1);
-                        cell.setCellValue(str);
+                        cell.setCellValue("ORDER_" + timePaying);
                         cell = row.createCell(2);
                         cell.setCellValue("PayInEnd");
                         cell = row.createCell(3);
@@ -841,11 +1034,9 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                }
 
                     SharedPreferences checkPrem = getSharedPreferences("AdminPremiumDetails", MODE_PRIVATE);
                     if (checkPrem.contains("status") && checkPrem.getString("status", "").equals("active")) {
-                        String month = monthName[calendar.get(Calendar.MONTH)];
                         if (storeForDishAnalysis.contains("DishAnalysisMonthBasis")) {
                             gson = new Gson();
                             Type type = new TypeToken<HashMap<String, HashMap<String, String>>>() {

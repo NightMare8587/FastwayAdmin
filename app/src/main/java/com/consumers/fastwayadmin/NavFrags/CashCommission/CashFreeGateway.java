@@ -64,7 +64,7 @@ public class CashFreeGateway extends AppCompatActivity {
         editor.apply();
         name = acInfo.getString("name","");
         email = acInfo.getString("email","");
-        number = acInfo.getString("number","");
+        number = "8076531395";
 
         if(acInfo.contains("testAdmin")){
             appID = "61532dad5cd9ca634ae8ca59d23516";

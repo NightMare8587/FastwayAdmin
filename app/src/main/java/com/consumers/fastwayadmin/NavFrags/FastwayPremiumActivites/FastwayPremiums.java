@@ -56,8 +56,8 @@ public class FastwayPremiums extends AppCompatActivity {
             @SuppressLint("SetTextI18n")
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(snapshot.hasChild("freeTrialPeriod")){
-                    long time = Long.parseLong(String.valueOf(snapshot.child("freeTrialPeriod").getValue()));
+                if(snapshot.hasChild("freeTrialDate")){
+                    long time = Long.parseLong(String.valueOf(snapshot.child("freeTrialDate").getValue()));
                     if(System.currentTimeMillis() > time){
                         setContentView(R.layout.isfreetraialrunning);
                         TextView textView = findViewById(R.id.freeTrailUpdateTextView);
@@ -124,7 +124,7 @@ public class FastwayPremiums extends AppCompatActivity {
                         if(System.currentTimeMillis() > subTime){
                             setContentView(R.layout.isfreetraialrunning);
                             TextView textView = findViewById(R.id.freeTrailUpdateTextView);
-                            textView.setText("Your free trial is over. Subscribe now \u20b9599 per month");
+                            textView.setText("Your subscription is over. Subscribe now \u20b9599 per month");
                             Button button = findViewById(R.id.subscribePremFreeTrialEnded);
                             button.setVisibility(View.VISIBLE);
                             button.setText("Subscribe Now");
@@ -136,7 +136,7 @@ public class FastwayPremiums extends AppCompatActivity {
                         }else{
                             setContentView(R.layout.isfreetraialrunning);
                             TextView textView = findViewById(R.id.freeTrailUpdateTextView);
-                            textView.setText("Your free trial is active. \nDays Remaining: " + TimeUnit.MILLISECONDS.toDays(subTime - System.currentTimeMillis()));
+                            textView.setText("Your subscription is active. \nDays Remaining: " + TimeUnit.MILLISECONDS.toDays(subTime - System.currentTimeMillis()));
                         }
                     }
                 }

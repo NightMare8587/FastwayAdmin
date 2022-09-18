@@ -29,7 +29,10 @@
             app:key="premium"
             app:title="Foodine Premium"
             app:summary=""/>
-
+        <Preference
+            app:key="premiumExcelSheet"
+            app:title="View Excel Sheet"
+            app:summary=""/>
 
     </PreferenceCategory>
 
