@@ -31,6 +31,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 //import com.aspose.cells.Workbook;
+import com.consumers.fastwayadmin.Chat.RandomChatFolder.RandomChatWithUsers;
 import com.consumers.fastwayadmin.Info.RestaurantDocuments.ReUploadDocumentsAgain;
 import com.consumers.fastwayadmin.Info.RestaurantDocuments.UploadRemainingDocs;
 import com.consumers.fastwayadmin.NavFrags.AccountSettingsFragment;
@@ -608,8 +609,19 @@ public class HomeScreen extends AppCompatActivity {
         else if(id == R.id.randomChatMessagesUsers){
             startActivity(new Intent(HomeScreen.this, ReplaceOrderRequests.class));
         }
-        else
-          startActivity(new Intent(HomeScreen.this, RandomChatNoww.class));
+        else {
+            AlertDialog.Builder builder = new AlertDialog.Builder(HomeScreen.this);
+            builder.setTitle("Choose one").setMessage("Choose one option from below")
+                            .setPositiveButton("Open Foodine Chat", (dialog, which) -> {
+                                dialog.dismiss();
+                                startActivity(new Intent(HomeScreen.this, RandomChatNoww.class));
+                            }).setNegativeButton("Open Users Chat", (dialog, which) -> {
+                                dialog.dismiss();
+                                startActivity(new Intent(HomeScreen.this, RandomChatWithUsers.class));
+                            }).setNeutralButton("Exit", (dialog, which) -> dialog.dismiss()).create();
+            builder.show();
+
+        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -871,9 +883,7 @@ public class HomeScreen extends AppCompatActivity {
     }
 
     private void checkIfBankDetailsSubmitted() {
-        new Handler().postDelayed(() -> {
 
-        },50);
     }
 
     private void checkIfNeededToAddToQuery() {
