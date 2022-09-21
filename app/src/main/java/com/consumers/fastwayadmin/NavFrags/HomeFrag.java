@@ -78,6 +78,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
 
@@ -348,6 +349,9 @@ public class HomeFrag extends Fragment {
                 statusEditor.apply();
                 onlineOrOfflineRestaurant.child("acceptingOrders").setValue("yes");
                 Toast.makeText(getContext(), "Restaurant is now accepting orders", Toast.LENGTH_SHORT).show();
+                FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+                firestore.collection(resInfoShared.getString("state","")).document("Restaurants").collection(resInfoShared.getString("locality",""))
+                        .document(UID).update("acceptingOrders","yes");
             }else{
                 onlineOrOfflineRestaurant.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -386,6 +390,9 @@ public class HomeFrag extends Fragment {
                 comboImage.setVisibility(View.VISIBLE);
                 linearLayout.setVisibility(View.VISIBLE);
                 onlineOrOfflineRestaurant.child("status").setValue("online");
+                FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+                firestore.collection(resInfoShared.getString("state","")).document("Restaurants").collection(resInfoShared.getString("locality",""))
+                                .document(UID).update("status","online","acceptingOrders","yes");
                 onlineOrOfflineRestaurant.child("acceptingOrders").setValue("yes");
                 editor.putString("online","true");
             }else{
@@ -815,6 +822,9 @@ public class HomeFrag extends Fragment {
                         acceptOrders.setChecked(false);
                         onlineOrOfflineRestaurant.child("acceptingOrders").setValue("no");
                         statusEditor.putString("resOrdersAccepting","no");
+                        FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+                        firestore.collection(resInfoShared.getString("state","")).document("Restaurants").collection(resInfoShared.getString("locality",""))
+                                .document(UID).update("acceptingOrders","no");
                         statusEditor.apply();
                         Toast.makeText(requireContext(), "Restaurant will not receive orders", Toast.LENGTH_SHORT).show();
                     }
@@ -868,6 +878,9 @@ public class HomeFrag extends Fragment {
                             secondLinearLayout.setVisibility(View.INVISIBLE);
                             onlineOrOfflineRestaurant.child("status").setValue("offline");
                             onlineOrOfflineRestaurant.child("acceptingOrders").setValue("no");
+                            FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+                            firestore.collection(resInfoShared.getString("state","")).document("Restaurants").collection(resInfoShared.getString("locality",""))
+                                    .document(UID).update("status","offline","acceptingOrders","no");
                             editor.putString("online","false");
                             FastDialog fastDialog = new FastDialogBuilder(requireContext(), Type.PROGRESS)
                                     .progressText("Closing restaurant... please wait")
