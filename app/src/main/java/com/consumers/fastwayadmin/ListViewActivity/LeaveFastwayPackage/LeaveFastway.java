@@ -49,7 +49,7 @@ public class LeaveFastway extends AppCompatActivity {
     RadioButton radioButton;
     boolean stopCode = false;
     String UID;
-    String reasonForLeave = "Not Finding FOODINE Usefull";
+    String reasonForLeave = "Not Finding Ordinalo Usefull";
     RadioGroup radioGroup;
     FirebaseAuth auth = FirebaseAuth.getInstance();
     
@@ -105,7 +105,7 @@ public class LeaveFastway extends AppCompatActivity {
 
         radioGroup.setOnCheckedChangeListener((radioGroup, i) -> {
           if(radioButton.getId() == i)
-              reasonForLeave = "Not Finding Foodine Usefull";
+              reasonForLeave = "Not Finding Ordinalo Usefull";
           else
               reasonForLeave = "Others";
 
@@ -138,7 +138,7 @@ public class LeaveFastway extends AppCompatActivity {
                     double gst = (totalCash * 5) / 100;
                     double platformFee = (totalMonth * 4) / 100;
                     AlertDialog.Builder builder = new AlertDialog.Builder(LeaveFastway.this);
-                    builder.setTitle("Pending Due's").setMessage("You need to pay off pending amount to leave Foodine\n\nCash Commission: \u20b9" + commAmount + "\nGST: \u20b9" + gst + "\nPlatform Fee: " + platformFee + "\nTotal: \u20b9" + decimalFormat.format(gst + commAmount + platformFee));
+                    builder.setTitle("Pending Due's").setMessage("You need to pay off pending amount to leave Ordinalo\n\nCash Commission: \u20b9" + commAmount + "\nGST: \u20b9" + gst + "\nPlatform Fee: " + platformFee + "\nTotal: \u20b9" + decimalFormat.format(gst + commAmount + platformFee));
                     builder.setPositiveButton("Pay Now", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {

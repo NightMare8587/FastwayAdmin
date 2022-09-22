@@ -136,7 +136,7 @@ public class HomeScreen extends AppCompatActivity {
                 if(snapshot.exists() && snapshot.hasChild("reasonForCancel")){
                     AlertDialog.Builder alert = new AlertDialog.Builder(HomeScreen.this);
                     String reason = snapshot.child("reasonForCancel").getValue(String.class);
-                    alert.setTitle("Error").setMessage("Your restaurant registration is denied by Foodine for following reason's:\n\n" + reason + "\n\nYou can submit another response for restaurant registration")
+                    alert.setTitle("Error").setMessage("Your restaurant registration is denied by Ordinalo for following reason's:\n\n" + reason + "\n\nYou can submit another response for restaurant registration")
                             .setPositiveButton("Re-Submit", (dialogInterface, i) -> {
                                 startActivity(new Intent(HomeScreen.this, ReUploadDocumentsAgain.class));
                                 dialogInterface.dismiss();
@@ -612,7 +612,7 @@ public class HomeScreen extends AppCompatActivity {
         else {
             AlertDialog.Builder builder = new AlertDialog.Builder(HomeScreen.this);
             builder.setTitle("Choose one").setMessage("Choose one option from below")
-                            .setPositiveButton("Open Foodine Chat", (dialog, which) -> {
+                            .setPositiveButton("Open Ordinalo Chat", (dialog, which) -> {
                                 dialog.dismiss();
                                 startActivity(new Intent(HomeScreen.this, RandomChatNoww.class));
                             }).setNegativeButton("Open Users Chat", (dialog, which) -> {
@@ -865,7 +865,7 @@ public class HomeScreen extends AppCompatActivity {
                             alertDialog.show();
                         }else{
                             AlertDialog.Builder builder = new AlertDialog.Builder(HomeScreen.this);
-                            builder.setTitle("Time Exceeded").setMessage("Your 30 days period to submit documents is over\nYour restaurant is now suspended from Foodine")
+                            builder.setTitle("Time Exceeded").setMessage("Your 30 days period to submit documents is over\nYour restaurant is now suspended from Ordinalo")
                                     .setPositiveButton("Exit", (dialogInterface, i) -> dialogInterface.dismiss()).create().show();
 
                         }
