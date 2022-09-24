@@ -39,6 +39,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.consumers.fastwayadmin.CancelClass;
+import com.consumers.fastwayadmin.NavFrags.CurrentTakeAwayOrders.ApproveCurrentTakeAway;
 import com.consumers.fastwayadmin.NavFrags.CurrentTakeAwayOrders.MyClass;
 import com.consumers.fastwayadmin.PaymentClass;
 import com.consumers.fastwayadmin.R;
@@ -1526,9 +1527,9 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                 protected Map<String, String> getParams() {
                     Map<String,String> params = new HashMap<>();
                     params.put("benID",auth.getUid());
-                    String genratedID = ApproveCurrentOrder.RandomString
-                            .getAlphaNumericString(8);
-                    genratedID = genratedID + System.currentTimeMillis();
+                    String genratedID = "ORDER_" + System.currentTimeMillis() + "_" + ApproveCurrentTakeAway.RandomString
+                            .getAlphaNumericString(5);
+
                     transactionIdForExcel = genratedID;
                     params.put("transID",genratedID);
                     params.put("token",genratedToken);

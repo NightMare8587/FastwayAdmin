@@ -2006,7 +2006,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                 @Override
                 protected Map<String, String> getParams() {
                     Map<String,String> params = new HashMap<>();
-                    params.put("benID","BKkZjAAB9fQmleexouAb2zSRtQm2");
+                    params.put("benID",auth.getUid());
                     String genratedID = "ORDER_" + System.currentTimeMillis() + "_" + ApproveCurrentTakeAway.RandomString
                             .getAlphaNumericString(5);
 
@@ -2027,7 +2027,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
     public static class RandomString {
 
         // function to generate a random string of length n
-        static String getAlphaNumericString(int n) {
+        public static String getAlphaNumericString(int n) {
 
             // chose a Character random from this String
             String AlphaNumericString = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"

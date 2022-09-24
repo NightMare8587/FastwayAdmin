@@ -104,7 +104,7 @@ public class MyOrderAdapter extends RecyclerView.Adapter<MyOrderAdapter.Holder> 
             if(status.get(position).equals("FAILED")){
                 AlertDialog.Builder alert = new AlertDialog.Builder(context);
                 alert.setTitle("Failed");
-                alert.setMessage("Transaction Failed\nDo you wanna raise a issue to Fastway about failed transaction");
+                alert.setMessage("Transaction Failed\nDo you wanna raise a issue to Ordinalo about failed transaction");
                 alert.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @RequiresApi(api = Build.VERSION_CODES.N)
                     @Override
