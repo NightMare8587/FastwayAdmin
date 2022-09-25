@@ -71,23 +71,14 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
                                 platformFeeAmount = Double.parseDouble(Objects.requireNonNull(snapshot.child("totalMonthAmount").getValue(String.class)));
                                 if(platformFeeAmount == 0D){
                                     platformFeeAmount = 0D;
-                                }else if(platformFeeAmount >= 1200000L){
-                                    platformFeeAmount = 36000D;
-                                }else if(platformFeeAmount >= 900000L){
-                                    platformFeeAmount = 24000D;
-                                }
-                                else if(platformFeeAmount >= 600000L){
-                                    platformFeeAmount = 12000D;
-                                }else if(platformFeeAmount >= 300000L){
-                                    platformFeeAmount = 6000D;
                                 }else{
-                                    platformFeeAmount = 2000D;
+                                    platformFeeAmount = (platformFeeAmount * 2)/100;
                                 }
                                 platformFee.setText("Platform Fee: " + "\u20B9" + df.format(platformFeeAmount));
                                 platformFeeBool = true;
                             }else{
                                 platformFeeAmount = 1500D;
-                                platformFee.setText("Platform Fee: " + "\u20B91000");
+                                platformFee.setText("Platform Fee: " + "\u20B91500");
                             }
                             totalCommission.setText("Commission to be paid " + "\u20B9" + df.format(commissionAmount + gstToBePaid));
                             payCommissionNow.setText("Pay \u20B9" + df.format(commissionAmount + platformFeeAmount + gstToBePaid) + " Now");
@@ -149,7 +140,7 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
                                                 acEdit.apply();
 
                                                 Intent intent = new Intent(CashTransactionCommissionActivity.this, CashFreeGateway.class);
-                                                intent.putExtra("amount","599.00");
+                                                intent.putExtra("amount",df.format(commissionAmount + platformFeeAmount + gstToBePaid));
                                                 startActivityForResult(intent,2);
                                             }else
                                                 Toast.makeText(CashTransactionCommissionActivity.this, "Invalid Number", Toast.LENGTH_SHORT).show();
@@ -172,7 +163,7 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
                                                     double fineAmount = (commissionAmount * 10)/100;
                                                     commissionAmount = commissionAmount + fineAmount;
                                                     Intent intent = new Intent(CashTransactionCommissionActivity.this, CashFreeGateway.class);
-                                                    intent.putExtra("amount", df.format(commissionAmount + platformFeeAmount) + "");
+                                                    intent.putExtra("amount",df.format(commissionAmount + platformFeeAmount + gstToBePaid));
                                                     startActivityForResult(intent, 2);
                                                 }).create();
                                         builder.show();
@@ -183,7 +174,7 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
                                                     dialogInterface.dismiss();
                                                     Intent intent = new Intent(CashTransactionCommissionActivity.this, CashFreeGateway.class);
 
-                                                    intent.putExtra("amount", (commissionAmount + platformFeeAmount) + "");
+                                                    intent.putExtra("amount",df.format(commissionAmount + platformFeeAmount + gstToBePaid));
                                                     startActivityForResult(intent, 2);
                                                 }).create();
                                         builder.show();
@@ -204,31 +195,23 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
                                                 click.dismissWithAnimation();
                                         totalCashTransaction.setText("Total Cash Transactions " + "\u20B9" + snapshot.child("totalCashTakeAway").getValue(String.class));
                                         double totalCash = Double.parseDouble(Objects.requireNonNull(snapshot.child("totalCashTakeAway").getValue(String.class)));
-                                        commissionAmount = (totalCash * 7)/100;
+                                        commissionAmount = (totalCash * 3)/100;
+                                        gstToBePaid = (totalCash * 5)/100;
                                         if(snapshot.hasChild("totalMonthAmount")){
                                             platformFeeAmount = Double.parseDouble(Objects.requireNonNull(snapshot.child("totalMonthAmount").getValue(String.class)));
                                             if(platformFeeAmount == 0D){
                                                 platformFeeAmount = 0D;
-                                            }else if(platformFeeAmount >= 1200000L){
-                                                platformFeeAmount = 36000D;
-                                            }else if(platformFeeAmount >= 900000L){
-                                                platformFeeAmount = 24000D;
-                                            }
-                                            else if(platformFeeAmount >= 600000L){
-                                                platformFeeAmount = 12000D;
-                                            }else if(platformFeeAmount >= 300000L){
-                                                platformFeeAmount = 6000D;
                                             }else{
-                                                platformFeeAmount = 2000D;
+                                                platformFeeAmount = (platformFeeAmount * 2)/100;
                                             }
                                             platformFee.setText("Platform Fee: " + "\u20B9" + df.format(platformFeeAmount));
                                             platformFeeBool = true;
                                         }else{
-                                            platformFeeAmount = 2000D;
-                                            platformFee.setText("Platform Fee: " + "\u20B91000");
+                                            platformFeeAmount = 1500D;
+                                            platformFee.setText("Platform Fee: " + "\u20B9" + platformFeeAmount);
                                         }
                                         totalCommission.setText("Commission to be paid " + "\u20B9" + df.format(commissionAmount));
-                                        payCommissionNow.setText("Pay \u20B9" + df.format(commissionAmount + platformFeeAmount) + " Now");
+                                        payCommissionNow.setText("Pay \u20B9" + df.format(commissionAmount + platformFeeAmount + gstToBePaid) + " Now");
                                         payCommissionNow.setOnClickListener(view -> {
                                             SharedPreferences acc = getSharedPreferences("loginInfo",MODE_PRIVATE);
                                             SharedPreferences.Editor acEdit = acc.edit();
@@ -253,7 +236,7 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
                                                             acEdit.apply();
 
                                                             Intent intent = new Intent(CashTransactionCommissionActivity.this, CashFreeGateway.class);
-                                                            intent.putExtra("amount","599.00");
+                                                            intent.putExtra("amount",df.format(commissionAmount + platformFeeAmount + gstToBePaid));
                                                             startActivityForResult(intent,2);
                                                         }else
                                                             Toast.makeText(CashTransactionCommissionActivity.this, "Invalid Number", Toast.LENGTH_SHORT).show();
@@ -264,6 +247,7 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
                                                 builder.show();
                                                 return;
                                             }
+
                                             if(commissionAmount != 0) {
                                                 SharedPreferences cash = getSharedPreferences("CashCommission",MODE_PRIVATE);
                                                 if(cash.contains("fine")) {
@@ -275,7 +259,7 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
                                                                 double fineAmount = (commissionAmount * 10)/100;
                                                                 commissionAmount = commissionAmount + fineAmount;
                                                                 Intent intent = new Intent(CashTransactionCommissionActivity.this, CashFreeGateway.class);
-                                                                intent.putExtra("amount", df.format(commissionAmount + platformFeeAmount) + "");
+                                                                intent.putExtra("amount",df.format(commissionAmount + platformFeeAmount + gstToBePaid));
                                                                 startActivityForResult(intent, 2);
                                                             }).create();
                                                     builder.show();
@@ -286,7 +270,7 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
                                                                 dialogInterface.dismiss();
                                                                 Intent intent = new Intent(CashTransactionCommissionActivity.this, CashFreeGateway.class);
 
-                                                                intent.putExtra("amount", (commissionAmount + platformFeeAmount) + "");
+                                                                intent.putExtra("amount",df.format(commissionAmount + platformFeeAmount + gstToBePaid));
                                                                 startActivityForResult(intent, 2);
                                                             }).create();
                                                     builder.show();
@@ -296,6 +280,41 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
                                         });
                                     });
 
+                            seeBreakDown.setOnClickListener(clic -> {
+                                AlertDialog.Builder dialog = new AlertDialog.Builder(CashTransactionCommissionActivity.this);
+                                dialog.setTitle("Breakdown").setMessage("Below you can see breakdown of fees and gst to be paid");
+                                LinearLayout linearLayout = new LinearLayout(CashTransactionCommissionActivity.this);
+                                linearLayout.setOrientation(LinearLayout.VERTICAL);
+                                TextView commissionAmountText = new TextView(CashTransactionCommissionActivity.this);
+                                commissionAmountText.setGravity(View.TEXT_ALIGNMENT_CENTER);
+                                commissionAmountText.setTextSize(18);
+                                TextView gstAmount = new TextView(CashTransactionCommissionActivity.this);
+                                gstAmount.setGravity(View.TEXT_ALIGNMENT_CENTER);
+                                gstAmount.setTextSize(18);
+                                TextView platformFee = new TextView(CashTransactionCommissionActivity.this);
+                                platformFee.setGravity(View.TEXT_ALIGNMENT_CENTER);
+                                platformFee.setTextSize(18);
+                                commissionAmountText.setText("Cash Commission Amount: " +  df.format(commissionAmount));
+                                gstAmount.setText("5% Gst: " + df.format(gstToBePaid) + "");
+                                platformFee.setText("Platform Fee: " + df.format(platformFeeAmount) + "");
+
+                                TextView totalSummary = new TextView(CashTransactionCommissionActivity.this);
+                                totalSummary.setGravity(View.TEXT_ALIGNMENT_CENTER);
+                                totalSummary.setTextSize(18);
+                                totalSummary.setTextColor(Color.BLACK);
+                                totalSummary.setText("Final Amount: " + df.format(commissionAmount + platformFeeAmount + gstToBePaid) + "");
+
+                                linearLayout.addView(commissionAmountText);
+                                linearLayout.addView(gstAmount);
+                                linearLayout.addView(platformFee);
+                                linearLayout.addView(totalSummary);
+
+                                dialog.setView(linearLayout);
+                                dialog.setPositiveButton("Exit", (dialog1, which) -> dialog1.dismiss()).create();
+                                dialog.create();
+                                dialog.show();
+                            });
+
                             kAlertDialog.setCancelable(false);
                             kAlertDialog.show();
                         }
@@ -304,32 +323,23 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
                         if(System.currentTimeMillis() - date >= 2073600000L){
                             totalCashTransaction.setText("Total Cash Transactions " + "\u20B9" + snapshot.child("totalCashTakeAway").getValue(String.class));
                             double totalCash = Double.parseDouble(Objects.requireNonNull(snapshot.child("totalCashTakeAway").getValue(String.class)));
-                            commissionAmount = (totalCash * 7)/100;
+                            commissionAmount = (totalCash * 3)/100;
+                            gstToBePaid = (totalCash * 5)/100;
                             if(snapshot.hasChild("totalMonthAmount")){
                                 platformFeeAmount = Double.parseDouble(Objects.requireNonNull(snapshot.child("totalMonthAmount").getValue(String.class)));
                                 if(platformFeeAmount == 0D){
                                     platformFeeAmount = 0D;
-                                }else if(platformFeeAmount >= 1200000L){
-                                    platformFeeAmount = 36000D;
-                                }else if(platformFeeAmount >= 900000L){
-                                    platformFeeAmount = 24000D;
-                                }
-                                else if(platformFeeAmount >= 600000L){
-                                    platformFeeAmount = 12000D;
-                                }else if(platformFeeAmount >= 300000L){
-                                    platformFeeAmount = 6000D;
                                 }else{
-                                    platformFeeAmount = 2000D;
+                                    platformFeeAmount = (platformFeeAmount * 2)/100;
                                 }
                                 platformFee.setText("Platform Fee: " + "\u20B9" + df.format(platformFeeAmount));
                                 platformFeeBool = true;
                             }else{
-                                platformFeeAmount = 2000D;
-                                platformFee.setText("Platform Fee: " + "\u20B91000");
+                                platformFeeAmount = 1500D;
+                                platformFee.setText("Platform Fee: " + "\u20B9" + platformFeeAmount);
                             }
                             totalCommission.setText("Commission to be paid " + "\u20B9" + df.format(commissionAmount));
-                            payCommissionNow.setText("Pay \u20B9" + df.format(commissionAmount + platformFeeAmount) + " Now");
-                            payCommissionNow.setOnClickListener(view -> {
+                            payCommissionNow.setText("Pay \u20B9" + df.format(commissionAmount + platformFeeAmount + gstToBePaid) + " Now");                            payCommissionNow.setOnClickListener(view -> {
                                 SharedPreferences acc = getSharedPreferences("loginInfo",MODE_PRIVATE);
                                 SharedPreferences.Editor acEdit = acc.edit();
                                 if(!acc.contains("number")) {
@@ -342,28 +352,26 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
                                     editText.setHint("Enter Number");
                                     editText.setMaxLines(10);
                                     linearLayout.addView(editText);
-                                    builder.setPositiveButton("Proceed", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            dialog.dismiss();
-                                            if(editText.length() == 10)
-                                            {
-                                                Toast.makeText(CashTransactionCommissionActivity.this, "Number Saved Successfully", Toast.LENGTH_SHORT).show();
-                                                acEdit.putString("number",editText.getText().toString());
-                                                acEdit.apply();
+                                    builder.setPositiveButton("Proceed", (dialog, which) -> {
+                                        dialog.dismiss();
+                                        if(editText.length() == 10)
+                                        {
+                                            Toast.makeText(CashTransactionCommissionActivity.this, "Number Saved Successfully", Toast.LENGTH_SHORT).show();
+                                            acEdit.putString("number",editText.getText().toString());
+                                            acEdit.apply();
 
-                                                Intent intent = new Intent(CashTransactionCommissionActivity.this, CashFreeGateway.class);
-                                                intent.putExtra("amount","599.00");
-                                                startActivityForResult(intent,2);
-                                            }else
-                                                Toast.makeText(CashTransactionCommissionActivity.this, "Invalid Number", Toast.LENGTH_SHORT).show();
-                                        }
+                                            Intent intent = new Intent(CashTransactionCommissionActivity.this, CashFreeGateway.class);
+                                            intent.putExtra("amount",df.format(commissionAmount + platformFeeAmount + gstToBePaid));
+                                            startActivityForResult(intent,2);
+                                        }else
+                                            Toast.makeText(CashTransactionCommissionActivity.this, "Invalid Number", Toast.LENGTH_SHORT).show();
                                     }).setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss()).create();
                                     builder.setCancelable(false);
                                     builder.setView(linearLayout);
                                     builder.show();
                                     return;
                                 }
+
                                 if(commissionAmount != 0) {
                                     SharedPreferences cash = getSharedPreferences("CashCommission",MODE_PRIVATE);
                                     if(cash.contains("fine")) {
@@ -375,7 +383,7 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
                                                     double fineAmount = (commissionAmount * 10)/100;
                                                     commissionAmount = commissionAmount + fineAmount;
                                                     Intent intent = new Intent(CashTransactionCommissionActivity.this, CashFreeGateway.class);
-                                                    intent.putExtra("amount", df.format(commissionAmount + platformFeeAmount) + "");
+                                                    intent.putExtra("amount",df.format(commissionAmount + platformFeeAmount + gstToBePaid));
                                                     startActivityForResult(intent, 2);
                                                 }).create();
                                         builder.show();
@@ -386,13 +394,47 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
                                                     dialogInterface.dismiss();
                                                     Intent intent = new Intent(CashTransactionCommissionActivity.this, CashFreeGateway.class);
 
-                                                    intent.putExtra("amount", (commissionAmount + platformFeeAmount) + "");
+                                                    intent.putExtra("amount",df.format(commissionAmount + platformFeeAmount + gstToBePaid));
                                                     startActivityForResult(intent, 2);
                                                 }).create();
                                         builder.show();
                                     }
                                 }else
                                     Toast.makeText(CashTransactionCommissionActivity.this, "No commission amount pending", Toast.LENGTH_SHORT).show();
+                            });
+                            seeBreakDown.setOnClickListener(click -> {
+                                AlertDialog.Builder dialog = new AlertDialog.Builder(CashTransactionCommissionActivity.this);
+                                dialog.setTitle("Breakdown").setMessage("Below you can see breakdown of fees and gst to be paid");
+                                LinearLayout linearLayout = new LinearLayout(CashTransactionCommissionActivity.this);
+                                linearLayout.setOrientation(LinearLayout.VERTICAL);
+                                TextView commissionAmountText = new TextView(CashTransactionCommissionActivity.this);
+                                commissionAmountText.setGravity(View.TEXT_ALIGNMENT_CENTER);
+                                commissionAmountText.setTextSize(18);
+                                TextView gstAmount = new TextView(CashTransactionCommissionActivity.this);
+                                gstAmount.setGravity(View.TEXT_ALIGNMENT_CENTER);
+                                gstAmount.setTextSize(18);
+                                TextView platformFee = new TextView(CashTransactionCommissionActivity.this);
+                                platformFee.setGravity(View.TEXT_ALIGNMENT_CENTER);
+                                platformFee.setTextSize(18);
+                                commissionAmountText.setText("Cash Commission Amount: " +  df.format(commissionAmount));
+                                gstAmount.setText("5% Gst: " + df.format(gstToBePaid) + "");
+                                platformFee.setText("Platform Fee: " + df.format(platformFeeAmount) + "");
+
+                                TextView totalSummary = new TextView(CashTransactionCommissionActivity.this);
+                                totalSummary.setGravity(View.TEXT_ALIGNMENT_CENTER);
+                                totalSummary.setTextSize(18);
+                                totalSummary.setTextColor(Color.BLACK);
+                                totalSummary.setText("Final Amount: " + df.format(commissionAmount + platformFeeAmount + gstToBePaid) + "");
+
+                                linearLayout.addView(commissionAmountText);
+                                linearLayout.addView(gstAmount);
+                                linearLayout.addView(platformFee);
+                                linearLayout.addView(totalSummary);
+
+                                dialog.setView(linearLayout);
+                                dialog.setPositiveButton("Exit", (dialog1, which) -> dialog1.dismiss()).create();
+                                dialog.create();
+                                dialog.show();
                             });
                         }else{
                             KAlertDialog kAlertDialog = new KAlertDialog(CashTransactionCommissionActivity.this,KAlertDialog.ERROR_TYPE)
@@ -407,32 +449,23 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
                                         click.dismissWithAnimation();
                                         totalCashTransaction.setText("Total Cash Transactions " + "\u20B9" + snapshot.child("totalCashTakeAway").getValue(String.class));
                                         double totalCash = Double.parseDouble(Objects.requireNonNull(snapshot.child("totalCashTakeAway").getValue(String.class)));
-                                        commissionAmount = (totalCash * 7)/100;
+                                        commissionAmount = (totalCash * 3)/100;
+                                        gstToBePaid = (totalCash * 5)/100;
                                         if(snapshot.hasChild("totalMonthAmount")){
                                             platformFeeAmount = Double.parseDouble(Objects.requireNonNull(snapshot.child("totalMonthAmount").getValue(String.class)));
                                             if(platformFeeAmount == 0D){
                                                 platformFeeAmount = 0D;
-                                            }else if(platformFeeAmount >= 1200000L){
-                                                platformFeeAmount = 36000D;
-                                            }else if(platformFeeAmount >= 900000L){
-                                                platformFeeAmount = 24000D;
-                                            }
-                                            else if(platformFeeAmount >= 600000L){
-                                                platformFeeAmount = 12000D;
-                                            }else if(platformFeeAmount >= 300000L){
-                                                platformFeeAmount = 6000D;
                                             }else{
-                                                platformFeeAmount = 2000D;
+                                                platformFeeAmount = (platformFeeAmount * 2)/100;
                                             }
                                             platformFee.setText("Platform Fee: " + "\u20B9" + df.format(platformFeeAmount));
                                             platformFeeBool = true;
                                         }else{
-                                            platformFeeAmount = 2000D;
-                                            platformFee.setText("Platform Fee: " + "\u20B91000");
+                                            platformFeeAmount = 1500D;
+                                            platformFee.setText("Platform Fee: " + "\u20B91500");
                                         }
                                         totalCommission.setText("Commission to be paid " + "\u20B9" + df.format(commissionAmount));
-                                        payCommissionNow.setText("Pay \u20B9" + df.format(commissionAmount + platformFeeAmount) + " Now");
-                                        payCommissionNow.setOnClickListener(view -> {
+                                        payCommissionNow.setText("Pay \u20B9" + df.format(commissionAmount + platformFeeAmount + gstToBePaid) + " Now");                                        payCommissionNow.setOnClickListener(view -> {
                                             SharedPreferences acc = getSharedPreferences("loginInfo",MODE_PRIVATE);
                                             SharedPreferences.Editor acEdit = acc.edit();
                                             if(!acc.contains("number")) {
@@ -445,28 +478,27 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
                                                 editText.setHint("Enter Number");
                                                 editText.setMaxLines(10);
                                                 linearLayout.addView(editText);
-                                                builder.setPositiveButton("Proceed", new DialogInterface.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(DialogInterface dialog, int which) {
-                                                        dialog.dismiss();
-                                                        if(editText.length() == 10)
-                                                        {
-                                                            Toast.makeText(CashTransactionCommissionActivity.this, "Number Saved Successfully", Toast.LENGTH_SHORT).show();
-                                                            acEdit.putString("number",editText.getText().toString());
-                                                            acEdit.apply();
+                                                builder.setPositiveButton("Proceed", (dialog, which) -> {
+                                                    dialog.dismiss();
+                                                    if(editText.length() == 10)
+                                                    {
+                                                        Toast.makeText(CashTransactionCommissionActivity.this, "Number Saved Successfully", Toast.LENGTH_SHORT).show();
+                                                        acEdit.putString("number",editText.getText().toString());
+                                                        acEdit.apply();
 
-                                                            Intent intent = new Intent(CashTransactionCommissionActivity.this, CashFreeGateway.class);
-                                                            intent.putExtra("amount","599.00");
-                                                            startActivityForResult(intent,2);
-                                                        }else
-                                                            Toast.makeText(CashTransactionCommissionActivity.this, "Invalid Number", Toast.LENGTH_SHORT).show();
-                                                    }
+                                                        Intent intent = new Intent(CashTransactionCommissionActivity.this, CashFreeGateway.class);
+                                                        intent.putExtra("amount",df.format(commissionAmount + platformFeeAmount + gstToBePaid));
+                                                        startActivityForResult(intent,2);
+                                                    }else
+                                                        Toast.makeText(CashTransactionCommissionActivity.this, "Invalid Number", Toast.LENGTH_SHORT).show();
                                                 }).setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss()).create();
                                                 builder.setCancelable(false);
                                                 builder.setView(linearLayout);
                                                 builder.show();
                                                 return;
                                             }
+
+
                                             if(commissionAmount != 0) {
                                                 SharedPreferences cash = getSharedPreferences("CashCommission",MODE_PRIVATE);
                                                 if(cash.contains("fine")) {
@@ -478,7 +510,7 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
                                                                 double fineAmount = (commissionAmount * 10)/100;
                                                                 commissionAmount = commissionAmount + fineAmount;
                                                                 Intent intent = new Intent(CashTransactionCommissionActivity.this, CashFreeGateway.class);
-                                                                intent.putExtra("amount", df.format(commissionAmount + platformFeeAmount) + "");
+                                                                intent.putExtra("amount",df.format(commissionAmount + platformFeeAmount + gstToBePaid));
                                                                 startActivityForResult(intent, 2);
                                                             }).create();
                                                     builder.show();
@@ -489,7 +521,7 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
                                                                 dialogInterface.dismiss();
                                                                 Intent intent = new Intent(CashTransactionCommissionActivity.this, CashFreeGateway.class);
 
-                                                                intent.putExtra("amount", (commissionAmount + platformFeeAmount) + "");
+                                                                intent.putExtra("amount",df.format(commissionAmount + platformFeeAmount + gstToBePaid));
                                                                 startActivityForResult(intent, 2);
                                                             }).create();
                                                     builder.show();
@@ -498,6 +530,41 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
                                                 Toast.makeText(CashTransactionCommissionActivity.this, "No commission amount pending", Toast.LENGTH_SHORT).show();
                                         });
                                     });
+
+                            seeBreakDown.setOnClickListener(clic -> {
+                                AlertDialog.Builder dialog = new AlertDialog.Builder(CashTransactionCommissionActivity.this);
+                                dialog.setTitle("Breakdown").setMessage("Below you can see breakdown of fees and gst to be paid");
+                                LinearLayout linearLayout = new LinearLayout(CashTransactionCommissionActivity.this);
+                                linearLayout.setOrientation(LinearLayout.VERTICAL);
+                                TextView commissionAmountText = new TextView(CashTransactionCommissionActivity.this);
+                                commissionAmountText.setGravity(View.TEXT_ALIGNMENT_CENTER);
+                                commissionAmountText.setTextSize(18);
+                                TextView gstAmount = new TextView(CashTransactionCommissionActivity.this);
+                                gstAmount.setGravity(View.TEXT_ALIGNMENT_CENTER);
+                                gstAmount.setTextSize(18);
+                                TextView platformFee = new TextView(CashTransactionCommissionActivity.this);
+                                platformFee.setGravity(View.TEXT_ALIGNMENT_CENTER);
+                                platformFee.setTextSize(18);
+                                commissionAmountText.setText("Cash Commission Amount: " +  df.format(commissionAmount));
+                                gstAmount.setText("5% Gst: " + df.format(gstToBePaid) + "");
+                                platformFee.setText("Platform Fee: " + df.format(platformFeeAmount) + "");
+
+                                TextView totalSummary = new TextView(CashTransactionCommissionActivity.this);
+                                totalSummary.setGravity(View.TEXT_ALIGNMENT_CENTER);
+                                totalSummary.setTextSize(18);
+                                totalSummary.setTextColor(Color.BLACK);
+                                totalSummary.setText("Final Amount: " + df.format(commissionAmount + platformFeeAmount + gstToBePaid) + "");
+
+                                linearLayout.addView(commissionAmountText);
+                                linearLayout.addView(gstAmount);
+                                linearLayout.addView(platformFee);
+                                linearLayout.addView(totalSummary);
+
+                                dialog.setView(linearLayout);
+                                dialog.setPositiveButton("Exit", (dialog1, which) -> dialog1.dismiss()).create();
+                                dialog.create();
+                                dialog.show();
+                            });
 
                             kAlertDialog.setCancelable(false);
                             kAlertDialog.show();

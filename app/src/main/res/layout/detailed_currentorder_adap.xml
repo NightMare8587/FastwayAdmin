@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_margin="6dp"
+    android:id="@+id/detailedCurrentOrderCardView"
+    android:elevation="5dp"
+    app:cardCornerRadius="10dp"
+    android:layout_height="140dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+        <TextView
+            android:id="@+id/tableNumTextViewAdapterDetailed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="9dp"
+            android:fontFamily="@font/inter"
+            android:text="TextView"
+            android:textSize="17sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/seatsDetailedCurrentORderAdp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="7dp"
+            android:text="TextView"
+            android:fontFamily="@font/inter"
+            android:textSize="17sp"
+
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tableNumTextViewAdapterDetailed" />
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_margin="5dp"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <Button
+                android:id="@+id/ChatWithCustCurrentORderDetailed"
+                android:layout_width="0dp"
+
+                android:layout_height="match_parent"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:background="#C8F493"
+                android:text="Chat With Customer"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/CurrentOrderDetailedAdp"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:background="#8CECF8"
+                android:text="Current Order"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.cardview.widget.CardView>

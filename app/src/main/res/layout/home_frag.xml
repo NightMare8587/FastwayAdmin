@@ -58,6 +58,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="14dp"
+                    android:id="@+id/currentTablesTextViewHomeFragAdmin"
                     android:layout_marginTop="4dp"
                     android:layout_marginEnd="4dp"
                     android:layout_weight="0.6"

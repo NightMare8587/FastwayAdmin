@@ -97,7 +97,9 @@ import karpuzoglu.enes.com.fastdialog.Type;
 public class HomeFrag extends Fragment {
     String currentTime;
     Calendar calendar;
+    int currentOrderCount = 0;
     int currentDay;
+    TextView currentTablesText;
     Button seeMoreDetails;
     DecimalFormat decimalFormat = new DecimalFormat("0.00");
     List<String> image = new ArrayList<>();
@@ -219,6 +221,7 @@ public class HomeFrag extends Fragment {
         restaurantTrackRecordsEditor = restaurantTrackRecords.edit();
         restaurantTrackEditor = restaurantDailyTrack.edit();
          dailyRestaurantTrackUpdate();
+         currentTablesText = view.findViewById(R.id.currentTablesTextViewHomeFragAdmin);
         SharedPreferences stopServices = requireActivity().getSharedPreferences("Stop Services",Context.MODE_PRIVATE);
          editor = stopServices.edit();
          acceptOrders = view.findViewById(R.id.acceptingOrdersSwitchHomeFrag);
@@ -955,9 +958,11 @@ public class HomeFrag extends Fragment {
 
     private void updateDatabase() {
         reference.child("Tables").addListenerForSingleValueEvent(new ValueEventListener() {
+            @SuppressLint("SetTextI18n")
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.exists()){
+                    currentOrderCount = 0;
                     tableNum.clear();
                     seats.clear();
                     isCurrentOrder.clear();
@@ -976,11 +981,25 @@ public class HomeFrag extends Fragment {
                             else
                                 amountPaymentPending.add("0");
                             if(dataSnapshot.hasChild("Current Order")){
+                                currentOrderCount++;
                                 isCurrentOrder.add("1");
                             }else
                                 isCurrentOrder.add("0");
                         }
                     }
+                    if(currentOrderCount != 0)
+                    currentTablesText.setText("CURRENT TABLES (" + currentOrderCount + ")");
+                    else
+                        currentTablesText.setText("CURRENT TABLES");
+
+                    if(currentOrderCount > 2)
+                    {
+                        refershRecyclerView.setText("MORE");
+                        refershRecyclerView.setOnClickListener(click -> {
+
+                        });
+                    }
+
                     recyclerView.setLayoutManager(horizonatl);
 //                    Toast.makeText(view.getContext(), ""+seats.toString(), Toast.LENGTH_SHORT).show();
                     recyclerView.setAdapter(new homeFragClass(tableNum,seats,resId,isCurrentOrder,amountPaymentPending));
