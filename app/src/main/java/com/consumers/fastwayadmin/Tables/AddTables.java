@@ -5,6 +5,7 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -38,8 +39,6 @@ import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 
 import com.consumers.fastwayadmin.R;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -68,8 +67,6 @@ public class AddTables extends AppCompatActivity {
 
     EditText tableNumber;
     Bitmap bmp,scaled;
-
-    Uri filePath;
     EditText numberOfSeats;
     FirebaseFirestore firestore = FirebaseFirestore.getInstance();
     Button generateQrCode;
@@ -298,9 +295,21 @@ public class AddTables extends AppCompatActivity {
 
                         notificationManager.notify(10101, builder.build());
                     }
-                }else
+                }else {
                     Toast.makeText(this, "Error Occurred Creating QR", Toast.LENGTH_SHORT).show();
                     Toast.makeText(this, "Check if File Already Exist", Toast.LENGTH_SHORT).show();
+                    AlertDialog.Builder builder = new AlertDialog.Builder(AddTables.this);
+                    builder.setTitle("Error").setMessage("There was an error creating table. Check if you have previously created table with same number\nDelete old image and create again")
+                            .setPositiveButton("Open Images", (dialog, which) -> {
+                                String path = String.valueOf(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM));
+                                Uri uri = Uri.parse(path);
+                                Intent intent = new Intent(Intent.ACTION_PICK);
+                                intent.setDataAndType(uri, "*/*");
+                                startActivity(intent);
+                            }).setNegativeButton("Exit", (dialog, which) -> dialog.dismiss()).create();
+                    builder.show();
+                }
+
             } catch (WriterException e) {
                 e.printStackTrace();
             }
@@ -342,7 +351,7 @@ public class AddTables extends AppCompatActivity {
 
     private void initialise() {
         bmp = BitmapFactory.decodeResource(getResources(),R.drawable.ordinalo);
-        scaled = Bitmap.createScaledBitmap(bmp,250,250,false);
+        scaled = Bitmap.createScaledBitmap(bmp,300,300,false);
         sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
         tableNumber = findViewById(R.id.tableNumber);
         numberOfSeats = findViewById(R.id.numberOfSeats);
