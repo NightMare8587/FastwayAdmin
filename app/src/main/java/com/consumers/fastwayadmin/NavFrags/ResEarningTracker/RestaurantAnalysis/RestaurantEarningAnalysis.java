@@ -59,7 +59,7 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
     TextView dateThatDay;
     TextView averageOrderThatDay;
     RecyclerView recyclerView;
-
+    TextView totalCustomersLast7days;
     double totalAmountOrdersText;
     TextView highestSalesDayText,highestSalesAmountThatDay,highestSalesOrderThatDay;
     TextView totalOrders,totalAmount;
@@ -67,6 +67,7 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
     TextView textView,totalOrderThatDay,totalAmountThatDay;
     List<String> days = new ArrayList<>();
     List<String> orders = new ArrayList<>();
+    SharedPreferences user7daysTracker;
     List<String> amounts = new ArrayList<>();
     String[] monthName = {"January", "February",
             "March", "April", "May", "June", "July",
@@ -82,7 +83,9 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
         setContentView(R.layout.activity_restaurant_earning_analysis);
         storedOrders = getSharedPreferences("RestaurantDailyStoreForAnalysis",MODE_PRIVATE);
         storeEditor = storedOrders.edit();
+        totalCustomersLast7days = findViewById(R.id.totalCustomersInLast7daysTextView);
         highestSalesDayText = findViewById(R.id.highestSalesDayOrdersTextView);
+        user7daysTracker = getSharedPreferences("DailyUserTrackingFor7days",MODE_PRIVATE);
         highestSalesAmountThatDay = findViewById(R.id.highestDateNameDay);
         highestSalesOrderThatDay = findViewById(R.id.highestSalesAmountTextViewDay);
         barChart = findViewById(R.id.barchartAnalysis);
@@ -138,6 +141,7 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
                 if(date.size() != 0) {
                     double highestSalesDay = 0D;
                     String dateName = "";
+                    int totalCust = 0;
                     int highestOrderAtDay = 0;
                     moreDays.setVisibility(View.INVISIBLE);
                     int loopTill = 0;
@@ -145,11 +149,23 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
                         loopTill = date.size() - 7;
                     daysLeftToShow = 6;
                     ArrayList<BarEntry> values = new ArrayList<>();
+                    Type types = new TypeToken<HashMap<String,HashMap<String,Integer>>>() {
+                    }.getType();
+                    int day = calendar.get(Calendar.DAY_OF_MONTH);
+                    Gson gson1 = new Gson();
+                    HashMap<String,HashMap<String,Integer>> mainMap = gson1.fromJson(user7daysTracker.getString(month,""),types);
+
                     for (int i = date.size() - 1; i >= loopTill; i--) {
                         daysLeftToShow--;
                         days.add(date.get(i) + "th " + month);
                         orders.add(totalORders.get(i) + "");
                         amounts.add(orderAmountList.get(i));
+                        if(mainMap.containsKey(date.get(i) + "")) {
+                            HashMap<String, Integer> innerMap = new HashMap<>(mainMap.get(date.get(i) + ""));
+                            for(String ii : innerMap.keySet()){
+                                totalCust++;
+                            }
+                        }
                         if(Double.parseDouble(orderAmountList.get(i)) > highestSalesDay){
                             dateName = date.get(i) + "th " + month;
                             highestSalesDay = Double.parseDouble(orderAmountList.get(i));
@@ -167,7 +183,7 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
                     ArrayList<IBarDataSet> dataSets = new ArrayList<>();
                     dataSets.add(barDataSet);
                     BarData data = new BarData(dataSets);
-
+                    totalCustomersLast7days.setText("Total Customer's: " + totalCust);
                     barChart.setData(data);
                     barChart.setFitBars(true);
 
@@ -184,10 +200,11 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
                     recyclerView.setAdapter(new TackerAdapterAnalysis(days, days.get(0), orders, amounts));
                     totalAmountThatDay.setText("Total Transaction Amount: \u20b9" + orderAmountList.get(orderAmountList.size() - 1) + "");
                     totalOrderThatDay.setText("Total Order's: " + totalORders.get(totalORders.size() - 1) + "");
-                    averageOrderThatDay.setText("Average Order Size: \u20b9" + (Double.parseDouble(orderAmountList.get(orderAmountList.size()-1))/Integer.parseInt(totalORders.get(totalORders.size()-1))));
+                    averageOrderThatDay.setText("Average Order Size: \u20b9" + new DecimalFormat("0.00").format(Double.parseDouble(orderAmountList.get(orderAmountList.size()-1))/Integer.parseInt(totalORders.get(totalORders.size()-1))));
                     dateThatDay.setText(date.get(date.size()-1) + "th " + month);
                     LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
                             new IntentFilter("custom-message-analysis"));
+
 
 
 

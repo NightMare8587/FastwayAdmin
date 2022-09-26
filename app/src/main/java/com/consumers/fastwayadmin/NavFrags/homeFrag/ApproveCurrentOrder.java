@@ -85,6 +85,8 @@ public class ApproveCurrentOrder extends AppCompatActivity {
     Gson gson;
     String json;
     SharedPreferences trackingOfTakeAway;
+    SharedPreferences.Editor user7daysEdit;
+    SharedPreferences dailyUserTrackingFor7days;
     SharedPreferences dailyAverageOrder;
     SharedPreferences.Editor averageEditor;
     SharedPreferences.Editor trackingDineAndWay;
@@ -174,6 +176,8 @@ public class ApproveCurrentOrder extends AppCompatActivity {
         StrictMode.setVmPolicy(builders.build());
         storeOrdersForAdminInfo = getSharedPreferences("StoreOrders",MODE_PRIVATE);
         dailyAverageOrder = getSharedPreferences("DailyAverageOrderMonthly",MODE_PRIVATE);
+        dailyUserTrackingFor7days = getSharedPreferences("DailyUserTrackingFor7days",MODE_PRIVATE);
+        user7daysEdit = dailyUserTrackingFor7days.edit();
         averageEditor = dailyAverageOrder.edit();
         storeEditor = storeOrdersForAdminInfo.edit();
         showCustomisation = findViewById(R.id.showCustomisationButton);
@@ -531,6 +535,41 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                         }
                         dishAnalysis.apply();
 
+
+                        if(dailyUserTrackingFor7days.contains(month)){
+                            gson = new Gson();
+                            java.lang.reflect.Type type = new TypeToken<HashMap<String,HashMap<String,Integer>>>() {
+                            }.getType();
+                            HashMap<String,HashMap<String,Integer>> mainMap = gson.fromJson(dailyUserTrackingFor7days.getString(month,""),type);
+                            int day = calendar.get(Calendar.DAY_OF_MONTH);
+                            HashMap<String, Integer> integerHashMap;
+                            if(mainMap.containsKey(day + "")){
+                                integerHashMap = new HashMap<>(mainMap.get(day + ""));
+                                if(integerHashMap.containsKey(id)){
+                                    int prev = integerHashMap.get(id);
+                                    prev++;
+                                    integerHashMap.put(id,prev);
+                                }else
+                                    integerHashMap.put(id,1);
+
+                            }else{
+                                integerHashMap = new HashMap<>();
+                                integerHashMap.put(id,1);
+                            }
+                            mainMap.put(day + "",integerHashMap);
+                            user7daysEdit.putString(month,gson.toJson(mainMap));
+                            user7daysEdit.apply();
+                        }else{
+                            gson = new Gson();
+                            int day = calendar.get(Calendar.DAY_OF_MONTH);
+                            HashMap<String,HashMap<String,Integer>> mainMap = new HashMap<>();
+                            HashMap<String,Integer> integerHashMap = new HashMap<>();
+                            integerHashMap.put(id,1);
+                            mainMap.put(day + "",integerHashMap);
+
+                            user7daysEdit.putString(month,gson.toJson(mainMap));
+                            user7daysEdit.apply();
+                        }
 
                         if (dailyAverageOrder.contains(month)) {
                             gson = new Gson();
