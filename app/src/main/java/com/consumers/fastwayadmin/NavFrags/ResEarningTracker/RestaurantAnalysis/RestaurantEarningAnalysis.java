@@ -216,28 +216,6 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
                     barChart.animateY(1650);
 
                     LineDataSet set1 = new LineDataSet(value, "DataSet 1");
-                    set1.setDrawIcons(false);
-
-
-                    // black lines and points
-                    set1.setColor(Color.BLACK);
-                    set1.setCircleColor(Color.BLACK);
-
-                    // line thickness and point size
-                    set1.setLineWidth(1f);
-                    set1.setCircleRadius(3f);
-
-                    // draw points as solid circles
-                    set1.setDrawCircleHole(false);
-
-
-                    // text size of values
-                    set1.setValueTextSize(9f);
-
-
-
-                    // set the filled area
-                    set1.setDrawFilled(true);
 
                     ArrayList<ILineDataSet> dataSetss = new ArrayList<>();
                     dataSetss.add(set1);
