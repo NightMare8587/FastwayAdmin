@@ -12,15 +12,16 @@
 
         <TextView
             android:id="@+id/textView39"
-            android:textStyle="bold"
-            android:textSize="19sp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@+id/lastViewStraightLine"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginTop="5dp"
-            android:text="User Frequency Tracker" />
+            android:text="User Frequency Tracker\nLast 7 days"
+            android:textAlignment="center"
+            android:textSize="19sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/lastViewStraightLine" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -40,6 +41,12 @@
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:layout_height="wrap_content"/>
+
+            <com.github.mikephil.charting.charts.LineChart
+                android:layout_width="match_parent"
+                android:id="@+id/lineChartRestaurantEarn7days"
+                android:layout_margin="5dp"
+                android:layout_height="150dp"/>
 
         </LinearLayout>
 

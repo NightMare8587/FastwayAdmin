@@ -14,6 +14,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.DashPathEffect;
+import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -27,12 +30,21 @@ import com.consumers.fastwayadmin.NavFrags.ResDishTracker.seeAllDishAnalysis;
 import com.consumers.fastwayadmin.NavFrags.ResEarningTracker.ResEarningTrackerActivity;
 import com.consumers.fastwayadmin.NavFrags.ResEarningTracker.TackerAdapter;
 import com.consumers.fastwayadmin.R;
+import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.components.LimitLine;
 import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.formatter.IFillFormatter;
+import com.github.mikephil.charting.interfaces.dataprovider.LineDataProvider;
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
@@ -49,12 +61,14 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 public class RestaurantEarningAnalysis extends AppCompatActivity {
     SharedPreferences storedOrders;
     SharedPreferences.Editor storeEditor;
     Gson gson;
     int daysLeftToShow = 0;
+    TextView dateTotalCustomers;
     Button moreDays;
     TextView dateThatDay;
     TextView averageOrderThatDay;
@@ -75,6 +89,7 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
             "December"};
     Calendar calendar = Calendar.getInstance();
     com.github.mikephil.charting.charts.BarChart barChart;
+    LineChart lineChart;
     String json;
     @SuppressLint("SetTextI18n")
     @Override
@@ -86,15 +101,19 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
         totalCustomersLast7days = findViewById(R.id.totalCustomersInLast7daysTextView);
         highestSalesDayText = findViewById(R.id.highestSalesDayOrdersTextView);
         user7daysTracker = getSharedPreferences("DailyUserTrackingFor7days",MODE_PRIVATE);
+        lineChart = findViewById(R.id.lineChartRestaurantEarn7days);
         highestSalesAmountThatDay = findViewById(R.id.highestDateNameDay);
         highestSalesOrderThatDay = findViewById(R.id.highestSalesAmountTextViewDay);
         barChart = findViewById(R.id.barchartAnalysis);
         averageOrderThatDay = findViewById(R.id.averageOrderSizeThatPerticularDay);
         barChart.getDescription().setEnabled(false);
+//        dateTotalCustomers = findViewById(R.id.DatetotalCustomersInLast7daysTextView);
         dateThatDay = findViewById(R.id.dateOfThatDayParticular);
         // if more than 60 entries are displayed in the chart, no values will be
         // drawn
         barChart.setMaxVisibleValueCount(10);
+        lineChart.setDragEnabled(true);
+        lineChart.setScaleEnabled(false);
 
         // scaling can now only be done on x- and y-axis separately
         barChart.setPinchZoom(false);
@@ -145,6 +164,7 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
                     int highestOrderAtDay = 0;
                     moreDays.setVisibility(View.INVISIBLE);
                     int loopTill = 0;
+                    int addToVal = 0;
                     if(date.size() > 7)
                         loopTill = date.size() - 7;
                     daysLeftToShow = 6;
@@ -154,18 +174,24 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
                     int day = calendar.get(Calendar.DAY_OF_MONTH);
                     Gson gson1 = new Gson();
                     HashMap<String,HashMap<String,Integer>> mainMap = gson1.fromJson(user7daysTracker.getString(month,""),types);
-
+                    ArrayList<Entry> value = new ArrayList<>();
                     for (int i = date.size() - 1; i >= loopTill; i--) {
                         daysLeftToShow--;
                         days.add(date.get(i) + "th " + month);
                         orders.add(totalORders.get(i) + "");
                         amounts.add(orderAmountList.get(i));
                         if(mainMap.containsKey(date.get(i) + "")) {
+                            addToVal = 0;
+
                             HashMap<String, Integer> innerMap = new HashMap<>(mainMap.get(date.get(i) + ""));
                             for(String ii : innerMap.keySet()){
                                 totalCust++;
+                                addToVal++;
                             }
+                            value.add(new Entry(Integer.parseInt(date.get(i)),addToVal));
+                            Log.i("infoVALLLL",addToVal + "");
                         }
+
                         if(Double.parseDouble(orderAmountList.get(i)) > highestSalesDay){
                             dateName = date.get(i) + "th " + month;
                             highestSalesDay = Double.parseDouble(orderAmountList.get(i));
@@ -188,6 +214,40 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
                     barChart.setFitBars(true);
 
                     barChart.animateY(1650);
+
+                    LineDataSet set1 = new LineDataSet(value, "DataSet 1");
+                    set1.setDrawIcons(false);
+
+
+                    // black lines and points
+                    set1.setColor(Color.BLACK);
+                    set1.setCircleColor(Color.BLACK);
+
+                    // line thickness and point size
+                    set1.setLineWidth(1f);
+                    set1.setCircleRadius(3f);
+
+                    // draw points as solid circles
+                    set1.setDrawCircleHole(false);
+
+
+                    // text size of values
+                    set1.setValueTextSize(9f);
+
+
+
+                    // set the filled area
+                    set1.setDrawFilled(true);
+
+                    ArrayList<ILineDataSet> dataSetss = new ArrayList<>();
+                    dataSetss.add(set1);
+                    // create a data object with the data sets
+                    LineData dataa = new LineData(dataSetss);
+
+                    // set data
+                    lineChart.setData(dataa);
+                    lineChart.animateY(1500);
+
 
 
                     barChart.getLegend().setEnabled(false);
