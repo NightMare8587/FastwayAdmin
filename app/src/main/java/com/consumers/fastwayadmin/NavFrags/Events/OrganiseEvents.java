@@ -1,20 +1,27 @@
 package com.consumers.fastwayadmin.NavFrags.Events;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AppCompatDialog;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.annotation.SuppressLint;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDialog;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.consumers.fastwayadmin.R;
 import com.developer.kalert.KAlertDialog;
@@ -24,6 +31,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +44,7 @@ public class OrganiseEvents extends AppCompatActivity {
     DatabaseReference currentEvent;
     TextView currentEventName,seats,filled,price,artistName,dateAndTime;
     SharedPreferences sharedPreferences;
-    Button cancelEvent,organiseEvent;
+    Button cancelEvent,organiseEvent,showQR;
     RecyclerView recyclerView;
     List<String> eventNames = new ArrayList<>();
     List<String> ticketsSold = new ArrayList<>();
@@ -113,6 +123,7 @@ public class OrganiseEvents extends AppCompatActivity {
                     seats.setText("Seats: " + snapshot.child("seats").getValue(String.class));
                     artistName.setText("Artist Name: " + snapshot.child("artistNameComing").getValue(String.class));
                     cancelEvent.setVisibility(View.VISIBLE);
+                    showQR.setVisibility(View.VISIBLE);
                     currentEventAvailable = true;
                 }
             }
@@ -121,6 +132,43 @@ public class OrganiseEvents extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError error) {
 
             }
+        });
+
+        showQR.setOnClickListener(click -> {
+            AlertDialog.Builder builder = new AlertDialog.Builder(OrganiseEvents.this);
+            builder.setTitle("QR Code").setMessage("Ask user to scan this QR");
+            LinearLayout linearLayout = new LinearLayout(OrganiseEvents.this);
+            ImageView imageView = new ImageView(OrganiseEvents.this);
+            imageView.setMaxHeight(512);
+            imageView.setMaxWidth(512);
+
+            QRCodeWriter writer = new QRCodeWriter();
+            try {
+                BitMatrix bitMatrix = writer.encode(auth.getUid() + "," + sharedPreferences.getString("state", "") + "," + sharedPreferences.getString("locality", "") + "," + "OrdinaloQR", BarcodeFormat.QR_CODE, 512, 512);
+                int width = bitMatrix.getWidth();
+                int height = bitMatrix.getHeight();
+                Bitmap bmp = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
+                for (int x = 0; x < width; x++) {
+                    for (int y = 0; y < height; y++) {
+                        bmp.setPixel(x, y, bitMatrix.get(x, y) ? Color.BLACK : Color.WHITE);
+                    }
+                }
+//                    Toast.makeText(AddTables.this, "Click on Image to download it..", Toast.LENGTH_SHORT).show();
+                imageView.setImageBitmap(bmp);
+
+            }catch (Exception e){
+                Toast.makeText(this, "Try again... :)", Toast.LENGTH_SHORT).show();
+            }
+
+            linearLayout.addView(imageView);
+            builder.setView(linearLayout);
+            builder.setPositiveButton("Exit", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    dialogInterface.dismiss();
+                }
+            });
+            builder.create().show();
         });
 
         organiseEvent.setOnClickListener(click -> {
@@ -154,6 +202,7 @@ public class OrganiseEvents extends AppCompatActivity {
                         seats.setText("Seats: " + snapshot.child("seats").getValue(String.class));
                         artistName.setText("Artist Name: " + snapshot.child("artistNameComing").getValue(String.class));
                         cancelEvent.setVisibility(View.VISIBLE);
+                        showQR.setVisibility(View.VISIBLE);
                         currentEventAvailable = true;
                     }
                 }
@@ -173,6 +222,7 @@ public class OrganiseEvents extends AppCompatActivity {
         filled = findViewById(R.id.filledSeatsOrganiseEvents);
         seats = findViewById(R.id.totalSeatsOrganiseEvent);
         recyclerView = findViewById(R.id.recyclerViewPreviousEventsList);
+        showQR = findViewById(R.id.showQRcodeToScanButton);
         artistName = findViewById(R.id.nameOfArtistComingOrganise);
         cancelEvent = findViewById(R.id.cancelCurrentEventButtonOrganised);
         organiseEvent = findViewById(R.id.organiseEventButton);
