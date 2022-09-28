@@ -159,7 +159,7 @@ public class OrganiseEvents extends AppCompatActivity {
             }catch (Exception e){
                 Toast.makeText(this, "Try again... :)", Toast.LENGTH_SHORT).show();
             }
-
+            linearLayout.setOrientation(LinearLayout.VERTICAL);
             linearLayout.addView(imageView);
             builder.setView(linearLayout);
             builder.setPositiveButton("Exit", new DialogInterface.OnClickListener() {
