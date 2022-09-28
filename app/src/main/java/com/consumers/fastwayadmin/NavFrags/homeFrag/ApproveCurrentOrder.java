@@ -205,6 +205,7 @@ public class ApproveCurrentOrder extends AppCompatActivity {
         });
         halfOrList = findViewById(R.id.halfOrFullCurrentORder);
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @SuppressLint("SuspiciousIndentation")
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for(DataSnapshot dataSnapshot : snapshot.getChildren()){

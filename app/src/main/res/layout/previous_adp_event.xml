@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_margin="6dp"
+    app:cardElevation="5dp"
+    app:cardCornerRadius="10dp"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:layout_height="match_parent">
+
+
+        <TextView
+            android:id="@+id/cardViewEventNameOrganise"
+            android:layout_width="wrap_content"
+            android:layout_margin="3dp"
+            android:textColor="#000000"
+            android:textSize="17sp"
+            android:text="Event name: "
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_margin="3dp"
+            android:id="@+id/dateAndTimeCardViewEvent"
+            android:textColor="#000000"
+            android:textSize="17sp"
+            android:text="Date And Time: "
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_margin="3dp"
+            android:textColor="#000000"
+            android:id="@+id/ticketSoldCardViewEvent"
+            android:textSize="17sp"
+            android:text="Tickets Sold: "
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_margin="3dp"
+            android:textColor="#000000"
+            android:textSize="17sp"
+            android:id="@+id/ArtistNameCardViewEvent"
+            android:text="Artist name: "
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

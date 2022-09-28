@@ -31,6 +31,20 @@
         tools:replace="android:icon,android:allowBackup"
         tools:targetApi="r">
         <activity
+            android:name=".NavFrags.Events.CreateEventOrganise"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
+            android:name=".NavFrags.Events.OrganiseEvents"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
             android:name=".NavFrags.homeFrag.DetailedCurrentOrdersList"
             android:exported="false">
             <meta-data
