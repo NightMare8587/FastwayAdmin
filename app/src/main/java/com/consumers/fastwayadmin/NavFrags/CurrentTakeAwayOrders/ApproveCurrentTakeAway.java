@@ -1764,33 +1764,63 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                 if(checkPrem.contains("status") && checkPrem.getString("status","").equals("active")) {
                     String month = monthName[calendar.get(Calendar.MONTH)];
                     if (storeForDishAnalysis.contains("DishAnalysisMonthBasis")) {
-                        gson = new Gson();
-                        Log.i("here", "first");
-                        java.lang.reflect.Type type = new TypeToken<HashMap<String, HashMap<String, Integer>>>() {
-                        }.getType();
-                        String storedHash = storeForDishAnalysis.getString("DishAnalysisMonthBasis", "");
-                        HashMap<String, HashMap<String, Integer>> myMap = gson.fromJson(storedHash, type);
-                        HashMap<String, Integer> map;
-                        if (myMap.containsKey(month)) {
-                            map = new HashMap<>(Objects.requireNonNull(myMap.get(month)));
-                            Log.i("checking", map.toString());
-                            for (int k = 0; k < dishName.size(); k++) {
-                                if (map.containsKey(dishName.get(k))) {
-                                    int val = Objects.requireNonNull(map.get(dishName.get(k)));
-                                    val++;
-                                    map.put(dishName.get(k), val);
-                                } else {
-                                    map.put(dishName.get(k), 1);
+                        try {
+                            gson = new Gson();
+                            Log.i("here", "first");
+                            java.lang.reflect.Type type = new TypeToken<HashMap<String, HashMap<String, Integer>>>() {
+                            }.getType();
+                            String storedHash = storeForDishAnalysis.getString("DishAnalysisMonthBasis", "");
+                            HashMap<String, HashMap<String, Integer>> myMap = gson.fromJson(storedHash, type);
+                            HashMap<String, Integer> map;
+                            if (myMap.containsKey(month)) {
+                                map = new HashMap<>(Objects.requireNonNull(myMap.get(month)));
+                                Log.i("checking", map.toString());
+                                for (int k = 0; k < dishName.size(); k++) {
+                                    if (map.containsKey(dishName.get(k))) {
+                                        int val = Objects.requireNonNull(map.get(dishName.get(k)));
+                                        val++;
+                                        map.put(dishName.get(k), val);
+                                    } else {
+                                        map.put(dishName.get(k), 1);
+                                    }
+                                }
+                            } else {
+                                map = new HashMap<>();
+                                for (int i = 0; i < dishName.size(); i++) {
+                                    map.put(dishName.get(i), 1);
                                 }
                             }
-                        } else {
-                            map = new HashMap<>();
-                            for (int i = 0; i < dishName.size(); i++) {
-                                map.put(dishName.get(i), 1);
+                            myMap.put(month, map);
+                            dishAnalysis.putString("DishAnalysisMonthBasis", gson.toJson(myMap));
+                        }catch (Exception e){
+                            gson = new Gson();
+                            Log.i("here", "first");
+                            java.lang.reflect.Type type = new TypeToken<HashMap<String, HashMap<String, Integer>>>() {
+                            }.getType();
+                            String storedHash = storeForDishAnalysis.getString("DishAnalysisMonthBasis", "");
+                            HashMap<String, HashMap<String, Integer>> myMap = gson.fromJson(storedHash, type);
+                            HashMap<String, Integer> map;
+                            if (myMap.containsKey(month)) {
+                                map = new HashMap<>(Objects.requireNonNull(myMap.get(month)));
+                                Log.i("checking", map.toString());
+                                for (int k = 0; k < dishName.size(); k++) {
+                                    if (map.containsKey(dishName.get(k))) {
+                                        int val = Objects.requireNonNull(map.get(dishName.get(k)));
+                                        val++;
+                                        map.put(dishName.get(k), val);
+                                    } else {
+                                        map.put(dishName.get(k), 1);
+                                    }
+                                }
+                            } else {
+                                map = new HashMap<>();
+                                for (int i = 0; i < dishName.size(); i++) {
+                                    map.put(dishName.get(i), 1);
+                                }
                             }
+                            myMap.put(month, map);
+                            dishAnalysis.putString("DishAnalysisMonthBasis", gson.toJson(myMap));
                         }
-                        myMap.put(month, map);
-                        dishAnalysis.putString("DishAnalysisMonthBasis", gson.toJson(myMap));
                     } else {
                         HashMap<String, HashMap<String, Integer>> map = new HashMap<>();
                         HashMap<String, Integer> myMap = new HashMap<>();
@@ -1805,28 +1835,53 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                     Log.i("response", response);
 
                     if(dailyUserTrackingFor7days.contains(month)){
-                        gson = new Gson();
-                        java.lang.reflect.Type type = new TypeToken<HashMap<String,HashMap<String,Integer>>>() {
-                        }.getType();
-                        HashMap<String,HashMap<String,Integer>> mainMap = gson.fromJson(dailyUserTrackingFor7days.getString(month,""),type);
-                        int day = calendar.get(Calendar.DAY_OF_MONTH);
-                        HashMap<String, Integer> integerHashMap;
-                        if(mainMap.containsKey(day + "")){
-                            integerHashMap = new HashMap<>(mainMap.get(day + ""));
-                            if(integerHashMap.containsKey(id)){
-                                int prev = integerHashMap.get(id);
-                                prev++;
-                                integerHashMap.put(id,prev);
-                            }else
-                                integerHashMap.put(id,1);
+                        try {
+                            gson = new Gson();
+                            java.lang.reflect.Type type = new TypeToken<HashMap<String, HashMap<String, Integer>>>() {
+                            }.getType();
+                            HashMap<String, HashMap<String, Integer>> mainMap = gson.fromJson(dailyUserTrackingFor7days.getString(month, ""), type);
+                            int day = calendar.get(Calendar.DAY_OF_MONTH);
+                            HashMap<String, Integer> integerHashMap;
+                            if (mainMap.containsKey(day + "")) {
+                                integerHashMap = new HashMap<>(mainMap.get(day + ""));
+                                if (integerHashMap.containsKey(id)) {
+                                    int prev = integerHashMap.get(id);
+                                    prev++;
+                                    integerHashMap.put(id, prev);
+                                } else
+                                    integerHashMap.put(id, 1);
 
-                        }else{
-                            integerHashMap = new HashMap<>();
-                            integerHashMap.put(id,1);
+                            } else {
+                                integerHashMap = new HashMap<>();
+                                integerHashMap.put(id, 1);
+                            }
+                            mainMap.put(day + "", integerHashMap);
+                            user7daysEdit.putString(month, gson.toJson(mainMap));
+                            user7daysEdit.apply();
+                        }catch (Exception e){
+                            gson = new Gson();
+                            java.lang.reflect.Type type = new TypeToken<HashMap<String, HashMap<String, Integer>>>() {
+                            }.getType();
+                            HashMap<String, HashMap<String, Integer>> mainMap = gson.fromJson(dailyUserTrackingFor7days.getString(month, ""), type);
+                            int day = calendar.get(Calendar.DAY_OF_MONTH);
+                            HashMap<String, Integer> integerHashMap;
+                            if (mainMap.containsKey(day + "")) {
+                                integerHashMap = new HashMap<>(mainMap.get(day + ""));
+                                if (integerHashMap.containsKey(id)) {
+                                    int prev = integerHashMap.get(id);
+                                    prev++;
+                                    integerHashMap.put(id, prev);
+                                } else
+                                    integerHashMap.put(id, 1);
+
+                            } else {
+                                integerHashMap = new HashMap<>();
+                                integerHashMap.put(id, 1);
+                            }
+                            mainMap.put(day + "", integerHashMap);
+                            user7daysEdit.putString(month, gson.toJson(mainMap));
+                            user7daysEdit.apply();
                         }
-                        mainMap.put(day + "",integerHashMap);
-                        user7daysEdit.putString(month,gson.toJson(mainMap));
-                        user7daysEdit.apply();
                     }else{
                         gson = new Gson();
                         int day = calendar.get(Calendar.DAY_OF_MONTH);
@@ -1841,21 +1896,37 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
 
                     new Thread(() -> {
                         if(userFrequency.contains(month)){
-                            java.lang.reflect.Type type = new TypeToken<HashMap<String,String>>() {
-                            }.getType();
-                            gson = new Gson();
-                            json = userFrequency.getString(month,"");
-                            HashMap<String,String> map = gson.fromJson(json,type);
-                            if(map.containsKey(id)){
-                                int val = Integer.parseInt(map.get(id) + "");
-                                val++;
-                                map.put(id,val + "");
-                            }else
-                            {
-                                map.put(id,"1");
-                            }
+                            try {
+                                java.lang.reflect.Type type = new TypeToken<HashMap<String, String>>() {
+                                }.getType();
+                                gson = new Gson();
+                                json = userFrequency.getString(month, "");
+                                HashMap<String, String> map = gson.fromJson(json, type);
+                                if (map.containsKey(id)) {
+                                    int val = Integer.parseInt(map.get(id) + "");
+                                    val++;
+                                    map.put(id, val + "");
+                                } else {
+                                    map.put(id, "1");
+                                }
 
-                            json = gson.toJson(map);
+                                json = gson.toJson(map);
+                            }catch (Exception e){
+                                java.lang.reflect.Type type = new TypeToken<HashMap<String, String>>() {
+                                }.getType();
+                                gson = new Gson();
+                                json = userFrequency.getString(month, "");
+                                HashMap<String, String> map = gson.fromJson(json, type);
+                                if (map.containsKey(id)) {
+                                    int val = Integer.parseInt(map.get(id) + "");
+                                    val++;
+                                    map.put(id, val + "");
+                                } else {
+                                    map.put(id, "1");
+                                }
+
+                                json = gson.toJson(map);
+                            }
                         }else{
                             HashMap<String,String> map = new HashMap<>();
                             map.put(id,"1");
@@ -1869,19 +1940,35 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                     }).start();
 
                     if(trackingOfTakeAway.contains(month)){
-                        java.lang.reflect.Type type = new TypeToken<HashMap<String,String>>() {
-                        }.getType();
-                        gson = new Gson();
-                        json = trackingOfTakeAway.getString(month,"");
-                        HashMap<String,String> map = gson.fromJson(json,type);
-                        if(map.containsKey(calendar.get(Calendar.DAY_OF_MONTH) + "")){
-                            int currentVal = Integer.parseInt(map.get(calendar.get(Calendar.DAY_OF_MONTH) + ""));
-                            currentVal++;
-                            map.put(calendar.get(Calendar.DAY_OF_MONTH) + "",currentVal + "");
-                        }else{
-                            map.put(calendar.get(Calendar.DAY_OF_MONTH) + "","1");
+                        try {
+                            java.lang.reflect.Type type = new TypeToken<HashMap<String, String>>() {
+                            }.getType();
+                            gson = new Gson();
+                            json = trackingOfTakeAway.getString(month, "");
+                            HashMap<String, String> map = gson.fromJson(json, type);
+                            if (map.containsKey(calendar.get(Calendar.DAY_OF_MONTH) + "")) {
+                                int currentVal = Integer.parseInt(map.get(calendar.get(Calendar.DAY_OF_MONTH) + ""));
+                                currentVal++;
+                                map.put(calendar.get(Calendar.DAY_OF_MONTH) + "", currentVal + "");
+                            } else {
+                                map.put(calendar.get(Calendar.DAY_OF_MONTH) + "", "1");
+                            }
+                            json = gson.toJson(map);
+                        }catch (Exception e){
+                            java.lang.reflect.Type type = new TypeToken<HashMap<String, String>>() {
+                            }.getType();
+                            gson = new Gson();
+                            json = trackingOfTakeAway.getString(month, "");
+                            HashMap<String, String> map = gson.fromJson(json, type);
+                            if (map.containsKey(calendar.get(Calendar.DAY_OF_MONTH) + "")) {
+                                int currentVal = Integer.parseInt(map.get(calendar.get(Calendar.DAY_OF_MONTH) + ""));
+                                currentVal++;
+                                map.put(calendar.get(Calendar.DAY_OF_MONTH) + "", currentVal + "");
+                            } else {
+                                map.put(calendar.get(Calendar.DAY_OF_MONTH) + "", "1");
+                            }
+                            json = gson.toJson(map);
                         }
-                        json = gson.toJson(map);
                     }else{
                         gson = new Gson();
                         HashMap<String,String> map = new HashMap<>();
@@ -1892,66 +1979,133 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                     trackingDineAndWay.apply();
 
                     if (storeOrdersForAdminInfo.contains(month)) {
-                        java.lang.reflect.Type type = new TypeToken<List<List<String>>>() {
-                        }.getType();
-                        gson = new Gson();
-                        Log.i("here", "second");
-                        json = storeOrdersForAdminInfo.getString(month, "");
-                        List<List<String>> mainDataList = gson.fromJson(json, type);
-                        List<String> date = new ArrayList<>(mainDataList.get(0));
-                        List<String> transID = new ArrayList<>(mainDataList.get(1));
-                        List<String> userID = new ArrayList<>(mainDataList.get(2));
-                        List<String> orderAmountList = new ArrayList<>(mainDataList.get(3));
+                        try {
+                            java.lang.reflect.Type type = new TypeToken<List<List<String>>>() {
+                            }.getType();
+                            gson = new Gson();
+                            Log.i("here", "second");
+                            json = storeOrdersForAdminInfo.getString(month, "");
+                            List<List<String>> mainDataList = gson.fromJson(json, type);
+                            List<String> date = new ArrayList<>(mainDataList.get(0));
+                            List<String> transID = new ArrayList<>(mainDataList.get(1));
+                            List<String> userID = new ArrayList<>(mainDataList.get(2));
+                            List<String> orderAmountList = new ArrayList<>(mainDataList.get(3));
 
-                        date.add(time);
-                        transID.add(transactionIdForExcel);
-                        userID.add(id);
-                        orderAmountList.add(orderAmount + "");
+                            date.add(time);
+                            transID.add(transactionIdForExcel);
+                            userID.add(id);
+                            orderAmountList.add(orderAmount + "");
 
-                        List<List<String>> storeNewList = new ArrayList<>();
-                        storeNewList.add(date);
-                        storeNewList.add(transID);
-                        storeNewList.add(userID);
-                        storeNewList.add(orderAmountList);
+                            List<List<String>> storeNewList = new ArrayList<>();
+                            storeNewList.add(date);
+                            storeNewList.add(transID);
+                            storeNewList.add(userID);
+                            storeNewList.add(orderAmountList);
 
-                        json = gson.toJson(storeNewList);
-                        storeEditor.putString(month, json);
-                        storeEditor.apply();
-                        int day = calendar.get(Calendar.DAY_OF_MONTH);
-                        type = new TypeToken<List<List<String>>>() {
-                        }.getType();
-                        gson = new Gson();
-                        json = storeDailyTotalOrdersMade.getString(month, "");
-                        List<List<String>> mainList = gson.fromJson(json, type);
-                        List<String> days = new ArrayList<>(mainList.get(0));
-                        List<String> totalAmounts = new ArrayList<>(mainList.get(1));
-                        List<String> totalOrdersPlaced = new ArrayList<>(mainList.get(2));
+                            json = gson.toJson(storeNewList);
+                            storeEditor.putString(month, json);
+                            storeEditor.apply();
+                        }catch (Exception e){
+                            java.lang.reflect.Type type = new TypeToken<List<List<String>>>() {
+                            }.getType();
+                            gson = new Gson();
+                            Log.i("here", "second");
+                            json = storeOrdersForAdminInfo.getString(month, "");
+                            List<List<String>> mainDataList = gson.fromJson(json, type);
+                            List<String> date = new ArrayList<>(mainDataList.get(0));
+                            List<String> transID = new ArrayList<>(mainDataList.get(1));
+                            List<String> userID = new ArrayList<>(mainDataList.get(2));
+                            List<String> orderAmountList = new ArrayList<>(mainDataList.get(3));
 
-                        if (Integer.parseInt(days.get(days.size() - 1)) == day) {
-                            Double totalAmount = Double.parseDouble(totalAmounts.get(totalAmounts.size() - 1));
-                            totalAmount += Double.parseDouble(orderAmount);
-                            totalAmounts.set(totalAmounts.size() - 1, String.valueOf(totalAmount));
+                            date.add(time);
+                            transID.add(transactionIdForExcel);
+                            userID.add(id);
+                            orderAmountList.add(orderAmount + "");
 
-                            int totalOrder = Integer.parseInt(totalOrdersPlaced.get(totalOrdersPlaced.size() - 1));
-                            totalOrder += 1;
-                            totalOrdersPlaced.set(totalOrdersPlaced.size() - 1, String.valueOf(totalOrder));
-                        } else {
-                            days.add(String.valueOf(day));
-                            totalOrdersPlaced.add("1");
-                            totalAmounts.add(String.valueOf(orderAmount));
+                            List<List<String>> storeNewList = new ArrayList<>();
+                            storeNewList.add(date);
+                            storeNewList.add(transID);
+                            storeNewList.add(userID);
+                            storeNewList.add(orderAmountList);
+
+                            json = gson.toJson(storeNewList);
+                            storeEditor.putString(month, json);
+                            storeEditor.apply();
                         }
 
-                        List<List<String>> newList = new ArrayList<>();
-                        newList.add(days);
-                        newList.add(totalAmounts);
-                        newList.add(totalOrdersPlaced);
-                        json = gson.toJson(newList);
-                        storeDailyEditor.putString(month, json);
-                        storeDailyEditor.apply();
+                        try {
+                            int day = calendar.get(Calendar.DAY_OF_MONTH);
+                            java.lang.reflect.Type type  = new TypeToken<List<List<String>>>() {
+                            }.getType();
+                            gson = new Gson();
+                            json = storeDailyTotalOrdersMade.getString(month, "");
+                            List<List<String>> mainList = gson.fromJson(json, type);
+                            List<String> days = new ArrayList<>(mainList.get(0));
+                            List<String> totalAmounts = new ArrayList<>(mainList.get(1));
+                            List<String> totalOrdersPlaced = new ArrayList<>(mainList.get(2));
 
-                        Log.i("myInfo", storeNewList.toString());
-                        Log.i("myInfo", newList.toString());
-                        Log.i("myInfo", storeNewList.toString());
+                            if (Integer.parseInt(days.get(days.size() - 1)) == day) {
+                                Double totalAmount = Double.parseDouble(totalAmounts.get(totalAmounts.size() - 1));
+                                totalAmount += Double.parseDouble(orderAmount);
+                                totalAmounts.set(totalAmounts.size() - 1, String.valueOf(totalAmount));
+
+                                int totalOrder = Integer.parseInt(totalOrdersPlaced.get(totalOrdersPlaced.size() - 1));
+                                totalOrder += 1;
+                                totalOrdersPlaced.set(totalOrdersPlaced.size() - 1, String.valueOf(totalOrder));
+                            } else {
+                                days.add(String.valueOf(day));
+                                totalOrdersPlaced.add("1");
+                                totalAmounts.add(String.valueOf(orderAmount));
+                            }
+
+                            List<List<String>> newList = new ArrayList<>();
+                            newList.add(days);
+                            newList.add(totalAmounts);
+                            newList.add(totalOrdersPlaced);
+                            json = gson.toJson(newList);
+                            storeDailyEditor.putString(month, json);
+                            storeDailyEditor.apply();
+
+//                            Log.i("myInfo", storeNewList.toString());
+                            Log.i("myInfo", newList.toString());
+//                            Log.i("myInfo", storeNewList.toString());
+                        }catch (Exception e){
+                            int day = calendar.get(Calendar.DAY_OF_MONTH);
+                            java.lang.reflect.Type type  = new TypeToken<List<List<String>>>() {
+                            }.getType();
+                            gson = new Gson();
+                            json = storeDailyTotalOrdersMade.getString(month, "");
+                            List<List<String>> mainList = gson.fromJson(json, type);
+                            List<String> days = new ArrayList<>(mainList.get(0));
+                            List<String> totalAmounts = new ArrayList<>(mainList.get(1));
+                            List<String> totalOrdersPlaced = new ArrayList<>(mainList.get(2));
+
+                            if (Integer.parseInt(days.get(days.size() - 1)) == day) {
+                                Double totalAmount = Double.parseDouble(totalAmounts.get(totalAmounts.size() - 1));
+                                totalAmount += Double.parseDouble(orderAmount);
+                                totalAmounts.set(totalAmounts.size() - 1, String.valueOf(totalAmount));
+
+                                int totalOrder = Integer.parseInt(totalOrdersPlaced.get(totalOrdersPlaced.size() - 1));
+                                totalOrder += 1;
+                                totalOrdersPlaced.set(totalOrdersPlaced.size() - 1, String.valueOf(totalOrder));
+                            } else {
+                                days.add(String.valueOf(day));
+                                totalOrdersPlaced.add("1");
+                                totalAmounts.add(String.valueOf(orderAmount));
+                            }
+
+                            List<List<String>> newList = new ArrayList<>();
+                            newList.add(days);
+                            newList.add(totalAmounts);
+                            newList.add(totalOrdersPlaced);
+                            json = gson.toJson(newList);
+                            storeDailyEditor.putString(month, json);
+                            storeDailyEditor.apply();
+
+//                            Log.i("myInfo", storeNewList.toString());
+                            Log.i("myInfo", newList.toString());
+//                            Log.i("myInfo", storeNewList.toString());
+                        }
                     } else {
                         List<List<String>> mainDataList = new ArrayList<>();
                         List<String> date = new ArrayList<>();
@@ -1993,38 +2147,71 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                     }
 
                     if(dailyAverageOrder.contains(month)){
-                        gson = new Gson();
-                        java.lang.reflect.Type type = new TypeToken<List<List<String>>>() {
-                        }.getType();
-                        List<List<String>> mainList = gson.fromJson(dailyAverageOrder.getString(month,""),type);
-                        List<String> day = new ArrayList<>(mainList.get(0));
-                        List<String> times = new ArrayList<>(mainList.get(1));
-                        List<String> amount = new ArrayList<>(mainList.get(2));
-                        int dayCal = calendar.get(Calendar.DAY_OF_MONTH);
-                        if(Integer.parseInt(day.get(day.size() - 1)) == dayCal){
-                            int timesToday = Integer.parseInt(times.get(times.size() - 1));
-                            timesToday++;
-                            double prev = Double.parseDouble(amount.get(amount.size()-1));
-                            prev += Double.parseDouble(orderAmount);
+                        try {
+                            gson = new Gson();
+                            java.lang.reflect.Type type = new TypeToken<List<List<String>>>() {
+                            }.getType();
+                            List<List<String>> mainList = gson.fromJson(dailyAverageOrder.getString(month, ""), type);
+                            List<String> day = new ArrayList<>(mainList.get(0));
+                            List<String> times = new ArrayList<>(mainList.get(1));
+                            List<String> amount = new ArrayList<>(mainList.get(2));
+                            int dayCal = calendar.get(Calendar.DAY_OF_MONTH);
+                            if (Integer.parseInt(day.get(day.size() - 1)) == dayCal) {
+                                int timesToday = Integer.parseInt(times.get(times.size() - 1));
+                                timesToday++;
+                                double prev = Double.parseDouble(amount.get(amount.size() - 1));
+                                prev += Double.parseDouble(orderAmount);
 
-                            double newVal = prev / timesToday;
+                                double newVal = prev / timesToday;
 
-                            amount.set(amount.size()-1,String.valueOf(newVal));
-                            times.set(times.size()-1,timesToday + "");
-                        }else
-                        {
-                            day.add(dayCal + "");
-                            amount.add(orderAmount);
-                            times.add("1");
+                                amount.set(amount.size() - 1, String.valueOf(newVal));
+                                times.set(times.size() - 1, timesToday + "");
+                            } else {
+                                day.add(dayCal + "");
+                                amount.add(orderAmount);
+                                times.add("1");
+                            }
+
+                            List<List<String>> newList = new ArrayList<>();
+                            newList.add(day);
+                            newList.add(times);
+                            newList.add(amount);
+
+                            averageEditor.putString(month, gson.toJson(newList));
+                        }catch (Exception e){
+
+                            gson = new Gson();
+                            java.lang.reflect.Type type = new TypeToken<List<List<String>>>() {
+                            }.getType();
+                            List<List<String>> mainList = gson.fromJson(dailyAverageOrder.getString(month, ""), type);
+                            List<String> day = new ArrayList<>(mainList.get(0));
+                            List<String> times = new ArrayList<>(mainList.get(1));
+                            List<String> amount = new ArrayList<>(mainList.get(2));
+                            int dayCal = calendar.get(Calendar.DAY_OF_MONTH);
+                            if (Integer.parseInt(day.get(day.size() - 1)) == dayCal) {
+                                int timesToday = Integer.parseInt(times.get(times.size() - 1));
+                                timesToday++;
+                                double prev = Double.parseDouble(amount.get(amount.size() - 1));
+                                prev += Double.parseDouble(orderAmount);
+
+                                double newVal = prev / timesToday;
+
+                                amount.set(amount.size() - 1, String.valueOf(newVal));
+                                times.set(times.size() - 1, timesToday + "");
+                            } else {
+                                day.add(dayCal + "");
+                                amount.add(orderAmount);
+                                times.add("1");
+                            }
+
+                            List<List<String>> newList = new ArrayList<>();
+                            newList.add(day);
+                            newList.add(times);
+                            newList.add(amount);
+
+                            averageEditor.putString(month, gson.toJson(newList));
+
                         }
-
-                        List<List<String>> newList = new ArrayList<>();
-                        newList.add(day);
-                        newList.add(times);
-                        newList.add(amount);
-
-                        averageEditor.putString(month,gson.toJson(newList));
-
                     }else{
                         int dayCal = calendar.get(Calendar.DAY_OF_MONTH);
                         List<List<String>> newList = new ArrayList<>();
@@ -2080,7 +2267,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                 @Override
                 protected Map<String, String> getParams() {
                     Map<String,String> params = new HashMap<>();
-                    params.put("benID",auth.getUid());
+                    params.put("benID","BKkZjAAB9fQmleexouAb2zSRtQm2");
                     String genratedID = "ORDER_" + System.currentTimeMillis() + "_" + ApproveCurrentTakeAway.RandomString
                             .getAlphaNumericString(5);
 

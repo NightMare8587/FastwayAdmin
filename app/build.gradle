@@ -134,7 +134,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-crashlytics'
     implementation 'com.google.firebase:firebase-analytics'
 
-
+    implementation 'com.google.guava:guava:28.1-android'
     implementation 'com.google.firebase:firebase-firestore'
 
 }
