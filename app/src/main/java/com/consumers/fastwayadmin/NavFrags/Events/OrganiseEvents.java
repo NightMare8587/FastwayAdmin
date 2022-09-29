@@ -8,6 +8,8 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -23,6 +25,13 @@ import androidx.appcompat.app.AppCompatDialog;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.consumers.fastwayadmin.R;
 import com.developer.kalert.KAlertDialog;
 import com.google.firebase.auth.FirebaseAuth;
@@ -35,24 +44,45 @@ import com.google.zxing.BarcodeFormat;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Random;
+
+import karpuzoglu.enes.com.fastdialog.Animations;
+import karpuzoglu.enes.com.fastdialog.FastDialog;
+import karpuzoglu.enes.com.fastdialog.FastDialogBuilder;
+import karpuzoglu.enes.com.fastdialog.Type;
 
 public class OrganiseEvents extends AppCompatActivity {
+    String genratedToken;
+    String customisation;
+    double payoutAmt;
+    String testPayoutToken = "https://intercellular-stabi.000webhostapp.com/CheckoutPayouts/testToken.php";
+    String prodPayoutToken = "https://intercellular-stabi.000webhostapp.com/CheckoutPayouts/payoutIMPS.php";
+    String testBearerToken = "https://intercellular-stabi.000webhostapp.com/CheckoutPayouts/test/testBearerToken.php";
+    String prodBearerToken = "https://intercellular-stabi.000webhostapp.com/CheckoutPayouts/authBEarerToken.php";
+    String testPaymentToVendor = "https://intercellular-stabi.000webhostapp.com/CheckoutPayouts/test/testPayment.php";
+    String prodPaymentToVendor = "https://intercellular-stabi.000webhostapp.com/CheckoutPayouts/PaymentToVendor.php";
     DatabaseReference databaseReference;
     DatabaseReference currentEvent;
+    String url = "https://intercellular-stabi.000webhostapp.com/refunds/initiateRefund.php";
     TextView currentEventName,seats,filled,price,artistName,dateAndTime;
     SharedPreferences sharedPreferences;
     Button cancelEvent,organiseEvent,showQR;
     RecyclerView recyclerView;
     List<String> eventNames = new ArrayList<>();
     List<String> ticketsSold = new ArrayList<>();
+    long timeActualForEvent;
     List<String> dateAndTimeList = new ArrayList<>();
     List<String> artistNameList = new ArrayList<>();
     DatabaseReference previousEvents;
     boolean currentEventAvailable = false;
     FirebaseAuth auth = FirebaseAuth.getInstance();
+    FastDialog fastDialog,fastDialog1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,6 +91,17 @@ public class OrganiseEvents extends AppCompatActivity {
         databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Registered Restaurants")
                 .child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
         initialise();
+        fastDialog = new FastDialogBuilder(OrganiseEvents.this, Type.PROGRESS)
+                .progressText("Cancelling.... Dont Exit")
+                        .cancelable(false)
+                                .setAnimation(Animations.GROW_IN)
+                                        .create();
+
+        fastDialog1 = new FastDialogBuilder(OrganiseEvents.this, Type.PROGRESS)
+                .progressText("Finishing Show.... Dont Exit")
+                .cancelable(false)
+                .setAnimation(Animations.GROW_IN)
+                .create();
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         previousEvents = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid()).child("Previous Events");
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -87,7 +128,119 @@ public class OrganiseEvents extends AppCompatActivity {
         });
 
         cancelEvent.setOnClickListener(click -> {
+            if(System.currentTimeMillis() < timeActualForEvent){
+                AlertDialog.Builder builder = new AlertDialog.Builder(OrganiseEvents.this);
+                builder.setTitle("Cancel").setMessage("Do you sure wanna cancel event ???")
+                        .setPositiveButton("Cancel Now", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
 
+                                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid()).child("Current Event").child("BookingIDs");
+                                databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                        if(snapshot.exists()){
+                                            fastDialog.show();
+                                            List<String> authIds = new ArrayList<>();
+                                            List<String> orderIDs = new ArrayList<>();
+                                            List<String> totalPrice = new ArrayList<>();
+                                            for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                                                authIds.add(dataSnapshot.getKey());
+                                                orderIDs.add(dataSnapshot.child("orderID").getValue(String.class));
+                                                totalPrice.add(dataSnapshot.child("amountPaidForBook").getValue(String.class));
+                                            }
+
+
+                                            for(int i=0;i<authIds.size();i++){
+                                                sendNotification(authIds.get(i));
+                                                sendRefund(orderIDs.get(i),totalPrice.get(i));
+                                            }
+
+
+                                            DatabaseReference removeFromGeo = FirebaseDatabase.getInstance().getReference().getRoot().child("Offers").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality",""))
+                                                    .child(auth.getUid());
+                                            removeFromGeo.child("Current Event").removeValue();
+
+                                            removeFromGeo = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid()).child("Current Event");
+                                            removeFromGeo.removeValue();
+
+                                            new Handler().postDelayed(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    fastDialog.dismiss();
+                                                    Toast.makeText(OrganiseEvents.this, "Cancelled Show", Toast.LENGTH_SHORT).show();
+                                                    finish();
+                                                }
+                                            },7500);
+                                        }else{
+                                            DatabaseReference removeFromGeo = FirebaseDatabase.getInstance().getReference().getRoot().child("Offers").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality",""))
+                                                    .child(auth.getUid());
+                                            removeFromGeo.child("Current Event").removeValue();
+
+                                            removeFromGeo = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid()).child("Current Event");
+                                            removeFromGeo.removeValue();
+
+                                            Toast.makeText(OrganiseEvents.this, "Cancelled Show", Toast.LENGTH_SHORT).show();
+                                            finish();
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError error) {
+
+                                    }
+                                });
+                            }
+                        }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+
+                            }
+                        }).create();
+                builder.show();
+            }else{
+                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid()).child("Current Event");
+                databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if(snapshot.hasChild("totalSalesPrice")){
+                            fastDialog1.show();
+                            double amt = Double.parseDouble(Objects.requireNonNull(snapshot.child("totalSalesPrice").getValue(String.class)));
+                            double cmmisn = (amt * 5) / 100;
+
+                            amt = amt - cmmisn;
+
+                            payoutAmt = amt;
+                            new MakePayout().execute();
+
+                            DatabaseReference removeFromGeo = FirebaseDatabase.getInstance().getReference().getRoot().child("Offers").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality",""))
+                                    .child(auth.getUid());
+                            removeFromGeo.child("Current Event").removeValue();
+
+                            removeFromGeo = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid()).child("Current Event");
+                            removeFromGeo.removeValue();
+
+                        }else{
+                            DatabaseReference removeFromGeo = FirebaseDatabase.getInstance().getReference().getRoot().child("Offers").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality",""))
+                                    .child(auth.getUid());
+                            removeFromGeo.child("Current Event").removeValue();
+
+                            removeFromGeo = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid()).child("Current Event");
+                            removeFromGeo.removeValue();
+
+                            Toast.makeText(OrganiseEvents.this, "Show finished", Toast.LENGTH_SHORT).show();
+                            finish();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+                AlertDialog.Builder builder = new AlertDialog.Builder(OrganiseEvents.this);
+                builder.setTitle("Finish Event");
+            }
         });
 
         AsyncTask.execute(() -> previousEvents.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -122,6 +275,10 @@ public class OrganiseEvents extends AppCompatActivity {
                     filled.setText("Filled : " + snapshot.child("filled").getValue(String.class));
                     seats.setText("Seats: " + snapshot.child("seats").getValue(String.class));
                     artistName.setText("Artist Name: " + snapshot.child("artistNameComing").getValue(String.class));
+                    long timeActual = Long.parseLong(snapshot.child("dateAndTime").getValue(String.class));
+                    timeActualForEvent = timeActual;
+                    if(timeActual < System.currentTimeMillis())
+                        cancelEvent.setText("FINISH EVENT");
                     cancelEvent.setVisibility(View.VISIBLE);
                     showQR.setVisibility(View.VISIBLE);
                     currentEventAvailable = true;
@@ -186,6 +343,127 @@ public class OrganiseEvents extends AppCompatActivity {
         });
     }
 
+    public class MakePayout extends AsyncTask<Void,Void,Void>{
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            RequestQueue requestQueue = Volley.newRequestQueue(OrganiseEvents.this);
+            StringRequest stringRequest = new StringRequest(Request.Method.POST, testPayoutToken, response -> {
+                Log.i("response",response);
+                genratedToken = response.trim();
+                new AuthorizeToken().execute();
+            }, error -> {
+
+            });
+            requestQueue.add(stringRequest);
+            return null;
+        }
+    }
+
+    public class AuthorizeToken extends AsyncTask<Void,Void,Void>{
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            RequestQueue requestQueue = Volley.newRequestQueue(OrganiseEvents.this);
+            StringRequest stringRequest = new StringRequest(Request.Method.POST, testBearerToken, response -> {
+                Log.i("response",response);
+                if(response.trim().equals("Token is valid")){
+                        initiatePayout(payoutAmt);
+
+                }
+            }, error -> {
+
+            }){
+                @NonNull
+                @Override
+                protected Map<String, String> getParams() {
+                    Map<String,String> params = new HashMap<>();
+                    params.put("token",genratedToken);
+                    return params;
+                }
+            };
+            requestQueue.add(stringRequest);
+            return null;
+        }
+    }
+
+    private void initiatePayout(double amt) {
+        AsyncTask.execute(() -> {
+            RequestQueue requestQueue = Volley.newRequestQueue(OrganiseEvents.this);
+            StringRequest stringRequest = new StringRequest(Request.Method.POST, testPaymentToVendor, response -> {
+                Log.i("resp",response);
+            }, error -> {
+                runOnUiThread(() -> {
+                    fastDialog1.dismiss();
+                    Toast.makeText(OrganiseEvents.this, "Show Finished", Toast.LENGTH_SHORT).show();
+                    finish();
+                });
+
+            }){
+                @NonNull
+                @Override
+                protected Map<String, String> getParams() {
+                    Map<String,String> params = new HashMap<>();
+                    params.put("benID",auth.getUid());
+                    String genratedID = "ORDER_" + System.currentTimeMillis();
+
+                    params.put("transID",genratedID);
+                    params.put("token",genratedToken);
+                    params.put("amount", new DecimalFormat("0.00").format(amt) + "");
+                    return params;
+                }
+            };
+            requestQueue.add(stringRequest);
+        });
+    }
+
+    private void sendRefund(String s, String s1) {
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                RequestQueue requestQueue = Volley.newRequestQueue(OrganiseEvents.this);
+                StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.i("resp",response);
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+
+                    }
+                }){
+                    @NonNull
+                    @Override
+                    protected Map<String, String> getParams() {
+                        Map<String,String> params = new HashMap<>();
+                        FirebaseAuth auth = FirebaseAuth.getInstance();
+                        String referid = String.valueOf(System.currentTimeMillis());
+                        String referIDSS = referid;
+                        Random random = new Random();
+
+                        referid = referid + (random.nextInt(1000 - 1) + 1);
+                        String finalReferIDForInfo = "refund_" + referid + "s";
+                        String time = String.valueOf(System.currentTimeMillis());
+
+                        params.put("referID",referid + "");
+                        params.put("refundAmount", s1 + "");
+                        params.put("orderID",s);
+                        return params;
+                    }
+                };
+                stringRequest.setRetryPolicy(new DefaultRetryPolicy(
+                        0,
+                        DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                        DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+                requestQueue.add(stringRequest);
+            }
+        });
+    }
+
+    private void sendNotification(String s) {
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -202,6 +480,9 @@ public class OrganiseEvents extends AppCompatActivity {
                         seats.setText("Seats: " + snapshot.child("seats").getValue(String.class));
                         artistName.setText("Artist Name: " + snapshot.child("artistNameComing").getValue(String.class));
                         cancelEvent.setVisibility(View.VISIBLE);
+                        long timeActual = Long.parseLong(snapshot.child("dateAndTime").getValue(String.class));
+                        if(timeActual < System.currentTimeMillis())
+                            cancelEvent.setText("FINISH EVENT");
                         showQR.setVisibility(View.VISIBLE);
                         currentEventAvailable = true;
                     }
@@ -227,4 +508,6 @@ public class OrganiseEvents extends AppCompatActivity {
         cancelEvent = findViewById(R.id.cancelCurrentEventButtonOrganised);
         organiseEvent = findViewById(R.id.organiseEventButton);
     }
+
+
 }
