@@ -199,47 +199,106 @@ public class OrganiseEvents extends AppCompatActivity {
                         }).create();
                 builder.show();
             }else{
-                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid()).child("Current Event");
-                databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if(snapshot.hasChild("totalSalesPrice")){
-                            fastDialog1.show();
-                            double amt = Double.parseDouble(Objects.requireNonNull(snapshot.child("totalSalesPrice").getValue(String.class)));
-                            double cmmisn = (amt * 5) / 100;
 
-                            amt = amt - cmmisn;
-
-                            payoutAmt = amt;
-                            new MakePayout().execute();
-
-                            DatabaseReference removeFromGeo = FirebaseDatabase.getInstance().getReference().getRoot().child("Offers").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality",""))
-                                    .child(auth.getUid());
-                            removeFromGeo.child("Current Event").removeValue();
-
-                            removeFromGeo = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid()).child("Current Event");
-                            removeFromGeo.removeValue();
-
-                        }else{
-                            DatabaseReference removeFromGeo = FirebaseDatabase.getInstance().getReference().getRoot().child("Offers").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality",""))
-                                    .child(auth.getUid());
-                            removeFromGeo.child("Current Event").removeValue();
-
-                            removeFromGeo = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid()).child("Current Event");
-                            removeFromGeo.removeValue();
-
-                            Toast.makeText(OrganiseEvents.this, "Show finished", Toast.LENGTH_SHORT).show();
-                            finish();
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-
-                    }
-                });
                 AlertDialog.Builder builder = new AlertDialog.Builder(OrganiseEvents.this);
-                builder.setTitle("Finish Event");
+                builder.setTitle("Finish Event").setMessage("Finish Event only after its finished. If finished then click Finish")
+                        .setPositiveButton("Finish", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid()).child("Current Event");
+                                databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                        if(snapshot.hasChild("totalSalesPrice")){
+                                            fastDialog1.show();
+                                            double amt = Double.parseDouble(Objects.requireNonNull(snapshot.child("totalSalesPrice").getValue(String.class)));
+                                            double cmmisn = (amt * 5) / 100;
+
+                                            amt = amt - cmmisn;
+
+                                            payoutAmt = amt;
+                                            new MakePayout().execute();
+
+                                            DatabaseReference removeFromGeo = FirebaseDatabase.getInstance().getReference().getRoot().child("Offers").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality",""))
+                                                    .child(auth.getUid());
+                                            removeFromGeo.child("Current Event").removeValue();
+
+                                            removeFromGeo = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid()).child("Current Event");
+                                            removeFromGeo.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                @Override
+                                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                                    String name = String.valueOf(snapshot.child("eventName").getValue());
+                                                    String date = String.valueOf(snapshot.child("dateAndTimeString").getValue());
+                                                    String salesAmt = String.valueOf(snapshot.child("totalSalesPrice").getValue());
+                                                    String seats = String.valueOf(snapshot.child("seats").getValue());
+                                                    String filledSeats = String.valueOf(snapshot.child("filled").getValue());
+
+                                                    DatabaseReference addToPrev = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid()).child("Previous Events");
+                                                    addToPrev.child(name).child("eventName").setValue(name);
+                                                    addToPrev.child(name).child("salesAmt").setValue(salesAmt);
+                                                    addToPrev.child(name).child("filledSeats").setValue(filledSeats);
+                                                    addToPrev.child(name).child("seats").setValue(seats);
+                                                    addToPrev.child(name).child("date").setValue(date);
+
+                                                    addToPrev = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid()).child("Current Event");
+                                                    addToPrev.removeValue();
+                                                }
+
+                                                @Override
+                                                public void onCancelled(@NonNull DatabaseError error) {
+
+                                                }
+                                            });
+
+                                        }else{
+                                            DatabaseReference removeFromGeo = FirebaseDatabase.getInstance().getReference().getRoot().child("Offers").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality",""))
+                                                    .child(auth.getUid());
+                                            removeFromGeo.child("Current Event").removeValue();
+
+                                            removeFromGeo = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid()).child("Current Event");
+                                            removeFromGeo.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                @Override
+                                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                                    String name = String.valueOf(snapshot.child("eventName").getValue());
+                                                    String date = String.valueOf(snapshot.child("dateAndTimeString").getValue());
+                                                    String salesAmt = String.valueOf(snapshot.child("totalSalesPrice").getValue());
+                                                    String seats = String.valueOf(snapshot.child("seats").getValue());
+                                                    String filledSeats = String.valueOf(snapshot.child("filled").getValue());
+
+                                                    DatabaseReference addToPrev = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid()).child("Previous Events");
+                                                    addToPrev.child(name).child("eventName").setValue(name);
+                                                    addToPrev.child(name).child("salesAmt").setValue("0");
+                                                    addToPrev.child(name).child("filledSeats").setValue("0");
+                                                    addToPrev.child(name).child("seats").setValue(seats);
+                                                    addToPrev.child(name).child("date").setValue(date);
+
+                                                    addToPrev = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid()).child("Current Event");
+                                                    addToPrev.removeValue();
+                                                }
+
+                                                @Override
+                                                public void onCancelled(@NonNull DatabaseError error) {
+
+                                                }
+                                            });
+                                            Toast.makeText(OrganiseEvents.this, "Show finished", Toast.LENGTH_SHORT).show();
+                                            finish();
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError error) {
+
+                                    }
+                                });
+                            }
+                        }).setNegativeButton("Exit", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+
+                            }
+                        }).create();
+                builder.show();
             }
         });
 
@@ -249,9 +308,9 @@ public class OrganiseEvents extends AppCompatActivity {
                 if(snapshot.exists()){
                     for(DataSnapshot dataSnapshot : snapshot.getChildren()){
                         eventNames.add(dataSnapshot.getKey());
-                        dateAndTimeList.add(dataSnapshot.child("dateAndTimeString").getValue(String.class));
-                        artistNameList.add(dataSnapshot.child("artistName").getValue(String.class));
-                        ticketsSold.add(dataSnapshot.child("ticketSold").getValue(String.class));
+                        dateAndTimeList.add(dataSnapshot.child("date").getValue(String.class));
+                        artistNameList.add(dataSnapshot.child("salesAmt").getValue(String.class));
+                        ticketsSold.add(dataSnapshot.child("filledSeats").getValue(String.class));
                     }
                     recyclerView.setAdapter(new PreviousEventADP(eventNames,ticketsSold,dateAndTimeList,artistNameList));
                 }

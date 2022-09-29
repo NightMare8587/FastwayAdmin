@@ -29,18 +29,21 @@ public class PreviousEventADP extends RecyclerView.Adapter<PreviousEventADP.Hold
     @NonNull
     @Override
     public Holder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.prev_campadap_layout,parent,false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.previous_adp_event,parent,false);
         return new Holder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull Holder holder, int position) {
-
+        holder.eventName.setText("Event Name: " + eventNames.get(position));
+        holder.dateAndTime.setText("Date: " + dateAndTimeList.get(position));
+        holder.ticketSold.setText("Filled Seat: " + ticketsSold.get(position));
+        holder.artist.setText("Amount Sale: \u20b9" + artistNameList.get(position));
     }
 
     @Override
     public int getItemCount() {
-        return 0;
+        return eventNames.size();
     }
     public class Holder extends RecyclerView.ViewHolder{
         TextView eventName,artist,ticketSold,dateAndTime;
