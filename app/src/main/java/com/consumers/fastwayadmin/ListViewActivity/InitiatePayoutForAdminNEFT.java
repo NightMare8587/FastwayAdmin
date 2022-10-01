@@ -89,7 +89,7 @@ public class InitiatePayoutForAdminNEFT extends AppCompatActivity {
                     }
                     availableForPayout = true;
                      amount = Double.parseDouble(String.valueOf(snapshot.child("totalPayoutAmount").getValue()));
-                     textView.setText(decimalFormat.format(amount));
+                     textView.setText("\u20b9" + decimalFormat.format(amount));
                 }else
                 {
                     button.setVisibility(View.INVISIBLE);
