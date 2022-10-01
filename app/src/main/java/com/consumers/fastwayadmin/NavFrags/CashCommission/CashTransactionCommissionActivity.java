@@ -72,7 +72,10 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
                                 if(platformFeeAmount == 0D){
                                     platformFeeAmount = 0D;
                                 }else{
-                                    platformFeeAmount = (platformFeeAmount * 2)/100;
+                                    if(platformFeeAmount >= 900000)
+                                        platformFeeAmount = ( platformFeeAmount * 4 ) / 100;
+                                    else
+                                        platformFeeAmount = ( platformFeeAmount * 3 ) / 100;
                                 }
                                 platformFee.setText("Platform Fee: " + "\u20B9" + df.format(platformFeeAmount));
                                 platformFeeBool = true;
@@ -202,7 +205,10 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
                                             if(platformFeeAmount == 0D){
                                                 platformFeeAmount = 0D;
                                             }else{
-                                                platformFeeAmount = (platformFeeAmount * 2)/100;
+                                                if(platformFeeAmount >= 900000)
+                                                    platformFeeAmount = ( platformFeeAmount * 4 ) / 100;
+                                                else
+                                                    platformFeeAmount = ( platformFeeAmount * 3 ) / 100;
                                             }
                                             platformFee.setText("Platform Fee: " + "\u20B9" + df.format(platformFeeAmount));
                                             platformFeeBool = true;
@@ -330,7 +336,10 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
                                 if(platformFeeAmount == 0D){
                                     platformFeeAmount = 0D;
                                 }else{
-                                    platformFeeAmount = (platformFeeAmount * 2)/100;
+                                    if(platformFeeAmount >= 900000)
+                                        platformFeeAmount = ( platformFeeAmount * 4 ) / 100;
+                                    else
+                                        platformFeeAmount = ( platformFeeAmount * 3 ) / 100;
                                 }
                                 platformFee.setText("Platform Fee: " + "\u20B9" + df.format(platformFeeAmount));
                                 platformFeeBool = true;
@@ -456,7 +465,10 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
                                             if(platformFeeAmount == 0D){
                                                 platformFeeAmount = 0D;
                                             }else{
-                                                platformFeeAmount = (platformFeeAmount * 2)/100;
+                                                if(platformFeeAmount >= 900000)
+                                                    platformFeeAmount = ( platformFeeAmount * 4 ) / 100;
+                                                else
+                                                    platformFeeAmount = ( platformFeeAmount * 3 ) / 100;
                                             }
                                             platformFee.setText("Platform Fee: " + "\u20B9" + df.format(platformFeeAmount));
                                             platformFeeBool = true;

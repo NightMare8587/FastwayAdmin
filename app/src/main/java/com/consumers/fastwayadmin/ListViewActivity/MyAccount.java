@@ -72,7 +72,7 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
     ModalBottomSheetDialog modalBottomSheetDialog;
     SharedPreferences.Editor editor;
     TextView textView;
-    String[] names = {"Change Credentials (Admin)","Change Credentials (Restaurants)","Restaurant Images","Delete Account","Change Bank Credentials","Restaurant Documents","Restaurant Staff Details","Leave Fastway","Initiate Payouts"};
+    String[] names = {"Change Credentials (Admin)","Change Credentials (Restaurants)","Restaurant Images","Delete Account","Change Bank Credentials","Restaurant Documents","Restaurant Staff Details","Leave Ordinalo","Initiate Payouts"};
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -180,7 +180,8 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
                     startActivity(new Intent(MyAccount.this, LeaveFastway.class));
                     break;
                 case 8:
-
+                    startActivity(new Intent(MyAccount.this, InitiatePayoutForAdminNEFT.class));
+                    break;
 
             }
         });

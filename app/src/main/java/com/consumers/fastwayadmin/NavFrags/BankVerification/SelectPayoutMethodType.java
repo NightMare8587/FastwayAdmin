@@ -65,7 +65,7 @@ public class SelectPayoutMethodType extends AppCompatActivity {
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(SelectPayoutMethodType.this);
                 if (checkedId == R.id.radioButtonNEFTpaymentMethod) {
-                    builder.setTitle("NEFT").setMessage("Get Payment whenever you want by initiating payout and will be credited within 4 hours or even 1 day depending upon traffic upon bank\nYou can still withdraw money instantly at any time by paying a nominal fee of \u20b98")
+                    builder.setTitle("NEFT").setMessage("Get Payment whenever you want by initiating payout and will be credited within 4 hours or even 1 day depending upon traffic upon bank\nYou can still withdraw money instantly at any time by paying a nominal fee of \u20b97")
                             .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
@@ -75,7 +75,7 @@ public class SelectPayoutMethodType extends AppCompatActivity {
                     builder.show();
                     checkedMethod = "neft";
                 }else if(checkedId == R.id.radioButtonIMPSPayoutMethod){
-                    builder.setTitle("IMPS").setMessage("Payment will be automatically generated after every order approved in Online payment method\nSince payment will be instant you will be charged with some nominal fee depending upon amount of transaction\n\u20b95 for amount under \u20b91000\n\u20b98 for amount under \u20b910000")
+                    builder.setTitle("IMPS").setMessage("Payment will be automatically generated after every order approved in Online payment method\nSince payment will be instant you will be charged with some nominal fee amount of \u20b92")
                             .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {

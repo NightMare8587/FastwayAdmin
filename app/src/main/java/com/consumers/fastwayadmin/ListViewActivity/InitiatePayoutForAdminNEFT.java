@@ -9,9 +9,12 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -43,9 +46,13 @@ import karpuzoglu.enes.com.fastdialog.Type;
 public class InitiatePayoutForAdminNEFT extends AppCompatActivity {
     DatabaseReference databaseReference;
     double amount;
+    double enteredAmount;
   MakePaymentToVendor makePaymentToVendor = new MakePaymentToVendor();
     String genratedToken;
+    long coolDownTime;
+    boolean cooldown = false;
     FastDialog fastDialog;
+    boolean moreThan20 = false;
     boolean availableForPayout = false;
     String testPayoutToken = "https://intercellular-stabi.000webhostapp.com/CheckoutPayouts/testToken.php";
     String prodPayoutToken = "https://intercellular-stabi.000webhostapp.com/CheckoutPayouts/payoutIMPS.php";
@@ -76,6 +83,10 @@ public class InitiatePayoutForAdminNEFT extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.hasChild("totalPayoutAmount")){
+                    if(snapshot.hasChild("coolDownPeriod")) {
+                        coolDownTime = Long.parseLong(snapshot.child("coolDownPeriod").getValue(String.class));
+                        cooldown = true;
+                    }
                     availableForPayout = true;
                      amount = Double.parseDouble(String.valueOf(snapshot.child("totalPayoutAmount").getValue()));
                      textView.setText(decimalFormat.format(amount));
@@ -97,7 +108,61 @@ public class InitiatePayoutForAdminNEFT extends AppCompatActivity {
         });
 
         button.setOnClickListener(click -> {
+
             if(availableForPayout && amount != 0){
+
+                if(cooldown) {
+                    if(System.currentTimeMillis() < coolDownTime){
+                        Toast.makeText(this, "Cooldown period is active", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                }
+
+                if(amount >= 20000) {
+                    moreThan20 = true;
+                    AlertDialog.Builder alert = new AlertDialog.Builder(InitiatePayoutForAdminNEFT.this);
+                    alert.setTitle("Message").setMessage("You can initiate payout of amount less than 20000 at a time. You can initiate again after period of 6 hours");
+                    LinearLayout linearLayout = new LinearLayout(InitiatePayoutForAdminNEFT.this);
+                    linearLayout.setOrientation(LinearLayout.VERTICAL);
+                    EditText editText = new EditText(InitiatePayoutForAdminNEFT.this);
+                    editText.setHint("Enter Amount Here");
+                    editText.setInputType(InputType.TYPE_CLASS_NUMBER);
+                    linearLayout.addView(editText);
+                    alert.setPositiveButton("Initiate Payout", (dialogInterface, i) -> {
+                        dialogInterface.dismiss();
+                        if(Double.parseDouble(editText.getText().toString()) > 20000D)
+                            Toast.makeText(InitiatePayoutForAdminNEFT.this, "Amount Should be less than 20k", Toast.LENGTH_SHORT).show();
+                        else{
+                            enteredAmount = Double.parseDouble(editText.getText().toString());
+                            if(enteredAmount > amount) {
+                                Toast.makeText(this, "Invalid Input", Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+                            AlertDialog.Builder builder = new AlertDialog.Builder(InitiatePayoutForAdminNEFT.this);
+                            builder.setTitle("Choose one option").setMessage("Choose one payout option\nGet payout after 4 to 5 hours (NEFT)\nGet Instant Payout (IMPS)")
+                                    .setPositiveButton("Choose NEFT", (dialog, which) -> {
+                                        new MakePayout().execute();
+                                        fastDialog.show();
+                                        dialog.dismiss();
+                                    }).setNegativeButton("Choose IMPS", (dialog, which) -> {
+                                        new MakePayoutIMPS().execute();
+                                        fastDialog.show();
+                                        dialog.dismiss();
+                                    }).setNeutralButton("Exit", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            dialog.dismiss();
+                                        }
+                                    }).create().show();
+                        }
+                    }).setNegativeButton("Wait", (dialogInterface, i) -> {
+
+                    }).create();
+                    alert.setView(linearLayout);
+                    alert.show();
+
+                    return;
+                }
                 AlertDialog.Builder builder = new AlertDialog.Builder(InitiatePayoutForAdminNEFT.this);
                 builder.setTitle("Choose one option").setMessage("Choose one payout option\nGet payout after 4 to 5 hours (NEFT)\nGet Instant Payout (IMPS)")
                         .setPositiveButton("Choose NEFT", new DialogInterface.OnClickListener() {
@@ -120,7 +185,8 @@ public class InitiatePayoutForAdminNEFT extends AppCompatActivity {
                                 dialog.dismiss();
                             }
                         }).create().show();
-            }
+            }else
+                Toast.makeText(this, "Amount should not be 0", Toast.LENGTH_SHORT).show();
         });
     }
 
@@ -149,7 +215,7 @@ public class InitiatePayoutForAdminNEFT extends AppCompatActivity {
             RequestQueue requestQueue = Volley.newRequestQueue(InitiatePayoutForAdminNEFT.this);
             StringRequest stringRequest = new StringRequest(Request.Method.POST, testPayoutToken, response -> {
                 Log.i("response",response);
-                amount = amount - 5;
+                amount = amount - 4;
                 genratedToken = response.trim();
                 new AuthorizeToken().execute();
             }, error -> {
@@ -193,8 +259,35 @@ public class InitiatePayoutForAdminNEFT extends AppCompatActivity {
             RequestQueue requestQueue = Volley.newRequestQueue(InitiatePayoutForAdminNEFT.this);
             StringRequest stringRequest = new StringRequest(Request.Method.POST, testPaymentToVendor, response -> {
                 fastDialog.dismiss();
-                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid());
-                databaseReference.child("totalPayoutAmount").setValue("0");
+                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
+                if(!moreThan20) {
+                    databaseReference.child("totalPayoutAmount").setValue("0");
+                    long timeCool = System.currentTimeMillis() + 21600000L;
+                    databaseReference.child("coolDownPeriod").setValue(timeCool + "");
+                }else{
+                    databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            double current = Double.parseDouble(Objects.requireNonNull(snapshot.child("totalPayoutAmount").getValue(String.class)));
+                            current = current - enteredAmount;
+                            if(current == 0)
+                                databaseReference.child("totalPayoutAmount").setValue("0");
+                            else
+                                databaseReference.child("totalPayoutAmount").setValue("" + current);
+
+
+                            long timeCool = System.currentTimeMillis() + 21600000L;
+                            databaseReference.child("coolDownPeriod").setValue(timeCool + "");
+
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
+                        }
+                    });
+
+                }
             },error -> {
 
             }){

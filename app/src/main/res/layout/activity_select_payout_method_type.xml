@@ -35,7 +35,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
 
-            android:text="Get payment instantly whenever order is approved (₹5 nominal fee on every order)"
+            android:text="Get payment instantly whenever order is approved (₹2 nominal fee on every order)"
             android:textSize="16sp" />
 
         <RadioButton
@@ -43,7 +43,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
-            android:text="Get Payment whenever you want by initiating payout\n(After Initiating it may Take 3 or 4 hours extra)\nYou can still withdraw money instantly at any time by paying a nominal fee of ₹8 "
+            android:text="Get Payment whenever you want by initiating payout\n(After Initiating it may Take 3 or 4 hours extra)\nYou can still withdraw money instantly at any time by paying a nominal fee of ₹7 "
             android:textSize="16sp" />
     </RadioGroup>
 
