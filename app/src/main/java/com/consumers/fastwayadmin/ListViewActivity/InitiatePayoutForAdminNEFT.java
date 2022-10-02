@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -80,11 +81,12 @@ public class InitiatePayoutForAdminNEFT extends AppCompatActivity {
         changeMethod = findViewById(R.id.changePayoutMethodNeftorAdmin);
         databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @SuppressLint("SetTextI18n")
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.hasChild("totalPayoutAmount")){
                     if(snapshot.hasChild("coolDownPeriod")) {
-                        coolDownTime = Long.parseLong(snapshot.child("coolDownPeriod").getValue(String.class));
+                        coolDownTime = Long.parseLong(Objects.requireNonNull(snapshot.child("coolDownPeriod").getValue(String.class)));
                         cooldown = true;
                     }
                     availableForPayout = true;
@@ -99,7 +101,6 @@ public class InitiatePayoutForAdminNEFT extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
             }
         });
 
