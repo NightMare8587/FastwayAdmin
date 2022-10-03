@@ -93,8 +93,8 @@ public void onBindViewHolder(@NonNull holder holder, @SuppressLint("RecyclerView
                             return;
                         }
 
-                        dishQuan.add(editText.getText().toString());
-                        dishNames.add(name.get(position));
+                        dishQuan.add(editText.getText().toString().trim());
+                        dishNames.add(name.get(position).trim());
 
                         String dishArr = dishNames.toString().replace("[","").replace("]","").trim();
                         String quanArr = dishQuan.toString().replace("[","").replace("]","").trim();

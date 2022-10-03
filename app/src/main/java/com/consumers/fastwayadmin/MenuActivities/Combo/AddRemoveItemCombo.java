@@ -65,7 +65,7 @@ public class AddRemoveItemCombo extends AppCompatActivity {
 //                    dishNames.remove(position);
                     arrayAdapter.notifyDataSetChanged();
                 }else
-                    Toast.makeText(this, "Minimum 2 two required in Combo", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Minimum 2 items two required in Combo", Toast.LENGTH_SHORT).show();
                 dialog.dismiss();
             }).setNegativeButton("No", (dialog, which) -> dialog.dismiss()).create().show();
 

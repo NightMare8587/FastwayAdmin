@@ -149,7 +149,7 @@ public class SearchFastwayClass extends RecyclerView.Adapter<SearchFastwayClass.
                     intent.putExtra("type",dish);
                     intent.putExtra("dishName", finalDishNameToAdd);
                     v.getContext().startActivity(intent);
-                }).setNegativeButton("Use Fastway Image", new DialogInterface.OnClickListener() {
+                }).setNegativeButton("Use Ordinalo Image", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         SharedPreferences storeImages = v.getContext().getSharedPreferences("storeImages",MODE_PRIVATE);
