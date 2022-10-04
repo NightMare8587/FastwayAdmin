@@ -27,6 +27,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -37,13 +38,16 @@ public class selectCurrentDishAdapter extends RecyclerView.Adapter<selectCurrent
         List<String> dishNames = new ArrayList<>();
         List<String> dishQuan = new ArrayList<>();
         Context context;
+        HashMap<String,String> mainMap;
         String comboName;
         String state;
         String locality;
 
-public selectCurrentDishAdapter(List<String> name, List<String> image,Context context,String comboName,String state,String locality,List<String> price,List<String> dishNames,List<String> dishQuan) {
+public selectCurrentDishAdapter(List<String> name, List<String> image,Context context,String comboName,String state,String locality,
+                                List<String> price,List<String> dishNames,List<String> dishQuan,HashMap<String,String> mainMap) {
         this.name = name;
         this.dishQuan = dishQuan;
+        this.mainMap = mainMap;
         this.image = image;
         this.dishNames = dishNames;
         this.price = price;
@@ -88,20 +92,22 @@ public void onBindViewHolder(@NonNull holder holder, @SuppressLint("RecyclerView
                             return;
                         }
 
-                        if(dishNames.contains(name.get(position))){
+                        if(mainMap.containsKey(name.get(position))){
                             Toast.makeText(context, "Dish Already Exists", Toast.LENGTH_SHORT).show();
                             return;
                         }
 
-                        dishQuan.add(editText.getText().toString().trim());
-                        dishNames.add(name.get(position).trim());
 
-                        String dishArr = dishNames.toString().replace("[","").replace("]","").trim();
-                        String quanArr = dishQuan.toString().replace("[","").replace("]","").trim();
+//                        dishQuan.add(editText.getText().toString().trim());
+//                        dishNames.add(name.get(position).trim());
+
+                        mainMap.put(name.get(position).trim(),editText.getText().toString().trim());
+//                        String dishArr = dishNames.toString().replace("[","").replace("]","").trim();
+//                        String quanArr = dishQuan.toString().replace("[","").replace("]","").trim();
 
                         FirebaseFirestore firestore = FirebaseFirestore.getInstance();
                         firestore.collection(state).document("Restaurants").collection(locality).document(auth.getUid()).collection("List of Dish").document(comboName)
-                                .update("dishNamesArr",dishArr,"dishQuantityArr",quanArr);
+                                .update("dishNamesPrice",mainMap);
 //                        reference.child("Combo").child(comboName).child(name.get(position)).child("name").child("name").setValue(name.get(position));
 //                        reference.child("Combo").child(comboName).child(name.get(position)).child("name").child("quantity").setValue(editText.getText().toString());
                         kAlertDialog.dismissWithAnimation();

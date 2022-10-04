@@ -57,6 +57,7 @@ public class ComboAndOffers extends AppCompatActivity {
     String dishType = "Veg";
     SharedPreferences sharedPreferences;
     List<String> name = new ArrayList<>();
+    HashMap<String,String> dishNamesInComboPrice = new HashMap<>();
     FirebaseAuth auth;
     String state;
     LinearLayoutManager horizonatl;
@@ -160,11 +161,13 @@ public class ComboAndOffers extends AppCompatActivity {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                                         if (snapshot.exists()) {
-                                            name.clear();
+                                            name.clear();//
+                                            dishNamesInComboPrice.clear();
                                             int count = 0;
                                             dishQuantity.clear();
                                             for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                                                 count++;
+                                                dishNamesInComboPrice.put(dataSnapshot.child("name").getValue(String.class),dataSnapshot.child("quantity").getValue(String.class));
                                                 name.add(dataSnapshot.child("name").getValue(String.class));
                                                 dishQuantity.add(dataSnapshot.child("quantity").getValue(String.class));
                                             }
@@ -191,12 +194,12 @@ public class ComboAndOffers extends AppCompatActivity {
                                             map.put("totalRate","0");
                                             map.put("menuType","Combo");
                                             map.put("comboName",comboName);
-                                            map.put("dishNamesArr",dishNameArray);
-                                            map.put("dishQuantityArr",dishQuanArray);
 
 
                                             firestore.collection(sharedPreferences.getString("state","")).document("Restaurants").collection(sharedPreferences.getString("locality",""))
                                                     .document(auth.getUid()).collection("List of Dish").document(comboName).set(map);
+                                            firestore.collection(sharedPreferences.getString("state","")).document("Restaurants").collection(sharedPreferences.getString("locality",""))
+                                                    .document(auth.getUid()).collection("List of Dish").document(comboName).update("dishNamesPrice",dishNamesInComboPrice);
                                             new Thread(() -> {
                                                 reference.child("Combo").child(comboName).child("price").setValue(priceDialog.getInputText());
                                                 reference.child("Combo").child(comboName).child("count").setValue("0");
@@ -424,10 +427,12 @@ public class ComboAndOffers extends AppCompatActivity {
                 if(snapshot.exists()){
                     name.clear();
                     dishQuantity.clear();
+                    dishNamesInComboPrice.clear();
 //                    Toast.makeText(ComboAndOffers.this, "Yes", Toast.LENGTH_SHORT).show();
                     for(DataSnapshot dataSnapshot : snapshot.getChildren()){
 //                       Toast.makeText(ComboAndOffers.this, ""+dataSnapshot.child("name").getValue(), Toast.LENGTH_SHORT).show();
                         name.add(String.valueOf(dataSnapshot.child("name").getValue()));
+                        dishNamesInComboPrice.put(dataSnapshot.child("name").getValue(String.class),dataSnapshot.child("quantity").getValue(String.class));
                         dishQuantity.add(String.valueOf(dataSnapshot.child("quantity").getValue()));
                     }
                     createCombo.setVisibility(View.VISIBLE);

@@ -32,7 +32,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.squareup.picasso.Picasso;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -42,13 +45,15 @@ public class ComboRecyclerView extends RecyclerView.Adapter<ComboRecyclerView.Ho
     List<List<String>> dishQuan;
     List<String> price;
     List<String> enabled;
+    HashMap<String,HashMap<String,String>> outerMap;
     List<String> comboImage;
     List<String> description;
     Context context;
     public ComboRecyclerView(List<String> comboName, List<List<String>> dishName, List<String> price, Context context,
-                             List<String> comboImage,List<String> description,List<String> enabled,List<List<String>> dishQuan) {
+                             List<String> comboImage,List<String> description,List<String> enabled,List<List<String>> dishQuan,HashMap<String,HashMap<String,String>> outerMap) {
         this.comboName = comboName;
         this.description = description;
+        this.outerMap = outerMap;
         this.comboImage = comboImage;
         this.dishQuan = dishQuan;
         this.enabled = enabled;
@@ -70,11 +75,13 @@ public class ComboRecyclerView extends RecyclerView.Adapter<ComboRecyclerView.Ho
     public void onBindViewHolder(@NonNull Holder holder, @SuppressLint("RecyclerView") int position) {
         holder.comboName.setText(comboName.get(position));
         holder.price.setText(price.get(position));
-        List<String> current = new ArrayList<>(dishName.get(position));
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1,current);
+        HashMap<String,String> map = new HashMap<>(outerMap.get(comboName.get(position)));
+        String[] arr = map.keySet().toArray(new String[0]);
+        List<String> current = Arrays.asList(arr);
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, current);
         holder.listView.setAdapter(arrayAdapter);
         ViewGroup.LayoutParams param = holder.listView.getLayoutParams();
-        param.height = 150*current.size();
+        param.height = 150 * current.size();
         holder.listView.setLayoutParams(param);
         if(enabled.get(position).equals("yes")){
             holder.checkBox.setText("Enabled");
@@ -127,8 +134,8 @@ dialogInterface.dismiss();
                 FirebaseFirestore firestore = FirebaseFirestore.getInstance();
                 firestore.collection(sharedPreferences.getString("state","")).document("Restaurants").collection(sharedPreferences.getString("locality","")).document(auth.getUid()).collection("List of Dish").document(comboName.get(position))
                         .update("description",editText.getText().toString());
-//                DatabaseReference reference =  FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid())).child("List of Dish").child("Combo").child(comboName.get(position));
-//                reference.child("description").setValue(editText.getText().toString());
+                DatabaseReference reference =  FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid())).child("List of Dish").child("Combo").child(comboName.get(position));
+                reference.child("description").setValue(editText.getText().toString());
                 Toast.makeText(v.getContext(), "Description Changed Successfully", Toast.LENGTH_SHORT).show();
                 dialogInterface1.dismiss();
             }).setNegativeButton("Cancel", (dialogInterface, i) -> dialogInterface.dismiss()).create();
@@ -149,8 +156,9 @@ dialogInterface.dismiss();
                 Intent intent = new Intent(v.getContext(),AddRemoveItemCombo.class);
                 intent.putExtra("name",comboName.get(position));
                 dialog.dismiss();
-                intent.putStringArrayListExtra("dishName", (ArrayList<String>) dishName.get(position));
-                intent.putStringArrayListExtra("dishQuan", (ArrayList<String>) dishQuan.get(position));
+//                intent.putStringArrayListExtra("dishName", (ArrayList<String>) dishName.get(position));
+//                intent.putStringArrayListExtra("dishQuan", (ArrayList<String>) dishQuan.get(position));
+                intent.putExtra("comboDishInfo",outerMap.get(comboName.get(position)));
                 v.getContext().startActivity(intent);
 
             }).setNeutralButton("Cancel", (dialog, which) -> dialog.dismiss()).setNegativeButton("Change Price", (dialogInterface, i) -> {

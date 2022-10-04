@@ -19,6 +19,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -31,6 +32,7 @@ public class SelectDishForCurrentCombo extends AppCompatActivity {
     List<String> dishQuan;
     String state;
     List<String> image = new ArrayList<>();
+    HashMap<String,String> mainMap;
     List<String> price = new ArrayList<>();
     String comboName;
     DatabaseReference reference;
@@ -42,8 +44,9 @@ public class SelectDishForCurrentCombo extends AppCompatActivity {
         setContentView(R.layout.activity_select_dish_for_current_combo);
         comboName = getIntent().getStringExtra("comboName");
         toolbar = findViewById(R.id.recyclerViewCurrentComboToolBar);
-        dishNames = getIntent().getStringArrayListExtra("dishName");
-        dishQuan = getIntent().getStringArrayListExtra("dishQuan");
+//        dishNames = getIntent().getStringArrayListExtra("dishName");
+//        dishQuan = getIntent().getStringArrayListExtra("dishQuan");
+        mainMap = (HashMap<String, String>) getIntent().getSerializableExtra("dishNamesPrice");
         setSupportActionBar(toolbar);
         recyclerView = findViewById(R.id.selectDishCurrentComboRecyclerView);
         auth = FirebaseAuth.getInstance();
@@ -61,7 +64,7 @@ public class SelectDishForCurrentCombo extends AppCompatActivity {
                         price.add(String.valueOf(dataSnapshot.child("full").getValue()));
                     }
                     recyclerView.setLayoutManager(new LinearLayoutManager(SelectDishForCurrentCombo.this));
-                    recyclerView.setAdapter(new selectCurrentDishAdapter(name,image,SelectDishForCurrentCombo.this,comboName,state,locality,price,dishNames,dishQuan));
+                    recyclerView.setAdapter(new selectCurrentDishAdapter(name,image,SelectDishForCurrentCombo.this,comboName,state,locality,price,dishNames,dishQuan,mainMap));
                 }
             }
 

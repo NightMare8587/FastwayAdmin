@@ -35,6 +35,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -48,6 +49,7 @@ public class ComboMenuDish extends AppCompatActivity {
     FirebaseFirestore firestore = FirebaseFirestore.getInstance();
     List<String> comboImage = new ArrayList<>();
     List<String> dish = new ArrayList<>();
+    HashMap<String,HashMap<String,String>> outerMap = new HashMap<>();
     List<String> enabled = new ArrayList<>();
     List<String> descriptionOfCombo = new ArrayList<>();
     List<String> price = new ArrayList<>();
@@ -55,6 +57,7 @@ public class ComboMenuDish extends AppCompatActivity {
     CollectionReference collectionReference;
     String locality;
     List<List<String>> dishNames = new ArrayList<>();
+    HashMap<String,String> mapOfComboInfo = new HashMap<>();
     List<List<String>> dishQuan = new ArrayList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,34 +68,38 @@ public class ComboMenuDish extends AppCompatActivity {
         state = getIntent().getStringExtra("state");
         locality = getIntent().getStringExtra("locality");
         recyclerView = findViewById(R.id.comboAdapterRecyclerView);
-        collectionReference = firestore.collection(state).document("Restaurants").collection(locality).document(auth.getUid()).collection("List of Dish");
+        collectionReference = firestore.collection(state).document("Restaurants").collection(locality).document(Objects.requireNonNull(auth.getUid())).collection("List of Dish");
         Query query = collectionReference.whereEqualTo("menuType","Combo");
         query.addSnapshotListener((value, error) -> {
             comboImage.clear();
             comboNames.clear();
             price.clear();
             descriptionOfCombo.clear();
-            enabled.clear();dishNames.clear();
+            enabled.clear();
+            dishNames.clear();
             dishQuan.clear();
             for(DocumentSnapshot documentSnapshot : value.getDocuments()){
                 Map<String,Object> map = documentSnapshot.getData();
+                Log.i("infoMapMy",map.toString());
                 comboNames.add((String) map.get("comboName"));
                 price.add((String) map.get("price"));
                 comboImage.add((String) map.get("image"));
                 descriptionOfCombo.add((String) map.get("description"));
                 enabled.add((String) map.get("enable"));
-                String[] str = String.valueOf(map.get("dishNamesArr")).split(",");
-                String[] str1 = String.valueOf(map.get("dishQuantityArr")).split(",");
-                ArrayList<String> strList = new ArrayList<>(
-                        Arrays.asList(str));
-                ArrayList<String> strList1 = new ArrayList<>(
-                        Arrays.asList(str1));
-
-                dishNames.add(new ArrayList<>(strList));
-                dishQuan.add(new ArrayList<>(strList1));
+                mapOfComboInfo = (HashMap<String, String>) map.get("dishNamesPrice");
+                outerMap.put((String) map.get("comboName"),mapOfComboInfo);
+//                String[] str = String.valueOf(map.get("dishNamesArr")).split(",");
+//                String[] str1 = String.valueOf(map.get("dishQuantityArr")).split(",");
+//                ArrayList<String> strList = new ArrayList<>(
+//                        Arrays.asList(str));
+//                ArrayList<String> strList1 = new ArrayList<>(
+//                        Arrays.asList(str1));
+//
+//                dishNames.add(new ArrayList<>(strList));
+//                dishQuan.add(new ArrayList<>(strList1));
             }
             recyclerView.setLayoutManager(new LinearLayoutManager(ComboMenuDish.this));
-            recyclerView.setAdapter(new ComboRecyclerView(comboNames,dishNames,price,ComboMenuDish.this,comboImage,descriptionOfCombo,enabled,dishQuan));
+            recyclerView.setAdapter(new ComboRecyclerView(comboNames,dishNames,price,ComboMenuDish.this,comboImage,descriptionOfCombo,enabled,dishQuan,outerMap));
 
         });
 //        reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(locality).child(Objects.requireNonNull(auth.getUid())).child("List of Dish");

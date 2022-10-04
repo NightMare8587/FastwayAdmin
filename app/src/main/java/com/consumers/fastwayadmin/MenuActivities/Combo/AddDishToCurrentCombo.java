@@ -19,6 +19,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -31,6 +32,7 @@ public class AddDishToCurrentCombo extends AppCompatActivity {
     List<String> dishNames;
     List<String> dishQuan;
     FirebaseAuth auth;
+    HashMap<String,String> mainMap;
     String comboName;
     LinearLayoutManager horizonatl;
     @Override
@@ -38,8 +40,9 @@ public class AddDishToCurrentCombo extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_dish_to_current_combo);
         comboName = getIntent().getStringExtra("name");
-        dishNames = getIntent().getStringArrayListExtra("dishName");
-        dishQuan = getIntent().getStringArrayListExtra("dishQuan");
+//        dishNames = getIntent().getStringArrayListExtra("dishName");
+//        dishQuan = getIntent().getStringArrayListExtra("dishQuan");
+        mainMap = (HashMap<String, String>) getIntent().getSerializableExtra("dishNamesPrice");
         auth = FirebaseAuth.getInstance();
         sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
         reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid()));
@@ -58,8 +61,9 @@ public class AddDishToCurrentCombo extends AppCompatActivity {
                     intent.putExtra("dishType","Main Course");
                     intent.putExtra("comboName",comboName);
                     intent.putExtra("state",sharedPreferences.getString("state",""));
-                    intent.putStringArrayListExtra("dishName", (ArrayList<String>) dishNames);
-                    intent.putStringArrayListExtra("dishQuan", (ArrayList<String>) dishQuan);
+//                    intent.putStringArrayListExtra("dishName", (ArrayList<String>) dishNames);
+//                    intent.putStringArrayListExtra("dishQuan", (ArrayList<String>) dishQuan);
+                    intent.putExtra("dishNamesPrice",mainMap);
                     intent.putExtra("locality",sharedPreferences.getString("locality",""));
                     startActivity(intent);
                 }).show());
@@ -73,8 +77,9 @@ public class AddDishToCurrentCombo extends AppCompatActivity {
                     intent.putExtra("dishType","Breads");
                     intent.putExtra("comboName",comboName);
                     intent.putExtra("state",sharedPreferences.getString("state",""));
-                    intent.putStringArrayListExtra("dishName", (ArrayList<String>) dishNames);
-                    intent.putStringArrayListExtra("dishQuan", (ArrayList<String>) dishQuan);
+//                    intent.putStringArrayListExtra("dishName", (ArrayList<String>) dishNames);
+//                    intent.putStringArrayListExtra("dishQuan", (ArrayList<String>) dishQuan);
+                    intent.putExtra("dishNamesPrice",mainMap);
                     intent.putExtra("locality",sharedPreferences.getString("locality",""));
                     startActivity(intent);
 
@@ -90,8 +95,9 @@ public class AddDishToCurrentCombo extends AppCompatActivity {
                     intent.putExtra("dishType","Deserts");
                     intent.putExtra("comboName",comboName);
                     intent.putExtra("state",sharedPreferences.getString("state",""));
-                    intent.putStringArrayListExtra("dishName", (ArrayList<String>) dishNames);
-                    intent.putStringArrayListExtra("dishQuan", (ArrayList<String>) dishQuan);
+//                    intent.putStringArrayListExtra("dishName", (ArrayList<String>) dishNames);
+//                    intent.putStringArrayListExtra("dishQuan", (ArrayList<String>) dishQuan);
+                    intent.putExtra("dishNamesPrice",mainMap);
                     intent.putExtra("locality",sharedPreferences.getString("locality",""));
                     startActivity(intent);
 //                                kAlertDialog.dismissWithAnimation();
@@ -106,8 +112,9 @@ public class AddDishToCurrentCombo extends AppCompatActivity {
                     intent.putExtra("dishType","Snacks");
                     intent.putExtra("comboName",comboName);
                     intent.putExtra("state",sharedPreferences.getString("state",""));
-                    intent.putStringArrayListExtra("dishName", (ArrayList<String>) dishNames);
-                    intent.putStringArrayListExtra("dishQuan", (ArrayList<String>) dishQuan);
+//                    intent.putStringArrayListExtra("dishName", (ArrayList<String>) dishNames);
+//                    intent.putStringArrayListExtra("dishQuan", (ArrayList<String>) dishQuan);
+                    intent.putExtra("dishNamesPrice",mainMap);
                     intent.putExtra("locality",sharedPreferences.getString("locality",""));
                     startActivity(intent);
 //                                kAlertDialog.dismissWithAnimation();
@@ -122,8 +129,9 @@ public class AddDishToCurrentCombo extends AppCompatActivity {
                     intent.putExtra("dishType","Drinks");
                     intent.putExtra("comboName",comboName);
                     intent.putExtra("state",sharedPreferences.getString("state",""));
-                    intent.putStringArrayListExtra("dishName", (ArrayList<String>) dishNames);
-                    intent.putStringArrayListExtra("dishQuan", (ArrayList<String>) dishQuan);
+//                    intent.putStringArrayListExtra("dishName", (ArrayList<String>) dishNames);
+//                    intent.putStringArrayListExtra("dishQuan", (ArrayList<String>) dishQuan);
+                    intent.putExtra("dishNamesPrice",mainMap);
                     intent.putExtra("locality",sharedPreferences.getString("locality",""));
                     startActivity(intent);
 //                                kAlertDialog.dismissWithAnimation();
