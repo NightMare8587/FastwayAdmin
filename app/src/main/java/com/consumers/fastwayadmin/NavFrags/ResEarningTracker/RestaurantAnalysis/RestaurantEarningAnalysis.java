@@ -88,7 +88,7 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
             "August", "September", "October", "November",
             "December"};
     Calendar calendar = Calendar.getInstance();
-    com.github.mikephil.charting.charts.BarChart barChart;
+    com.github.mikephil.charting.charts.BarChart barChart,barChart1;
     LineChart lineChart;
     String json;
     @SuppressLint("SetTextI18n")
@@ -101,7 +101,7 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
         totalCustomersLast7days = findViewById(R.id.totalCustomersInLast7daysTextView);
         highestSalesDayText = findViewById(R.id.highestSalesDayOrdersTextView);
         user7daysTracker = getSharedPreferences("DailyUserTrackingFor7days",MODE_PRIVATE);
-        lineChart = findViewById(R.id.lineChartRestaurantEarn7days);
+        barChart1 = findViewById(R.id.lineChartRestaurantEarn7days);
         highestSalesAmountThatDay = findViewById(R.id.highestDateNameDay);
         highestSalesOrderThatDay = findViewById(R.id.highestSalesAmountTextViewDay);
         barChart = findViewById(R.id.barchartAnalysis);
@@ -112,8 +112,6 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
         // if more than 60 entries are displayed in the chart, no values will be
         // drawn
         barChart.setMaxVisibleValueCount(10);
-        lineChart.setDragEnabled(true);
-        lineChart.setScaleEnabled(false);
 
         // scaling can now only be done on x- and y-axis separately
         barChart.setPinchZoom(false);
@@ -135,6 +133,35 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
         l.setFormSize(9f);
         l.setTextSize(11f);
         l.setXEntrySpace(4f);
+
+        barChart1.setPinchZoom(false);
+
+        barChart1.setDrawBarShadow(true);
+        barChart1.setDrawGridBackground(false);
+
+        barChart1.getAxisLeft().setDrawGridLines(false);
+
+        Legend l1 = barChart1.getLegend();
+
+        l.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);
+        l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.LEFT);
+        l.setOrientation(Legend.LegendOrientation.HORIZONTAL);
+        l.setDrawInside(false);
+        l.setForm(Legend.LegendForm.SQUARE);
+        l.setFormSize(9f);
+        l.setTextSize(11f);
+        l.setXEntrySpace(4f);
+
+
+        l1.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);
+        l1.setHorizontalAlignment(Legend.LegendHorizontalAlignment.LEFT);
+        l1.setOrientation(Legend.LegendOrientation.HORIZONTAL);
+        l1.setDrawInside(false);
+        l1.setForm(Legend.LegendForm.SQUARE);
+        l1.setFormSize(9f);
+        l1.setTextSize(11f);
+        l1.setXEntrySpace(4f);
+
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false);
         recyclerView = findViewById(R.id.restaurantEarningAnalysisRecyclerView);
@@ -174,7 +201,7 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
                     int day = calendar.get(Calendar.DAY_OF_MONTH);
                     Gson gson1 = new Gson();
                     HashMap<String,HashMap<String,Integer>> mainMap = gson1.fromJson(user7daysTracker.getString(month,""),types);
-                    ArrayList<Entry> value = new ArrayList<>();
+                    ArrayList<BarEntry> value = new ArrayList<>();
                     for (int i = date.size() - 1; i >= loopTill; i--) {
                         daysLeftToShow--;
                         days.add(date.get(i) + "th " + month);
@@ -188,7 +215,7 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
                                 totalCust++;
                                 addToVal++;
                             }
-                            value.add(new Entry(Integer.parseInt(date.get(i)),addToVal));
+                            value.add(new BarEntry(Integer.parseInt(date.get(i)),addToVal));
                             Log.i("infoVALLLL",addToVal + "");
                         }
 
@@ -215,19 +242,32 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
 
                     barChart.animateY(1650);
 
-                    LineDataSet set1 = new LineDataSet(value, "DataSet 1");
+                    BarDataSet barDataSet1 = new BarDataSet(value,"Month: " + month);
+                    barDataSet1.setColors(ColorTemplate.VORDIPLOM_COLORS);
+                    barDataSet1.setDrawValues(true);
 
-                    ArrayList<ILineDataSet> dataSetss = new ArrayList<>();
-                    dataSetss.add(set1);
-                    // create a data object with the data sets
-                    LineData dataa = new LineData(dataSetss);
+                    ArrayList<IBarDataSet> dataSets1 = new ArrayList<>();
+                    dataSets1.add(barDataSet1);
+                    BarData data1 = new BarData(dataSets1);
+                    barChart1.setData(data1);
+                    barChart1.setFitBars(true);
 
-                    // set data
-                    lineChart.setData(dataa);
-                    lineChart.animateY(1500);
+                    barChart1.animateY(1150);
+
+//                    LineDataSet set1 = new LineDataSet(value, "DataSet 1");
+//
+//                    ArrayList<ILineDataSet> dataSetss = new ArrayList<>();
+//                    dataSetss.add(set1);
+//                    // create a data object with the data sets
+//                    LineData dataa = new LineData(dataSetss);
+//
+//                    // set data
+//                    lineChart.setData(dataa);
+//                    lineChart.animateY(1500);
 
 
 
+                    barChart1.getLegend().setEnabled(false);
                     barChart.getLegend().setEnabled(false);
                     highestSalesDayText.setText("Date: " + dateName);
                     highestSalesAmountThatDay.setText("Amount: \u20b9" + highestSalesDay);

@@ -94,8 +94,8 @@ public class ComboRecyclerView extends RecyclerView.Adapter<ComboRecyclerView.Ho
         holder.listView.setLayoutParams(param);
 
         ViewGroup.LayoutParams params = holder.listView2.getLayoutParams();
-        param.height = 150 * current.size();
-        params.width= 100;
+        params.height = 150 * current.size();
+        params.width= 150;
         holder.listView2.setLayoutParams(params);
         if(enabled.get(position).equals("yes")){
             holder.checkBox.setText("Enabled");

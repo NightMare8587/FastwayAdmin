@@ -24,6 +24,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.consumers.fastwayadmin.NavFrags.FastwayPremiumActivites.FastwayPremiums;
 import com.consumers.fastwayadmin.NavFrags.ResDishTracker.RecyclerClassView;
 import com.consumers.fastwayadmin.NavFrags.ResDishTracker.seeAllDishAnalysis;
 import com.consumers.fastwayadmin.NavFrags.ResEarningTracker.RestaurantAnalysis.RestaurantEarningAnalysis;
@@ -123,8 +124,7 @@ public class ResEarningTrackerActivity extends AppCompatActivity{
                 builder.setTitle("Dialog").setMessage("You need to subscribe to premium plan to see analysis")
                         .setPositiveButton("Subscribe Now", (dialogInterface, i) -> {
                             dialogInterface.dismiss();
-                            premEdit.putString("status", "active");
-                            premEdit.apply();
+                            startActivity(new Intent(ResEarningTrackerActivity.this, FastwayPremiums.class));
                             finish();
 //                        startActivity(new Intent(ResEarningTrackerActivity.this, FastwayPremiums.class));
                         }).setNegativeButton("Not Now", (dialogInterface, i) -> {
@@ -139,8 +139,7 @@ public class ResEarningTrackerActivity extends AppCompatActivity{
             builder.setTitle("Dialog").setMessage("You need to subscribe to premium plan to see analysis")
                     .setPositiveButton("Subscribe Now", (dialogInterface, i) -> {
                         dialogInterface.dismiss();
-                        premEdit.putString("status", "active");
-                        premEdit.apply();
+                        startActivity(new Intent(ResEarningTrackerActivity.this, FastwayPremiums.class));
                         finish();
 //                        startActivity(new Intent(ResEarningTrackerActivity.this, FastwayPremiums.class));
                     }).setNegativeButton("Not Now", (dialogInterface, i) -> {

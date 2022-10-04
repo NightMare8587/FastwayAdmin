@@ -42,11 +42,19 @@
                 android:textStyle="bold"
                 android:layout_height="wrap_content"/>
 
-            <com.github.mikephil.charting.charts.LineChart
-                android:layout_width="match_parent"
+            <com.github.mikephil.charting.charts.BarChart
                 android:id="@+id/lineChartRestaurantEarn7days"
-                android:layout_margin="5dp"
-                android:layout_height="150dp"/>
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:layout_marginTop="5dp"
+                android:orientation="vertical"
+                android:padding="10dp"
+                app:egBarWidth="20dp"
+                app:egFixedBarWidth="true"
+                app:egLegendHeight="40dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
         </LinearLayout>
 
