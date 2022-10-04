@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 public class ComboRecyclerView extends RecyclerView.Adapter<ComboRecyclerView.Holder> {
@@ -74,15 +75,28 @@ public class ComboRecyclerView extends RecyclerView.Adapter<ComboRecyclerView.Ho
     @Override
     public void onBindViewHolder(@NonNull Holder holder, @SuppressLint("RecyclerView") int position) {
         holder.comboName.setText(comboName.get(position));
-        holder.price.setText(price.get(position));
+        holder.price.setText("\u20b9" + price.get(position));
         HashMap<String,String> map = new HashMap<>(outerMap.get(comboName.get(position)));
-        String[] arr = map.keySet().toArray(new String[0]);
-        List<String> current = Arrays.asList(arr);
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, current);
+//        String[] arr = map.keySet().toArray(new String[0]);
+        List<String> current = new ArrayList<>();
+        List<String> currentQ = new ArrayList<>();
+
+        for(Map.Entry<String,String> mapE : map.entrySet()){
+            current.add(mapE.getKey());
+            currentQ.add(mapE.getValue());
+        }
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(context, android.R.layout.simple_list_item_1, current);
+        ArrayAdapter<String> arrayAdapter1 = new ArrayAdapter<>(context, android.R.layout.simple_list_item_1, currentQ);
         holder.listView.setAdapter(arrayAdapter);
+        holder.listView2.setAdapter(arrayAdapter1);
         ViewGroup.LayoutParams param = holder.listView.getLayoutParams();
         param.height = 150 * current.size();
         holder.listView.setLayoutParams(param);
+
+        ViewGroup.LayoutParams params = holder.listView2.getLayoutParams();
+        param.height = 150 * current.size();
+        params.width= 100;
+        holder.listView2.setLayoutParams(params);
         if(enabled.get(position).equals("yes")){
             holder.checkBox.setText("Enabled");
             holder.checkBox.setChecked(true);
@@ -222,7 +236,7 @@ dialogInterface.dismiss();
 
     protected class Holder extends RecyclerView.ViewHolder{
         TextView comboName,price,description;
-        ListView listView;
+        ListView listView,listView2;
         CheckBox checkBox;
         ImageView imageView;
         CardView cardView;
@@ -231,6 +245,7 @@ dialogInterface.dismiss();
             comboName = itemView.findViewById(R.id.comboMenuDishName);
             price = itemView.findViewById(R.id.comboMenuPriceView);
             listView = itemView.findViewById(R.id.comboDishListViewMenu);
+            listView2 = itemView.findViewById(R.id.comboDishListViewQuantity);
             checkBox = itemView.findViewById(R.id.checkBox);
             description = itemView.findViewById(R.id.descriptionOfComboMenuFrag);
             imageView = itemView.findViewById(R.id.ComboImageView);
