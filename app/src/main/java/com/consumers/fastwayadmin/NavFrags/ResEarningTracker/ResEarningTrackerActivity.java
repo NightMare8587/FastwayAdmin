@@ -36,6 +36,7 @@ import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
@@ -220,10 +221,15 @@ public class ResEarningTrackerActivity extends AppCompatActivity{
         mBarChart.getDescription().setEnabled(false);
         mBarChart.setDrawBarShadow(true);
         mBarChart.setDrawGridBackground(false);
+        mBarChart.getAxisRight().setGranularityEnabled(true);
+        mBarChart.getAxisRight().setValueFormatter(new MyDecimalValueFormatter());
+        mBarChart.getAxisLeft().setGranularityEnabled(true);
+        mBarChart.getAxisLeft().setValueFormatter(new MyDecimalValueFormatter());
         XAxis xAxis = mBarChart.getXAxis();
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         xAxis.setDrawGridLines(false);
-
+        xAxis.setGranularityEnabled(true);
+        xAxis.setValueFormatter(new MyDecimalValueFormatter());
         mBarChart.getAxisLeft().setDrawGridLines(false);
         Legend l = mBarChart.getLegend();
 
@@ -746,5 +752,19 @@ public class ResEarningTrackerActivity extends AppCompatActivity{
             temp.put(aa.getKey(), aa.getValue());
         }
         return temp;
+    }
+
+    public class MyDecimalValueFormatter extends ValueFormatter {
+
+        private DecimalFormat mFormat;
+
+        public MyDecimalValueFormatter() {
+            mFormat = new DecimalFormat("#");
+        }
+
+        @Override
+        public String getFormattedValue(float value) {
+            return mFormat.format(value);
+        }
     }
 }

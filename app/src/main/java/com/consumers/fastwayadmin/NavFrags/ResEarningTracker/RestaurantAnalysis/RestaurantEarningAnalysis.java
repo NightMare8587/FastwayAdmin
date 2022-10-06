@@ -42,6 +42,8 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.IFillFormatter;
+import com.github.mikephil.charting.formatter.IValueFormatter;
+import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.interfaces.dataprovider.LineDataProvider;
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
@@ -115,14 +117,21 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
 
         // scaling can now only be done on x- and y-axis separately
         barChart.setPinchZoom(false);
+        barChart.setFitBars(true);
 
         barChart.setDrawBarShadow(true);
         barChart.setDrawGridBackground(false);
         XAxis xAxis = barChart.getXAxis();
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setValueFormatter(new MyDecimalValueFormatter());
+        xAxis.setGranularityEnabled(true);
         xAxis.setDrawGridLines(false);
 
+        barChart.getAxisRight().setGranularityEnabled(true);
+        barChart.getAxisRight().setValueFormatter(new MyDecimalValueFormatter());
+
         barChart.getAxisLeft().setDrawGridLines(false);
+
         Legend l = barChart.getLegend();
 
         l.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);
@@ -133,14 +142,22 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
         l.setFormSize(9f);
         l.setTextSize(11f);
         l.setXEntrySpace(4f);
-
+        XAxis xAxis1 = barChart1.getXAxis();
+        xAxis1.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis1.setValueFormatter(new MyDecimalValueFormatter());
+        xAxis1.setGranularityEnabled(true);
+        xAxis1.setDrawGridLines(false);
+        barChart1.getDescription().setEnabled(false);
         barChart1.setPinchZoom(false);
 
         barChart1.setDrawBarShadow(true);
         barChart1.setDrawGridBackground(false);
 
         barChart1.getAxisLeft().setDrawGridLines(false);
-
+        barChart1.getAxisRight().setGranularityEnabled(true);
+        barChart1.getAxisRight().setValueFormatter(new MyDecimalValueFormatter());
+        barChart1.getAxisLeft().setValueFormatter(new MyDecimalValueFormatter());
+        barChart1.getAxisLeft().setGranularityEnabled(true);
         Legend l1 = barChart1.getLegend();
 
         l.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);
@@ -202,8 +219,11 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
                     Gson gson1 = new Gson();
                     HashMap<String,HashMap<String,Integer>> mainMap = gson1.fromJson(user7daysTracker.getString(month,""),types);
                     ArrayList<BarEntry> value = new ArrayList<>();
+//                    xAxis.setAxisMaximum(Float.parseFloat(date.get(date.size()-1)));
+//                    xAxis.setAxisMinimum(Float.parseFloat(date.get(loopTill)));
                     for (int i = date.size() - 1; i >= loopTill; i--) {
                         daysLeftToShow--;
+
                         days.add(date.get(i) + "th " + month);
                         orders.add(totalORders.get(i) + "");
                         amounts.add(orderAmountList.get(i));
@@ -229,6 +249,7 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
 //                        mBarChart.addBar(new BarModel(Float.parseFloat(orderAmountList.get(i)), 0xFF1BA4E6));
                         values.add(new BarEntry(Integer.parseInt(date.get(i)),Float.parseFloat(orderAmountList.get(i))));
                     }
+
                     BarDataSet barDataSet = new BarDataSet(values,"Month: " + month);
                     barDataSet.setColors(ColorTemplate.VORDIPLOM_COLORS);
                     barDataSet.setDrawValues(true);
@@ -236,6 +257,8 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
                     ArrayList<IBarDataSet> dataSets = new ArrayList<>();
                     dataSets.add(barDataSet);
                     BarData data = new BarData(dataSets);
+
+                    data.setValueFormatter(new MyDecimalValueFormatter());
                     totalCustomersLast7days.setText("Total Customer's: " + totalCust);
                     barChart.setData(data);
                     barChart.setFitBars(true);
@@ -249,6 +272,7 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
                     ArrayList<IBarDataSet> dataSets1 = new ArrayList<>();
                     dataSets1.add(barDataSet1);
                     BarData data1 = new BarData(dataSets1);
+                    data1.setValueFormatter(new MyDecimalValueFormatter());
                     barChart1.setData(data1);
                     barChart1.setFitBars(true);
 
@@ -374,4 +398,32 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
 
         }
     };
+
+//    public class MyYAxisValueFormatter implements IValueFormatter {
+//
+//        private DecimalFormat mFormat;
+//
+//        public MyYAxisValueFormatter(){
+//            mFormat = new DecimalFormat("###,###,##0");
+//        }
+//
+//        @Override
+//        public String getFormattedValue(float value, YAxis yAxis) {
+//            return mFormat.format(value);
+//        }
+//    }
+
+    public class MyDecimalValueFormatter extends ValueFormatter {
+
+        private DecimalFormat mFormat;
+
+        public MyDecimalValueFormatter() {
+            mFormat = new DecimalFormat("#");
+        }
+
+        @Override
+        public String getFormattedValue(float value) {
+            return mFormat.format(value);
+        }
+    }
 }
