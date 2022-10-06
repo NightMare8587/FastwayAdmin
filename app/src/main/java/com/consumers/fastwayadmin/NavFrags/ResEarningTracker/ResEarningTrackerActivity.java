@@ -239,7 +239,7 @@ public class ResEarningTrackerActivity extends AppCompatActivity{
         l.setDrawInside(false);
         l.setForm(Legend.LegendForm.SQUARE);
         l.setFormSize(9f);
-        l.setTextSize(11f);
+        l.setTextSize(15f);
         l.setXEntrySpace(4f);
 
 
