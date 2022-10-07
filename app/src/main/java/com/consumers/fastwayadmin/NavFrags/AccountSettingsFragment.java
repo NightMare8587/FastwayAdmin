@@ -180,6 +180,10 @@ public class AccountSettingsFragment extends PreferenceFragmentCompat {
 
                         SharedPreferences DishAnalysis = requireContext().getSharedPreferences("DishAnalysis", MODE_PRIVATE);
                         DishAnalysis.edit().clear().apply();
+                        SharedPreferences trackTake = requireContext().getSharedPreferences("TrackingOfTakeAway", MODE_PRIVATE);
+                        trackTake.edit().clear().apply();
+                        SharedPreferences trackFood = requireContext().getSharedPreferences("TrackingOfFoodDining", MODE_PRIVATE);
+                        trackFood.edit().clear().apply();
 
                         startActivity(new Intent(getActivity(), SplashScreen.class));
                         requireActivity().finish();
