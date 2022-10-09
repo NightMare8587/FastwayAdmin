@@ -27,7 +27,7 @@
             app:summary=""/>
         <Preference
             app:key="premium"
-            app:title="Foodine Premium"
+            app:title="Ordinalo Premium"
             app:summary=""/>
         <Preference
             app:key="premiumExcelSheet"

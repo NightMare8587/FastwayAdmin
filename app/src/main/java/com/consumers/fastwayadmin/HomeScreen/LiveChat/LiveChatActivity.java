@@ -1,7 +1,9 @@
 package com.consumers.fastwayadmin.HomeScreen.LiveChat;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.text.InputType;
 import android.text.TextUtils;
@@ -13,6 +15,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -34,6 +37,7 @@ import com.google.firebase.database.annotations.NotNull;
 
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -189,6 +193,34 @@ public class LiveChatActivity extends AppCompatActivity {
                     return;
                 }
 
+                if(messa.equals("1")){
+                    SharedPreferences sharedPreferences = getSharedPreferences("AdminPremiumDetails",MODE_PRIVATE);
+                    String time = String.valueOf(System.currentTimeMillis());
+
+                    liveChatClass liveChatClass = new liveChatClass(messa,time,"0");
+                    reference.child("Live Chat").child(System.currentTimeMillis() + "").setValue(liveChatClass);
+
+                    new Handler().postDelayed(() -> {
+                        if(sharedPreferences.contains("status") && sharedPreferences.getString("status","").equals("active")) {
+                            String stime = String.valueOf(System.currentTimeMillis());
+                            liveChatClass liveChatClass1 = new liveChatClass("Opening", stime, "1");
+                            reference.child("Live Chat").child(System.currentTimeMillis() + "").setValue(liveChatClass1);
+                            Intent intent = new Intent(Intent.ACTION_VIEW);
+                            File file = new File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS) + "/RestaurantEarningTracker.xlsx");
+                            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                            intent.setDataAndType(FileProvider.getUriForFile(LiveChatActivity.this, getPackageName() + ".provider",file), "application/vnd.ms-excel");
+//            intent.setDataAndType(Uri.parse(file.getPath().toString()), "application/vnd.ms-excel");
+                            startActivity(intent);
+                        }else{
+                            String stime = String.valueOf(System.currentTimeMillis());
+                            liveChatClass liveChatClass1 = new liveChatClass("You need to subscribe premium", stime, "1");
+                            reference.child("Live Chat").child(System.currentTimeMillis() + "").setValue(liveChatClass1);
+                        }
+
+                    },250);
+                    return;
+                }
+
                 if(messa.length() == 10 && TextUtils.isDigitsOnly(messa)){
                     String time = String.valueOf(System.currentTimeMillis());
 
@@ -315,7 +347,7 @@ public class LiveChatActivity extends AppCompatActivity {
         reference.child("Live Chat").child(System.currentTimeMillis() + "").setValue(liveChatClass);
 
         new Handler().postDelayed(() -> {
-            liveChatClass liveChatClass1 = new liveChatClass("Choose One Option\n1.Refund Status\n2.Other Options\n\n Enter number as input",System.currentTimeMillis() + "","1");
+            liveChatClass liveChatClass1 = new liveChatClass("Choose One Option\n1.View Excel Sheet\n2.Other Options\n\n Enter number as input",System.currentTimeMillis() + "","1");
             reference.child("Live Chat").child(System.currentTimeMillis() + "").setValue(liveChatClass1);
         },500);
     }

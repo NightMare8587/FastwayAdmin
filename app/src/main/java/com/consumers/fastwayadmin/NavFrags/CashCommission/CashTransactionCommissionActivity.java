@@ -194,7 +194,7 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
                                         click.dismiss();
                                         finish();
                                     })
-                                            .setCancelText("Leaving Fastway").setCancelClickListener(click -> {
+                                            .setCancelText("Leaving Ordinalo").setCancelClickListener(click -> {
                                                 click.dismissWithAnimation();
                                         totalCashTransaction.setText("Total Cash Transactions " + "\u20B9" + snapshot.child("totalCashTakeAway").getValue(String.class));
                                         double totalCash = Double.parseDouble(Objects.requireNonNull(snapshot.child("totalCashTakeAway").getValue(String.class)));
@@ -454,7 +454,7 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
                                         click.dismiss();
                                         finish();
                                     })
-                                    .setCancelText("Leaving Fastway").setCancelClickListener(click -> {
+                                    .setCancelText("Leaving Ordinalo").setCancelClickListener(click -> {
                                         click.dismissWithAnimation();
                                         totalCashTransaction.setText("Total Cash Transactions " + "\u20B9" + snapshot.child("totalCashTakeAway").getValue(String.class));
                                         double totalCash = Double.parseDouble(Objects.requireNonNull(snapshot.child("totalCashTakeAway").getValue(String.class)));

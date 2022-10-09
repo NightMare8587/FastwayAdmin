@@ -76,7 +76,7 @@ public class CampaignActivity extends AppCompatActivity {
         locality = sharedPreferences.getString("locality","");
         if(!sharedPreferences.contains("shownCampaignDialog")){
             AlertDialog.Builder builder = new AlertDialog.Builder(CampaignActivity.this);
-            builder.setTitle("Important").setMessage("Every campaign you create costs \u20b915. This amount is added to your monthly platform fee payment.\n\nFor any queries contact Foodine")
+            builder.setTitle("Important").setMessage("Every campaign you create costs \u20b915. This amount is added to your monthly platform fee payment.\n\nFor any queries contact Ordinalo")
                     .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
