@@ -1,6 +1,20 @@
 package com.consumers.fastwayadmin.NavFrags.ResEarningTracker.RestaurantAnalysis;
 
-import static java.util.stream.Collectors.toMap;
+import android.annotation.SuppressLint;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
+import android.os.Build;
+import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
@@ -8,69 +22,30 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.annotation.SuppressLint;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.graphics.DashPathEffect;
-import android.graphics.Typeface;
-import android.os.Build;
-import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
-import android.widget.Toast;
-
-import com.consumers.fastwayadmin.NavFrags.ResDishTracker.RecyclerClassView;
-import com.consumers.fastwayadmin.NavFrags.ResDishTracker.seeAllDishAnalysis;
-import com.consumers.fastwayadmin.NavFrags.ResEarningTracker.ResEarningTrackerActivity;
-import com.consumers.fastwayadmin.NavFrags.ResEarningTracker.TackerAdapter;
 import com.consumers.fastwayadmin.R;
-import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Legend;
-import com.github.mikephil.charting.components.LimitLine;
 import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
-import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.data.LineData;
-import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.formatter.IFillFormatter;
-import com.github.mikephil.charting.formatter.IValueFormatter;
 import com.github.mikephil.charting.formatter.ValueFormatter;
-import com.github.mikephil.charting.interfaces.dataprovider.LineDataProvider;
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
-import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
-
-import org.eazegraph.lib.charts.BarChart;
-import org.eazegraph.lib.models.BarModel;
 
 import java.lang.reflect.Type;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Random;
 
 public class RestaurantEarningAnalysis extends AppCompatActivity {
     SharedPreferences storedOrders;
     SharedPreferences.Editor storeEditor;
     Gson gson;
     int daysLeftToShow = 0;
-    TextView dateTotalCustomers;
     Button moreDays;
     TextView dateThatDay;
     TextView averageOrderThatDay;
@@ -89,9 +64,10 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
             "March", "April", "May", "June", "July",
             "August", "September", "October", "November",
             "December"};
+    ProgressBar progressBar;
     Calendar calendar = Calendar.getInstance();
     com.github.mikephil.charting.charts.BarChart barChart,barChart1;
-    LineChart lineChart;
+
     String json;
     @SuppressLint("SetTextI18n")
     @Override
@@ -103,6 +79,7 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
         totalCustomersLast7days = findViewById(R.id.totalCustomersInLast7daysTextView);
         highestSalesDayText = findViewById(R.id.highestSalesDayOrdersTextView);
         user7daysTracker = getSharedPreferences("DailyUserTrackingFor7days",MODE_PRIVATE);
+        progressBar = findViewById(R.id.progressBarRestaurantEarningAnalysis);
         barChart1 = findViewById(R.id.lineChartRestaurantEarn7days);
         highestSalesAmountThatDay = findViewById(R.id.highestDateNameDay);
         highestSalesOrderThatDay = findViewById(R.id.highestSalesAmountTextViewDay);
@@ -307,6 +284,7 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
                     LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
                             new IntentFilter("custom-message-analysis"));
 
+                    progressBar.setVisibility(View.INVISIBLE);
 
 
 
@@ -381,6 +359,7 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             // Get extra data included in the Intent
+            progressBar.setVisibility(View.VISIBLE);
             String MonthName = intent.getStringExtra("month");
             String orders = intent.getStringExtra("orders");
             String amounts = intent.getStringExtra("amounts");
@@ -394,6 +373,7 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
             totalOrderThatDay.setText("Total Order's: " + orders + "");
             averageOrderThatDay.setText("Average Order Size: \u20b9" + new DecimalFormat("0.00").format(Double.parseDouble(amounts)/Integer.parseInt(orders)));
             dateThatDay.setText( MonthName);
+            new Handler().postDelayed(() -> progressBar.setVisibility(View.INVISIBLE),1155);
 //            Toast.makeText(context, "" + orders + " " + amounts + " " + MonthName, Toast.LENGTH_SHORT).show();
 
         }
