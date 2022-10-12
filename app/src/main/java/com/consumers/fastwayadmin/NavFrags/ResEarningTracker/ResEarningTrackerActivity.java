@@ -285,7 +285,7 @@ public class ResEarningTrackerActivity extends AppCompatActivity{
                 else
                     mBarChart.setVisibleXRangeMaximum(12);
                 mBarChart.animateY(1900);
-z
+
                 mBarChart.getLegend().setEnabled(false);
 
                 mBarChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
