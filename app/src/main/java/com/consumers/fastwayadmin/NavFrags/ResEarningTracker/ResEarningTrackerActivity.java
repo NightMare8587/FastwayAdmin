@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -50,8 +51,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 
-import org.eazegraph.lib.models.BarModel;
-
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -72,7 +71,7 @@ public class ResEarningTrackerActivity extends AppCompatActivity{
     double totalDineWayOverall = 0;
     double totalResDineWayOverAll = 0;
     double totalResOver = 0;
-    Calendar calendar;
+    Calendar calendar = Calendar.getInstance();
     BarChart mBarChart;
 //    int overVeg = 0,overNon = 0,overVegan = 0,resVegVal = 0,resVeganVal = 0,resNonVal = 0;
     boolean resAvailable = false;
@@ -90,6 +89,8 @@ public class ResEarningTrackerActivity extends AppCompatActivity{
     Gson gson;
     TextView totalOrdersMade,totalTransactionsMade;
     String json;
+    Spinner spinner;
+    List<String> prevYears = new ArrayList<>();
     TextView totalCustomers,oneTime,Recuuring;
     SharedPreferences dish;
     SharedPreferences.Editor editor;
@@ -107,6 +108,9 @@ public class ResEarningTrackerActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_res_earning_tracker);
         initialise();
+        prevYears.add(String.valueOf(calendar.get(Calendar.YEAR)));
+
+
         loginInfoShared = getSharedPreferences("loginInfo",MODE_PRIVATE);
         SharedPreferences adminPrem = getSharedPreferences("AdminPremiumDetails",MODE_PRIVATE);
         usersFrequencyPref = getSharedPreferences("UsersFrequencyPerMonth",MODE_PRIVATE);
