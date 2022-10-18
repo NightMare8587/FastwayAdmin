@@ -183,6 +183,7 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
 
+
             if(emailAddress.getText().toString().equals("foodinetest858784@gmail.com") && phoneNumber.getText().toString().equals("1234567890")){
                 FastDialog fastDialog = new FastDialogBuilder(MainActivity.this,Type.PROGRESS)
                         .setAnimation(Animations.FADE_IN)
