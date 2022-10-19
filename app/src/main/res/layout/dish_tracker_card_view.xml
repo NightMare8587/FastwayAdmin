@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_margin="6dp"
+    android:id="@+id/dishTrackerCardViewLayout"
     app:cardElevation="5dp"
     app:cardCornerRadius="10dp"
     android:layout_height="100dp">
@@ -57,6 +58,18 @@
             app:layout_constraintEnd_toEndOf="@+id/dishTrackerCardImageView"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/dishTrackerCardImageView" />
+
+        <TextView
+            android:id="@+id/clickToShowMoreDetailed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="6dp"
+            android:text="Click to show more"
+            android:textColor="#6BB3ED"
+            android:visibility="invisible"
+            app:layout_constraintStart_toEndOf="@+id/dishTrackerCardImageView"
+            app:layout_constraintTop_toBottomOf="@+id/totalPurchaseCountDishRecycler" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

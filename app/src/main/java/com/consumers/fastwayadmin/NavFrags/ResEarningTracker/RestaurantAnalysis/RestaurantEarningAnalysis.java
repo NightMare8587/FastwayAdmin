@@ -90,7 +90,7 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
         dateThatDay = findViewById(R.id.dateOfThatDayParticular);
         // if more than 60 entries are displayed in the chart, no values will be
         // drawn
-        barChart.setMaxVisibleValueCount(10);
+        barChart.setMaxVisibleValueCount(35);
 
         // scaling can now only be done on x- and y-axis separately
         barChart.setPinchZoom(false);
@@ -240,6 +240,8 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
                     barChart.setData(data);
                     barChart.setFitBars(true);
 
+
+
                     barChart.animateY(1650);
 
                     BarDataSet barDataSet1 = new BarDataSet(value,"Month: " + month);
@@ -252,6 +254,7 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
                     data1.setValueFormatter(new MyDecimalValueFormatter());
                     barChart1.setData(data1);
                     barChart1.setFitBars(true);
+
 
                     barChart1.animateY(1150);
 

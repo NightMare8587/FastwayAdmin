@@ -72,6 +72,7 @@ public class ResEarningTrackerActivity extends AppCompatActivity{
     double totalResDineWayOverAll = 0;
     double totalResOver = 0;
     Calendar calendar = Calendar.getInstance();
+
     BarChart mBarChart;
 //    int overVeg = 0,overNon = 0,overVegan = 0,resVegVal = 0,resVeganVal = 0,resNonVal = 0;
     boolean resAvailable = false;
@@ -109,7 +110,7 @@ public class ResEarningTrackerActivity extends AppCompatActivity{
         setContentView(R.layout.activity_res_earning_tracker);
         initialise();
         prevYears.add(String.valueOf(calendar.get(Calendar.YEAR)));
-
+        SharedPreferences dishShared = getSharedPreferences("DishOrderedWithOthers",MODE_PRIVATE);
 
         loginInfoShared = getSharedPreferences("loginInfo",MODE_PRIVATE);
         SharedPreferences adminPrem = getSharedPreferences("AdminPremiumDetails",MODE_PRIVATE);
@@ -288,7 +289,7 @@ public class ResEarningTrackerActivity extends AppCompatActivity{
                 mBarChart.setVisibleXRangeMaximum(6);
                 else
                     mBarChart.setVisibleXRangeMaximum(12);
-                mBarChart.animateY(1900);
+                mBarChart.animateY(1360);
 
                 mBarChart.getLegend().setEnabled(false);
 
@@ -370,6 +371,7 @@ public class ResEarningTrackerActivity extends AppCompatActivity{
                Log.i("info",valuesName.toString());
 //
                 Collections.reverse(keysName);
+
                 Collections.reverse(valuesName);
 //               for(int i=0;i<sorted.size();i++){
 //                   valuesName.add("" + sorted.values().toArray()[i]);

@@ -1,23 +1,34 @@
 package com.consumers.fastwayadmin.NavFrags.ResDishTracker;
 
+import static android.content.Context.MODE_PRIVATE;
+
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.consumers.fastwayadmin.R;
+import com.google.common.reflect.TypeToken;
+import com.google.gson.Gson;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class recyclerAllDish extends RecyclerView.Adapter<recyclerAllDish.holder> {
     List<String> dishNames;
@@ -41,7 +52,8 @@ public class recyclerAllDish extends RecyclerView.Adapter<recyclerAllDish.holder
     @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull holder holder, int position) {
-        SharedPreferences sharedPreferences = context.getSharedPreferences("storeImages",Context.MODE_PRIVATE);
+        SharedPreferences dishShared = context.getSharedPreferences("DishOrderedWithOthers",MODE_PRIVATE);
+        SharedPreferences sharedPreferences = context.getSharedPreferences("storeImages", MODE_PRIVATE);
         if(sharedPreferences.contains(dishNames.get(position))){
             Picasso.get().load(sharedPreferences.getString(dishNames.get(position),"")).into(holder.imageView, new Callback() {
                 @Override
@@ -59,6 +71,47 @@ public class recyclerAllDish extends RecyclerView.Adapter<recyclerAllDish.holder
             Picasso.get().load("https://image.shutterstock.com/image-vector/no-image-vector-isolated-on-600w-1481369594.jpg").into(holder.imageView);
         }
 
+        if(dishShared.contains(dishNames.get(position))) {
+            holder.seeMore.setVisibility(View.VISIBLE);
+            holder.cardView.setClickable(false);
+        }
+
+        holder.cardView.setOnClickListener(click -> {
+            java.lang.reflect.Type type1 = new TypeToken<HashMap<String,Integer>>(){}.getType();
+            Gson gson = new Gson();
+            HashMap<String,Integer> myMap = gson.fromJson(dishShared.getString(dishNames.get(position),""),type1);
+            List<String> dishNamesList = new ArrayList<>();
+            List<String> dishQuanList = new ArrayList<>();
+
+            for(Map.Entry<String,Integer> map : myMap.entrySet()){
+                if(!map.getKey().equals(dishNames.get(position))){
+                    dishNamesList.add(map.getKey());
+                    dishQuanList.add(String.valueOf(map.getValue()));
+                }
+            }
+
+            LayoutInflater inflater = (LayoutInflater) context.getSystemService( Context.LAYOUT_INFLATER_SERVICE );
+            View view = inflater.inflate(R.layout.res_info_dialog_layout,null);
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            builder.setTitle("Detailed Info").setMessage("Showing dish ordered with this together");
+
+
+            ListView listView = view.findViewById(R.id.listDishNamesResInfo);
+
+            ListView listView1 = view.findViewById(R.id.listDishNamesQuantityInfo);
+
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(context, android.R.layout.simple_list_item_1,dishNamesList);
+            ArrayAdapter<String> adapter1 = new ArrayAdapter<>(context, android.R.layout.simple_list_item_1,dishQuanList);
+
+            listView1.setAdapter(adapter1);
+            listView.setAdapter(adapter);
+
+            builder.setView(view);
+//                builder.setItems(array, (dialogInterface, i) -> Log.i("list",array.toString()));
+            builder.setPositiveButton("exit", (dialogInterface, i) -> dialogInterface.dismiss()).create().show();
+
+        });
+
 
 
         holder.dishName.setText(dishNames.get(position));
@@ -71,14 +124,17 @@ public class recyclerAllDish extends RecyclerView.Adapter<recyclerAllDish.holder
     }
     public class holder extends RecyclerView.ViewHolder{
         ImageView imageView;
-        TextView dishName,totalCount;
+        TextView dishName,totalCount,seeMore;
         ProgressBar progressBar;
+        CardView cardView;
         public holder(@NonNull View itemView) {
             super(itemView);
             dishName = itemView.findViewById(R.id.dishNameTrackerAnalysisRecycler);
             totalCount = itemView.findViewById(R.id.totalPurchaseCountDishRecycler);
             imageView = itemView.findViewById(R.id.dishTrackerCardImageView);
             progressBar = itemView.findViewById(R.id.reccyclerResDishProgress);
+            seeMore = itemView.findViewById(R.id.clickToShowMoreDetailed);
+            cardView = itemView.findViewById(R.id.dishTrackerCardViewLayout);
         }
     }
 }

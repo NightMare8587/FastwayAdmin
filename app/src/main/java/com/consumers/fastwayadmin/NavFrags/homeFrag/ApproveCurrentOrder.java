@@ -505,14 +505,41 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                                 String storedHash = storeForDishAnalysis.getString("DishAnalysisMonthBasis", "");
                                 HashMap<String, HashMap<String, Integer>> myMap = gson.fromJson(storedHash, type);
                                 HashMap<String, Integer> map;
+                                SharedPreferences dishShared = getSharedPreferences("DishOrderedWithOthers",MODE_PRIVATE);
+                                SharedPreferences.Editor dishSharedEdit = dishShared.edit();
                                 if (myMap.containsKey(month)) {
                                     map = new HashMap<>(myMap.get(month));
                                     Log.i("checking", map.toString());
                                     for (int k = 0; k < dishNames.size(); k++) {
                                         if (map.containsKey(dishNames.get(k))) {
+                                            String currDishName = dishNames.get(k);
                                             int val = map.get(dishNames.get(k));
                                             val++;
                                             map.put(dishNames.get(k), val);
+
+                                            if(dishShared.contains(dishNames.get(k))){
+                                                java.lang.reflect.Type type1 = new TypeToken<HashMap<String,Integer>>(){}.getType();
+                                                HashMap<String,Integer> dishMapIndividual = gson.fromJson(dishShared.getString(dishNames.get(k),""),type1);
+                                                for(int l=0;l<dishNames.size();l++){
+                                                    if(!dishNames.equals(currDishName)){
+                                                        if(dishMapIndividual.containsKey(dishNames.get(l))){
+                                                            int prev = dishMapIndividual.get(dishNames.get(l));
+                                                            prev++;
+                                                            dishMapIndividual.put(dishNames.get(l),prev);
+                                                        }else
+                                                            dishMapIndividual.put(dishNames.get(l),1);
+                                                    }
+                                                }
+                                                dishSharedEdit.putString(currDishName,gson.toJson(dishMapIndividual));
+                                            }else{
+                                                HashMap<String,Integer> dishMapIndividual = new HashMap<>();
+                                                for(int l=0;l<dishNames.size();l++){
+                                                    if(!dishNames.equals(currDishName))
+                                                        dishMapIndividual.put(dishNames.get(l),1);
+                                                }
+
+                                                dishSharedEdit.putString(currDishName,gson.toJson(dishMapIndividual));
+                                            }
                                         } else {
                                             map.put(dishNames.get(k), 1);
                                         }
@@ -524,6 +551,7 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                                     }
                                 }
                                 myMap.put(month, map);
+                                dishSharedEdit.apply();
                                 dishAnalysis.putString("DishAnalysisMonthBasis", gson.toJson(myMap));
                             }catch (Exception e){
 

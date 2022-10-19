@@ -538,14 +538,40 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                                             String storedHash = storeForDishAnalysis.getString("DishAnalysisMonthBasis", "");
                                             HashMap<String, HashMap<String, Integer>> myMap = gson.fromJson(storedHash, type);
                                             HashMap<String, Integer> map;
+                                            SharedPreferences dishShared = getSharedPreferences("DishOrderedWithOthers",MODE_PRIVATE);
+                                            SharedPreferences.Editor dishSharedEdit = dishShared.edit();
                                             if (myMap.containsKey(month)) {
                                                 map = new HashMap<>(Objects.requireNonNull(myMap.get(month)));
                                                 Log.i("checking", map.toString());
                                                 for (int k = 0; k < dishName.size(); k++) {
                                                     if (map.containsKey(dishName.get(k))) {
+                                                        String currDishName = dishName.get(k);
                                                         int val = Objects.requireNonNull(map.get(dishName.get(k)));
                                                         val++;
                                                         map.put(dishName.get(k), val);
+                                                        if(dishShared.contains(dishName.get(k))){
+                                                            java.lang.reflect.Type type1 = new TypeToken<HashMap<String,Integer>>(){}.getType();
+                                                            HashMap<String,Integer> dishMapIndividual = gson.fromJson(dishShared.getString(dishName.get(k),""),type1);
+                                                            for(int l=0;l<dishName.size();l++){
+                                                                if(!dishName.equals(currDishName)){
+                                                                    if(dishMapIndividual.containsKey(dishName.get(l))){
+                                                                        int prev = dishMapIndividual.get(dishName.get(l));
+                                                                        prev++;
+                                                                        dishMapIndividual.put(dishName.get(l),prev);
+                                                                    }else
+                                                                        dishMapIndividual.put(dishName.get(l),1);
+                                                                }
+                                                            }
+                                                            dishSharedEdit.putString(currDishName,gson.toJson(dishMapIndividual));
+                                                        }else{
+                                                            HashMap<String,Integer> dishMapIndividual = new HashMap<>();
+                                                            for(int l=0;l<dishName.size();l++){
+                                                                if(!dishName.equals(currDishName))
+                                                                dishMapIndividual.put(dishName.get(l),1);
+                                                            }
+
+                                                            dishSharedEdit.putString(currDishName,gson.toJson(dishMapIndividual));
+                                                        }
                                                     } else {
                                                         map.put(dishName.get(k), 1);
                                                     }
@@ -557,6 +583,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                                                 }
                                             }
                                             myMap.put(month, map);
+                                            dishSharedEdit.apply();
                                             dishAnalysis.putString("DishAnalysisMonthBasis", gson.toJson(myMap));
                                         } else {
                                             HashMap<String, HashMap<String, Integer>> map = new HashMap<>();
@@ -1799,11 +1826,37 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                             String storedHash = storeForDishAnalysis.getString("DishAnalysisMonthBasis", "");
                             HashMap<String, HashMap<String, Integer>> myMap = gson.fromJson(storedHash, type);
                             HashMap<String, Integer> map;
+                            SharedPreferences dishShared = getSharedPreferences("DishOrderedWithOthers",MODE_PRIVATE);
+                            SharedPreferences.Editor dishSharedEdit = dishShared.edit();
                             if (myMap.containsKey(month)) {
                                 map = new HashMap<>(Objects.requireNonNull(myMap.get(month)));
                                 Log.i("checking", map.toString());
                                 for (int k = 0; k < dishName.size(); k++) {
                                     if (map.containsKey(dishName.get(k))) {
+                                        String currDishName = dishName.get(k);
+                                        if(dishShared.contains(dishName.get(k))){
+                                            java.lang.reflect.Type type1 = new TypeToken<HashMap<String,Integer>>(){}.getType();
+                                            HashMap<String,Integer> dishMapIndividual = gson.fromJson(dishShared.getString(dishName.get(k),""),type1);
+                                            for(int l=0;l<dishName.size();l++){
+                                                if(!dishName.equals(currDishName)){
+                                                    if(dishMapIndividual.containsKey(dishName.get(l))){
+                                                        int prev = dishMapIndividual.get(dishName.get(l));
+                                                        prev++;
+                                                        dishMapIndividual.put(dishName.get(l),prev);
+                                                    }else
+                                                        dishMapIndividual.put(dishName.get(l),1);
+                                                }
+                                            }
+                                            dishSharedEdit.putString(currDishName,gson.toJson(dishMapIndividual));
+                                        }else{
+                                            HashMap<String,Integer> dishMapIndividual = new HashMap<>();
+                                            for(int l=0;l<dishName.size();l++){
+                                                if(!dishName.equals(currDishName))
+                                                    dishMapIndividual.put(dishName.get(l),1);
+                                            }
+
+                                            dishSharedEdit.putString(currDishName,gson.toJson(dishMapIndividual));
+                                        }
                                         int val = Objects.requireNonNull(map.get(dishName.get(k)));
                                         val++;
                                         map.put(dishName.get(k), val);
@@ -1818,6 +1871,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                                 }
                             }
                             myMap.put(month, map);
+                            dishSharedEdit.apply();
                             dishAnalysis.putString("DishAnalysisMonthBasis", gson.toJson(myMap));
                         }
                     } else {
