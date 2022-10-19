@@ -77,39 +77,41 @@ public class recyclerAllDish extends RecyclerView.Adapter<recyclerAllDish.holder
         }
 
         holder.cardView.setOnClickListener(click -> {
-            java.lang.reflect.Type type1 = new TypeToken<HashMap<String,Integer>>(){}.getType();
-            Gson gson = new Gson();
-            HashMap<String,Integer> myMap = gson.fromJson(dishShared.getString(dishNames.get(position),""),type1);
-            List<String> dishNamesList = new ArrayList<>();
-            List<String> dishQuanList = new ArrayList<>();
+            if(dishShared.contains(dishNames.get(position))) {
+                java.lang.reflect.Type type1 = new TypeToken<HashMap<String, Integer>>() {
+                }.getType();
+                Gson gson = new Gson();
+                HashMap<String, Integer> myMap = gson.fromJson(dishShared.getString(dishNames.get(position), ""), type1);
+                List<String> dishNamesList = new ArrayList<>();
+                List<String> dishQuanList = new ArrayList<>();
 
-            for(Map.Entry<String,Integer> map : myMap.entrySet()){
-                if(!map.getKey().equals(dishNames.get(position))){
-                    dishNamesList.add(map.getKey());
-                    dishQuanList.add(String.valueOf(map.getValue()));
+                for (Map.Entry<String, Integer> map : myMap.entrySet()) {
+                    if (!map.getKey().equals(dishNames.get(position))) {
+                        dishNamesList.add(map.getKey());
+                        dishQuanList.add(String.valueOf(map.getValue()));
+                    }
                 }
-            }
 
-            LayoutInflater inflater = (LayoutInflater) context.getSystemService( Context.LAYOUT_INFLATER_SERVICE );
-            View view = inflater.inflate(R.layout.res_info_dialog_layout,null);
-            AlertDialog.Builder builder = new AlertDialog.Builder(context);
-            builder.setTitle("Detailed Info").setMessage("Showing dish ordered with this together");
+                LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                View view = inflater.inflate(R.layout.res_info_dialog_layout, null);
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setTitle("Detailed Info").setMessage("Showing dish ordered with this together ( " + dishNames.get(position) + " )");
 
 
-            ListView listView = view.findViewById(R.id.listDishNamesResInfo);
+                ListView listView = view.findViewById(R.id.listDishNamesResInfo);
 
-            ListView listView1 = view.findViewById(R.id.listDishNamesQuantityInfo);
+                ListView listView1 = view.findViewById(R.id.listDishNamesQuantityInfo);
 
-            ArrayAdapter<String> adapter = new ArrayAdapter<>(context, android.R.layout.simple_list_item_1,dishNamesList);
-            ArrayAdapter<String> adapter1 = new ArrayAdapter<>(context, android.R.layout.simple_list_item_1,dishQuanList);
+                ArrayAdapter<String> adapter = new ArrayAdapter<>(context, android.R.layout.simple_list_item_1, dishNamesList);
+                ArrayAdapter<String> adapter1 = new ArrayAdapter<>(context, android.R.layout.simple_list_item_1, dishQuanList);
 
-            listView1.setAdapter(adapter1);
-            listView.setAdapter(adapter);
+                listView1.setAdapter(adapter1);
+                listView.setAdapter(adapter);
 
-            builder.setView(view);
+                builder.setView(view);
 //                builder.setItems(array, (dialogInterface, i) -> Log.i("list",array.toString()));
-            builder.setPositiveButton("exit", (dialogInterface, i) -> dialogInterface.dismiss()).create().show();
-
+                builder.setPositiveButton("exit", (dialogInterface, i) -> dialogInterface.dismiss()).create().show();
+            }
         });
 
 
