@@ -184,6 +184,15 @@ public class HomeScreen extends AppCompatActivity {
                         SharedPreferences.Editor premEdit = adminPrem.edit();
                         premEdit.putString("status", "active");
                         premEdit.apply();
+                        
+
+//
+//                        SharedPreferences storedOrders = getSharedPreferences("RestaurantDailyStoreForAnalysis",MODE_PRIVATE);
+//                        String month = monthName[calendar.get(Calendar.MONTH)];
+//
+//                        if(storedOrders.contains(month)){
+//
+//                        }
                     }
                 }else{
                     DatabaseReference databaseReference1 = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
@@ -242,6 +251,8 @@ public class HomeScreen extends AppCompatActivity {
 
             }
         });
+
+
       new BackgroundWork().execute();
 //        checkIfBankDetailsSubmitted();
 //        if(sharedPreferences.contains("myListStored")){
