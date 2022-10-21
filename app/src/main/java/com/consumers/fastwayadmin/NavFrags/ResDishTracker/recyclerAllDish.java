@@ -34,9 +34,11 @@ public class recyclerAllDish extends RecyclerView.Adapter<recyclerAllDish.holder
     List<String> dishNames;
     List<Integer> dishTotalCount;
     Context context;
+    String month;
 
-    public recyclerAllDish(List<String> dishNames, List<Integer> dishTotalCount,Context context) {
+    public recyclerAllDish(List<String> dishNames, List<Integer> dishTotalCount,Context context,String month) {
         this.dishNames = dishNames;
+        this.month = month;
         this.context = context;
         this.dishTotalCount = dishTotalCount;
     }

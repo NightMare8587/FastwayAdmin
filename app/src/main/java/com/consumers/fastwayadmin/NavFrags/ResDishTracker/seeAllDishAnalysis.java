@@ -16,6 +16,7 @@ import java.util.List;
     RecyclerView recyclerView;
     ArrayList<String> dishName = new ArrayList<>();
     ArrayList<Integer> dishValue = new ArrayList<>();
+    String month;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,9 +24,9 @@ import java.util.List;
         setContentView(R.layout.activity_see_all_dish_analysis);
         dishName = (ArrayList<String>) getIntent().getSerializableExtra("dishName");
         dishValue = (ArrayList<Integer>) getIntent().getSerializableExtra("dishValue");
-
+        month = getIntent().getStringExtra("monthName");
         recyclerView = findViewById(R.id.recyclerViewSeeAllDishAnalysis);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setAdapter(new recyclerAllDish(dishName,dishValue,seeAllDishAnalysis.this));
+        recyclerView.setAdapter(new recyclerAllDish(dishName,dishValue,seeAllDishAnalysis.this,month));
     }
 }

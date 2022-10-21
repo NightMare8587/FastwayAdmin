@@ -549,29 +549,72 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                                                         int val = Objects.requireNonNull(map.get(dishName.get(k)));
                                                         val++;
                                                         map.put(dishName.get(k), val);
-                                                        if(dishShared.contains(dishName.get(k))){
-                                                            java.lang.reflect.Type type1 = new TypeToken<HashMap<String,Integer>>(){}.getType();
-                                                            HashMap<String,Integer> dishMapIndividual = gson.fromJson(dishShared.getString(dishName.get(k),""),type1);
+                                                        java.lang.reflect.Type type1 = new TypeToken<HashMap<String,HashMap<String,Integer>>>(){}.getType();
+
+                                                        HashMap<String,HashMap<String,Integer>> mapDishMain;
+                                                        if(dishShared.contains(month)){
+                                                            mapDishMain = gson.fromJson(dishShared.getString(month,""),type1);
+                                                            HashMap<String,Integer> innerMap;
+                                                            if(mapDishMain.containsKey(currDishName)){
+                                                                innerMap = new HashMap<>(mapDishMain.get(currDishName));
+                                                                for(int l=0;l<dishName.size();l++){
+                                                                    if(!dishName.get(l).equals(currDishName)){
+                                                                        if(innerMap.containsKey(dishName.get(l))){
+                                                                            int prev = innerMap.get(dishName.get(l));
+                                                                            prev++;
+                                                                            innerMap.put(dishName.get(l),prev);
+                                                                        }else
+                                                                            innerMap.put(dishName.get(l),1);
+                                                                    }
+                                                                }
+
+                                                            }else{
+                                                                innerMap = new HashMap<>();
+                                                                for(int l=0;l<dishName.size();l++){
+                                                                    if(!dishName.get(l).equals(currDishName)){
+                                                                        innerMap.put(dishName.get(l),1);
+                                                                    }
+                                                                }
+
+                                                            }
+                                                            mapDishMain.put(currDishName,innerMap);
+                                                            dishSharedEdit.putString(month,gson.toJson(mapDishMain));
+                                                            dishSharedEdit.apply();
+                                                        }else{
+                                                            mapDishMain = new HashMap<>();
+                                                            HashMap<String,Integer> innerMap = new HashMap<>();
                                                             for(int l=0;l<dishName.size();l++){
-                                                                if(!dishName.equals(currDishName)){
-                                                                    if(dishMapIndividual.containsKey(dishName.get(l))){
-                                                                        int prev = dishMapIndividual.get(dishName.get(l));
-                                                                        prev++;
-                                                                        dishMapIndividual.put(dishName.get(l),prev);
-                                                                    }else
-                                                                        dishMapIndividual.put(dishName.get(l),1);
+                                                                if(!dishName.get(l).equals(currDishName)){
+                                                                    innerMap.put(dishName.get(l),1);
                                                                 }
                                                             }
-                                                            dishSharedEdit.putString(currDishName,gson.toJson(dishMapIndividual));
-                                                        }else{
-                                                            HashMap<String,Integer> dishMapIndividual = new HashMap<>();
-                                                            for(int l=0;l<dishName.size();l++){
-                                                                if(!dishName.equals(currDishName))
-                                                                dishMapIndividual.put(dishName.get(l),1);
-                                                            }
-
-                                                            dishSharedEdit.putString(currDishName,gson.toJson(dishMapIndividual));
+                                                            mapDishMain.put(currDishName,innerMap);
+                                                            dishSharedEdit.putString(month,gson.toJson(mapDishMain));
+                                                            dishSharedEdit.apply();
                                                         }
+//                                                        if(dishShared.contains(dishName.get(k))){
+//                                                            java.lang.reflect.Type type1 = new TypeToken<HashMap<String,Integer>>(){}.getType();
+//                                                            HashMap<String,Integer> dishMapIndividual = gson.fromJson(dishShared.getString(dishName.get(k),""),type1);
+//                                                            for(int l=0;l<dishName.size();l++){
+//                                                                if(!dishName.equals(currDishName)){
+//                                                                    if(dishMapIndividual.containsKey(dishName.get(l))){
+//                                                                        int prev = dishMapIndividual.get(dishName.get(l));
+//                                                                        prev++;
+//                                                                        dishMapIndividual.put(dishName.get(l),prev);
+//                                                                    }else
+//                                                                        dishMapIndividual.put(dishName.get(l),1);
+//                                                                }
+//                                                            }
+//                                                            dishSharedEdit.putString(currDishName,gson.toJson(dishMapIndividual));
+//                                                        }else{
+//                                                            HashMap<String,Integer> dishMapIndividual = new HashMap<>();
+//                                                            for(int l=0;l<dishName.size();l++){
+//                                                                if(!dishName.equals(currDishName))
+//                                                                dishMapIndividual.put(dishName.get(l),1);
+//                                                            }
+//
+//                                                            dishSharedEdit.putString(currDishName,gson.toJson(dishMapIndividual));
+//                                                        }
                                                     } else {
                                                         map.put(dishName.get(k), 1);
                                                     }

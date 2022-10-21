@@ -386,6 +386,7 @@ public class ResEarningTrackerActivity extends AppCompatActivity{
                     Intent intent1 = new Intent(ResEarningTrackerActivity.this, seeAllDishAnalysis.class);
                     intent1.putExtra("dishName", keysName);
                     intent1.putExtra("dishValue",  valuesName);
+                    intent1.putExtra("monthName",  month);
                     startActivity(intent1);
                 });
                 dishRecyclerView.setLayoutManager(new LinearLayoutManager(ResEarningTrackerActivity.this));
@@ -568,6 +569,7 @@ public class ResEarningTrackerActivity extends AppCompatActivity{
                         Intent intent1 = new Intent(ResEarningTrackerActivity.this, seeAllDishAnalysis.class);
                         intent1.putExtra("dishName",  keysName);
                         intent1.putExtra("dishValue",  valuesName);
+                        intent1.putExtra("monthName",  MonthName);
                         startActivity(intent1);
                     });
                     dishRecyclerView.setLayoutManager(new LinearLayoutManager(ResEarningTrackerActivity.this));
