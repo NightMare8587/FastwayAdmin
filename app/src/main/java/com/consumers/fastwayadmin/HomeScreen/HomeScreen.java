@@ -5,6 +5,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.Typeface;
+import android.graphics.pdf.PdfDocument;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -48,6 +52,7 @@ import com.consumers.fastwayadmin.R;
 import com.consumers.fastwayadmin.RandomChatNoww;
 import com.gauravk.bubblenavigation.BubbleNavigationConstraintView;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.common.reflect.TypeToken;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -68,8 +73,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Type;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Timer;
@@ -86,6 +95,7 @@ public class HomeScreen extends AppCompatActivity {
     String subRefID;
     SharedPreferences calenderForExcel;
     SharedPreferences adminPrem;
+
     SharedPreferences.Editor premEditor;
     SharedPreferences.Editor editor;
     Calendar calendar = Calendar.getInstance();
@@ -249,6 +259,230 @@ public class HomeScreen extends AppCompatActivity {
 
             }
         });
+        SharedPreferences last7daysReport = getSharedPreferences("last7daysReport",MODE_PRIVATE);
+        SharedPreferences.Editor last7daysReportEdit = last7daysReport.edit();
+        SharedPreferences storeOrders = getSharedPreferences("RestaurantDailyStoreForAnalysis",MODE_PRIVATE);
+        new Thread(() -> {
+//            PdfDocument pdfDocument = new PdfDocument();
+//            Paint myPaint = new Paint();
+//            PdfDocument.PageInfo myPage = new  PdfDocument.PageInfo.Builder(2080,2040,1).create();
+//            PdfDocument.Page page = pdfDocument.startPage(myPage);
+//
+//            Paint text = new Paint();
+//            Canvas canvas = page.getCanvas();
+//
+//            text.setTextAlign(Paint.Align.LEFT);
+//            text.setTextSize(80);
+//            text.setTypeface(Typeface.create(Typeface.DEFAULT,Typeface.BOLD));
+//            canvas.drawText("Last 7 days Report",100,155,text);
+//            text.setTextSize(70);
+//            canvas.drawText("From 13th to 20th October",100,265,text);
+//            text.setTextSize(58);
+//            text.setTypeface(Typeface.create(Typeface.DEFAULT,Typeface.NORMAL));
+//            canvas.drawText("Total Orders Made: 115",100,375,text);
+//            canvas.drawText("Total Transaction Amount: 11500",100,450,text);
+//            text.setTextSize(65);
+//            text.setTypeface(Typeface.create(Typeface.DEFAULT,Typeface.BOLD));
+//            canvas.drawText("Highest Sales",100,525,text);
+//            text.setTextSize(50);
+//            text.setTypeface(Typeface.create(Typeface.DEFAULT,Typeface.NORMAL));
+//            canvas.drawText("Date: 13th Oct",100,595,text);
+//            canvas.drawText("Total Orders: 130",100,670,text);
+//            canvas.drawText("Total Amount: 13078",100,745,text);
+//
+//            text.setTextSize(65);
+//            text.setTypeface(Typeface.create(Typeface.DEFAULT,Typeface.BOLD));
+//            canvas.drawText("Total Customers",100,830,text);
+//
+//            text.setTextSize(50);
+//            text.setTypeface(Typeface.create(Typeface.DEFAULT,Typeface.NORMAL));
+//            canvas.drawText("Customers: 500",100,905,text);
+//
+//
+//            text.setTextSize(80);
+//            text.setTypeface(Typeface.create(Typeface.DEFAULT,Typeface.BOLD));
+//            canvas.drawText("Compare with last 7 days",650,1050,text);
+//            text.setTextSize(58);
+//            text.setTypeface(Typeface.create(Typeface.DEFAULT,Typeface.NORMAL));
+//            canvas.drawText("Total Orders: Increase By 11.5%",100,1160,text);
+//            canvas.drawText("Total Orders: Increase By 11.5%",100,1235,text);
+//            canvas.drawText("Total Orders: Increase By 11.5%",100,1310,text);
+//
+//            pdfDocument.finishPage(page);
+//            String fileName = "/invoicexd" + ".pdf";
+//            File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS) + fileName);
+//
+//            try{
+//                pdfDocument.writeTo(new FileOutputStream(file));
+//                runOnUiThread(() -> Toast.makeText(HomeScreen.this, "Generated", Toast.LENGTH_SHORT).show());
+//
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//
+//            pdfDocument.close();
+        }).start();
+        new Thread(() -> {
+            String month = monthName[calendar.get(Calendar.MONTH)];
+            if(last7daysReport.contains("currentMonth") && last7daysReport.getString("currentMonth","").equals(month)){
+                if(last7daysReport.contains("daysTracked")){
+                    int day = calendar.get(Calendar.DAY_OF_MONTH);
+                    if(Integer.parseInt(last7daysReport.getString("currentDate","")) != day && Integer.parseInt(last7daysReport.getString("daysTracked","")) == 7){
+                        String json = storeOrders.getString(month, "");
+                        Type type = new TypeToken<List<List<String>>>() {
+                        }.getType();
+                        List<List<String>> mainDataList = gson.fromJson(json, type);
+
+                        if(!mainDataList.isEmpty()){
+                            List<String> date = new ArrayList<>(mainDataList.get(0));
+                            List<String> totalORders = new ArrayList<>(mainDataList.get(2));
+                            List<String> orderAmountList = new ArrayList<>(mainDataList.get(1));
+
+
+                            if(date.size() != 0) {
+                                String startDate,endDate;
+                                double highestSalesDay = 0D;
+                                String dateName = "";
+                                int totalCust = 0;
+                                int highestOrderAtDay = 0;
+                                int loopTill = 0;
+                                int totalOrders = 0;
+                                if (date.size() > 7)
+                                    loopTill = date.size() - 7;
+                                int daysLeftToShow = 6;
+                                double totalSalesThatPeriod = 0;
+                                if(last7daysReport.contains("lastDateReport")) {
+                                    int index = date.indexOf(last7daysReport.getString("lastDateReport",""));
+
+                                    for (int i = date.size() - 1; i > index; i--) {
+
+                                    }
+                                }else{
+                                    endDate = date.get(date.size()-1);
+                                    startDate = date.get(loopTill);
+                                    for (int i = date.size() - 1; i >= loopTill; i--) {
+                                        totalSalesThatPeriod += Double.parseDouble(orderAmountList.get(i));
+                                        totalOrders += Integer.parseInt(totalORders.get(i));
+                                        startDate = date.get(i);
+                                        if(Double.parseDouble(orderAmountList.get(i)) > highestSalesDay){
+                                            dateName = date.get(i) + "th " + month;
+                                            highestSalesDay = Double.parseDouble(orderAmountList.get(i));
+                                            highestOrderAtDay = Integer.parseInt(totalORders.get(i));
+                                        }
+                                    }
+
+
+
+
+
+                                    PdfDocument pdfDocument = new PdfDocument();
+                                    Paint myPaint = new Paint();
+                                    PdfDocument.PageInfo myPage = new  PdfDocument.PageInfo.Builder(2080,2040,1).create();
+                                    PdfDocument.Page page = pdfDocument.startPage(myPage);
+
+                                    Paint text = new Paint();
+                                    Canvas canvas = page.getCanvas();
+
+                                    text.setTextAlign(Paint.Align.LEFT);
+                                    text.setTextSize(80);
+                                    text.setTypeface(Typeface.create(Typeface.DEFAULT,Typeface.BOLD));
+                                    canvas.drawText("Last 7 days Report",100,155,text);
+                                    text.setTextSize(70);
+                                    canvas.drawText("From " + startDate + " to " + endDate + " " + month,100,265,text);
+                                    text.setTextSize(58);
+                                    text.setTypeface(Typeface.create(Typeface.DEFAULT,Typeface.NORMAL));
+                                    canvas.drawText("Total Orders Made: " + totalOrders,100,375,text);
+                                    canvas.drawText("Total Transaction Amount: \u20b9" + totalSalesThatPeriod,100,450,text);
+                                    text.setTextSize(65);
+                                    text.setTypeface(Typeface.create(Typeface.DEFAULT,Typeface.BOLD));
+                                    canvas.drawText("Highest Sales",100,525,text);
+                                    text.setTextSize(50);
+                                    text.setTypeface(Typeface.create(Typeface.DEFAULT,Typeface.NORMAL));
+                                    canvas.drawText("Date: " + dateName + " th" + month,100,595,text);
+                                    canvas.drawText("Total Orders: " + highestOrderAtDay,100,670,text);
+                                    canvas.drawText("Total Amount: \u20b9" + highestSalesDay,100,745,text);
+
+                                    text.setTextSize(65);
+                                    text.setTypeface(Typeface.create(Typeface.DEFAULT,Typeface.BOLD));
+                                    canvas.drawText("Total Customers",100,830,text);
+
+                                    text.setTextSize(50);
+                                    text.setTypeface(Typeface.create(Typeface.DEFAULT,Typeface.NORMAL));
+                                    canvas.drawText("Customers: 500",100,905,text);
+
+
+
+                                    if(last7daysReport.contains("lastAnalysisHashMap")) {
+                                        Type typeo = new TypeToken<HashMap<String,String>>() {
+                                        }.getType();
+                                        HashMap<String,String> prevMap = new HashMap<>(gson.fromJson(last7daysReport.getString("lastAnalysisHashMap",""),typeo));
+                                        Double prevSalesAmt = Double.parseDouble(prevMap.get("totalSales"));
+                                        int ordersMadeTotal = Integer.parseInt(prevMap.get("totalOrders"));
+                                        int totalCustomersTotal = Integer.parseInt(prevMap.get("totalCustomers"));
+                                        text.setTextSize(80);
+                                        text.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+                                        canvas.drawText("Compare with last 7 days", 650, 1050, text);
+                                        text.setTextSize(58);
+                                        text.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.NORMAL));
+
+                                        double data1 =   ((totalSalesThatPeriod - prevSalesAmt)/prevSalesAmt) * 100;
+                                        if(totalSalesThatPeriod > prevSalesAmt) {
+                                            canvas.drawText("Total Sales: Increase By " + new DecimalFormat("0.00").format(data1) + "%", 100, 1160, text);
+                                        }else{
+                                            canvas.drawText("Total Sales: Decrease By " + new DecimalFormat("0.00").format(data1) + "%", 100, 1160, text);
+                                        }
+
+                                        double data2 = (double)  ((totalOrders - ordersMadeTotal)/ordersMadeTotal) * 100;
+                                        if(totalOrders > ordersMadeTotal) {
+                                            canvas.drawText("Total Orders: Increase By" + new DecimalFormat("0.00").format(data2) + "%", 100, 1235, text);
+                                        }else{
+                                            canvas.drawText("Total Orders: Decrease By" + new DecimalFormat("0.00").format(data2) + "%", 100, 1235, text);
+                                        }
+
+                                        double data3 = (double) ((totalCust - totalCustomersTotal) / totalCustomersTotal) * 100;
+                                        if(totalCust > totalCustomersTotal) {
+                                            canvas.drawText("Total Customers: Increase By" + new DecimalFormat("0.00").format(data3) + "%", 100, 1310, text);
+                                        }else
+                                            canvas.drawText("Total Customers: Decrease By" + new DecimalFormat("0.00").format(data3) + "%", 100, 1310, text);
+
+                                    }
+
+                                    pdfDocument.finishPage(page);
+                                    String fileName = "/invoicexd" + ".pdf";
+                                    File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS) + fileName);
+
+                                    try{
+                                        pdfDocument.writeTo(new FileOutputStream(file));
+                                        runOnUiThread(() -> Toast.makeText(HomeScreen.this, "Generated", Toast.LENGTH_SHORT).show());
+
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+
+                                    pdfDocument.close();
+
+                                    HashMap<String,String> prevAnalysisInfo = new HashMap<>();
+                                    prevAnalysisInfo.put("totalSales",totalSalesThatPeriod + "");
+                                    prevAnalysisInfo.put("totalOrders",totalOrders + "");
+                                    prevAnalysisInfo.put("totalCustomers",totalOrders + "");
+                                    last7daysReportEdit.putString("lastAnalysisHashMap",gson.toJson(prevAnalysisInfo));
+                                    last7daysReportEdit.apply();
+                                }
+                            }
+
+                        }
+                    }else
+                    {
+//                        runOnUiThread(() -> {
+//                            double data =  (( 100 - 50) / 50 ) * 100;
+//
+//                            Toast.makeText(this, "" + new DecimalFormat("0.00").format(data), Toast.LENGTH_SHORT).show();
+//                        });
+
+                    }
+                }
+            }
+        }).start();
 
 
       new BackgroundWork().execute();

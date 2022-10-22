@@ -594,6 +594,35 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                         }
                         dishAnalysis.apply();
 
+                        SharedPreferences last7daysReport = getSharedPreferences("last7daysReport",MODE_PRIVATE);
+                        SharedPreferences.Editor last7daysReportEdit = last7daysReport.edit();
+                        new Thread(() -> {
+                            if(last7daysReport.contains("currentMonth") && last7daysReport.getString("currentMonth","").equals(month)){
+                                int day = calendar.get(Calendar.DAY_OF_MONTH);
+                                if(last7daysReport.contains("daysTracked")){
+                                    if(Integer.parseInt(last7daysReport.getString("currentDate","")) != day) {
+                                        int prevData = Integer.parseInt(last7daysReport.getString("daysTracked", ""));
+                                        prevData++;
+                                        last7daysReportEdit.putString("daysTracked",prevData + "");
+                                    }
+
+                                    last7daysReportEdit.putString("currentDate",day + "");
+                                    last7daysReportEdit.apply();
+                                }else{
+                                    int prevData = 1;
+                                    last7daysReportEdit.putString("currentDate",day + "");
+                                    last7daysReportEdit.putString("daysTracked",prevData + "");
+                                    last7daysReportEdit.apply();
+                                }
+                            }else{
+                                int prevData = 1;
+                                int day = calendar.get(Calendar.DAY_OF_MONTH);
+                                last7daysReportEdit.putString("currentDate",day + "");
+                                last7daysReportEdit.putString("daysTracked",prevData + "");
+                                last7daysReportEdit.putString("currentMonth",month + "");
+                                last7daysReportEdit.apply();
+                            }
+                        }).start();
 
                         if(dailyUserTrackingFor7days.contains(month)){
                             try {
