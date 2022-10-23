@@ -163,20 +163,54 @@ public class AccountSettingsFragment extends PreferenceFragmentCompat {
                         SharedPreferences intro = requireContext().getSharedPreferences("IntroAct", MODE_PRIVATE);
                         intro.edit().clear().apply();
 
+                        SharedPreferences current = requireContext().getSharedPreferences("locations current", MODE_PRIVATE);
+                        current.edit().clear().apply();
+
+                        SharedPreferences AdminPremiumDetails = requireContext().getSharedPreferences("AdminPremiumDetails", MODE_PRIVATE);
+                        AdminPremiumDetails.edit().clear().apply();
+
+                        SharedPreferences CalenderForExcel = requireContext().getSharedPreferences("CalenderForExcel", MODE_PRIVATE);
+                        CalenderForExcel.edit().clear().apply();
+
+                        SharedPreferences resDailyStore = requireContext().getSharedPreferences("RestaurantDailyStoreForAnalysis", MODE_PRIVATE);
+                        resDailyStore.edit().clear().apply();
+
+
+                        SharedPreferences last7days = requireContext().getSharedPreferences("last7daysReport", MODE_PRIVATE);
+                        last7days.edit().clear().apply();
+
                         SharedPreferences storeOrders = requireContext().getSharedPreferences("StoreOrders", MODE_PRIVATE);
                         storeOrders.edit().clear().apply();
 
                         SharedPreferences location = requireContext().getSharedPreferences("LocationMaps", MODE_PRIVATE);
                         location.edit().clear().apply();
 
+                        SharedPreferences storeImages = requireContext().getSharedPreferences("storeImages", MODE_PRIVATE);
+                        storeImages.edit().clear().apply();
+
+                        SharedPreferences StoreDataForPayInEnd = requireContext().getSharedPreferences("StoreDataForPayInEnd", MODE_PRIVATE);
+                        StoreDataForPayInEnd.edit().clear().apply();
+
                         SharedPreferences cashCommission = requireContext().getSharedPreferences("CashCommission", MODE_PRIVATE);
                         cashCommission.edit().clear().apply();
+
+                        SharedPreferences DailyUserTrackingFor7days = requireContext().getSharedPreferences("DailyUserTrackingFor7days", MODE_PRIVATE);
+                        DailyUserTrackingFor7days.edit().clear().apply();
+
+                        SharedPreferences DailyAverageOrderMonthly = requireContext().getSharedPreferences("DailyAverageOrderMonthly", MODE_PRIVATE);
+                        DailyAverageOrderMonthly.edit().clear().apply();
 
                         SharedPreferences RestaurantTrackingDaily = requireContext().getSharedPreferences("RestaurantTrackingDaily", MODE_PRIVATE);
                         RestaurantTrackingDaily.edit().clear().apply();
 
                         SharedPreferences RestaurantTrackRecords = requireContext().getSharedPreferences("RestaurantTrackRecords", MODE_PRIVATE);
                         RestaurantTrackRecords.edit().clear().apply();
+
+                        SharedPreferences UserFrequencyPerMonth = requireContext().getSharedPreferences("UserFrequencyPerMonth", MODE_PRIVATE);
+                        UserFrequencyPerMonth.edit().clear().apply();
+
+                        SharedPreferences DishOrderedWithOthers = requireContext().getSharedPreferences("DishOrderedWithOthers", MODE_PRIVATE);
+                        DishOrderedWithOthers.edit().clear().apply();
 
                         SharedPreferences DishAnalysis = requireContext().getSharedPreferences("DishAnalysis", MODE_PRIVATE);
                         DishAnalysis.edit().clear().apply();
