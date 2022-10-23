@@ -596,6 +596,8 @@ public class ApproveCurrentOrder extends AppCompatActivity {
 
                         SharedPreferences last7daysReport = getSharedPreferences("last7daysReport",MODE_PRIVATE);
                         SharedPreferences.Editor last7daysReportEdit = last7daysReport.edit();
+                        SharedPreferences lastMonthReport = getSharedPreferences("lastMonthlyReport",MODE_PRIVATE);
+                        SharedPreferences.Editor editorMonthly = lastMonthReport.edit();
                         new Thread(() -> {
                             if(last7daysReport.contains("currentMonth") && last7daysReport.getString("currentMonth","").equals(month)){
                                 int day = calendar.get(Calendar.DAY_OF_MONTH);
@@ -621,6 +623,13 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                                 last7daysReportEdit.putString("daysTracked",prevData + "");
                                 last7daysReportEdit.putString("currentMonth",month + "");
                                 last7daysReportEdit.apply();
+                            }
+
+                            if(lastMonthReport.contains("currentMonth") && lastMonthReport.getString("currentMonth","").equals(month)){
+
+                            }else{
+                                editorMonthly.putString("currentMonth",month);
+                                editorMonthly.apply();
                             }
                         }).start();
 

@@ -503,7 +503,7 @@ public class HomeScreen extends AppCompatActivity {
                     if(calendar.get(Calendar.MONTH) != Calendar.JANUARY) {
                         gson = new Gson();
                         String prevMonth = monthName[calendar.get(Calendar.MONTH) - 1];
-                        String json = storeOrders.getString(month, "");
+                        String json = storeOrders.getString(prevMonth, "");
                         gson = new Gson();
                         Type type = new TypeToken<List<List<String>>>() {
                         }.getType();
@@ -570,7 +570,7 @@ public class HomeScreen extends AppCompatActivity {
                                         text.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
                                         canvas.drawText("Last 7 days Report", 100, 155, text);
                                         text.setTextSize(70);
-                                        canvas.drawText("From " + startDate + " to " + endDate + " " + month, 100, 265, text);
+                                        canvas.drawText("From " + startDate + " to " + endDate + " " + prevMonth, 100, 265, text);
                                         text.setTextSize(58);
                                         text.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.NORMAL));
                                         canvas.drawText("Total Orders Made: " + totalOrders, 100, 375, text);
@@ -655,6 +655,170 @@ public class HomeScreen extends AppCompatActivity {
                             }
                     }
 
+                }
+            }
+
+            SharedPreferences lastMonthReport = getSharedPreferences("lastMonthlyReport",MODE_PRIVATE);
+            SharedPreferences.Editor editorMonthly = lastMonthReport.edit();
+            if(lastMonthReport.contains("currentMonth")){
+                if(!lastMonthReport.getString("currentMonth","").equals(month)){
+                    if(calendar.get(Calendar.MONTH) != Calendar.JANUARY) {
+                        String monthNameOfReport = monthName[calendar.get(Calendar.MONTH) - 1];
+
+                        if(lastMonthReport.contains("prevMonthNameReport") && lastMonthReport.getString("prevMonthNameReport","").equals(monthNameOfReport)){
+
+                        }else{
+                            gson = new Gson();
+                            String prevMonth = monthName[calendar.get(Calendar.MONTH) - 1];
+                            String json = storeOrders.getString(prevMonth, "");
+                            gson = new Gson();
+                            Type type = new TypeToken<List<List<String>>>() {
+                            }.getType();
+                            List<List<String>> mainDataList = gson.fromJson(json, type);
+                            Type types = new TypeToken<HashMap<String, HashMap<String, Integer>>>() {
+                            }.getType();
+                            HashMap<String, HashMap<String, Integer>> mainMap = gson.fromJson(user7daysTracker.getString(prevMonth, ""), types);
+
+                            if(!mainDataList.isEmpty()){
+
+                                List<String> date = new ArrayList<>(mainDataList.get(0));
+                                List<String> totalORders = new ArrayList<>(mainDataList.get(2));
+                                List<String> orderAmountList = new ArrayList<>(mainDataList.get(1));
+
+
+                                if(date.size() != 0) {
+                                    String startDate, endDate;
+                                    double highestSalesDay = 0D;
+                                    String dateName = "";
+                                    int totalCust = 0;
+                                    int highestOrderAtDay = 0;
+                                    int loopTill = 0;
+                                    int totalOrders = 0;
+                                    int daysLeftToShow = 6;
+                                    double totalSalesThatPeriod = 0;
+
+
+                                    startDate = date.get(0);
+                                    endDate = date.get(date.size() - 1);
+
+
+                                    for(int i=0; i <  date.size() ; i++){
+
+                                        totalSalesThatPeriod += Double.parseDouble(orderAmountList.get(i));
+                                        totalOrders += Integer.parseInt(totalORders.get(i));
+
+                                        if (Double.parseDouble(orderAmountList.get(i)) > highestSalesDay) {
+                                            dateName = date.get(i) + "th " + month;
+                                            highestSalesDay = Double.parseDouble(orderAmountList.get(i));
+                                            highestOrderAtDay = Integer.parseInt(totalORders.get(i));
+                                        }
+
+                                        if (mainMap.containsKey(date.get(i))) {
+                                            HashMap<String, Integer> innerMap = new HashMap<>(mainMap.get(date.get(i) + ""));
+                                            for (String ii : innerMap.keySet()) {
+                                                totalCust++;
+                                            }
+                                        }
+
+                                    }
+
+
+                                    PdfDocument pdfDocument = new PdfDocument();
+                                    Paint myPaint = new Paint();
+                                    PdfDocument.PageInfo myPage = new PdfDocument.PageInfo.Builder(2080, 2040, 1).create();
+                                    PdfDocument.Page page = pdfDocument.startPage(myPage);
+
+                                    Paint text = new Paint();
+                                    Canvas canvas = page.getCanvas();
+
+                                    text.setTextAlign(Paint.Align.LEFT);
+                                    text.setTextSize(80);
+                                    text.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+                                    canvas.drawText("Monthly Report", 100, 155, text);
+                                    text.setTextSize(70);
+                                    canvas.drawText("From " + startDate + " to " + endDate + " " + prevMonth, 100, 265, text);
+                                    text.setTextSize(58);
+                                    text.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.NORMAL));
+                                    canvas.drawText("Total Orders Made: " + totalOrders, 100, 375, text);
+                                    canvas.drawText("Total Transaction Amount: \u20b9" + totalSalesThatPeriod, 100, 450, text);
+                                    text.setTextSize(65);
+                                    text.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+                                    canvas.drawText("Highest Sales", 100, 525, text);
+                                    text.setTextSize(50);
+                                    text.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.NORMAL));
+                                    canvas.drawText("Date: " + dateName + " th" + month, 100, 595, text);
+                                    canvas.drawText("Total Orders: " + highestOrderAtDay, 100, 670, text);
+                                    canvas.drawText("Total Amount: \u20b9" + highestSalesDay, 100, 745, text);
+
+                                    text.setTextSize(65);
+                                    text.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+                                    canvas.drawText("Total Customers", 100, 830, text);
+
+                                    text.setTextSize(50);
+                                    text.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.NORMAL));
+                                    canvas.drawText("Customers: " + totalCust, 100, 905, text);
+
+
+                                    if(lastMonthReport.contains("lastAnalysisHashMap")){
+                                        Type typeo = new TypeToken<HashMap<String, String>>() {
+                                        }.getType();
+                                        HashMap<String, String> prevMap = new HashMap<>(gson.fromJson(lastMonthReport.getString("lastAnalysisHashMap", ""), typeo));
+                                        Double prevSalesAmt = Double.parseDouble(prevMap.get("totalSales"));
+                                        int ordersMadeTotal = Integer.parseInt(prevMap.get("totalOrders"));
+                                        int totalCustomersTotal = Integer.parseInt(prevMap.get("totalCustomers"));
+                                        text.setTextSize(80);
+                                        text.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+                                        canvas.drawText("Compare with last Month", 650, 1050, text);
+                                        text.setTextSize(58);
+                                        text.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.NORMAL));
+
+                                        double data1 = ((totalSalesThatPeriod - prevSalesAmt) / prevSalesAmt) * 100;
+                                        if (totalSalesThatPeriod > prevSalesAmt) {
+                                            canvas.drawText("Total Sales: Increase By " + new DecimalFormat("0.00").format(data1) + "%", 100, 1160, text);
+                                        } else {
+                                            canvas.drawText("Total Sales: Decrease By " + new DecimalFormat("0.00").format(data1) + "%", 100, 1160, text);
+                                        }
+
+                                        double data2 = (double) ((totalOrders - ordersMadeTotal) / ordersMadeTotal) * 100;
+                                        if (totalOrders > ordersMadeTotal) {
+                                            canvas.drawText("Total Orders: Increase By" + new DecimalFormat("0.00").format(data2) + "%", 100, 1235, text);
+                                        } else {
+                                            canvas.drawText("Total Orders: Decrease By" + new DecimalFormat("0.00").format(data2) + "%", 100, 1235, text);
+                                        }
+
+                                        double data3 = (double) ((totalCust - totalCustomersTotal) / totalCustomersTotal) * 100;
+                                        if (totalCust > totalCustomersTotal) {
+                                            canvas.drawText("Total Customers: Increase By" + new DecimalFormat("0.00").format(data3) + "%", 100, 1310, text);
+                                        } else
+                                            canvas.drawText("Total Customers: Decrease By" + new DecimalFormat("0.00").format(data3) + "%", 100, 1310, text);
+
+                                    }
+
+                                    pdfDocument.finishPage(page);
+                                    String fileName = "/invoicexdMonthly" + ".pdf";
+                                    File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS) + fileName);
+
+                                    try {
+                                        pdfDocument.writeTo(new FileOutputStream(file));
+                                        runOnUiThread(() -> Toast.makeText(HomeScreen.this, "Report Generated", Toast.LENGTH_SHORT).show());
+
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+
+                                    pdfDocument.close();
+
+                                    HashMap<String, String> prevAnalysisInfo = new HashMap<>();
+                                    prevAnalysisInfo.put("totalSales", totalSalesThatPeriod + "");
+                                    prevAnalysisInfo.put("totalOrders", totalOrders + "");
+                                    prevAnalysisInfo.put("totalCustomers", totalCust + "");
+                                    editorMonthly.putString("lastAnalysisHashMap", gson.toJson(prevAnalysisInfo));
+                                    editorMonthly.apply();
+
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }).start();

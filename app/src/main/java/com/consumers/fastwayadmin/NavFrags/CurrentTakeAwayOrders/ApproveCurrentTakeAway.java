@@ -639,6 +639,8 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                                             dishAnalysis.putString("DishAnalysisMonthBasis", gson.toJson(map));
                                         }
                                         dishAnalysis.apply();
+                                        SharedPreferences lastMonthReport = getSharedPreferences("lastMonthlyReport",MODE_PRIVATE);
+                                        SharedPreferences.Editor editorMonthly = lastMonthReport.edit();
                                         SharedPreferences last7daysReport = getSharedPreferences("last7daysReport",MODE_PRIVATE);
                                         SharedPreferences.Editor last7daysReportEdit = last7daysReport.edit();
                                         new Thread(() -> {
@@ -667,6 +669,15 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                                                 last7daysReportEdit.putString("currentMonth",month + "");
                                                 last7daysReportEdit.apply();
                                             }
+
+
+                                            if(lastMonthReport.contains("currentMonth") && lastMonthReport.getString("currentMonth","").equals(month)){
+
+                                            }else{
+                                                editorMonthly.putString("currentMonth",month);
+                                                editorMonthly.apply();
+                                            }
+
                                         }).start();
 
                                         if(dailyUserTrackingFor7days.contains(month)){
@@ -1958,7 +1969,8 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                     }
                     dishAnalysis.apply();
                     Log.i("response", response);
-
+                    SharedPreferences lastMonthReport = getSharedPreferences("lastMonthlyReport",MODE_PRIVATE);
+                    SharedPreferences.Editor editorMonthly = lastMonthReport.edit();
                     SharedPreferences last7daysReport = getSharedPreferences("last7daysReport",MODE_PRIVATE);
                     SharedPreferences.Editor last7daysReportEdit = last7daysReport.edit();
                     new Thread(() -> {
@@ -1986,6 +1998,13 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                             last7daysReportEdit.putString("daysTracked",prevData + "");
                             last7daysReportEdit.putString("currentMonth",month + "");
                             last7daysReportEdit.apply();
+                        }
+
+                        if(lastMonthReport.contains("currentMonth") && lastMonthReport.getString("currentMonth","").equals(month)){
+
+                        }else{
+                            editorMonthly.putString("currentMonth",month);
+                            editorMonthly.apply();
                         }
                     }).start();
 
