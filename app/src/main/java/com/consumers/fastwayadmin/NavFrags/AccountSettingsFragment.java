@@ -3,7 +3,6 @@ package com.consumers.fastwayadmin.NavFrags;
 import static android.content.Context.MODE_PRIVATE;
 
 import android.app.Activity;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -18,7 +17,6 @@ import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.SwitchPreferenceCompat;
 
-import com.consumers.fastwayadmin.ListViewActivity.BlockedUsersList.BlockedUsers;
 import com.consumers.fastwayadmin.ListViewActivity.CashTrans.CashTransactions;
 import com.consumers.fastwayadmin.ListViewActivity.MyAccount;
 import com.consumers.fastwayadmin.ListViewActivity.MyOrdersTransactions;

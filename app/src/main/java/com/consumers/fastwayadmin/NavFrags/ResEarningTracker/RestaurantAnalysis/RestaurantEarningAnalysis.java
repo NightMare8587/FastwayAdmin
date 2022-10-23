@@ -16,13 +16,20 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.consumers.fastwayadmin.NavFrags.ResEarningTracker.ResEarningTrackerActivity;
 import com.consumers.fastwayadmin.R;
+import com.elconfidencial.bubbleshowcase.BubbleShowCase;
+import com.elconfidencial.bubbleshowcase.BubbleShowCaseBuilder;
+import com.elconfidencial.bubbleshowcase.BubbleShowCaseListener;
+import com.elconfidencial.bubbleshowcase.BubbleShowCaseSequence;
+import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.BarData;
@@ -49,6 +56,12 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
     Button moreDays;
     TextView dateThatDay;
     TextView averageOrderThatDay;
+    BubbleShowCaseBuilder bubbleShowCaseBuilder2;
+    BubbleShowCaseBuilder bubbleShowCaseBuilder3;
+    BubbleShowCaseBuilder bubbleShowCaseBuilder4;
+    BubbleShowCaseBuilder bubbleShowCaseBuilder5;
+    SharedPreferences loginInfo;
+    SharedPreferences.Editor editorlogin;
     RecyclerView recyclerView;
     TextView totalCustomersLast7days;
     double totalAmountOrdersText;
@@ -76,6 +89,8 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
         setContentView(R.layout.activity_restaurant_earning_analysis);
         storedOrders = getSharedPreferences("RestaurantDailyStoreForAnalysis",MODE_PRIVATE);
         storeEditor = storedOrders.edit();
+        loginInfo = getSharedPreferences("loginInfo",MODE_PRIVATE);
+        editorlogin = loginInfo.edit();
         totalCustomersLast7days = findViewById(R.id.totalCustomersInLast7daysTextView);
         highestSalesDayText = findViewById(R.id.highestSalesDayOrdersTextView);
         user7daysTracker = getSharedPreferences("DailyUserTrackingFor7days",MODE_PRIVATE);
@@ -86,6 +101,9 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
         barChart = findViewById(R.id.barchartAnalysis);
         averageOrderThatDay = findViewById(R.id.averageOrderSizeThatPerticularDay);
         barChart.getDescription().setEnabled(false);
+
+        if(!loginInfo.contains("ResEarnAnalysis"))
+            showBuilderIntro();
 //        dateTotalCustomers = findViewById(R.id.DatetotalCustomersInLast7daysTextView);
         dateThatDay = findViewById(R.id.dateOfThatDayParticular);
         // if more than 60 entries are displayed in the chart, no values will be
@@ -356,6 +374,91 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
 
 
     }
+
+    private void showBuilderIntro() {
+        BarChart mBarChart = findViewById(R.id.barchartAnalysis);
+        RecyclerView recyclerView = findViewById(R.id.restaurantEarningAnalysisRecyclerView);
+        bubbleShowCaseBuilder5 = new BubbleShowCaseBuilder(RestaurantEarningAnalysis.this);
+        bubbleShowCaseBuilder5.title("Weekly Bar Graph")
+                .description("Here you can see last 7 days earnings in graph form. ( if available )")
+                .targetView(mBarChart).listener(new BubbleShowCaseListener() {
+                    @Override
+                    public void onTargetClick(@NonNull BubbleShowCase bubbleShowCase) {
+
+                    }
+
+                    @Override
+                    public void onCloseActionImageClick(@NonNull BubbleShowCase bubbleShowCase) {
+
+                    }
+
+                    @Override
+                    public void onBackgroundDimClick(@NonNull BubbleShowCase bubbleShowCase) {
+                        bubbleShowCase.dismiss();
+                    }
+
+                    @Override
+                    public void onBubbleClick(@NonNull BubbleShowCase bubbleShowCase) {
+                        bubbleShowCase.dismiss();
+                    }
+                });
+
+        bubbleShowCaseBuilder4 = new BubbleShowCaseBuilder(RestaurantEarningAnalysis.this);
+        bubbleShowCaseBuilder4.title("Individual Dates")
+                .description("Here you can see individual dates data (if available)")
+                .targetView(recyclerView).listener(new BubbleShowCaseListener() {
+                    @Override
+                    public void onTargetClick(@NonNull BubbleShowCase bubbleShowCase) {
+
+                    }
+
+                    @Override
+                    public void onCloseActionImageClick(@NonNull BubbleShowCase bubbleShowCase) {
+
+                    }
+
+                    @Override
+                    public void onBackgroundDimClick(@NonNull BubbleShowCase bubbleShowCase) {
+                        bubbleShowCase.dismiss();
+                    }
+
+                    @Override
+                    public void onBubbleClick(@NonNull BubbleShowCase bubbleShowCase) {
+                        bubbleShowCase.dismiss();
+                    }
+                });
+
+        bubbleShowCaseBuilder2 = new BubbleShowCaseBuilder(RestaurantEarningAnalysis.this);
+        bubbleShowCaseBuilder2.title("More Data").description("More info like highest sales, user frequency and many more").titleTextSize(20).listener(new BubbleShowCaseListener() {
+            @Override
+            public void onTargetClick(@NonNull BubbleShowCase bubbleShowCase) {
+
+            }
+
+            @Override
+            public void onCloseActionImageClick(@NonNull BubbleShowCase bubbleShowCase) {
+
+            }
+
+            @Override
+            public void onBackgroundDimClick(@NonNull BubbleShowCase bubbleShowCase) {
+                bubbleShowCase.dismiss();
+            }
+
+            @Override
+            public void onBubbleClick(@NonNull BubbleShowCase bubbleShowCase) {
+                bubbleShowCase.dismiss();
+            }
+        });
+
+        BubbleShowCaseSequence bubbleShowCaseSequence = new BubbleShowCaseSequence();
+        bubbleShowCaseSequence.addShowCase(bubbleShowCaseBuilder5).addShowCase(bubbleShowCaseBuilder4).addShowCase(bubbleShowCaseBuilder2);
+        bubbleShowCaseSequence.show();
+
+        editorlogin.putString("ResEarnAnalysis","yes");
+        editorlogin.apply();
+    }
+
     public BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @RequiresApi(api = Build.VERSION_CODES.N)
         @SuppressLint("SetTextI18n")

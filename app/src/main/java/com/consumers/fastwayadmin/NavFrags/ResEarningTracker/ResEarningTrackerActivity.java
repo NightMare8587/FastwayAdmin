@@ -30,6 +30,10 @@ import com.consumers.fastwayadmin.NavFrags.ResDishTracker.RecyclerClassView;
 import com.consumers.fastwayadmin.NavFrags.ResDishTracker.seeAllDishAnalysis;
 import com.consumers.fastwayadmin.NavFrags.ResEarningTracker.RestaurantAnalysis.RestaurantEarningAnalysis;
 import com.consumers.fastwayadmin.R;
+import com.elconfidencial.bubbleshowcase.BubbleShowCase;
+import com.elconfidencial.bubbleshowcase.BubbleShowCaseBuilder;
+import com.elconfidencial.bubbleshowcase.BubbleShowCaseListener;
+import com.elconfidencial.bubbleshowcase.BubbleShowCaseSequence;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
@@ -69,6 +73,11 @@ public class ResEarningTrackerActivity extends AppCompatActivity{
     double totalValOver = 0;
     TextView currentMonthNameViewing;
     double totalDineWayOverall = 0;
+    BubbleShowCaseBuilder bubbleShowCaseBuilder1;
+    BubbleShowCaseBuilder bubbleShowCaseBuilder2;
+    BubbleShowCaseBuilder bubbleShowCaseBuilder3;
+    BubbleShowCaseBuilder bubbleShowCaseBuilder4;
+    BubbleShowCaseBuilder bubbleShowCaseBuilder5;
     double totalResDineWayOverAll = 0;
     double totalResOver = 0;
     Calendar calendar = Calendar.getInstance();
@@ -159,6 +168,9 @@ public class ResEarningTrackerActivity extends AppCompatActivity{
         seeAnalysis.setOnClickListener(click -> {
             startActivity(new Intent(click.getContext(), RestaurantEarningAnalysis.class));
         });
+
+        if(!loginInfoShared.contains("ResEarnTrackerShown"))
+            showResEarnTrackerIntro();
         resTrackInfo = getSharedPreferences("RestaurantTrackingDaily",MODE_PRIVATE);
         calendar = Calendar.getInstance();
         dishRecyclerView = findViewById(R.id.dishTrackerRecyclerViewAnalysis);
@@ -396,6 +408,114 @@ public class ResEarningTrackerActivity extends AppCompatActivity{
                 dishRecyclerView.setVisibility(View.INVISIBLE);
             }
         }
+    }
+
+    private void showResEarnTrackerIntro() {
+        BarChart mBarChart = findViewById(R.id.barchart);
+        RecyclerView recyclerView = findViewById(R.id.dishTrackerRecyclerViewAnalysis);
+        bubbleShowCaseBuilder5 = new BubbleShowCaseBuilder(ResEarningTrackerActivity.this);
+        bubbleShowCaseBuilder5.title("Monthly Bar Graph")
+                .description("Here you can see all days earnings in graph form. Scroll right to left to show more ( if available )")
+                .targetView(mBarChart).listener(new BubbleShowCaseListener() {
+                    @Override
+                    public void onTargetClick(@NonNull BubbleShowCase bubbleShowCase) {
+
+                    }
+
+                    @Override
+                    public void onCloseActionImageClick(@NonNull BubbleShowCase bubbleShowCase) {
+
+                    }
+
+                    @Override
+                    public void onBackgroundDimClick(@NonNull BubbleShowCase bubbleShowCase) {
+                        bubbleShowCase.dismiss();
+                    }
+
+                    @Override
+                    public void onBubbleClick(@NonNull BubbleShowCase bubbleShowCase) {
+                        bubbleShowCase.dismiss();
+                    }
+                });
+
+        bubbleShowCaseBuilder4 = new BubbleShowCaseBuilder(ResEarningTrackerActivity.this);
+        bubbleShowCaseBuilder4.title("Dish Tracker")
+                .description("Here you can see how many times dish are ordered ( Highest to lowest )")
+                .targetView(recyclerView).listener(new BubbleShowCaseListener() {
+                    @Override
+                    public void onTargetClick(@NonNull BubbleShowCase bubbleShowCase) {
+
+                    }
+
+                    @Override
+                    public void onCloseActionImageClick(@NonNull BubbleShowCase bubbleShowCase) {
+
+                    }
+
+                    @Override
+                    public void onBackgroundDimClick(@NonNull BubbleShowCase bubbleShowCase) {
+                        bubbleShowCase.dismiss();
+                    }
+
+                    @Override
+                    public void onBubbleClick(@NonNull BubbleShowCase bubbleShowCase) {
+                        bubbleShowCase.dismiss();
+                    }
+                });
+        bubbleShowCaseBuilder3 = new BubbleShowCaseBuilder(ResEarningTrackerActivity.this);
+        bubbleShowCaseBuilder3.title("Months List")
+                .description("Here you can see different months analysis ( if available )")
+                .targetView(findViewById(R.id.monthNamesListViewRes)).listener(new BubbleShowCaseListener() {
+                    @Override
+                    public void onTargetClick(@NonNull BubbleShowCase bubbleShowCase) {
+
+                    }
+
+                    @Override
+                    public void onCloseActionImageClick(@NonNull BubbleShowCase bubbleShowCase) {
+
+                    }
+
+                    @Override
+                    public void onBackgroundDimClick(@NonNull BubbleShowCase bubbleShowCase) {
+                        bubbleShowCase.dismiss();
+                    }
+
+                    @Override
+                    public void onBubbleClick(@NonNull BubbleShowCase bubbleShowCase) {
+                        bubbleShowCase.dismiss();
+                    }
+                });
+
+        bubbleShowCaseBuilder2 = new BubbleShowCaseBuilder(ResEarningTrackerActivity.this);
+        bubbleShowCaseBuilder2.title("Scroll Down to see more").titleTextSize(20).listener(new BubbleShowCaseListener() {
+            @Override
+            public void onTargetClick(@NonNull BubbleShowCase bubbleShowCase) {
+
+            }
+
+            @Override
+            public void onCloseActionImageClick(@NonNull BubbleShowCase bubbleShowCase) {
+
+            }
+
+            @Override
+            public void onBackgroundDimClick(@NonNull BubbleShowCase bubbleShowCase) {
+                bubbleShowCase.dismiss();
+            }
+
+            @Override
+            public void onBubbleClick(@NonNull BubbleShowCase bubbleShowCase) {
+                bubbleShowCase.dismiss();
+            }
+        });
+
+        BubbleShowCaseSequence bubbleShowCaseSequence = new BubbleShowCaseSequence();
+        bubbleShowCaseSequence.addShowCase(bubbleShowCaseBuilder5).addShowCase(bubbleShowCaseBuilder4).addShowCase(bubbleShowCaseBuilder3).addShowCase(bubbleShowCaseBuilder2);
+        bubbleShowCaseSequence.show();
+
+        editor.putString("ResEarnTrackerShown","yes");
+        editor.apply();
     }
 
     private void initialise() {
