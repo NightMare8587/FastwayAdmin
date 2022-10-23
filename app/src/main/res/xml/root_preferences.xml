@@ -1,3 +1,4 @@
+
 <PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
     <PreferenceCategory app:title="Account">
 
@@ -6,10 +7,10 @@
             app:title="My Account"
             app:summary=""/>
 
-        <Preference
-            app:key="blockedUsers"
-            app:title="Blocked Users"
-            app:summary=""/>
+<!--        <Preference-->
+<!--            app:key="blockedUsers"-->
+<!--            app:title="Blocked Users"-->
+<!--            app:summary=""/>-->
 
         <Preference
             app:key="myTrans"
@@ -34,6 +35,11 @@
             app:title="View Excel Sheet"
             app:summary=""/>
 
+        <Preference
+            app:key="viewReportsGenerated"
+            app:title="View Week/Month Reports"
+            app:summary=""/>
+
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/sync_header">
@@ -53,11 +59,6 @@
         <Preference
             app:key="termsConditions"
             app:title="Terms And Conditions"
-            app:summary=""/>
-
-        <Preference
-            app:key="privacyPolicy"
-            app:title="Privacy Policy"
             app:summary=""/>
     </PreferenceCategory>
 

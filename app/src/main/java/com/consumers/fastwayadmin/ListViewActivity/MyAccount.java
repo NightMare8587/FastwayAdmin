@@ -479,24 +479,61 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
             SharedPreferences intro = getSharedPreferences("IntroAct", MODE_PRIVATE);
             intro.edit().clear().apply();
 
-            SharedPreferences location = getSharedPreferences("LocationMaps", MODE_PRIVATE);
-            location.edit().clear().commit();
+            SharedPreferences current = getSharedPreferences("locations current", MODE_PRIVATE);
+            current.edit().clear().apply();
+
+            SharedPreferences AdminPremiumDetails = getSharedPreferences("AdminPremiumDetails", MODE_PRIVATE);
+            AdminPremiumDetails.edit().clear().apply();
+
+            SharedPreferences CalenderForExcel = getSharedPreferences("CalenderForExcel", MODE_PRIVATE);
+            CalenderForExcel.edit().clear().apply();
+
+            SharedPreferences resDailyStore = getSharedPreferences("RestaurantDailyStoreForAnalysis", MODE_PRIVATE);
+            resDailyStore.edit().clear().apply();
+
+
+            SharedPreferences last7days = getSharedPreferences("last7daysReport", MODE_PRIVATE);
+            last7days.edit().clear().apply();
 
             SharedPreferences storeOrders = getSharedPreferences("StoreOrders", MODE_PRIVATE);
-            storeOrders.edit().clear().commit();
+            storeOrders.edit().clear().apply();
 
+            SharedPreferences location = getSharedPreferences("LocationMaps", MODE_PRIVATE);
+            location.edit().clear().apply();
+
+            SharedPreferences storeImages = getSharedPreferences("storeImages", MODE_PRIVATE);
+            storeImages.edit().clear().apply();
+
+            SharedPreferences StoreDataForPayInEnd = getSharedPreferences("StoreDataForPayInEnd", MODE_PRIVATE);
+            StoreDataForPayInEnd.edit().clear().apply();
 
             SharedPreferences cashCommission = getSharedPreferences("CashCommission", MODE_PRIVATE);
-            cashCommission.edit().clear().commit();
+            cashCommission.edit().clear().apply();
+
+            SharedPreferences DailyUserTrackingFor7days = getSharedPreferences("DailyUserTrackingFor7days", MODE_PRIVATE);
+            DailyUserTrackingFor7days.edit().clear().apply();
+
+            SharedPreferences DailyAverageOrderMonthly = getSharedPreferences("DailyAverageOrderMonthly", MODE_PRIVATE);
+            DailyAverageOrderMonthly.edit().clear().apply();
 
             SharedPreferences RestaurantTrackingDaily = getSharedPreferences("RestaurantTrackingDaily", MODE_PRIVATE);
-            RestaurantTrackingDaily.edit().clear().commit();
+            RestaurantTrackingDaily.edit().clear().apply();
 
             SharedPreferences RestaurantTrackRecords = getSharedPreferences("RestaurantTrackRecords", MODE_PRIVATE);
-            RestaurantTrackRecords.edit().clear().commit();
+            RestaurantTrackRecords.edit().clear().apply();
+
+            SharedPreferences UserFrequencyPerMonth = getSharedPreferences("UserFrequencyPerMonth", MODE_PRIVATE);
+            UserFrequencyPerMonth.edit().clear().apply();
+
+            SharedPreferences DishOrderedWithOthers = getSharedPreferences("DishOrderedWithOthers", MODE_PRIVATE);
+            DishOrderedWithOthers.edit().clear().apply();
 
             SharedPreferences DishAnalysis = getSharedPreferences("DishAnalysis", MODE_PRIVATE);
-            DishAnalysis.edit().clear().commit();
+            DishAnalysis.edit().clear().apply();
+            SharedPreferences trackTake = getSharedPreferences("TrackingOfTakeAway", MODE_PRIVATE);
+            trackTake.edit().clear().apply();
+            SharedPreferences trackFood = getSharedPreferences("TrackingOfFoodDining", MODE_PRIVATE);
+            trackFood.edit().clear().apply();
             auth.signOut();
             gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                     .requestIdToken("765176451275-u1ati379eiinc9b21472ml968chmlsqh.apps.googleusercontent.com")

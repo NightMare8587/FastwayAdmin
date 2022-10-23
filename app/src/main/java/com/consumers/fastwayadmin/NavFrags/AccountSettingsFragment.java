@@ -3,6 +3,7 @@ package com.consumers.fastwayadmin.NavFrags;
 import static android.content.Context.MODE_PRIVATE;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -21,7 +22,6 @@ import com.consumers.fastwayadmin.ListViewActivity.BlockedUsersList.BlockedUsers
 import com.consumers.fastwayadmin.ListViewActivity.CashTrans.CashTransactions;
 import com.consumers.fastwayadmin.ListViewActivity.MyAccount;
 import com.consumers.fastwayadmin.ListViewActivity.MyOrdersTransactions;
-import com.consumers.fastwayadmin.ListViewActivity.ViewExcelSheets;
 import com.consumers.fastwayadmin.MyService;
 import com.consumers.fastwayadmin.NavFrags.CashCommission.CashTransactionCommissionActivity;
 import com.consumers.fastwayadmin.NavFrags.FastwayPremiumActivites.FastwayPremiums;
@@ -52,6 +52,7 @@ public class AccountSettingsFragment extends PreferenceFragmentCompat {
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         setPreferencesFromResource(R.xml.root_preferences, rootKey);
+
         databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid());
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -76,7 +77,8 @@ public class AccountSettingsFragment extends PreferenceFragmentCompat {
         UID = auth.getUid();
         googleSignInClient = GoogleSignIn.getClient(requireContext(),gso);
         Preference account = findPreference("myAccount");
-        Preference blockedUsers = findPreference("blockedUsers");
+//        Preference blockedUsers = findPreference("blockedUsers");
+        Preference reports = findPreference("viewReportsGenerated");
         Preference viewExcel = findPreference("premiumExcelSheet");
         Preference myTrans = findPreference("myTrans");
         Preference logout = findPreference("logoutNow");
@@ -85,6 +87,40 @@ public class AccountSettingsFragment extends PreferenceFragmentCompat {
         Preference comFee = findPreference("commisionAndFee");
         SwitchPreferenceCompat takeaway = findPreference("TakeAwaySwitch");
         SwitchPreferenceCompat tableOrder = findPreference("tableBookingAllowedSwitch");
+
+        reports.setOnPreferenceClickListener(preference -> {
+            AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+            builder.setTitle("Choose One Option")
+                    .setMessage("Choose weekly or monthly report")
+                    .setPositiveButton("Open Weekly", (dialogInterface, i) -> {
+
+                        Intent intent = new Intent(Intent.ACTION_VIEW);
+                        File file12 = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS) + "/invoicexd.pdf");
+                        if(file12.exists()) {
+                            Toast.makeText(requireContext(), "Opening....", Toast.LENGTH_SHORT).show();
+                            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                            intent.setDataAndType(FileProvider.getUriForFile(requireContext(), requireContext().getPackageName() + ".provider", file12), "application/pdf");
+                            startActivity(intent);
+                        }else
+                            Toast.makeText(requireContext(), "No Reports Generated", Toast.LENGTH_SHORT).show();
+                    }).setNegativeButton("Open Monthly", (dialogInterface, i) -> {
+                        Toast.makeText(requireContext(), "Opening....", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(Intent.ACTION_VIEW);
+                        File file12 = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS) + "/invoicexdMonthly.pdf");
+                        if(file12.exists()) {
+                            Toast.makeText(requireContext(), "Opening....", Toast.LENGTH_SHORT).show();
+                            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                            intent.setDataAndType(FileProvider.getUriForFile(requireContext(), requireContext().getPackageName() + ".provider", file12), "application/pdf");
+                            startActivity(intent);
+                        }else
+                            Toast.makeText(requireContext(), "No Reports Generated", Toast.LENGTH_SHORT).show();
+                    }).setNeutralButton("Exit", (dialogInterface, i) -> {
+
+                    }).create();
+            builder.show();
+
+            return true;
+        });
 
         viewExcel.setOnPreferenceClickListener(preference -> {
             if(available){
@@ -117,17 +153,25 @@ public class AccountSettingsFragment extends PreferenceFragmentCompat {
         takeaway.setChecked(sharedPreferences.getString("TakeAwayAllowed", "").equals("yes"));
         tableOrder.setChecked(sharedPreferences.getString("TableBookAllowed", "").equals("yes"));
         terms.setOnPreferenceClickListener(preference -> {
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.websitepolicies.com/policies/view/CpwDZziF"));
-            startActivity(browserIntent);
-            return true;
-        });
-        Preference privacy = findPreference("privacyPolicy");
+            AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+            builder.setTitle("Choose one option").setMessage("Open Privacy Policy or Terms And Conditions")
+                    .setPositiveButton("Open Terms & Condition", (dialogInterface, i) -> {
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.websitepolicies.com/policies/view/CpwDZziF"));
+                        startActivity(browserIntent);
+                    }).setNeutralButton("Open Privacy Policy", (dialogInterface, i) -> {
+                        Intent privacyIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://fastway.flycricket.io/privacy.html"));
+                        startActivity(privacyIntent);
+                    }).setNegativeButton("Exit", (dialogInterface, i) -> dialogInterface.dismiss()).create();
+            builder.show();
 
-        privacy.setOnPreferenceClickListener(preference -> {
-            Intent privacyIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://fastway.flycricket.io/privacy.html"));
-            startActivity(privacyIntent);
             return true;
         });
+//        Preference privacy = findPreference("privacyPolicy");
+
+//        privacy.setOnPreferenceClickListener(preference -> {
+
+//            return true;
+//        });
         premium.setOnPreferenceClickListener(preference -> {
             startActivity(new Intent(requireContext(), FastwayPremiums.class));
             return true;
@@ -244,13 +288,13 @@ public class AccountSettingsFragment extends PreferenceFragmentCompat {
             return true;
         });
 
-        blockedUsers.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                startActivity(new Intent(requireContext(), BlockedUsers.class));
-                return true;
-            }
-        });
+//        blockedUsers.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+//            @Override
+//            public boolean onPreferenceClick(Preference preference) {
+//                startActivity(new Intent(requireContext(), BlockedUsers.class));
+//                return true;
+//            }
+//        });
         account.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
