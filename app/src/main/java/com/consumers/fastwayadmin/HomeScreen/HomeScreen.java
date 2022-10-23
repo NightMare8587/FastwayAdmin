@@ -27,6 +27,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.FragmentManager;
 
 import com.android.volley.Request;
@@ -485,6 +486,25 @@ public class HomeScreen extends AppCompatActivity {
                                         last7daysReportEdit.putString("lastAnalysisHashMap", gson.toJson(prevAnalysisInfo));
                                         last7daysReportEdit.putString("lastDateReport", endDate);
                                         last7daysReportEdit.apply();
+
+                                        runOnUiThread(() -> {
+                                            AlertDialog.Builder builder = new AlertDialog.Builder(HomeScreen.this);
+                                            builder.setTitle("Weekly Report Generated")
+                                                    .setMessage("Your Weekly report is generated of 7 days.\nDo you wanna open it?")
+                                                    .setPositiveButton("Open", new DialogInterface.OnClickListener() {
+                                                        @Override
+                                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                                            dialogInterface.dismiss();
+                                                            Toast.makeText(HomeScreen.this, "Opening....", Toast.LENGTH_SHORT).show();
+                                                            Intent intent = new Intent(Intent.ACTION_VIEW);
+                                                            File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS) + "/invoicexd.pdf");
+                                                            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                                                            intent.setDataAndType(FileProvider.getUriForFile(HomeScreen.this, getPackageName() + ".provider",file), "application/pdf");
+                                                            startActivity(intent);
+                                                        }
+                                                    }).setNegativeButton("Later", (dialogInterface, i) -> dialogInterface.dismiss()).create();
+                                            builder.show();
+                                        });
                                     }
                                 }
 
@@ -649,6 +669,22 @@ public class HomeScreen extends AppCompatActivity {
                                         last7daysReportEdit.putString("lastAnalysisHashMap", gson.toJson(prevAnalysisInfo));
                                         last7daysReportEdit.putString("lastDateReport", endDate);
                                         last7daysReportEdit.apply();
+
+                                        runOnUiThread(() -> {
+                                            AlertDialog.Builder builder = new AlertDialog.Builder(HomeScreen.this);
+                                            builder.setTitle("Week End Report Generated")
+                                                    .setMessage("Your Week end report is generated of remaining days.\nDo you wanna open it?")
+                                                    .setPositiveButton("Open", (dialogInterface, i) -> {
+                                                        dialogInterface.dismiss();
+                                                        Toast.makeText(HomeScreen.this, "Opening....", Toast.LENGTH_SHORT).show();
+                                                        Intent intent = new Intent(Intent.ACTION_VIEW);
+                                                        File file1 = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS) + "/invoicexd.pdf");
+                                                        intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                                                        intent.setDataAndType(FileProvider.getUriForFile(HomeScreen.this, getPackageName() + ".provider", file1), "application/pdf");
+                                                        startActivity(intent);
+                                                    }).setNegativeButton("Later", (dialogInterface, i) -> dialogInterface.dismiss()).create();
+                                            builder.show();
+                                        });
                                     }
                                 }
                             }
@@ -671,7 +707,6 @@ public class HomeScreen extends AppCompatActivity {
                             gson = new Gson();
                             String prevMonth = monthName[calendar.get(Calendar.MONTH) - 1];
                             String json = storeOrders.getString(prevMonth, "");
-                            gson = new Gson();
                             Type type = new TypeToken<List<List<String>>>() {
                             }.getType();
                             List<List<String>> mainDataList = gson.fromJson(json, type);
@@ -815,6 +850,22 @@ public class HomeScreen extends AppCompatActivity {
                                     editorMonthly.putString("lastAnalysisHashMap", gson.toJson(prevAnalysisInfo));
                                     editorMonthly.apply();
 
+
+                                    runOnUiThread(() -> {
+                                        AlertDialog.Builder builder = new AlertDialog.Builder(HomeScreen.this);
+                                        builder.setTitle("Monthly Report Generated")
+                                                .setMessage("Your Monthly report is generated of " + prevMonth + " Month.\nDo you wanna open it?")
+                                                .setPositiveButton("Open", (dialogInterface, i) -> {
+                                                    dialogInterface.dismiss();
+                                                    Toast.makeText(HomeScreen.this, "Opening....", Toast.LENGTH_SHORT).show();
+                                                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                                                    File file12 = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS) + "/invoicexdMonthly.pdf");
+                                                    intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                                                    intent.setDataAndType(FileProvider.getUriForFile(HomeScreen.this, getPackageName() + ".provider", file12), "application/pdf");
+                                                    startActivity(intent);
+                                                }).setNegativeButton("Later", (dialogInterface, i) -> dialogInterface.dismiss()).create();
+                                        builder.show();
+                                    });
                                 }
                             }
                         }
@@ -887,8 +938,8 @@ public class HomeScreen extends AppCompatActivity {
             }
         });
 //        new checkBank().execute();
-        StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
-        StrictMode.setVmPolicy(builder.build());
+        StrictMode.VmPolicy.Builder builderr = new StrictMode.VmPolicy.Builder();
+        StrictMode.setVmPolicy(builderr.build());
         File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
 //        Workbook workbook;
 //        workbook.getWorksheets().get(0).getCells().get("A1").putValue("Date");
