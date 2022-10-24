@@ -874,12 +874,12 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                     restaurantTrackEditor.apply();
                     DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(sharedPreferences.getString("locality", "")).child(Objects.requireNonNull(auth.getUid())).child("Tables").child(table);
                     SharedPreferences loginInfo = getSharedPreferences("loginInfo", MODE_PRIVATE);
-                    if (loginInfo.contains("payoutMethodChoosen")) {
-                        if (loginInfo.getString("payoutMethodChoosen", "").equals("imps")) {
-                            amountToBeSend = Double.parseDouble(orderAmount);
-                            amountToBeSend = amountToBeSend - 2;
-                            new MakePayout().execute();
-                        } else {
+//                    if (loginInfo.contains("payoutMethodChoosen")) {
+//                        if (loginInfo.getString("payoutMethodChoosen", "").equals("imps")) {
+//                            amountToBeSend = Double.parseDouble(orderAmount);
+//                            amountToBeSend = amountToBeSend - 2;
+//                            new MakePayout().execute();
+//                        } else {
                             DatabaseReference updatePayoutOrder = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid());
                             updatePayoutOrder.addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
@@ -898,29 +898,29 @@ public class ApproveCurrentOrder extends AppCompatActivity {
 
                                 }
                             });
-                        }
-                    } else {
-//                            Toast.makeText(this, "Defau", Toast.LENGTH_SHORT).show();
-                        Toast.makeText(this, "No payout method choosen\nDefault Method will be applicable", Toast.LENGTH_LONG).show();
-                        DatabaseReference updatePayoutOrder = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid());
-                        updatePayoutOrder.addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                if (snapshot.hasChild("totalPayoutAmount")) {
-                                    double current = Double.parseDouble(String.valueOf(snapshot.child("totalPayoutAmount").getValue()));
-                                    current += Double.parseDouble(orderAmount);
-                                    updatePayoutOrder.child("totalPayoutAmount").setValue(String.valueOf(current));
-                                } else {
-                                    updatePayoutOrder.child("totalPayoutAmount").setValue(String.valueOf(orderAmount));
-                                }
-                            }
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError error) {
-
-                            }
-                        });
-                    }
+//                        }
+//                    } else {
+////                            Toast.makeText(this, "Defau", Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(this, "No payout method choosen\nDefault Method will be applicable", Toast.LENGTH_LONG).show();
+//                        DatabaseReference updatePayoutOrder = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid());
+//                        updatePayoutOrder.addListenerForSingleValueEvent(new ValueEventListener() {
+//                            @Override
+//                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                                if (snapshot.hasChild("totalPayoutAmount")) {
+//                                    double current = Double.parseDouble(String.valueOf(snapshot.child("totalPayoutAmount").getValue()));
+//                                    current += Double.parseDouble(orderAmount);
+//                                    updatePayoutOrder.child("totalPayoutAmount").setValue(String.valueOf(current));
+//                                } else {
+//                                    updatePayoutOrder.child("totalPayoutAmount").setValue(String.valueOf(orderAmount));
+//                                }
+//                            }
+//
+//                            @Override
+//                            public void onCancelled(@NonNull DatabaseError error) {
+//
+//                            }
+//                        });
+//                    }
                     try {
                         main.put("to", "/topics/" + id + "");
                         JSONObject notification = new JSONObject();

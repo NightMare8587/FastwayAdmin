@@ -39,6 +39,7 @@ import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 import karpuzoglu.enes.com.fastdialog.FastDialog;
 import karpuzoglu.enes.com.fastdialog.FastDialogBuilder;
@@ -78,7 +79,7 @@ public class InitiatePayoutForAdminNEFT extends AppCompatActivity {
 
 
         button = findViewById(R.id.initiatePaymentForPayoutAdmin);
-        changeMethod = findViewById(R.id.changePayoutMethodNeftorAdmin);
+//        changeMethod = findViewById(R.id.changePayoutMethodNeftorAdmin);
         databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @SuppressLint("SetTextI18n")
@@ -104,9 +105,9 @@ public class InitiatePayoutForAdminNEFT extends AppCompatActivity {
             }
         });
 
-        changeMethod.setOnClickListener(click -> {
-            startActivity(new Intent(InitiatePayoutForAdminNEFT.this, SelectPayoutMethodType.class));
-        });
+//        changeMethod.setOnClickListener(click -> {
+//            startActivity(new Intent(InitiatePayoutForAdminNEFT.this, SelectPayoutMethodType.class));
+//        });
 
         button.setOnClickListener(click -> {
 
@@ -115,6 +116,7 @@ public class InitiatePayoutForAdminNEFT extends AppCompatActivity {
                 if(cooldown) {
                     if(System.currentTimeMillis() < coolDownTime){
                         Toast.makeText(this, "Cooldown period is active", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "Remaining: " + TimeUnit.MILLISECONDS.toHours(coolDownTime - System.currentTimeMillis()), Toast.LENGTH_SHORT).show();
                         return;
                     }
                 }
@@ -122,7 +124,7 @@ public class InitiatePayoutForAdminNEFT extends AppCompatActivity {
                 if(amount >= 20000) {
                     moreThan20 = true;
                     AlertDialog.Builder alert = new AlertDialog.Builder(InitiatePayoutForAdminNEFT.this);
-                    alert.setTitle("Message").setMessage("You can initiate payout of amount less than 20000 at a time. You can initiate again after period of 6 hours");
+                    alert.setTitle("Message").setMessage("You can initiate payout of amount less than \u20b920000 at a time. You can initiate again after a cooldown period of 6 hours");
                     LinearLayout linearLayout = new LinearLayout(InitiatePayoutForAdminNEFT.this);
                     linearLayout.setOrientation(LinearLayout.VERTICAL);
                     EditText editText = new EditText(InitiatePayoutForAdminNEFT.this);
@@ -140,7 +142,7 @@ public class InitiatePayoutForAdminNEFT extends AppCompatActivity {
                                 return;
                             }
                             AlertDialog.Builder builder = new AlertDialog.Builder(InitiatePayoutForAdminNEFT.this);
-                            builder.setTitle("Choose one option").setMessage("Choose one payout option\nGet payout after 4 to 5 hours (NEFT)\nGet Instant Payout (IMPS)")
+                            builder.setTitle("Choose one option").setMessage("Choose one payout option\nGet payout after 4 to 5 hours (NEFT \u20b93 charge) \nGet Instant Payout (IMPS \u20b97 charge)")
                                     .setPositiveButton("Choose NEFT", (dialog, which) -> {
                                         new MakePayout().execute();
                                         fastDialog.show();
@@ -165,7 +167,7 @@ public class InitiatePayoutForAdminNEFT extends AppCompatActivity {
                     return;
                 }
                 AlertDialog.Builder builder = new AlertDialog.Builder(InitiatePayoutForAdminNEFT.this);
-                builder.setTitle("Choose one option").setMessage("Choose one payout option\nGet payout after 4 to 5 hours (NEFT)\nGet Instant Payout (IMPS)")
+                builder.setTitle("Choose one option").setMessage("Choose one payout option\nGet payout after 4 to 5 hours (NEFT \u20b93 charge)\nGet Instant Payout (IMPS \u20b97 charge)")
                         .setPositiveButton("Choose NEFT", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
@@ -216,7 +218,7 @@ public class InitiatePayoutForAdminNEFT extends AppCompatActivity {
             RequestQueue requestQueue = Volley.newRequestQueue(InitiatePayoutForAdminNEFT.this);
             StringRequest stringRequest = new StringRequest(Request.Method.POST, testPayoutToken, response -> {
                 Log.i("response",response);
-                amount = amount - 4;
+                amount = amount - 3;
                 genratedToken = response.trim();
                 new AuthorizeToken().execute();
             }, error -> {

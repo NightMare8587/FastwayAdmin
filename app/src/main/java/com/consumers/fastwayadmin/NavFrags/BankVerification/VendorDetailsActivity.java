@@ -308,7 +308,7 @@ public class VendorDetailsActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        startActivity(new Intent(VendorDetailsActivity.this,SelectPayoutMethodType.class));
+                        finish();
                     }
                 });
             }, error -> {

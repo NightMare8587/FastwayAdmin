@@ -1553,12 +1553,12 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                             }
 
                             Toast.makeText(ApproveCurrentTakeAway.this, "Order Confirmed", Toast.LENGTH_SHORT).show();
-                            if (loginInfo.contains("payoutMethodChoosen")) {
-                                if (loginInfo.getString("payoutMethodChoosen", "").equals("imps")) {
-                                    amountToBeSend = Double.parseDouble(orderAmount);
-                                    amountToBeSend = amountToBeSend - 2;
-                                    new MakePayout().execute();
-                                } else {
+//                            if (loginInfo.contains("payoutMethodChoosen")) {
+//                                if (loginInfo.getString("payoutMethodChoosen", "").equals("imps")) {
+//                                    amountToBeSend = Double.parseDouble(orderAmount);
+//                                    amountToBeSend = amountToBeSend - 2;
+//                                    new MakePayout().execute();
+//                                }
                                     DatabaseReference updatePayoutOrder = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid());
                                     updatePayoutOrder.addListenerForSingleValueEvent(new ValueEventListener() {
                                         @Override
@@ -1577,29 +1577,29 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
 
                                         }
                                     });
-                                }
-                            } else {
-//                            Toast.makeText(this, "Defau", Toast.LENGTH_SHORT).show();
-                                Toast.makeText(this, "No payout method choosen\nDefault Method will be applicable", Toast.LENGTH_LONG).show();
-                                DatabaseReference updatePayoutOrder = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid());
-                                updatePayoutOrder.addListenerForSingleValueEvent(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                        if (snapshot.hasChild("totalPayoutAmount")) {
-                                            double current = Double.parseDouble(String.valueOf(snapshot.child("totalPayoutAmount").getValue()));
-                                            current += Double.parseDouble(orderAmount);
-                                            updatePayoutOrder.child("totalPayoutAmount").setValue(String.valueOf(current));
-                                        } else {
-                                            updatePayoutOrder.child("totalPayoutAmount").setValue(String.valueOf(orderAmount));
-                                        }
-                                    }
 
-                                    @Override
-                                    public void onCancelled(@NonNull DatabaseError error) {
-
-                                    }
-                                });
-                            }
+//                            } else {
+////                            Toast.makeText(this, "Defau", Toast.LENGTH_SHORT).show();
+//                                Toast.makeText(this, "No payout method choosen\nDefault Method will be applicable", Toast.LENGTH_LONG).show();
+//                                DatabaseReference updatePayoutOrder = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid());
+//                                updatePayoutOrder.addListenerForSingleValueEvent(new ValueEventListener() {
+//                                    @Override
+//                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                                        if (snapshot.hasChild("totalPayoutAmount")) {
+//                                            double current = Double.parseDouble(String.valueOf(snapshot.child("totalPayoutAmount").getValue()));
+//                                            current += Double.parseDouble(orderAmount);
+//                                            updatePayoutOrder.child("totalPayoutAmount").setValue(String.valueOf(current));
+//                                        } else {
+//                                            updatePayoutOrder.child("totalPayoutAmount").setValue(String.valueOf(orderAmount));
+//                                        }
+//                                    }
+//
+//                                    @Override
+//                                    public void onCancelled(@NonNull DatabaseError error) {
+//
+//                                    }
+//                                });
+//                            }
                             RequestQueue requestQueue = Volley.newRequestQueue(ApproveCurrentTakeAway.this);
                             fastDialog.dismiss();
                             JSONObject main = new JSONObject();
