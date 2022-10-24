@@ -116,7 +116,7 @@ public class InitiatePayoutForAdminNEFT extends AppCompatActivity {
                 if(cooldown) {
                     if(System.currentTimeMillis() < coolDownTime){
                         Toast.makeText(this, "Cooldown period is active", Toast.LENGTH_SHORT).show();
-                        Toast.makeText(this, "Remaining: " + TimeUnit.MILLISECONDS.toHours(coolDownTime - System.currentTimeMillis()), Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(this, "Remaining: " + TimeUnit.MILLISECONDS.to(coolDownTime - System.currentTimeMillis()), Toast.LENGTH_SHORT).show();
                         return;
                     }
                 }
