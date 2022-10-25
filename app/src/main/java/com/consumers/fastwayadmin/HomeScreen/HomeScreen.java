@@ -1073,6 +1073,50 @@ public class HomeScreen extends AppCompatActivity {
 
                     SharedPreferences.Editor userFEdit = usersF.edit();
                     userFEdit.clear().apply();
+
+                    SharedPreferences dishOrderedTogetherAnalysis = getSharedPreferences("DishOrderedWithOthers",MODE_PRIVATE);
+                    SharedPreferences prevdishOrderedTogetherAnalysis = getSharedPreferences("PreviousDishOrderedWithOthers" + whichY,MODE_PRIVATE);
+                    SharedPreferences.Editor prevdishOrderedTogetherAnalysisEdit = prevdishOrderedTogetherAnalysis.edit();
+                    Map<String,?> prevOr = prevdishOrderedTogetherAnalysis.getAll();
+                    for(Map.Entry<String,?> entry : prevOr.entrySet()){
+                        Log.d("map values",entry.getKey() + ": " + entry.getValue().toString());
+                        String value = (String) entry.getValue();
+                        String key = entry.getKey();
+
+                        prevdishOrderedTogetherAnalysisEdit.putString(key,value);
+
+                    }
+                    prevdishOrderedTogetherAnalysisEdit.apply();
+                    SharedPreferences.Editor dishOrderedTogetherEditor = dishOrderedTogetherAnalysis.edit();
+                    dishOrderedTogetherEditor.clear().apply();
+
+//
+//                    SharedPreferences trackTake = getSharedPreferences("TrackingOfTakeAway", MODE_PRIVATE);
+//                    trackTake.edit().clear().apply();
+//                    SharedPreferences trackFood = getSharedPreferences("TrackingOfFoodDining", MODE_PRIVATE);
+//                    trackFood.edit().clear().apply();
+//                    SharedPreferences DailyUserTrackingFor7days = getSharedPreferences("DailyUserTrackingFor7days", MODE_PRIVATE);
+//                    DailyUserTrackingFor7days.edit().clear().apply();
+//
+//                    SharedPreferences DailyAverageOrderMonthly = getSharedPreferences("DailyAverageOrderMonthly", MODE_PRIVATE);
+//                    DailyAverageOrderMonthly.edit().clear().apply();
+//
+//                    SharedPreferences RestaurantTrackingDaily = getSharedPreferences("RestaurantTrackingDaily", MODE_PRIVATE);
+//                    RestaurantTrackingDaily.edit().clear().apply();
+//
+//                    SharedPreferences RestaurantTrackRecords = getSharedPreferences("RestaurantTrackRecords", MODE_PRIVATE);
+//                    RestaurantTrackRecords.edit().clear().apply();
+//
+//                    SharedPreferences UserFrequencyPerMonth = getSharedPreferences("UserFrequencyPerMonth", MODE_PRIVATE);
+//                    UserFrequencyPerMonth.edit().clear().apply();
+//
+//                    SharedPreferences resDailyStore = getSharedPreferences("RestaurantDailyStoreForAnalysis", MODE_PRIVATE);
+//                    resDailyStore.edit().clear().apply();
+//
+//
+//                    SharedPreferences last7days = getSharedPreferences("last7daysReport", MODE_PRIVATE);
+//                    last7days.edit().clear().apply();
+
                 }
 
                 String month = monthName[calendar.get(Calendar.MONTH)] + "_" + year;
