@@ -869,7 +869,7 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                     for (int i = 0; i < dishNames.size(); i++) {
 
                         MyClass myClass = new MyClass(dishNames.get(i), dishPrices.get(i), image.get(i), type.get(i), "" + approveTime, dishQuantity.get(i), dishHalfOr.get(i), state, String.valueOf(orderAmount), orderID, orderAndPayment.get(i), "Order Approved", sharedPreferences.getString("locality", ""));
-                        databaseReference.child("Recent Orders").child("" + time).child(auth.getUid()).child(dishNames.get(i)).setValue(myClass);
+                        databaseReference.child("Recent Orders").child("" + time).child(id).child(dishNames.get(i)).setValue(myClass);
                     }
                     restaurantTrackEditor.apply();
                     DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(sharedPreferences.getString("locality", "")).child(Objects.requireNonNull(auth.getUid())).child("Tables").child(table);
@@ -878,7 +878,7 @@ public class ApproveCurrentOrder extends AppCompatActivity {
 //                        if (loginInfo.getString("payoutMethodChoosen", "").equals("imps")) {
 //                            amountToBeSend = Double.parseDouble(orderAmount);
 //                            amountToBeSend = amountToBeSend - 2;
-//                            new MakePayout().execute();
+                            new MakePaymentToVendor().execute();
 //                        } else {
                             DatabaseReference updatePayoutOrder = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid());
                             updatePayoutOrder.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -1758,8 +1758,8 @@ public class ApproveCurrentOrder extends AppCompatActivity {
         protected Void doInBackground(Void... voids) {
             Log.i("statusTwo", String.valueOf(makePaymentToVendor.getStatus()));
             RequestQueue requestQueue = Volley.newRequestQueue(ApproveCurrentOrder.this);
-            StringRequest stringRequest = new StringRequest(Request.Method.POST, testPaymentToVendor, response -> {
-                Log.i("response",response);
+//            StringRequest stringRequest = new StringRequest(Request.Method.POST, testPaymentToVendor, response -> {
+//                Log.i("response",response);
                 SharedPreferences checkPrem = getSharedPreferences("AdminPremiumDetails",MODE_PRIVATE);
                 if(checkPrem.contains("status") && checkPrem.getString("status","").equals("active")) {
                     String month = monthName[calendar.get(Calendar.MONTH)];
@@ -1821,7 +1821,7 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                             List<String> orderAmountList = new ArrayList<>(mainDataList.get(3));
 
                             date.add(time);
-                            transID.add(transactionIdForExcel);
+                            transID.add("Online");
                             userID.add(id);
                             orderAmountList.add(orderAmount + "");
 
@@ -1847,7 +1847,7 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                             List<String> orderAmountList = new ArrayList<>(mainDataList.get(3));
 
                             date.add(time);
-                            transID.add(transactionIdForExcel);
+                            transID.add("Online");
                             userID.add(id);
                             orderAmountList.add(orderAmount + "");
 
@@ -1941,7 +1941,7 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                         List<String> orderAmountList = new ArrayList<>();
                         int day = calendar.get(Calendar.DAY_OF_MONTH);
                         date.add(time);
-                        transID.add(transactionIdForExcel);
+                        transID.add("Online");
                         userID.add(id);
                         orderAmountList.add(orderAmount + "");
                         mainDataList.add(date);
@@ -1988,7 +1988,7 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                         cell = row.createCell(0);
                         cell.setCellValue(dateFormat.format(date));
                         cell = row.createCell(1);
-                        cell.setCellValue(transactionIdForExcel);
+                        cell.setCellValue("Online");
                         cell = row.createCell(2);
                         cell.setCellValue("Online");
                         cell = row.createCell(3);
@@ -2005,28 +2005,28 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                     }
                 }
                 Log.i("statusOne", String.valueOf(makePaymentToVendor.getStatus()));
-            }, error -> {
-
-            }){
-                @NonNull
-                @Override
-                protected Map<String, String> getParams() {
-                    Map<String,String> params = new HashMap<>();
-                    params.put("benID","BKkZjAAB9fQmleexouAb2zSRtQm2");
-                    String genratedID = "ORDER_" + System.currentTimeMillis() + "_" + ApproveCurrentTakeAway.RandomString
-                            .getAlphaNumericString(5);
-
-                    transactionIdForExcel = genratedID;
-                    params.put("transID",genratedID);
-                    params.put("token",genratedToken);
-                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid())).child("Transactions");
-                    PaymentClass paymentClass = new PaymentClass(genratedID,id);
-                    databaseReference.child(time).setValue(paymentClass);
-                    params.put("amount", "1");
-                    return params;
-                }
-            };
-            requestQueue.add(stringRequest);
+//            }, error -> {
+//
+//            }){
+//                @NonNull
+//                @Override
+//                protected Map<String, String> getParams() {
+//                    Map<String,String> params = new HashMap<>();
+//                    params.put("benID","BKkZjAAB9fQmleexouAb2zSRtQm2");
+//                    String genratedID = "ORDER_" + System.currentTimeMillis() + "_" + ApproveCurrentTakeAway.RandomString
+//                            .getAlphaNumericString(5);
+//
+//                    transactionIdForExcel = genratedID;
+//                    params.put("transID",genratedID);
+//                    params.put("token",genratedToken);
+//                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid())).child("Transactions");
+//                    PaymentClass paymentClass = new PaymentClass(genratedID,id);
+//                    databaseReference.child(time).setValue(paymentClass);
+//                    params.put("amount", "1");
+//                    return params;
+//                }
+//            };
+//            requestQueue.add(stringRequest);
             return null;
         }
     }

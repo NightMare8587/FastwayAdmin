@@ -382,134 +382,134 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                                 .setConfirmClickListener(kAlertDialog -> {
                                     kAlertDialog.dismissWithAnimation();
                                     new Thread(() -> {
-                                        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("ResAnalysis").child(state).child(sharedPreferences.getString("locality", ""));
-                                        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-                                            @Override
-                                            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                                if (snapshot.exists()) {
-
-                                                    if (snapshot.hasChild("veg")) {
-                                                        int vegVal = Integer.parseInt(String.valueOf(snapshot.child("veg").getValue()));
-                                                        vegVal += veg;
-                                                        databaseReference.child("veg").setValue(vegVal + "");
-                                                    } else
-                                                        databaseReference.child("veg").setValue(veg + "");
-
-                                                    if (snapshot.hasChild("NonVeg")) {
-                                                        int vegVal = Integer.parseInt(String.valueOf(snapshot.child("NonVeg").getValue()));
-                                                        vegVal += nonVeg;
-                                                        databaseReference.child("NonVeg").setValue(vegVal + "");
-                                                    } else
-                                                        databaseReference.child("NonVeg").setValue(nonVeg + "");
-
-                                                    if (snapshot.hasChild("vegan")) {
-                                                        int vegVal = Integer.parseInt(String.valueOf(snapshot.child("vegan").getValue()));
-                                                        vegVal += vegan;
-                                                        databaseReference.child("vegan").setValue(vegVal + "");
-                                                    } else
-                                                        databaseReference.child("vegan").setValue(vegan + "");
-
-                                                    DatabaseReference checkRestaurant = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("ResAnalysis").child(state).child(sharedPreferences.getString("locality", "")).child(auth.getUid());
-                                                    checkRestaurant.addListenerForSingleValueEvent(new ValueEventListener() {
-                                                        @Override
-                                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                                            if (snapshot.exists()) {
-                                                                if (snapshot.hasChild("veg")) {
-                                                                    int vegVal = Integer.parseInt(String.valueOf(snapshot.child("veg").getValue()));
-                                                                    vegVal += veg;
-                                                                    checkRestaurant.child("veg").setValue(vegVal + "");
-                                                                } else
-                                                                    checkRestaurant.child("veg").setValue(veg + "");
-
-                                                                if (snapshot.hasChild("NonVeg")) {
-                                                                    int vegVal = Integer.parseInt(String.valueOf(snapshot.child("NonVeg").getValue()));
-                                                                    vegVal += nonVeg;
-                                                                    checkRestaurant.child("NonVeg").setValue(vegVal + "");
-                                                                } else
-                                                                    checkRestaurant.child("NonVeg").setValue(nonVeg + "");
-
-                                                                if (snapshot.hasChild("vegan")) {
-                                                                    int vegVal = Integer.parseInt(String.valueOf(snapshot.child("vegan").getValue()));
-                                                                    vegVal += vegan;
-                                                                    checkRestaurant.child("vegan").setValue(vegVal + "");
-                                                                } else
-                                                                    checkRestaurant.child("vegan").setValue(vegan + "");
-                                                            } else {
-                                                                if (!(veg == 0))
-                                                                    checkRestaurant.child("veg").setValue(veg + "");
-
-                                                                if (!(vegan == 0))
-                                                                    checkRestaurant.child("vegan").setValue(vegan + "");
-
-                                                                if (!(nonVeg == 0))
-                                                                    checkRestaurant.child("NonVeg").setValue(nonVeg + "");
-                                                            }
-                                                        }
-
-                                                        @Override
-                                                        public void onCancelled(@NonNull DatabaseError error) {
-
-                                                        }
-                                                    });
-                                                } else {
-                                                    DatabaseReference checkRestaurant = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("ResAnalysis").child(state).child(sharedPreferences.getString("locality", "")).child(auth.getUid());
-                                                    checkRestaurant.addListenerForSingleValueEvent(new ValueEventListener() {
-                                                        @Override
-                                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                                            if (snapshot.exists()) {
-                                                                if (snapshot.hasChild("veg")) {
-                                                                    int vegVal = Integer.parseInt(String.valueOf(snapshot.child("veg").getValue()));
-                                                                    vegVal += veg;
-                                                                    checkRestaurant.child("veg").setValue(vegVal + "");
-                                                                } else
-                                                                    checkRestaurant.child("veg").setValue(veg + "");
-
-                                                                if (snapshot.hasChild("NonVeg")) {
-                                                                    int vegVal = Integer.parseInt(String.valueOf(snapshot.child("NonVeg").getValue()));
-                                                                    vegVal += nonVeg;
-                                                                    checkRestaurant.child("NonVeg").setValue(vegVal + "");
-                                                                } else
-                                                                    checkRestaurant.child("NonVeg").setValue(nonVeg + "");
-
-                                                                if (snapshot.hasChild("vegan")) {
-                                                                    int vegVal = Integer.parseInt(String.valueOf(snapshot.child("vegan").getValue()));
-                                                                    vegVal += vegan;
-                                                                    checkRestaurant.child("vegan").setValue(vegVal + "");
-                                                                } else
-                                                                    checkRestaurant.child("vegan").setValue(vegan + "");
-                                                            } else {
-                                                                if (!(veg == 0))
-                                                                    checkRestaurant.child("veg").setValue(veg + "");
-
-                                                                if (!(vegan == 0))
-                                                                    checkRestaurant.child("vegan").setValue(vegan + "");
-
-                                                                if (!(nonVeg == 0))
-                                                                    checkRestaurant.child("NonVeg").setValue(nonVeg + "");
-                                                            }
-                                                        }
-
-                                                        @Override
-                                                        public void onCancelled(@NonNull DatabaseError error) {
-
-                                                        }
-                                                    });
-                                                    if (!(veg == 0))
-                                                        databaseReference.child("veg").setValue(veg + "");
-
-                                                    if (!(vegan == 0))
-                                                        databaseReference.child("vegan").setValue(vegan + "");
-
-                                                    if (!(nonVeg == 0))
-                                                        databaseReference.child("NonVeg").setValue(nonVeg + "");
-                                                }
-                                            }
-
-                                            @Override
-                                            public void onCancelled(@NonNull DatabaseError error) {
-
-                                            }
-                                        });
+//                                        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("ResAnalysis").child(state).child(sharedPreferences.getString("locality", ""));
+//                                        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+//                                            @Override
+//                                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                                                if (snapshot.exists()) {
+//
+//                                                    if (snapshot.hasChild("veg")) {
+//                                                        int vegVal = Integer.parseInt(String.valueOf(snapshot.child("veg").getValue()));
+//                                                        vegVal += veg;
+//                                                        databaseReference.child("veg").setValue(vegVal + "");
+//                                                    } else
+//                                                        databaseReference.child("veg").setValue(veg + "");
+//
+//                                                    if (snapshot.hasChild("NonVeg")) {
+//                                                        int vegVal = Integer.parseInt(String.valueOf(snapshot.child("NonVeg").getValue()));
+//                                                        vegVal += nonVeg;
+//                                                        databaseReference.child("NonVeg").setValue(vegVal + "");
+//                                                    } else
+//                                                        databaseReference.child("NonVeg").setValue(nonVeg + "");
+//
+//                                                    if (snapshot.hasChild("vegan")) {
+//                                                        int vegVal = Integer.parseInt(String.valueOf(snapshot.child("vegan").getValue()));
+//                                                        vegVal += vegan;
+//                                                        databaseReference.child("vegan").setValue(vegVal + "");
+//                                                    } else
+//                                                        databaseReference.child("vegan").setValue(vegan + "");
+//
+//                                                    DatabaseReference checkRestaurant = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("ResAnalysis").child(state).child(sharedPreferences.getString("locality", "")).child(auth.getUid());
+//                                                    checkRestaurant.addListenerForSingleValueEvent(new ValueEventListener() {
+//                                                        @Override
+//                                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                                                            if (snapshot.exists()) {
+//                                                                if (snapshot.hasChild("veg")) {
+//                                                                    int vegVal = Integer.parseInt(String.valueOf(snapshot.child("veg").getValue()));
+//                                                                    vegVal += veg;
+//                                                                    checkRestaurant.child("veg").setValue(vegVal + "");
+//                                                                } else
+//                                                                    checkRestaurant.child("veg").setValue(veg + "");
+//
+//                                                                if (snapshot.hasChild("NonVeg")) {
+//                                                                    int vegVal = Integer.parseInt(String.valueOf(snapshot.child("NonVeg").getValue()));
+//                                                                    vegVal += nonVeg;
+//                                                                    checkRestaurant.child("NonVeg").setValue(vegVal + "");
+//                                                                } else
+//                                                                    checkRestaurant.child("NonVeg").setValue(nonVeg + "");
+//
+//                                                                if (snapshot.hasChild("vegan")) {
+//                                                                    int vegVal = Integer.parseInt(String.valueOf(snapshot.child("vegan").getValue()));
+//                                                                    vegVal += vegan;
+//                                                                    checkRestaurant.child("vegan").setValue(vegVal + "");
+//                                                                } else
+//                                                                    checkRestaurant.child("vegan").setValue(vegan + "");
+//                                                            } else {
+//                                                                if (!(veg == 0))
+//                                                                    checkRestaurant.child("veg").setValue(veg + "");
+//
+//                                                                if (!(vegan == 0))
+//                                                                    checkRestaurant.child("vegan").setValue(vegan + "");
+//
+//                                                                if (!(nonVeg == 0))
+//                                                                    checkRestaurant.child("NonVeg").setValue(nonVeg + "");
+//                                                            }
+//                                                        }
+//
+//                                                        @Override
+//                                                        public void onCancelled(@NonNull DatabaseError error) {
+//
+//                                                        }
+//                                                    });
+//                                                } else {
+//                                                    DatabaseReference checkRestaurant = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("ResAnalysis").child(state).child(sharedPreferences.getString("locality", "")).child(auth.getUid());
+//                                                    checkRestaurant.addListenerForSingleValueEvent(new ValueEventListener() {
+//                                                        @Override
+//                                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                                                            if (snapshot.exists()) {
+//                                                                if (snapshot.hasChild("veg")) {
+//                                                                    int vegVal = Integer.parseInt(String.valueOf(snapshot.child("veg").getValue()));
+//                                                                    vegVal += veg;
+//                                                                    checkRestaurant.child("veg").setValue(vegVal + "");
+//                                                                } else
+//                                                                    checkRestaurant.child("veg").setValue(veg + "");
+//
+//                                                                if (snapshot.hasChild("NonVeg")) {
+//                                                                    int vegVal = Integer.parseInt(String.valueOf(snapshot.child("NonVeg").getValue()));
+//                                                                    vegVal += nonVeg;
+//                                                                    checkRestaurant.child("NonVeg").setValue(vegVal + "");
+//                                                                } else
+//                                                                    checkRestaurant.child("NonVeg").setValue(nonVeg + "");
+//
+//                                                                if (snapshot.hasChild("vegan")) {
+//                                                                    int vegVal = Integer.parseInt(String.valueOf(snapshot.child("vegan").getValue()));
+//                                                                    vegVal += vegan;
+//                                                                    checkRestaurant.child("vegan").setValue(vegVal + "");
+//                                                                } else
+//                                                                    checkRestaurant.child("vegan").setValue(vegan + "");
+//                                                            } else {
+//                                                                if (!(veg == 0))
+//                                                                    checkRestaurant.child("veg").setValue(veg + "");
+//
+//                                                                if (!(vegan == 0))
+//                                                                    checkRestaurant.child("vegan").setValue(vegan + "");
+//
+//                                                                if (!(nonVeg == 0))
+//                                                                    checkRestaurant.child("NonVeg").setValue(nonVeg + "");
+//                                                            }
+//                                                        }
+//
+//                                                        @Override
+//                                                        public void onCancelled(@NonNull DatabaseError error) {
+//
+//                                                        }
+//                                                    });
+//                                                    if (!(veg == 0))
+//                                                        databaseReference.child("veg").setValue(veg + "");
+//
+//                                                    if (!(vegan == 0))
+//                                                        databaseReference.child("vegan").setValue(vegan + "");
+//
+//                                                    if (!(nonVeg == 0))
+//                                                        databaseReference.child("NonVeg").setValue(nonVeg + "");
+//                                                }
+//                                            }
+//
+//                                            @Override
+//                                            public void onCancelled(@NonNull DatabaseError error) {
+//
+//                                            }
+//                                        });
                                         DatabaseReference databaseReference1 = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("ResAnalysis").child(state).child(sharedPreferences.getString("locality", ""));
                                         databaseReference1.addListenerForSingleValueEvent(new ValueEventListener() {
                                             @Override
@@ -578,8 +578,6 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
 
                                                             }
                                                             mapDishMain.put(currDishName,innerMap);
-                                                            dishSharedEdit.putString(month,gson.toJson(mapDishMain));
-                                                            dishSharedEdit.apply();
                                                         }else{
                                                             mapDishMain = new HashMap<>();
                                                             HashMap<String,Integer> innerMap = new HashMap<>();
@@ -589,9 +587,9 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                                                                 }
                                                             }
                                                             mapDishMain.put(currDishName,innerMap);
-                                                            dishSharedEdit.putString(month,gson.toJson(mapDishMain));
-                                                            dishSharedEdit.apply();
                                                         }
+                                                        dishSharedEdit.putString(month,gson.toJson(mapDishMain));
+                                                        dishSharedEdit.apply();
 //                                                        if(dishShared.contains(dishName.get(k))){
 //                                                            java.lang.reflect.Type type1 = new TypeToken<HashMap<String,Integer>>(){}.getType();
 //                                                            HashMap<String,Integer> dishMapIndividual = gson.fromJson(dishShared.getString(dishName.get(k),""),type1);
@@ -643,7 +641,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                                         SharedPreferences.Editor editorMonthly = lastMonthReport.edit();
                                         SharedPreferences last7daysReport = getSharedPreferences("last7daysReport",MODE_PRIVATE);
                                         SharedPreferences.Editor last7daysReportEdit = last7daysReport.edit();
-                                        new Thread(() -> {
+//                                        new Thread(() -> {
                                             if(last7daysReport.contains("currentMonth") && last7daysReport.getString("currentMonth","").equals(month)){
                                                 int day = calendar.get(Calendar.DAY_OF_MONTH);
                                                 if(last7daysReport.contains("daysTracked")){
@@ -678,7 +676,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                                                 editorMonthly.apply();
                                             }
 
-                                        }).start();
+//                                        }).start();
 
                                         if(dailyUserTrackingFor7days.contains(month)){
                                             gson = new Gson();
@@ -801,7 +799,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                                     }).start();
                                     Calendar calendar = Calendar.getInstance();
                                     int yearCurrent = calendar.get(Calendar.YEAR);
-                                    new Thread(() -> {
+//                                    new Thread(() -> {
                                         if (userFrequency.contains(month)) {
                                             java.lang.reflect.Type type = new TypeToken<HashMap<String, String>>() {
                                             }.getType();
@@ -871,7 +869,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
 //                                        }
 //                                    }
 
-                                    }).start();
+//                                    }).start();
                                     if (storeOrdersForAdminInfo.contains(month)) {
                                         java.lang.reflect.Type type = new TypeToken<List<List<String>>>() {
                                         }.getType();
@@ -1071,7 +1069,136 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                                     } catch (Exception e) {
                                         Toast.makeText(ApproveCurrentTakeAway.this, e.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
                                     }
-                                    new Handler().postDelayed(this::finish, 1500);
+
+                                    DatabaseReference databaseReferences = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("ResAnalysis").child(state).child(sharedPreferences.getString("locality", ""));
+                                    databaseReferences.addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                            if (snapshot.exists()) {
+
+                                                if (snapshot.hasChild("veg")) {
+                                                    int vegVal = Integer.parseInt(String.valueOf(snapshot.child("veg").getValue()));
+                                                    vegVal += veg;
+                                                    databaseReferences.child("veg").setValue(vegVal + "");
+                                                } else
+                                                    databaseReferences.child("veg").setValue(veg + "");
+
+                                                if (snapshot.hasChild("NonVeg")) {
+                                                    int vegVal = Integer.parseInt(String.valueOf(snapshot.child("NonVeg").getValue()));
+                                                    vegVal += nonVeg;
+                                                    databaseReferences.child("NonVeg").setValue(vegVal + "");
+                                                } else
+                                                    databaseReferences.child("NonVeg").setValue(nonVeg + "");
+
+                                                if (snapshot.hasChild("vegan")) {
+                                                    int vegVal = Integer.parseInt(String.valueOf(snapshot.child("vegan").getValue()));
+                                                    vegVal += vegan;
+                                                    databaseReferences.child("vegan").setValue(vegVal + "");
+                                                } else
+                                                    databaseReferences.child("vegan").setValue(vegan + "");
+
+                                                DatabaseReference checkRestaurant = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("ResAnalysis").child(state).child(sharedPreferences.getString("locality", "")).child(auth.getUid());
+                                                checkRestaurant.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                    @Override
+                                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                                        if (snapshot.exists()) {
+                                                            if (snapshot.hasChild("veg")) {
+                                                                int vegVal = Integer.parseInt(String.valueOf(snapshot.child("veg").getValue()));
+                                                                vegVal += veg;
+                                                                checkRestaurant.child("veg").setValue(vegVal + "");
+                                                            } else
+                                                                checkRestaurant.child("veg").setValue(veg + "");
+
+                                                            if (snapshot.hasChild("NonVeg")) {
+                                                                int vegVal = Integer.parseInt(String.valueOf(snapshot.child("NonVeg").getValue()));
+                                                                vegVal += nonVeg;
+                                                                checkRestaurant.child("NonVeg").setValue(vegVal + "");
+                                                            } else
+                                                                checkRestaurant.child("NonVeg").setValue(nonVeg + "");
+
+                                                            if (snapshot.hasChild("vegan")) {
+                                                                int vegVal = Integer.parseInt(String.valueOf(snapshot.child("vegan").getValue()));
+                                                                vegVal += vegan;
+                                                                checkRestaurant.child("vegan").setValue(vegVal + "");
+                                                            } else
+                                                                checkRestaurant.child("vegan").setValue(vegan + "");
+                                                        } else {
+                                                            if (!(veg == 0))
+                                                                checkRestaurant.child("veg").setValue(veg + "");
+
+                                                            if (!(vegan == 0))
+                                                                checkRestaurant.child("vegan").setValue(vegan + "");
+
+                                                            if (!(nonVeg == 0))
+                                                                checkRestaurant.child("NonVeg").setValue(nonVeg + "");
+                                                        }
+                                                    }
+
+                                                    @Override
+                                                    public void onCancelled(@NonNull DatabaseError error) {
+
+                                                    }
+                                                });
+                                            } else {
+                                                DatabaseReference checkRestaurant = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("ResAnalysis").child(state).child(sharedPreferences.getString("locality", "")).child(auth.getUid());
+                                                checkRestaurant.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                    @Override
+                                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                                        if (snapshot.exists()) {
+                                                            if (snapshot.hasChild("veg")) {
+                                                                int vegVal = Integer.parseInt(String.valueOf(snapshot.child("veg").getValue()));
+                                                                vegVal += veg;
+                                                                checkRestaurant.child("veg").setValue(vegVal + "");
+                                                            } else
+                                                                checkRestaurant.child("veg").setValue(veg + "");
+
+                                                            if (snapshot.hasChild("NonVeg")) {
+                                                                int vegVal = Integer.parseInt(String.valueOf(snapshot.child("NonVeg").getValue()));
+                                                                vegVal += nonVeg;
+                                                                checkRestaurant.child("NonVeg").setValue(vegVal + "");
+                                                            } else
+                                                                checkRestaurant.child("NonVeg").setValue(nonVeg + "");
+
+                                                            if (snapshot.hasChild("vegan")) {
+                                                                int vegVal = Integer.parseInt(String.valueOf(snapshot.child("vegan").getValue()));
+                                                                vegVal += vegan;
+                                                                checkRestaurant.child("vegan").setValue(vegVal + "");
+                                                            } else
+                                                                checkRestaurant.child("vegan").setValue(vegan + "");
+                                                        } else {
+                                                            if (!(veg == 0))
+                                                                checkRestaurant.child("veg").setValue(veg + "");
+
+                                                            if (!(vegan == 0))
+                                                                checkRestaurant.child("vegan").setValue(vegan + "");
+
+                                                            if (!(nonVeg == 0))
+                                                                checkRestaurant.child("NonVeg").setValue(nonVeg + "");
+                                                        }
+                                                    }
+
+                                                    @Override
+                                                    public void onCancelled(@NonNull DatabaseError error) {
+
+                                                    }
+                                                });
+                                                if (!(veg == 0))
+                                                    databaseReferences.child("veg").setValue(veg + "");
+
+                                                if (!(vegan == 0))
+                                                    databaseReferences.child("vegan").setValue(vegan + "");
+
+                                                if (!(nonVeg == 0))
+                                                    databaseReferences.child("NonVeg").setValue(nonVeg + "");
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError error) {
+
+                                        }
+                                    });
+                                    new Handler().postDelayed(this::finish, 1000);
                                 }).setCancelText("No Wait")
                                 .setCancelClickListener(KAlertDialog::dismissWithAnimation).show();
                     } else {
@@ -1557,7 +1684,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
 //                                if (loginInfo.getString("payoutMethodChoosen", "").equals("imps")) {
 //                                    amountToBeSend = Double.parseDouble(orderAmount);
 //                                    amountToBeSend = amountToBeSend - 2;
-//                                    new MakePayout().execute();
+                                    new MakePaymentToVendor().execute();
 //                                }
                                     DatabaseReference updatePayoutOrder = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid());
                                     updatePayoutOrder.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -1866,10 +1993,9 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
         protected Void doInBackground(Void... voids) {
             Calendar calendar  = Calendar.getInstance();
             SharedPreferences checkPrem = getSharedPreferences("AdminPremiumDetails",MODE_PRIVATE);
-
             Log.i("statusTwo", String.valueOf(makePaymentToVendor.getStatus()));
             RequestQueue requestQueue = Volley.newRequestQueue(ApproveCurrentTakeAway.this);
-            StringRequest stringRequest = new StringRequest(Request.Method.POST, testPaymentToVendor, response -> {
+//            StringRequest stringRequest = new StringRequest(Request.Method.POST, testPaymentToVendor, response -> {
                 if(checkPrem.contains("status") && checkPrem.getString("status","").equals("active")) {
                     String month = monthName[calendar.get(Calendar.MONTH)];
                     if (storeForDishAnalysis.contains("DishAnalysisMonthBasis")) {
@@ -1968,12 +2094,12 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                         dishAnalysis.putString("DishAnalysisMonthBasis", gson.toJson(map));
                     }
                     dishAnalysis.apply();
-                    Log.i("response", response);
+//                    Log.i("response", response);
                     SharedPreferences lastMonthReport = getSharedPreferences("lastMonthlyReport",MODE_PRIVATE);
                     SharedPreferences.Editor editorMonthly = lastMonthReport.edit();
                     SharedPreferences last7daysReport = getSharedPreferences("last7daysReport",MODE_PRIVATE);
                     SharedPreferences.Editor last7daysReportEdit = last7daysReport.edit();
-                    new Thread(() -> {
+//                    new Thread(() -> {
                         if(last7daysReport.contains("currentMonth") && last7daysReport.getString("currentMonth","").equals(month)){
                             int day = calendar.get(Calendar.DAY_OF_MONTH);
                             if(last7daysReport.contains("daysTracked")){
@@ -2006,7 +2132,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                             editorMonthly.putString("currentMonth",month);
                             editorMonthly.apply();
                         }
-                    }).start();
+//                    }).start();
 
                     if(dailyUserTrackingFor7days.contains(month)){
                         try {
@@ -2068,7 +2194,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                         user7daysEdit.apply();
                     }
 
-                    new Thread(() -> {
+//                    new Thread(() -> {
                         if(userFrequency.contains(month)){
                             try {
                                 java.lang.reflect.Type type = new TypeToken<HashMap<String, String>>() {
@@ -2111,7 +2237,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                         }
                         userFedit.putString(month,json);
                         userFedit.apply();
-                    }).start();
+//                    }).start();
 
                     if(trackingOfTakeAway.contains(month)){
                         try {
@@ -2166,7 +2292,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                             List<String> orderAmountList = new ArrayList<>(mainDataList.get(3));
 
                             date.add(time);
-                            transID.add(transactionIdForExcel);
+                            transID.add("Online");
                             userID.add(id);
                             orderAmountList.add(orderAmount + "");
 
@@ -2192,7 +2318,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                             List<String> orderAmountList = new ArrayList<>(mainDataList.get(3));
 
                             date.add(time);
-                            transID.add(transactionIdForExcel);
+                            transID.add("Online");
                             userID.add(id);
                             orderAmountList.add(orderAmount + "");
 
@@ -2288,7 +2414,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                         List<String> orderAmountList = new ArrayList<>();
 
                         date.add(time);
-                        transID.add(transactionIdForExcel);
+                        transID.add("Online");
                         userID.add(id);
                         orderAmountList.add(orderAmount + "");
                         mainDataList.add(date);
@@ -2317,7 +2443,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                         json = gson.toJson(mainList);
                         storeDailyEditor.putString(month, json);
                         storeDailyEditor.apply();
-                        Log.i("myInfo", mainDataList.toString() + " " + mainList.toString());
+                        Log.i("myInfo", mainDataList + " " + mainList);
                     }
 
                     if(dailyAverageOrder.contains(month)){
@@ -2417,7 +2543,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                         cell = row.createCell(0);
                         cell.setCellValue(dateFormat.format(date));
                         cell = row.createCell(1);
-                        cell.setCellValue(transactionIdForExcel);
+                        cell.setCellValue("Online");
                         cell = row.createCell(2);
                         cell.setCellValue("Online");
                         cell = row.createCell(3);
@@ -2434,28 +2560,29 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                     }
                 }
                 Log.i("statusOne", String.valueOf(makePaymentToVendor.getStatus()));
-            }, error -> {
-
-            }){
-                @NonNull
-                @Override
-                protected Map<String, String> getParams() {
-                    Map<String,String> params = new HashMap<>();
-                    params.put("benID","BKkZjAAB9fQmleexouAb2zSRtQm2");
-                    String genratedID = "ORDER_" + System.currentTimeMillis() + "_" + ApproveCurrentTakeAway.RandomString
-                            .getAlphaNumericString(5);
-
-                    transactionIdForExcel = genratedID;
-                    params.put("transID",genratedID);
-                    params.put("token",genratedToken);
-                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid())).child("Transactions");
-                    PaymentClass paymentClass = new PaymentClass(genratedID,auth.getUid() + "");
-                    databaseReference.child(time).setValue(paymentClass);
-                    params.put("amount", "1");
-                    return params;
-                }
-            };
-            requestQueue.add(stringRequest);
+//            }, error -> {
+//
+//            });
+//            {
+//                @NonNull
+//                @Override
+//                protected Map<String, String> getParams() {
+//                    Map<String,String> params = new HashMap<>();
+//                    params.put("benID","BKkZjAAB9fQmleexouAb2zSRtQm2");
+//                    String genratedID = "ORDER_" + System.currentTimeMillis() + "_" + ApproveCurrentTakeAway.RandomString
+//                            .getAlphaNumericString(5);
+//
+//                    transactionIdForExcel = genratedID;
+//                    params.put("transID",genratedID);
+//                    params.put("token",genratedToken);
+//                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid())).child("Transactions");
+//                    PaymentClass paymentClass = new PaymentClass(genratedID,auth.getUid() + "");
+//                    databaseReference.child(time).setValue(paymentClass);
+//                    params.put("amount", "1");
+//                    return params;
+//                }
+//            };
+//            requestQueue.add(stringRequest);
             return null;
         }
     }

@@ -142,7 +142,7 @@ public class InitiatePayoutForAdminNEFT extends AppCompatActivity {
                                 return;
                             }
                             AlertDialog.Builder builder = new AlertDialog.Builder(InitiatePayoutForAdminNEFT.this);
-                            builder.setTitle("Choose one option").setMessage("Choose one payout option\nGet payout after 4 to 5 hours (NEFT \u20b93 charge) \nGet Instant Payout (IMPS \u20b97 charge)")
+                            builder.setTitle("Choose one option").setMessage("Choose one payout option\nGet payout after 2 to 4 hours (NEFT \u20b93 charge) \nGet Instant Payout (IMPS \u20b97 charge)")
                                     .setPositiveButton("Choose NEFT", (dialog, which) -> {
                                         new MakePayout().execute();
                                         fastDialog.show();
@@ -151,12 +151,7 @@ public class InitiatePayoutForAdminNEFT extends AppCompatActivity {
                                         new MakePayoutIMPS().execute();
                                         fastDialog.show();
                                         dialog.dismiss();
-                                    }).setNeutralButton("Exit", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            dialog.dismiss();
-                                        }
-                                    }).create().show();
+                                    }).setNeutralButton("Exit", (dialog, which) -> dialog.dismiss()).create().show();
                         }
                     }).setNegativeButton("Wait", (dialogInterface, i) -> {
 
