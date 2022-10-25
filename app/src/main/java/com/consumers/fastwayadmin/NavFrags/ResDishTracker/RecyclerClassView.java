@@ -12,7 +12,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -36,11 +35,13 @@ public class RecyclerClassView extends RecyclerView.Adapter<RecyclerClassView.ho
     List<String> dishNames;
     List<Integer> dishTotalCount;
     Context context;
+    String month;
 
 
-    public RecyclerClassView(List<String> dishNames, List<Integer> dishTotalCount,Context context) {
+    public RecyclerClassView(List<String> dishNames, List<Integer> dishTotalCount,Context context,String month) {
         this.dishNames = dishNames;
         this.context = context;
+        this.month = month;
         this.dishTotalCount = dishTotalCount;
     }
 
@@ -73,6 +74,17 @@ public class RecyclerClassView extends RecyclerView.Adapter<RecyclerClassView.ho
         }else{
             holder.progressBar.setVisibility(View.INVISIBLE);
             Picasso.get().load("https://image.shutterstock.com/image-vector/no-image-vector-isolated-on-600w-1481369594.jpg").into(holder.imageView);
+        }
+
+        if(dishShared.contains(month)) {
+            java.lang.reflect.Type type1 = new TypeToken<HashMap<String,HashMap<String, Integer>>>() {
+            }.getType();
+            Gson gson = new Gson();
+            HashMap<String, HashMap<String,Integer>> myMap = gson.fromJson(dishShared.getString(month, ""), type1);
+
+            if(myMap.containsKey(dishNames.get(position))) {
+                holder.clickToShow.setVisibility(View.VISIBLE);
+            }
         }
 
 //        if(dishShared.contains(dishNames.get(position))) {
@@ -116,6 +128,49 @@ public class RecyclerClassView extends RecyclerView.Adapter<RecyclerClassView.ho
 //                builder.setPositiveButton("exit", (dialogInterface, i) -> dialogInterface.dismiss()).create().show();
 //            }
 //        });
+
+        holder.cardView.setOnClickListener(click -> {
+            if(dishShared.contains(month)) {
+                java.lang.reflect.Type type1 = new TypeToken<HashMap<String,HashMap<String, Integer>>>() {
+                }.getType();
+                Gson gson = new Gson();
+                HashMap<String, HashMap<String,Integer>> myMap = gson.fromJson(dishShared.getString(month, ""), type1);
+                List<String> dishNamesList = new ArrayList<>();
+                List<String> dishQuanList = new ArrayList<>();
+
+                if(myMap.containsKey(dishNames.get(position))) {
+                    HashMap<String, Integer> innerMap = new HashMap<>(myMap.get(dishNames.get(position)));
+
+
+                    for (Map.Entry<String, Integer> map : innerMap.entrySet()) {
+                        if (!map.getKey().equals(dishNames.get(position))) {
+                            dishNamesList.add(map.getKey());
+                            dishQuanList.add(String.valueOf(map.getValue()));
+                        }
+                    }
+
+                    LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                    View view = inflater.inflate(R.layout.res_info_dialog_layout, null);
+                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                    builder.setTitle("Detailed Info").setMessage("Showing dish ordered with this together ( " + dishNames.get(position) + " )");
+
+
+                    ListView listView = view.findViewById(R.id.listDishNamesResInfo);
+
+                    ListView listView1 = view.findViewById(R.id.listDishNamesQuantityInfo);
+
+                    ArrayAdapter<String> adapter = new ArrayAdapter<>(context, android.R.layout.simple_list_item_1, dishNamesList);
+                    ArrayAdapter<String> adapter1 = new ArrayAdapter<>(context, android.R.layout.simple_list_item_1, dishQuanList);
+
+                    listView1.setAdapter(adapter1);
+                    listView.setAdapter(adapter);
+
+                    builder.setView(view);
+//                builder.setItems(array, (dialogInterface, i) -> Log.i("list",array.toString()));
+                    builder.setPositiveButton("exit", (dialogInterface, i) -> dialogInterface.dismiss()).create().show();
+                }
+            }
+        });
 
 
         holder.dishName.setText(dishNames.get(position));

@@ -222,6 +222,9 @@ public class HomeFrag extends Fragment {
         restaurantTrackRecordsEditor = restaurantTrackRecords.edit();
         restaurantTrackEditor = restaurantDailyTrack.edit();
          dailyRestaurantTrackUpdate();
+//         SharedPreferences clearJust = requireContext().getSharedPreferences("DishOrderedWithOthers",Context.MODE_PRIVATE);
+//         SharedPreferences.Editor editorClear = clearJust.edit();
+//         editorClear.clear().apply();
          currentTablesText = view.findViewById(R.id.currentTablesTextViewHomeFragAdmin);
         SharedPreferences stopServices = requireActivity().getSharedPreferences("Stop Services",Context.MODE_PRIVATE);
          editor = stopServices.edit();

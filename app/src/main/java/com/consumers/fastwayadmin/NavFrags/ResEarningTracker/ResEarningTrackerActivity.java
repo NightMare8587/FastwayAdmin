@@ -402,7 +402,7 @@ public class ResEarningTrackerActivity extends AppCompatActivity{
                     startActivity(intent1);
                 });
                 dishRecyclerView.setLayoutManager(new LinearLayoutManager(ResEarningTrackerActivity.this));
-                dishRecyclerView.setAdapter(new RecyclerClassView(keysName,valuesName,ResEarningTrackerActivity.this));
+                dishRecyclerView.setAdapter(new RecyclerClassView(keysName,valuesName,ResEarningTrackerActivity.this,month));
             }else {
                 seeMoreDetails.setVisibility(View.INVISIBLE);
                 dishRecyclerView.setVisibility(View.INVISIBLE);
@@ -693,7 +693,7 @@ public class ResEarningTrackerActivity extends AppCompatActivity{
                         startActivity(intent1);
                     });
                     dishRecyclerView.setLayoutManager(new LinearLayoutManager(ResEarningTrackerActivity.this));
-                    dishRecyclerView.setAdapter(new RecyclerClassView(keysName,valuesName,ResEarningTrackerActivity.this));
+                    dishRecyclerView.setAdapter(new RecyclerClassView(keysName,valuesName,ResEarningTrackerActivity.this,MonthName));
                 }else {
                     seeMoreDetails.setVisibility(View.INVISIBLE);
                     dishRecyclerView.setVisibility(View.INVISIBLE);
