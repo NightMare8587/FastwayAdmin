@@ -226,7 +226,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
 
         String[] orderPaymentArr = str.split(",");
         amountPaidByUser = orderPaymentArr[2];
-        Toast.makeText(this, "" + amountPaidByUser, Toast.LENGTH_SHORT).show();
+//        Toast.makeText(this, "" + amountPaidByUser, Toast.LENGTH_SHORT).show();
         Log.i("name",dishName.toString());
         decline = findViewById(R.id.declineTakeAwayButton);
         listView = findViewById(R.id.quantityTakeAwayListView);
