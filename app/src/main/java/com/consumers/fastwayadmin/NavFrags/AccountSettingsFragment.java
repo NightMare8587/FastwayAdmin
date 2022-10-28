@@ -51,7 +51,7 @@ public class AccountSettingsFragment extends PreferenceFragmentCompat {
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         setPreferencesFromResource(R.xml.root_preferences, rootKey);
 
-        databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid());
+        databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -93,7 +93,7 @@ public class AccountSettingsFragment extends PreferenceFragmentCompat {
                     .setPositiveButton("Open Weekly", (dialogInterface, i) -> {
 
                         Intent intent = new Intent(Intent.ACTION_VIEW);
-                        File file12 = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS) + "/invoicexd.pdf");
+                        File file12 = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS) + "/WeeklyReportTracker.pdf");
                         if(file12.exists()) {
                             Toast.makeText(requireContext(), "Opening....", Toast.LENGTH_SHORT).show();
                             intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
@@ -104,7 +104,7 @@ public class AccountSettingsFragment extends PreferenceFragmentCompat {
                     }).setNegativeButton("Open Monthly", (dialogInterface, i) -> {
                         Toast.makeText(requireContext(), "Opening....", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(Intent.ACTION_VIEW);
-                        File file12 = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS) + "/invoicexdMonthly.pdf");
+                        File file12 = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS) + "/MonthlyReportTracker.pdf");
                         if(file12.exists()) {
                             Toast.makeText(requireContext(), "Opening....", Toast.LENGTH_SHORT).show();
                             intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
