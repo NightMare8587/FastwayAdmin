@@ -102,6 +102,7 @@ public class FirebaseNotification extends FirebaseMessagingService {
                 .setOnlyAlertOnce(true)
                 .setContentIntent(pendingIntent);
 
+
         // A customized design for the notification can be
         // set only for Android versions 4.1 and above. Thus
         // condition for the same is checked here.
@@ -123,6 +124,7 @@ public class FirebaseNotification extends FirebaseMessagingService {
             notificationManager.createNotificationChannel(
                     notificationChannel);
         }
+        
 
         notificationManager.notify(0, builder.build());
     }
