@@ -2944,13 +2944,15 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                             String storedHash = dish.getString("DishAnalysisMonthBasis", "");
                             HashMap<String, HashMap<String, Integer>> myMap = gson.fromJson(storedHash, types);
 
-                            HashMap<String,Integer> dishmap = new HashMap<>(Objects.requireNonNull(myMap.get(month)));
+                            if(myMap.containsKey(month)) {
+                                HashMap<String, Integer> dishmap = new HashMap<>(Objects.requireNonNull(myMap.get(month)));
 
 
-                            Log.i("Dishinfo",dishmap.toString());
+                                Log.i("Dishinfo", dishmap.toString());
 
-                            HashMap<String,Integer> map1 = sortByValue(dishmap);
-                            storeForFoodineAnalysis.child("DishInfo").setValue(map1);
+                                HashMap<String, Integer> map1 = sortByValue(dishmap);
+                                storeForFoodineAnalysis.child("DishInfo").setValue(map1);
+                            }
                         }
                     }else{
                         HashMap<String, String> map = new HashMap<>();
@@ -2996,13 +2998,15 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                             String storedHash = dish.getString("DishAnalysisMonthBasis", "");
                             HashMap<String, HashMap<String, Integer>> myMap = gson.fromJson(storedHash, types);
 
-                            HashMap<String,Integer> dishmap = new HashMap<>(Objects.requireNonNull(myMap.get(month)));
+                            if(myMap.containsKey(month)) {
+                                HashMap<String, Integer> dishmap = new HashMap<>(Objects.requireNonNull(myMap.get(month)));
 
 
-                            Log.i("Dishinfo",dishmap.toString());
+                                Log.i("Dishinfo", dishmap.toString());
 
-                            HashMap<String,Integer> map1 = sortByValue(dishmap);
-                            storeForFoodineAnalysis.child("DishInfo").setValue(map1);
+                                HashMap<String, Integer> map1 = sortByValue(dishmap);
+                                storeForFoodineAnalysis.child("DishInfo").setValue(map1);
+                            }
                         }
 
                     }

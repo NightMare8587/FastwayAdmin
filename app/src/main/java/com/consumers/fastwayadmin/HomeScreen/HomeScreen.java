@@ -178,17 +178,8 @@ public class HomeScreen extends AppCompatActivity {
                         AlertDialog.Builder builder = new AlertDialog.Builder(HomeScreen.this);
                         builder.setCancelable(false);
                         builder.setTitle("Trial Finished").setMessage("Your current free trial is finished\nSubscribe premium")
-                                .setPositiveButton("Subscribe", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        startActivity(new Intent(HomeScreen.this, FastwayPremiums.class));
-                                    }
-                                }).setNegativeButton("No", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        dialog.dismiss();
-                                    }
-                                }).create();
+                                .setPositiveButton("Subscribe", (dialog, which) -> startActivity(new Intent(HomeScreen.this, FastwayPremiums.class)))
+                                .setNegativeButton("No", (dialog, which) -> dialog.dismiss()).create();
                         builder.show();
                     }else{
                         SharedPreferences adminPrem = getSharedPreferences("AdminPremiumDetails",MODE_PRIVATE);
@@ -215,17 +206,11 @@ public class HomeScreen extends AppCompatActivity {
                                     premEditor.apply();
                                     AlertDialog.Builder builder = new AlertDialog.Builder(HomeScreen.this);
                                     builder.setTitle("ReSubscribe").setMessage("Your Subscription Period is over. ReSubscribe Now")
-                                            .setPositiveButton("ReSubscribe", new DialogInterface.OnClickListener() {
-                                                @Override
-                                                public void onClick(DialogInterface dialog, int which) {
-                                                    dialog.dismiss();
-                                                    startActivity(new Intent(HomeScreen.this,FastwayPremiums.class));
-                                                }
-                                            }).setNegativeButton("Later", new DialogInterface.OnClickListener() {
-                                                @Override
-                                                public void onClick(DialogInterface dialog, int which) {
+                                            .setPositiveButton("ReSubscribe", (dialog, which) -> {
+                                                dialog.dismiss();
+                                                startActivity(new Intent(HomeScreen.this,FastwayPremiums.class));
+                                            }).setNegativeButton("Later", (dialog, which) -> {
 
-                                                }
                                             }).create();
                                     builder.show();
                                 }else{
@@ -355,7 +340,7 @@ public class HomeScreen extends AppCompatActivity {
             }
 
             pdfDocument.close();
-        }).start();
+        });
         SharedPreferences user7daysTracker = getSharedPreferences("DailyUserTrackingFor7days",MODE_PRIVATE);
         new Thread(() -> {
             String month = monthName[calendar.get(Calendar.MONTH)];
@@ -485,16 +470,16 @@ public class HomeScreen extends AppCompatActivity {
 
                                             double data2 = ((totalOrders - ordersMadeTotal) / ordersMadeTotal) * 100;
                                             if (totalOrders > ordersMadeTotal) {
-                                                canvas.drawText("Total Orders: ↑ Increase By" + new DecimalFormat("0.00").format(data2) + "%", 100, 1235, text);
+                                                canvas.drawText("Total Orders: ↑ Increase By " + new DecimalFormat("0.00").format(data2) + "%", 100, 1235, text);
                                             } else {
-                                                canvas.drawText("Total Orders: ↓ Decrease By" + new DecimalFormat("0.00").format(data2) + "%", 100, 1235, text);
+                                                canvas.drawText("Total Orders: ↓ Decrease By " + new DecimalFormat("0.00").format(data2) + "%", 100, 1235, text);
                                             }
 
                                             double data3 =  ((totalCust - totalCustomersTotal) / totalCustomersTotal) * 100;
                                             if (totalCust > totalCustomersTotal) {
-                                                canvas.drawText("Total Customers: ↑ Increase By" + new DecimalFormat("0.00").format(data3) + "%", 100, 1310, text);
+                                                canvas.drawText("Total Customers: ↑ Increase By " + new DecimalFormat("0.00").format(data3) + "%", 100, 1310, text);
                                             } else
-                                                canvas.drawText("Total Customers: ↓ Decrease By" + new DecimalFormat("0.00").format(data3) + "%", 100, 1310, text);
+                                                canvas.drawText("Total Customers: ↓ Decrease By " + new DecimalFormat("0.00").format(data3) + "%", 100, 1310, text);
 
                                         }
 
@@ -561,7 +546,7 @@ public class HomeScreen extends AppCompatActivity {
                         List<List<String>> mainDataList = gson.fromJson(json, type);
                         Type types = new TypeToken<HashMap<String, HashMap<String, Integer>>>() {
                         }.getType();
-                        HashMap<String, HashMap<String, Integer>> mainMap = gson.fromJson(user7daysTracker.getString(month, ""), types);
+                        HashMap<String, HashMap<String, Integer>> mainMap = gson.fromJson(user7daysTracker.getString(prevMonth, ""), types);
                         if (!mainDataList.isEmpty()) {
                             List<String> date = new ArrayList<>(mainDataList.get(0));
                             List<String> totalORders = new ArrayList<>(mainDataList.get(2));
@@ -631,7 +616,7 @@ public class HomeScreen extends AppCompatActivity {
                                         canvas.drawText("Highest Sales", 100, 525, text);
                                         text.setTextSize(50);
                                         text.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.NORMAL));
-                                        canvas.drawText("Date: " + dateName + " th" + month, 100, 595, text);
+                                        canvas.drawText("Date: " + dateName, 100, 595, text);
                                         canvas.drawText("Total Orders: " + highestOrderAtDay, 100, 670, text);
                                         canvas.drawText("Total Amount: \u20b9" + highestSalesDay, 100, 745, text);
 
@@ -666,16 +651,16 @@ public class HomeScreen extends AppCompatActivity {
 
                                             double data2 =  ((totalOrders - ordersMadeTotal) / ordersMadeTotal) * 100;
                                             if (totalOrders > ordersMadeTotal) {
-                                                canvas.drawText("Total Orders: ↑ Increase By" + new DecimalFormat("0.00").format(data2) + "%", 100, 1235, text);
+                                                canvas.drawText("Total Orders: ↑ Increase By " + new DecimalFormat("0.00").format(data2) + "%", 100, 1235, text);
                                             } else {
-                                                canvas.drawText("Total Orders: ↓ Decrease By" + new DecimalFormat("0.00").format(data2) + "%", 100, 1235, text);
+                                                canvas.drawText("Total Orders: ↓ Decrease By " + new DecimalFormat("0.00").format(data2) + "%", 100, 1235, text);
                                             }
 
                                             double data3 =  ((totalCust - totalCustomersTotal) / totalCustomersTotal) * 100;
                                             if (totalCust > totalCustomersTotal) {
-                                                canvas.drawText("Total Customers: ↑ Increase By" + new DecimalFormat("0.00").format(data3) + "%", 100, 1310, text);
+                                                canvas.drawText("Total Customers: ↑ Increase By " + new DecimalFormat("0.00").format(data3) + "%", 100, 1310, text);
                                             } else
-                                                canvas.drawText("Total Customers: ↓ Decrease By" + new DecimalFormat("0.00").format(data3) + "%", 100, 1310, text);
+                                                canvas.drawText("Total Customers: ↓ Decrease By " + new DecimalFormat("0.00").format(data3) + "%", 100, 1310, text);
 
                                         }
 
@@ -813,7 +798,7 @@ public class HomeScreen extends AppCompatActivity {
                                     canvas.drawText("Highest Sales", 100, 525, text);
                                     text.setTextSize(50);
                                     text.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.NORMAL));
-                                    canvas.drawText("Date: " + dateName + " th" + month, 100, 595, text);
+                                    canvas.drawText("Date: " + dateName, 100, 595, text);
                                     canvas.drawText("Total Orders: " + highestOrderAtDay, 100, 670, text);
                                     canvas.drawText("Total Amount: \u20b9" + highestSalesDay, 100, 745, text);
 
@@ -848,16 +833,16 @@ public class HomeScreen extends AppCompatActivity {
 
                                         double data2 =  ((totalOrders - ordersMadeTotal) / ordersMadeTotal) * 100;
                                         if (totalOrders > ordersMadeTotal) {
-                                            canvas.drawText("Total Orders: ↑ Increase By" + new DecimalFormat("0.00").format(data2) + "%", 100, 1235, text);
+                                            canvas.drawText("Total Orders: ↑ Increase By " + new DecimalFormat("0.00").format(data2) + "%", 100, 1235, text);
                                         } else {
-                                            canvas.drawText("Total Orders: ↓ Decrease By" + new DecimalFormat("0.00").format(data2) + "%", 100, 1235, text);
+                                            canvas.drawText("Total Orders: ↓ Decrease By " + new DecimalFormat("0.00").format(data2) + "%", 100, 1235, text);
                                         }
 
                                         double data3 =  ((totalCust - totalCustomersTotal) / totalCustomersTotal) * 100;
                                         if (totalCust > totalCustomersTotal) {
-                                            canvas.drawText("Total Customers: ↑ Increase By" + new DecimalFormat("0.00").format(data3) + "%", 100, 1310, text);
+                                            canvas.drawText("Total Customers: ↑ Increase By " + new DecimalFormat("0.00").format(data3) + "%", 100, 1310, text);
                                         } else
-                                            canvas.drawText("Total Customers: ↓ Decrease By" + new DecimalFormat("0.00").format(data3) + "%", 100, 1310, text);
+                                            canvas.drawText("Total Customers: ↓ Decrease By " + new DecimalFormat("0.00").format(data3) + "%", 100, 1310, text);
 
                                     }
 
@@ -880,6 +865,7 @@ public class HomeScreen extends AppCompatActivity {
                                     prevAnalysisInfo.put("totalOrders", totalOrders + "");
                                     prevAnalysisInfo.put("totalCustomers", totalCust + "");
                                     editorMonthly.putString("lastAnalysisHashMap", gson.toJson(prevAnalysisInfo));
+                                    editorMonthly.putString("prevMonthNameReport",prevMonth);
                                     editorMonthly.apply();
 
 
