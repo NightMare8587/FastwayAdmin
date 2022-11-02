@@ -77,10 +77,19 @@ public class FirebaseNotification extends FirebaseMessagingService {
         // Pass the intent to PendingIntent to start the
         // next Activity
         PendingIntent pendingIntent;
-        pendingIntent
-               = PendingIntent.getActivity(
-               this, 0, intent,
-               PendingIntent.FLAG_IMMUTABLE);
+        if (Build.VERSION.SDK_INT
+                >= Build.VERSION_CODES.S) {
+            pendingIntent
+                    = PendingIntent.getActivity(
+                    this, 0, intent,
+                    PendingIntent.FLAG_MUTABLE);
+        }else{
+            pendingIntent
+                    = PendingIntent.getActivity(
+                    this, 0, intent,
+                    PendingIntent.FLAG_IMMUTABLE);
+        }
+
 
         SharedPreferences preferences = this.getSharedPreferences("value",MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
