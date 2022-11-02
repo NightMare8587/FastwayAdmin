@@ -648,6 +648,48 @@ public class ResEarningTrackerActivity extends AppCompatActivity{
                 Recuuring.setText("0");
             }
 
+            {
+                double ResTakeAway = 0;
+                double ResDineVal = 0;
+                SharedPreferences sharedPreferences = getSharedPreferences("AdminPremiumDetails", MODE_PRIVATE);
+                if (sharedPreferences.contains("status") && sharedPreferences.getString("status", "").equals("active")) {
+                    ResDineAndWayy.setVisibility(View.VISIBLE);
+                    SharedPreferences trackingTakeAway = getSharedPreferences("TrackingOfTakeAway", MODE_PRIVATE);
+                    SharedPreferences trackingFoodDining = getSharedPreferences("TrackingOfFoodDining", MODE_PRIVATE);
+                    if (trackingTakeAway.contains(MonthName)) {
+                        java.lang.reflect.Type type = new TypeToken<HashMap<String, String>>() {
+                        }.getType();
+                        gson = new Gson();
+                        json = trackingTakeAway.getString(MonthName, "");
+                        HashMap<String, String> map = gson.fromJson(json, type);
+
+                        for (String i : map.keySet()) {
+                            double val = Double.parseDouble(Objects.requireNonNull(map.get(i)));
+                            ResTakeAway += val;
+                        }
+                    }
+
+                    if (trackingFoodDining.contains(MonthName)) {
+                        java.lang.reflect.Type type = new TypeToken<HashMap<String, String>>() {
+                        }.getType();
+                        gson = new Gson();
+                        json = trackingFoodDining.getString(MonthName, "");
+                        HashMap<String, String> map = gson.fromJson(json, type);
+
+                        for (String i : map.keySet()) {
+                            double val = Double.parseDouble(Objects.requireNonNull(map.get(i)));
+                            ResDineVal += val;
+                        }
+                    }
+
+                    totalResDineWayOverAll = ResDineVal + ResTakeAway;
+                    if (totalResDineWayOverAll != 0) {
+                        ResDine.setText("Dining: " + new DecimalFormat("0.00").format(ResDineVal * 100 / totalResDineWayOverAll) + "%");
+                        ResTake.setText("TakeAway: " + new DecimalFormat("0.00").format(ResTakeAway * 100 / totalResDineWayOverAll) + "%");
+                    }
+                }
+            }
+
             if(dish.contains("DishAnalysisMonthBasis")){
                 gson = new Gson();
                 java.lang.reflect.Type types = new TypeToken<HashMap<String, HashMap<String,Integer>>>(){}.getType();
