@@ -271,18 +271,19 @@ public class AccountSettingsFragment extends PreferenceFragmentCompat {
         });
 
         myTrans.setOnPreferenceClickListener(preference -> {
-            AlertDialog.Builder alert = new AlertDialog.Builder(requireContext());
-            alert.setTitle("Choose");
-            alert.setMessage("Choose one option from below");
-            alert.setPositiveButton("Show Online Transactions", (dialogInterface, i12) -> {
-                dialogInterface.dismiss();
-                startActivity(new Intent(getActivity(), MyOrdersTransactions.class));
-            }).setNegativeButton("Show Cash Transactions", (dialogInterface, i13) -> {
-                dialogInterface.dismiss();
-                startActivity(new Intent(getActivity(), CashTransactions.class));
-            }).setNeutralButton("Cancel", (dialogInterface, i14) -> dialogInterface.dismiss()).create();
-
-            alert.show();
+            startActivity(new Intent(getActivity(), CashTransactions.class));
+//            AlertDialog.Builder alert = new AlertDialog.Builder(requireContext());
+//            alert.setTitle("Choose");
+//            alert.setMessage("Choose one option from below");
+//            alert.setPositiveButton("Show Online Transactions", (dialogInterface, i12) -> {
+//                dialogInterface.dismiss();
+//                startActivity(new Intent(getActivity(), MyOrdersTransactions.class));
+//            }).setNegativeButton("Show Cash Transactions", (dialogInterface, i13) -> {
+//                dialogInterface.dismiss();
+//                startActivity(new Intent(getActivity(), CashTransactions.class));
+//            }).setNeutralButton("Cancel", (dialogInterface, i14) -> dialogInterface.dismiss()).create();
+//
+//            alert.show();
             return true;
         });
 

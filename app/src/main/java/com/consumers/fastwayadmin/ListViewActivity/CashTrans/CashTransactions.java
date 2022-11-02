@@ -35,7 +35,7 @@ public class CashTransactions extends AppCompatActivity {
         recyclerView = findViewById(R.id.cashTransactionRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid())).child("Cash Transactions");
-        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+        reference.limitToLast(20).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(!snapshot.exists()){
