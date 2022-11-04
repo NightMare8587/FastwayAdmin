@@ -2240,6 +2240,24 @@ public class ApproveCurrentOrder extends AppCompatActivity {
 
             Calendar calendar = Calendar.getInstance();
             String month = monthName[calendar.get(Calendar.MONTH)];
+            String yearCurrent = calendar.get(Calendar.YEAR) + "";
+            DatabaseReference trackAmountForGST = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("AmountTrackingDB").child(state).child(yearCurrent).child(month);
+            trackAmountForGST.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if(snapshot.hasChild("amountEarned")){
+                        double prev = Double.parseDouble(snapshot.child("amountEarned").getValue(String.class));
+                        prev += Double.parseDouble(orderAmount);
+                        trackAmountForGST.child("amountEarned").setValue(prev + "");
+                    }else
+                        trackAmountForGST.child("amountEarned").setValue(orderAmount + "");
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
             SharedPreferences dish = getSharedPreferences("DishAnalysis",Context.MODE_PRIVATE);
 
             if(dish.contains("DishAnalysisMonthBasis")){

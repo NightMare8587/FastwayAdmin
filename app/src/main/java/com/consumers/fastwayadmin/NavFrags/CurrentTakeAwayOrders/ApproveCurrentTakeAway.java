@@ -364,9 +364,10 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
 
         approve.setOnClickListener(view -> {
             try {
-                new hugeBackgroundWork().execute();
+
                 approve.setEnabled(false);
                 if (paymentMode.equals("cash")) {
+
                     Log.i("infose", veg + " " + nonVeg + " " + vegan);
                     SharedPreferences checkPrem = getSharedPreferences("AdminPremiumDetails", MODE_PRIVATE);
                     if (checkPrem.contains("status") && checkPrem.getString("status", "").equals("active")) {
@@ -380,6 +381,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                                 .setConfirmText("Confirm Order")
                                 .setConfirmClickListener(kAlertDialog -> {
                                     kAlertDialog.dismissWithAnimation();
+                                    new hugeBackgroundWork().execute();
                                     new Thread(() -> {
 //                                        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("ResAnalysis").child(state).child(sharedPreferences.getString("locality", ""));
 //                                        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -1502,6 +1504,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                             Toast.makeText(ApproveCurrentTakeAway.this, "Field can't be empty", Toast.LENGTH_SHORT).show();
                             fastDialog.dismiss();
                         } else if (fastDialog.getInputText().equals(digitCode.trim())) {
+                            new hugeBackgroundWork().execute();
 
                             if (restaurantDailyTrack.contains("totalOrdersToday")) {
                                 int val = Integer.parseInt(restaurantDailyTrack.getString("totalOrdersToday", ""));
@@ -2808,6 +2811,9 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
 
         @Override
         protected Void doInBackground(Void... voids) {
+
+
+
             String[] monthName = {"January", "February",
                     "March", "April", "May", "June", "July",
                     "August", "September", "October", "November",
@@ -2815,6 +2821,24 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
 
             Calendar calendar = Calendar.getInstance();
             String month = monthName[calendar.get(Calendar.MONTH)];
+            String yearCurrent = calendar.get(Calendar.YEAR) + "";
+            DatabaseReference trackAmountForGST = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("AmountTrackingDB").child(state).child(yearCurrent).child(month);
+            trackAmountForGST.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if(snapshot.hasChild("amountEarned")){
+                        double prev = Double.parseDouble(snapshot.child("amountEarned").getValue(String.class));
+                        prev += Double.parseDouble(orderAmount);
+                        trackAmountForGST.child("amountEarned").setValue(prev + "");
+                    }else
+                        trackAmountForGST.child("amountEarned").setValue(orderAmount + "");
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
             SharedPreferences dish = getSharedPreferences("DishAnalysis",Context.MODE_PRIVATE);
 
             if(dish.contains("DishAnalysisMonthBasis")){
