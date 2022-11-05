@@ -344,6 +344,160 @@ public class HomeScreen extends AppCompatActivity {
 
             pdfDocument.close();
         });
+
+        new Thread(() -> {
+            SharedPreferences dailyInsights = getSharedPreferences("DailyInsightsStoringData",MODE_PRIVATE);
+            SharedPreferences.Editor editor = dailyInsights.edit();
+            String month = monthName[calendar.get(Calendar.MONTH)];
+            int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+
+
+            if(dailyInsights.contains(month)){
+//                runOnUiThread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        Toast.makeText(HomeScreen.this, "First", Toast.LENGTH_SHORT).show();
+//                    }
+//                });
+                gson = new Gson();
+                Type type = new TypeToken<HashMap<String, HashMap<String, String>>>() {
+                }.getType();
+                HashMap<String,HashMap<String,String>> mainMap = gson.fromJson(dailyInsights.getString(month,""),type);
+
+                if(day != 1 ){
+
+                    day--;
+
+                    if(dailyInsights.contains("lastDay") && dailyInsights.getString("lastDay","").equals(day + ""))
+                        return;
+                    if(mainMap.containsKey(day + "")){
+
+
+//                        runOnUiThread(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                Toast.makeText(HomeScreen.this, "Second", Toast.LENGTH_SHORT).show();
+//                            }
+//                        });
+                        Type typeo = new TypeToken<List<String>>() {
+                        }.getType();
+                        HashMap<String,String> innerMap = new HashMap<>(mainMap.get(day + ""));
+
+                        List<String> orderList = new ArrayList<>(gson.fromJson(innerMap.get("orderList"),typeo));
+                        List<String> custList = new ArrayList<>(gson.fromJson(innerMap.get("custList"),typeo));
+                        String revenueTotal = innerMap.get("revenueTotal");
+
+
+
+
+
+                        PdfDocument pdfDocument = new PdfDocument();
+                        Paint myPaint = new Paint();
+                        PdfDocument.PageInfo myPage = new PdfDocument.PageInfo.Builder(2080, 2040, 1).create();
+                        PdfDocument.Page page = pdfDocument.startPage(myPage);
+
+                        Paint text = new Paint();
+                        Canvas canvas = page.getCanvas();
+
+                        text.setTextAlign(Paint.Align.LEFT);
+                        text.setTextSize(90);
+                        text.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+                        canvas.drawText("Daily Restaurant Insights", 100, 155, text);
+                        text.setTextSize(75);
+                        canvas.drawText(day + " " + month, 100, 265, text);
+                        text.setTextSize(58);
+                        text.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.NORMAL));
+                        canvas.drawText("Total Orders Made: " + orderList.size(), 100, 385, text);
+                        canvas.drawText("Total Transaction Amount: \u20b9" + revenueTotal, 100, 485, text);
+//                        text.setTextSize(65);
+//                        text.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+//                        canvas.drawText("Highest Sales", 100, 580, text);
+//                        text.setTextSize(50);
+//                        text.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.NORMAL));
+//                        canvas.drawText("Date: " + "16" + "th" + " October", 100, 650, text);
+//                        canvas.drawText("Total Orders: " + "55", 100, 715, text);
+//                        canvas.drawText("Total Amount: \u20b9" + "3625", 100, 785, text);
+
+                        text.setTextSize(65);
+                        text.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+                        canvas.drawText("Total Customers", 100, 580, text);
+
+                        text.setTextSize(50);
+                        text.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.NORMAL));
+                        canvas.drawText("Customers: " + custList.size(), 100, 650, text);
+
+
+//            if (last7daysReport.contains("lastAnalysisHashMap")) {
+//                Type typeo = new TypeToken<HashMap<String, String>>() {
+//                }.getType();
+//                HashMap<String, String> prevMap = new HashMap<>(gson.fromJson(last7daysReport.getString("lastAnalysisHashMap", ""), typeo));
+//                Double prevSalesAmt = Double.parseDouble(prevMap.get("totalSales"));
+//                int ordersMadeTotal = Integer.parseInt(prevMap.get("totalOrders"));
+//                int totalCustomersTotal = Integer.parseInt(prevMap.get("totalCustomers"));
+                        text.setTextSize(90);
+                        text.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+                        canvas.drawText("Compare with previous day", 600, 760, text);
+                        text.setTextSize(58);
+                        text.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.NORMAL));
+
+                        double data1 = ((145682D - 157896D) / 157896D) * 100;
+//                if (totalSalesThatPeriod > prevSalesAmt) {
+//                    canvas.drawText("Total Sales: Increase By " + new DecimalFormat("0.00").format(data1) + "%", 100, 1160, text);
+//                } else {
+                        canvas.drawText("Total Sales: Decrease By " + new DecimalFormat("0.00").format(data1) + "%", 100, 860, text);
+//                }
+
+                        double data2 = (double) ((525D - 625D) / 625D) * 100;
+//                if (totalOrders > ordersMadeTotal) {
+//                    canvas.drawText("Total Orders: Increase By" + new DecimalFormat("0.00").format(data2) + "%", 100, 1235, text);
+//                } else {
+
+                        canvas.drawText("Total Orders: ↓ Decrease By " + new DecimalFormat("0.00").format(data2) + "%", 100, 960, text);
+//                }
+
+                        double data3 = (double) ((896D - 750D) / 750D) * 100;
+//                if (totalCust > totalCustomersTotal) {
+//                    canvas.drawText("Total Customers: Increase By" + new DecimalFormat("0.00").format(data3) + "%", 100, 1310, text);
+//                } else
+                        canvas.drawText("Total Customers: ↑ Increase By " + new DecimalFormat("0.00").format(data3) + "%", 100, 1060, text);
+
+//            }
+
+                        canvas.drawText("For other info, Check Premium Activity", 100, 1160, text);
+                        text.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+                        text.setTextSize(52);
+                        canvas.drawText("Contact Ordinalo", 1200, 1260, text);
+                        canvas.drawText("Phone: +91-8076531395", 1200, 1340, text);
+                        canvas.drawText("Email: fastway8587@gmail.com", 1200, 1420, text);
+
+
+                        editor.putString("lastDay",day + "");
+                        editor.apply();
+
+                        pdfDocument.finishPage(page);
+                        String fileName = "/DailyReportInsights" + ".pdf";
+                        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS) + fileName);
+
+                        try {
+                            pdfDocument.writeTo(new FileOutputStream(file));
+                            runOnUiThread(() -> Toast.makeText(HomeScreen.this, "Generated", Toast.LENGTH_SHORT).show());
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+                        pdfDocument.close();
+                    }
+                }
+            }else{
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(HomeScreen.this, "Hello", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        }).start();
         SharedPreferences user7daysTracker = getSharedPreferences("DailyUserTrackingFor7days",MODE_PRIVATE);
         new Thread(() -> {
             String month = monthName[calendar.get(Calendar.MONTH)];
