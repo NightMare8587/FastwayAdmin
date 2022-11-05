@@ -532,6 +532,130 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
 
                                             }
                                         });
+
+                                        SharedPreferences dailyInsightStoring = getSharedPreferences("DailyInsightsStoringData",MODE_PRIVATE);
+                                        SharedPreferences.Editor dailyInsightEditor = dailyInsightStoring.edit();
+
+                                        if(dailyInsightStoring.contains(month)) {
+                                            gson = new Gson();
+                                            java.lang.reflect.Type type = new TypeToken<HashMap<String, HashMap<String, String>>>() {
+                                            }.getType();
+                                            HashMap<String, HashMap<String, String>> mainMap = gson.fromJson(dailyInsightStoring.getString(month, ""), type);
+                                            int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+                                            if (mainMap.containsKey(day + "")) {
+                                                HashMap<String, String> innerMap = new HashMap<>(mainMap.get(day + ""));
+                                                java.lang.reflect.Type ordersType = new TypeToken<List<String>>() {
+                                                }.getType();
+
+                                                List<String> ordersList = new ArrayList<>(gson.fromJson(innerMap.get("orderList"), ordersType));
+                                                ordersList.add(System.currentTimeMillis() + "");
+
+                                                innerMap.put("orderList", gson.toJson(ordersList));
+
+                                                List<String> custList = new ArrayList<>(gson.fromJson(innerMap.get("custList"), ordersType));
+                                                if (!custList.contains(id)) {
+                                                    custList.add(id);
+                                                    innerMap.put("custList", gson.toJson(custList));
+                                                }
+
+                                                java.lang.reflect.Type timeZoneMap = new TypeToken<HashMap<String, Integer>>() {
+                                                }.getType();
+
+                                                HashMap<String, Integer> timeMap = new HashMap<>(gson.fromJson(innerMap.get("timeZoneMap"), timeZoneMap));
+                                                int hours = calendar.get(Calendar.HOUR_OF_DAY);
+
+                                                if (timeMap.containsKey(hours + "")) {
+                                                    int prev = timeMap.get(hours + "");
+                                                    prev++;
+                                                    timeMap.put(hours + "", prev);
+                                                } else
+                                                    timeMap.put(hours + "", 1);
+
+                                                innerMap.put("timeZoneMap",gson.toJson(timeMap));
+
+                                                double prevVal = Double.parseDouble(innerMap.get("revenueTotal"));
+                                                prevVal += Double.parseDouble(orderAmount);
+                                                innerMap.put("revenueTotal", prevVal + "");
+
+                                                java.lang.reflect.Type timeZoneRevenue = new TypeToken<HashMap<String, String>>() {
+                                                }.getType();
+
+                                                HashMap<String,String> revenueMap = new HashMap<>(gson.fromJson(innerMap.get("revenueMap"),timeZoneRevenue));
+
+                                                if(revenueMap.containsKey(hours + "")){
+                                                    double prevs = Double.parseDouble(revenueMap.get(hours + ""));
+                                                    prevs += Double.parseDouble(orderAmount);
+                                                    revenueMap.put(hours + "",prevs + "");
+                                                }else
+                                                    revenueMap.put(hours + "",orderAmount);
+
+                                                innerMap.put("revenueMap",gson.toJson(revenueMap));
+
+                                                mainMap.put(day + "",innerMap);
+
+                                            }else{
+                                                gson = new Gson();
+                                                HashMap<String,String> innerMap = new HashMap<>();
+                                                List<String> ordersList = new ArrayList<>();
+                                                ordersList.add(System.currentTimeMillis() + "");
+
+                                                innerMap.put("orderList",gson.toJson(ordersList));
+
+                                                List<String> custList = new ArrayList<>();
+                                                custList.add(id);
+                                                innerMap.put("custList",gson.toJson(custList));
+
+                                                HashMap<String,Integer> timeMap = new HashMap<>();
+                                                int hours = calendar.get(Calendar.HOUR_OF_DAY);
+                                                timeMap.put(hours + "",1);
+                                                innerMap.put("timeZoneMap",gson.toJson(timeMap));
+
+                                                innerMap.put("revenueTotal",orderAmount);
+
+                                                HashMap<String,String> revenueMap = new HashMap<>();
+                                                revenueMap.put(hours + "",orderAmount);
+                                                innerMap.put("revenueMap",gson.toJson(revenueMap));
+
+                                                mainMap.put(day + "",innerMap);
+                                            }
+
+                                            dailyInsightEditor.putString(month,gson.toJson(mainMap));
+                                            dailyInsightEditor.apply();
+
+
+                                        }else{
+                                            int day = calendar.get(Calendar.DAY_OF_MONTH);
+                                            gson = new Gson();
+                                            HashMap<String,String> innerMap = new HashMap<>();
+                                            List<String> ordersList = new ArrayList<>();
+                                            ordersList.add(System.currentTimeMillis() + "");
+
+                                            innerMap.put("orderList",gson.toJson(ordersList));
+
+                                            List<String> custList = new ArrayList<>();
+                                            custList.add(id);
+                                            innerMap.put("custList",gson.toJson(custList));
+
+                                            HashMap<String,Integer> timeMap = new HashMap<>();
+                                            int hours = calendar.get(Calendar.HOUR_OF_DAY);
+                                            timeMap.put(hours + "",1);
+                                            innerMap.put("timeZoneMap",gson.toJson(timeMap));
+
+                                            innerMap.put("revenueTotal",orderAmount);
+
+                                            HashMap<String,String> revenueMap = new HashMap<>();
+                                            revenueMap.put(hours + "",orderAmount);
+                                            innerMap.put("revenueMap",gson.toJson(revenueMap));
+
+                                            HashMap<String,HashMap<String,String>> mainMap = new HashMap<>();
+                                            mainMap.put(day + "",innerMap);
+
+                                            dailyInsightEditor.putString(month,gson.toJson(mainMap));
+                                            dailyInsightEditor.apply();
+
+                                        }
+
                                         if (storeForDishAnalysis.contains("DishAnalysisMonthBasis")) {
                                             gson = new Gson();
                                             java.lang.reflect.Type type = new TypeToken<HashMap<String, HashMap<String, Integer>>>() {
@@ -2026,6 +2150,131 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
 //            StringRequest stringRequest = new StringRequest(Request.Method.POST, testPaymentToVendor, response -> {
                 if(checkPrem.contains("status") && checkPrem.getString("status","").equals("active")) {
                     String month = monthName[calendar.get(Calendar.MONTH)];
+
+                    SharedPreferences dailyInsightStoring = getSharedPreferences("DailyInsightsStoringData",MODE_PRIVATE);
+                    SharedPreferences.Editor dailyInsightEditor = dailyInsightStoring.edit();
+
+                    if(dailyInsightStoring.contains(month)) {
+                        gson = new Gson();
+                        java.lang.reflect.Type type = new TypeToken<HashMap<String, HashMap<String, String>>>() {
+                        }.getType();
+                        HashMap<String, HashMap<String, String>> mainMap = gson.fromJson(dailyInsightStoring.getString(month, ""), type);
+                        int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+                        if (mainMap.containsKey(day + "")) {
+                            HashMap<String, String> innerMap = new HashMap<>(mainMap.get(day + ""));
+                            java.lang.reflect.Type ordersType = new TypeToken<List<String>>() {
+                            }.getType();
+
+                            List<String> ordersList = new ArrayList<>(gson.fromJson(innerMap.get("orderList"), ordersType));
+                            ordersList.add(System.currentTimeMillis() + "");
+
+                            innerMap.put("orderList", gson.toJson(ordersList));
+
+                            List<String> custList = new ArrayList<>(gson.fromJson(innerMap.get("custList"), ordersType));
+                            if (!custList.contains(id)) {
+                                custList.add(id);
+                                innerMap.put("custList", gson.toJson(custList));
+                            }
+
+                            java.lang.reflect.Type timeZoneMap = new TypeToken<HashMap<String, Integer>>() {
+                            }.getType();
+
+                            HashMap<String, Integer> timeMap = new HashMap<>(gson.fromJson(innerMap.get("timeZoneMap"), timeZoneMap));
+                            int hours = calendar.get(Calendar.HOUR_OF_DAY);
+
+                            if (timeMap.containsKey(hours + "")) {
+                                int prev = timeMap.get(hours + "");
+                                prev++;
+                                timeMap.put(hours + "", prev);
+                            } else
+                                timeMap.put(hours + "", 1);
+
+                            innerMap.put("timeZoneMap",gson.toJson(timeMap));
+
+                            double prevVal = Double.parseDouble(innerMap.get("revenueTotal"));
+                            prevVal += Double.parseDouble(orderAmount);
+                            innerMap.put("revenueTotal", prevVal + "");
+
+                            java.lang.reflect.Type timeZoneRevenue = new TypeToken<HashMap<String, String>>() {
+                            }.getType();
+
+                            HashMap<String,String> revenueMap = new HashMap<>(gson.fromJson(innerMap.get("revenueMap"),timeZoneRevenue));
+
+                            if(revenueMap.containsKey(hours + "")){
+                                double prevs = Double.parseDouble(revenueMap.get(hours + ""));
+                                prevs += Double.parseDouble(orderAmount);
+                                revenueMap.put(hours + "",prevs + "");
+                            }else
+                                revenueMap.put(hours + "",orderAmount);
+
+                            innerMap.put("revenueMap",gson.toJson(revenueMap));
+
+                            mainMap.put(day + "",innerMap);
+
+                        }else{
+                            gson = new Gson();
+                            HashMap<String,String> innerMap = new HashMap<>();
+                            List<String> ordersList = new ArrayList<>();
+                            ordersList.add(System.currentTimeMillis() + "");
+
+                            innerMap.put("orderList",gson.toJson(ordersList));
+
+                            List<String> custList = new ArrayList<>();
+                            custList.add(id);
+                            innerMap.put("custList",gson.toJson(custList));
+
+                            HashMap<String,Integer> timeMap = new HashMap<>();
+                            int hours = calendar.get(Calendar.HOUR_OF_DAY);
+                            timeMap.put(hours + "",1);
+                            innerMap.put("timeZoneMap",gson.toJson(timeMap));
+
+                            innerMap.put("revenueTotal",orderAmount);
+
+                            HashMap<String,String> revenueMap = new HashMap<>();
+                            revenueMap.put(hours + "",orderAmount);
+                            innerMap.put("revenueMap",gson.toJson(revenueMap));
+
+                            mainMap.put(day + "",innerMap);
+                        }
+
+                        dailyInsightEditor.putString(month,gson.toJson(mainMap));
+                        dailyInsightEditor.apply();
+
+
+                    }else{
+                        int day = calendar.get(Calendar.DAY_OF_MONTH);
+                        gson = new Gson();
+                        HashMap<String,String> innerMap = new HashMap<>();
+                        List<String> ordersList = new ArrayList<>();
+                        ordersList.add(System.currentTimeMillis() + "");
+
+                        innerMap.put("orderList",gson.toJson(ordersList));
+
+                        List<String> custList = new ArrayList<>();
+                        custList.add(id);
+                        innerMap.put("custList",gson.toJson(custList));
+
+                        HashMap<String,Integer> timeMap = new HashMap<>();
+                        int hours = calendar.get(Calendar.HOUR_OF_DAY);
+                        timeMap.put(hours + "",1);
+                        innerMap.put("timeZoneMap",gson.toJson(timeMap));
+
+                        innerMap.put("revenueTotal",orderAmount);
+
+                        HashMap<String,String> revenueMap = new HashMap<>();
+                        revenueMap.put(hours + "",orderAmount);
+                        innerMap.put("revenueMap",gson.toJson(revenueMap));
+
+                        HashMap<String,HashMap<String,String>> mainMap = new HashMap<>();
+                        mainMap.put(day + "",innerMap);
+
+                        dailyInsightEditor.putString(month,gson.toJson(mainMap));
+                        dailyInsightEditor.apply();
+
+                    }
+
+
                     if (storeForDishAnalysis.contains("DishAnalysisMonthBasis")) {
                         try {
                             gson = new Gson();

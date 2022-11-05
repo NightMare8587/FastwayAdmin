@@ -140,6 +140,9 @@ public class HomeScreen extends AppCompatActivity {
                 (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
         FirebaseMessaging.getInstance().subscribeToTopic("FastwayQueryDB");
 
+//        SharedPreferences clear = getSharedPreferences("DailyInsightsStoringData",MODE_PRIVATE);
+//        SharedPreferences.Editor clearEdit = clear.edit();
+//        clearEdit.clear().apply();
         resRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(UID)).child("Restaurant Documents");
         resRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
