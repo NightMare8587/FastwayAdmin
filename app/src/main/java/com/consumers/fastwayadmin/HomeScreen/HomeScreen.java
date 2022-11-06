@@ -453,7 +453,7 @@ public class HomeScreen extends AppCompatActivity {
                         canvas.drawText("Total Sales: ↓ Decrease By " + new DecimalFormat("0.00").format(data1) + "%", 100, 860, text);
                 }
 
-                        double data2 = (double) ((totalOrders - ordersMadeTotal) / 625D) * 100;
+                        double data2 = (double) ((totalOrders - ordersMadeTotal) / ordersMadeTotal) * 100;
                 if (totalOrders > ordersMadeTotal) {
                     canvas.drawText("Total Orders: ↑ Increase By" + new DecimalFormat("0.00").format(data2) + "%", 100, 1235, text);
                 } else {
@@ -582,7 +582,7 @@ public class HomeScreen extends AppCompatActivity {
                                             canvas.drawText("Total Sales: ↓ Decrease By " + new DecimalFormat("0.00").format(data1) + "%", 100, 860, text);
                                         }
 
-                                        double data2 = (double) ((totalOrders - ordersMadeTotal) / 625D) * 100;
+                                        double data2 = (double) ((totalOrders - ordersMadeTotal) / ordersMadeTotal) * 100;
                                         if (totalOrders > ordersMadeTotal) {
                                             canvas.drawText("Total Orders: ↑ Increase By" + new DecimalFormat("0.00").format(data2) + "%", 100, 1235, text);
                                         } else {
