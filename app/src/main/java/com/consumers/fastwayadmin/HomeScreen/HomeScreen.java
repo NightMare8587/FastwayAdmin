@@ -448,14 +448,14 @@ public class HomeScreen extends AppCompatActivity {
                         text.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.NORMAL));
                         double data1 = ((totalSalesThatPeriod - prevSalesAmt) / prevSalesAmt) * 100;
                 if (totalSalesThatPeriod > prevSalesAmt) {
-                    canvas.drawText("Total Sales: ↑ Increase By " + new DecimalFormat("0.00").format(data1) + "%", 100, 1160, text);
+                    canvas.drawText("Total Sales: ↑ Increase By " + new DecimalFormat("0.00").format(data1) + "%", 100, 860, text);
                 } else {
                         canvas.drawText("Total Sales: ↓ Decrease By " + new DecimalFormat("0.00").format(data1) + "%", 100, 860, text);
                 }
 
                         double data2 = (double) ((totalOrders - ordersMadeTotal) / ordersMadeTotal) * 100;
                 if (totalOrders > ordersMadeTotal) {
-                    canvas.drawText("Total Orders: ↑ Increase By" + new DecimalFormat("0.00").format(data2) + "%", 100, 1235, text);
+                    canvas.drawText("Total Orders: ↑ Increase By" + new DecimalFormat("0.00").format(data2) + "%", 100, 960, text);
                 } else {
 
                         canvas.drawText("Total Orders: ↓ Decrease By " + new DecimalFormat("0.00").format(data2) + "%", 100, 960, text);
@@ -463,7 +463,7 @@ public class HomeScreen extends AppCompatActivity {
 
                         double data3 = (double) ((totalCust - totalCustomersTotal) / totalCustomersTotal) * 100;
                 if (totalCust > totalCustomersTotal) {
-                    canvas.drawText("Total Customers: ↑ Increase By" + new DecimalFormat("0.00").format(data3) + "%", 100, 1310, text);
+                    canvas.drawText("Total Customers: ↑ Increase By" + new DecimalFormat("0.00").format(data3) + "%", 100, 1060, text);
                 } else
                         canvas.drawText("Total Customers: ↓ Decrease By " + new DecimalFormat("0.00").format(data3) + "%", 100, 1060, text);
 
@@ -577,14 +577,14 @@ public class HomeScreen extends AppCompatActivity {
                                         double data1 = ((totalSalesThatPeriod - prevSalesAmt) / prevSalesAmt) * 100;
 
                                         if (totalSalesThatPeriod > prevSalesAmt) {
-                                            canvas.drawText("Total Sales: ↑ Increase By " + new DecimalFormat("0.00").format(data1) + "%", 100, 1160, text);
+                                            canvas.drawText("Total Sales: ↑ Increase By " + new DecimalFormat("0.00").format(data1) + "%", 100, 860, text);
                                         } else {
                                             canvas.drawText("Total Sales: ↓ Decrease By " + new DecimalFormat("0.00").format(data1) + "%", 100, 860, text);
                                         }
 
                                         double data2 = (double) ((totalOrders - ordersMadeTotal) / ordersMadeTotal) * 100;
                                         if (totalOrders > ordersMadeTotal) {
-                                            canvas.drawText("Total Orders: ↑ Increase By" + new DecimalFormat("0.00").format(data2) + "%", 100, 1235, text);
+                                            canvas.drawText("Total Orders: ↑ Increase By" + new DecimalFormat("0.00").format(data2) + "%", 100, 960, text);
                                         } else {
 
                                             canvas.drawText("Total Orders: ↓ Decrease By " + new DecimalFormat("0.00").format(data2) + "%", 100, 960, text);
@@ -592,7 +592,7 @@ public class HomeScreen extends AppCompatActivity {
 
                                         double data3 = (double) ((totalCust - totalCustomersTotal) / totalCustomersTotal) * 100;
                                         if (totalCust > totalCustomersTotal) {
-                                            canvas.drawText("Total Customers: ↑ Increase By" + new DecimalFormat("0.00").format(data3) + "%", 100, 1310, text);
+                                            canvas.drawText("Total Customers: ↑ Increase By" + new DecimalFormat("0.00").format(data3) + "%", 100, 1060, text);
                                         } else
                                             canvas.drawText("Total Customers: ↓ Decrease By " + new DecimalFormat("0.00").format(data3) + "%", 100, 1060, text);
 
