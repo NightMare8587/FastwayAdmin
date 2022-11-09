@@ -2877,6 +2877,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                         Toast.makeText(ApproveCurrentTakeAway.this, "Completed", Toast.LENGTH_SHORT).show();
                         workbook.close();
                     } catch (Exception e) {
+                        Log.i("black","" + e.getLocalizedMessage());
                         e.printStackTrace();
                     }
                 }

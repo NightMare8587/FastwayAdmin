@@ -125,6 +125,7 @@ public class HomeScreen extends AppCompatActivity {
         sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
         int year = calendar.get(Calendar.YEAR);
         myEditor = sharedPreferences.edit();
+//        myEditor.remove("FileGeneratedExcel");
         myEditor.putString("payoutMethodChoosen","imps");
         if(!sharedPreferences.contains("currentYear"))
         {
@@ -374,13 +375,6 @@ public class HomeScreen extends AppCompatActivity {
                         return;
                     if(mainMap.containsKey(day + "")){
 
-
-//                        runOnUiThread(new Runnable() {
-//                            @Override
-//                            public void run() {
-//                                Toast.makeText(HomeScreen.this, "Second", Toast.LENGTH_SHORT).show();
-//                            }
-//                        });
                         Type typeo = new TypeToken<List<String>>() {
                         }.getType();
                         HashMap<String,String> innerMap = new HashMap<>(mainMap.get(day + ""));
@@ -388,12 +382,6 @@ public class HomeScreen extends AppCompatActivity {
                         List<String> orderList = new ArrayList<>(gson.fromJson(innerMap.get("orderList"),typeo));
                         List<String> custList = new ArrayList<>(gson.fromJson(innerMap.get("custList"),typeo));
                         String revenueTotal = innerMap.get("revenueTotal");
-
-
-
-
-
-
 
                         PdfDocument pdfDocument = new PdfDocument();
                         Paint myPaint = new Paint();

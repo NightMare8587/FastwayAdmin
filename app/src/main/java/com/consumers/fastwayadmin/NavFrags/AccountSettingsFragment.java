@@ -123,12 +123,16 @@ public class AccountSettingsFragment extends PreferenceFragmentCompat {
         viewExcel.setOnPreferenceClickListener(preference -> {
             if(available){
                 Toast.makeText(requireContext(), "Opening....", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                File file = new File(requireContext().getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS) + "/RestaurantEarningTracker.xlsx");
-                intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                intent.setDataAndType(FileProvider.getUriForFile(requireContext(), requireContext().getPackageName() + ".provider",file), "application/vnd.ms-excel");
+                try {
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    File file = new File(requireContext().getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS) + "/RestaurantEarningTracker.xlsx");
+                    intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    intent.setDataAndType(FileProvider.getUriForFile(requireContext(), requireContext().getPackageName() + ".provider", file), "application/vnd.ms-excel");
 //            intent.setDataAndType(Uri.parse(file.getPath().toString()), "application/vnd.ms-excel");
-                startActivity(intent);
+                    startActivity(intent);
+                }catch (Exception e){
+                    Toast.makeText(requireContext(), "" + e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                }
             }else{
                 new KAlertDialog(requireContext(),KAlertDialog.NORMAL_TYPE)
                         .setTitleText("Subscribe").setContentText("Subscribe Premium to open excel sheet")
