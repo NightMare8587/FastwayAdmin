@@ -71,7 +71,10 @@ public class ResEarningTrackerActivity extends AppCompatActivity{
     SharedPreferences resTrackInfo;
     SharedPreferences storeOrdersForAdminInfo;
     double totalValOver = 0;
+    double totalCustomerAllTable;
     TextView currentMonthNameViewing;
+    LinearLayout tableRateLinear;
+    RecyclerView customerTableRecycler;
     double totalDineWayOverall = 0;
     BubbleShowCaseBuilder bubbleShowCaseBuilder1;
     BubbleShowCaseBuilder bubbleShowCaseBuilder2;
@@ -120,7 +123,8 @@ public class ResEarningTrackerActivity extends AppCompatActivity{
         initialise();
         prevYears.add(String.valueOf(calendar.get(Calendar.YEAR)));
         SharedPreferences dishShared = getSharedPreferences("DishOrderedWithOthers",MODE_PRIVATE);
-
+        tableRateLinear = findViewById(R.id.customerAquisitionRateLinearLayout);
+        customerTableRecycler = findViewById(R.id.tableAquisitionRateRecyclerView);
         loginInfoShared = getSharedPreferences("loginInfo",MODE_PRIVATE);
         SharedPreferences adminPrem = getSharedPreferences("AdminPremiumDetails",MODE_PRIVATE);
         usersFrequencyPref = getSharedPreferences("UsersFrequencyPerMonth",MODE_PRIVATE);
@@ -881,6 +885,23 @@ public class ResEarningTrackerActivity extends AppCompatActivity{
                             }
                         });
 
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+
+            DatabaseReference getTableData = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(loginInfoShared.getString("state","")).child(loginInfoShared.getString("locality","")).child(auth.getUid());
+            getTableData.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if(snapshot.hasChild("totalCustomersAllTables")){
+                        totalCustomerAllTable = Double.parseDouble(String.valueOf(snapshot.child("totalCustomerAllTables").getValue()));
+
+                        DatabaseReference individualTable = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(loginInfoShared.getString("state","")).child(loginInfoShared.getString("locality","")).child(auth.getUid()).child("Tables");
                     }
                 }
 
