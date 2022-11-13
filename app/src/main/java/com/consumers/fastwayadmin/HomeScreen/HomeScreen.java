@@ -631,9 +631,11 @@ public class HomeScreen extends AppCompatActivity {
                 if( last7daysReport.getString("currentMonth","").equals(month)) {
                     if (last7daysReport.contains("daysTracked")) {
                         int day = calendar.get(Calendar.DAY_OF_MONTH);
-                        if (Integer.parseInt(last7daysReport.getString("currentDate", "")) != day && Integer.parseInt(last7daysReport.getString("daysTracked", "")) == 7) {
+
+                        if (Integer.parseInt(last7daysReport.getString("currentDate", "")) == day && Integer.parseInt(last7daysReport.getString("daysTracked", "")) == 9) {
                             String json = storeOrders.getString(month, "");
                             gson = new Gson();
+                            Log.i("info1414","kaaaaaaaaaaaaaaaaaaaaaaaaaaala");
                             Type type = new TypeToken<List<List<String>>>() {
                             }.getType();
                             List<List<String>> mainDataList = gson.fromJson(json, type);
@@ -660,7 +662,7 @@ public class HomeScreen extends AppCompatActivity {
                                     double totalSalesThatPeriod = 0;
 
 
-                                    if (last7daysReport.contains("lastDateReport")) {
+                                    if (!last7daysReport.contains("lastDateReport")) {
                                         int index = date.indexOf(last7daysReport.getString("lastDateReport", ""));
                                         runOnUiThread(() -> {
 //                                            Toast.makeText(this, "" + index, Toast.LENGTH_SHORT).show();
