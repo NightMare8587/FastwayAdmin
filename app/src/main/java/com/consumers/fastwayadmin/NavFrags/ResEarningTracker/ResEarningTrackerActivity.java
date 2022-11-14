@@ -75,6 +75,7 @@ public class ResEarningTrackerActivity extends AppCompatActivity{
     TextView currentMonthNameViewing;
     LinearLayout tableRateLinear;
     RecyclerView customerTableRecycler;
+    TextView totalCustomersTable;
     double totalDineWayOverall = 0;
     BubbleShowCaseBuilder bubbleShowCaseBuilder1;
     BubbleShowCaseBuilder bubbleShowCaseBuilder2;
@@ -122,6 +123,7 @@ public class ResEarningTrackerActivity extends AppCompatActivity{
         setContentView(R.layout.activity_res_earning_tracker);
         initialise();
         prevYears.add(String.valueOf(calendar.get(Calendar.YEAR)));
+        totalCustomersTable = findViewById(R.id.totalCustomerInTableAquisition);
         SharedPreferences dishShared = getSharedPreferences("DishOrderedWithOthers",MODE_PRIVATE);
         tableRateLinear = findViewById(R.id.customerAquisitionRateLinearLayout);
         customerTableRecycler = findViewById(R.id.tableAquisitionRateRecyclerView);
@@ -899,9 +901,51 @@ public class ResEarningTrackerActivity extends AppCompatActivity{
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     if(snapshot.hasChild("totalCustomersAllTables")){
-                        totalCustomerAllTable = Double.parseDouble(String.valueOf(snapshot.child("totalCustomerAllTables").getValue()));
-
+                        totalCustomerAllTable = Double.parseDouble(String.valueOf(snapshot.child("totalCustomersAllTables").getValue()));
                         DatabaseReference individualTable = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(loginInfoShared.getString("state","")).child(loginInfoShared.getString("locality","")).child(auth.getUid()).child("Tables");
+                        individualTable.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @SuppressLint("SetTextI18n")
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                if(snapshot.exists()){
+                                    List<String> tableNum = new ArrayList<>();
+                                    List<String> customerAquisition = new ArrayList<>();
+                                    for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                                        if(dataSnapshot.hasChild("totalCustomersTillNow")){
+                                            tableNum.add(dataSnapshot.getKey());
+                                            double d = Double.parseDouble(dataSnapshot.child("totalCustomersTillNow").getValue(String.class));
+                                            customerAquisition.add(d + "");
+//                                            runOnUiThread(()-> {
+//                                            });
+
+                                        }
+                                    }
+
+                                    runOnUiThread(() -> {
+                                        totalCustomersTable.setText("Total Customer's: " + new DecimalFormat("#").format(totalCustomerAllTable));
+
+                                        customerTableRecycler.setLayoutManager(new LinearLayoutManager(ResEarningTrackerActivity.this));
+                                        customerTableRecycler.setAdapter(new TableCusRecycler(tableNum,totalCustomerAllTable,customerAquisition));
+                                    });
+
+
+                                }else
+                                {
+                                    runOnUiThread(() -> {
+                                        tableRateLinear.setVisibility(View.INVISIBLE);
+                                    });
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+
+                            }
+                        });
+                    }else{
+                        runOnUiThread(() -> {
+                            tableRateLinear.setVisibility(View.INVISIBLE);
+                        });
                     }
                 }
 
