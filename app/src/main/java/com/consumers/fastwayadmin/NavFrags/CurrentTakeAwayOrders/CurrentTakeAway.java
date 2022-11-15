@@ -71,13 +71,10 @@ public class CurrentTakeAway extends RecyclerView.Adapter<CurrentTakeAway.Holder
         else{
             holder.paymentMode.setText("Mode: " + finalPayment.get(position) + " (\u20B9" + orderAmount.get(position) + ")");
         }
-        holder.chatWithCustomer.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(view.getContext(), ChatWithCustomer.class);
-                intent.putExtra("id",currentTakeAwayAuth.get(position));
-                view.getContext().startActivity(intent);
-            }
+        holder.chatWithCustomer.setOnClickListener(view -> {
+            Intent intent = new Intent(view.getContext(), ChatWithCustomer.class);
+            intent.putExtra("id",currentTakeAwayAuth.get(position));
+            view.getContext().startActivity(intent);
         });
         holder.checkOrder.setOnClickListener(view -> {
             Intent intent = new Intent(view.getContext(),ApproveCurrentTakeAway.class);
@@ -96,6 +93,12 @@ public class CurrentTakeAway extends RecyclerView.Adapter<CurrentTakeAway.Holder
             intent.putStringArrayListExtra("orderAndPayment",(ArrayList<String>) orderAndPayments);
             intent.putStringArrayListExtra("image",(ArrayList<String>) image);
             intent.putStringArrayListExtra("type",(ArrayList<String>) type);
+            Log.i("info1",dishQuantityCurrentTakeAway.toString());
+            Log.i("info1",dishPrice.toString());
+            Log.i("info1",image.toString());
+            Log.i("info1",type.toString());
+            Log.i("info1",dishNameCurrentTakeAway.toString());
+            Log.i("info1",halfOr.toString());
             intent.putExtra("orderID",orderId.get(position));
             intent.putExtra("payment",finalPayment.get(position));
             intent.putExtra("time",time.get(position));

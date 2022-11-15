@@ -396,7 +396,7 @@ public class HomeScreen extends AppCompatActivity {
                         text.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
                         canvas.drawText("Daily Restaurant Insights", 100, 155, text);
                         text.setTextSize(75);
-                        canvas.drawText(day + " " + month, 100, 265, text);
+                        canvas.drawText(day + "th " + month, 100, 265, text);
                         text.setTextSize(58);
                         text.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.NORMAL));
                         canvas.drawText("Total Orders Made: " + orderList.size(), 100, 385, text);
@@ -485,6 +485,31 @@ public class HomeScreen extends AppCompatActivity {
                         }
 
                         pdfDocument.close();
+
+                        runOnUiThread(() -> {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(HomeScreen.this);
+                            builder.setTitle("Daily Insights").setMessage("Do you wanna open your last day insights file")
+                                    .setPositiveButton("Open", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                            Intent intent = new Intent(Intent.ACTION_VIEW);
+                                            File file12 = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS) + "/DailyReportInsights.pdf");
+                                            if(file12.exists()) {
+                                                Toast.makeText(HomeScreen.this, "Opening....", Toast.LENGTH_SHORT).show();
+                                                intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                                                intent.setDataAndType(FileProvider.getUriForFile(HomeScreen.this, getPackageName() + ".provider", file12), "application/pdf");
+                                                startActivity(intent);
+                                            }else
+                                                Toast.makeText(HomeScreen.this, "No Reports Generated", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }).setNegativeButton("Later", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+
+                                        }
+                                    }).create();
+                            builder.show();
+                        });
                     }
                 }else{
                     if(Calendar.getInstance().get(Calendar.MONTH) != Calendar.JANUARY) {
@@ -503,12 +528,6 @@ public class HomeScreen extends AppCompatActivity {
                                     List<String> orderList = new ArrayList<>(gson.fromJson(innerMap.get("orderList"),typeo));
                                     List<String> custList = new ArrayList<>(gson.fromJson(innerMap.get("custList"),typeo));
                                     String revenueTotal = innerMap.get("revenueTotal");
-
-
-
-
-
-
 
 
                                     PdfDocument pdfDocument = new PdfDocument();
@@ -720,7 +739,7 @@ public class HomeScreen extends AppCompatActivity {
                                         canvas.drawText("Highest Sales", 100, 545, text);
                                         text.setTextSize(50);
                                         text.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.NORMAL));
-                                        canvas.drawText("Date: " + dateName + " th" + month, 100, 615, text);
+                                        canvas.drawText("Date: " + dateName, 100, 615, text);
                                         canvas.drawText("Total Orders: " + highestOrderAtDay, 100, 690, text);
                                         canvas.drawText("Total Amount: \u20b9" + highestSalesDay, 100, 765, text);
 

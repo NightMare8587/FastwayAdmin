@@ -620,8 +620,8 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                                                 mainMap.put(day + "",innerMap);
                                             }
 
-                                            dailyInsightEditor.putString(month,gson.toJson(mainMap));
-                                            dailyInsightEditor.apply();
+//                                            dailyInsightEditor.putString(month,gson.toJson(mainMap));
+//                                            dailyInsightEditor.apply();
 
 
                                         }else{
@@ -954,6 +954,60 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
 //                                    }
 
 //                                    }).start();
+
+
+
+                                    FirebaseAuth auth = FirebaseAuth.getInstance();
+                                    DatabaseReference trackTotalCash = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
+                                    trackTotalCash.addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                            if (snapshot.hasChild("totalCashTakeAway")) {
+                                                double prevAmount = Double.parseDouble(String.valueOf(snapshot.child("totalCashTakeAway").getValue()));
+                                                double currAmount = Double.parseDouble(orderAmount);
+                                                trackTotalCash.child("totalCashTakeAway").setValue(String.valueOf(currAmount + prevAmount));
+                                            } else {
+                                                trackTotalCash.child("totalCashTakeAway").setValue(String.valueOf(orderAmount));
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError error) {
+
+                                        }
+                                    });
+
+
+                                    String approveTime = String.valueOf(System.currentTimeMillis());
+                                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(id).child("Recent Orders").child(time);
+                                    try {
+                                        for (int i = 0; i < dishName.size(); i++) {
+                                            MyClass myClass = new MyClass(dishName.get(i), dishPrice.get(i), image.get(i), type.get(i), "" + approveTime, quantity.get(i), halfOr.get(i), state, String.valueOf(orderAmount), orderId, "TakeAway,Cash", "Order Approved", sharedPreferences.getString("locality", ""));
+                                            databaseReference.child(auth.getUid()).child(dishName.get(i)).setValue(myClass);
+                                        }
+
+                                        databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(sharedPreferences.getString("locality", "")).child(auth.getUid());
+                                        for (int i = 0; i < dishName.size(); i++) {
+                                            MyClass myClass = new MyClass(dishName.get(i), dishPrice.get(i), image.get(i), type.get(i), "" + approveTime, quantity.get(i), halfOr.get(i), state, String.valueOf(orderAmount), orderId, "TakeAway,Cash", "Order Approved", sharedPreferences.getString("locality", ""));
+                                            databaseReference.child("Recent Orders").child("" + time).child(id).child(dishName.get(i)).setValue(myClass);
+                                        }
+                                    }catch (Exception e){
+                                        for (int i = 0; i < dishName.size(); i++) {
+                                            MyClass myClass = new MyClass(dishName.get(i), dishPrice.get(i), image.get(i), type.get(i), "" + approveTime, quantity.get(i), halfOr.get(i), state, String.valueOf(orderAmount), orderId, "TakeAway,Cash", "Order Approved", sharedPreferences.getString("locality", ""));
+                                            databaseReference.child(auth.getUid()).child(dishName.get(i)).setValue(myClass);
+                                        }
+
+                                        databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(sharedPreferences.getString("locality", "")).child(auth.getUid());
+                                        for (int i = 0; i < dishName.size(); i++) {
+                                            MyClass myClass = new MyClass(dishName.get(i), dishPrice.get(i), image.get(i), type.get(i), "" + approveTime, quantity.get(i), halfOr.get(i), state, String.valueOf(orderAmount), orderId, "TakeAway,Cash", "Order Approved", sharedPreferences.getString("locality", ""));
+                                            databaseReference.child("Recent Orders").child("" + time).child(id).child(dishName.get(i)).setValue(myClass);
+                                        }
+                                    }
+
+                                    java.lang.reflect.Type type1 = new TypeToken<HashMap<String,HashMap<String,Integer>>>(){}.getType();
+
+                                    HashMap<String,HashMap<String,Integer>> mapDishMain;
+
                                     if (storeOrdersForAdminInfo.contains(month)) {
                                         java.lang.reflect.Type type = new TypeToken<List<List<String>>>() {
                                         }.getType();
@@ -1083,45 +1137,6 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                                     } catch (Exception e) {
                                         e.printStackTrace();
                                     }
-
-
-                                    FirebaseAuth auth = FirebaseAuth.getInstance();
-                                    DatabaseReference trackTotalCash = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
-                                    trackTotalCash.addListenerForSingleValueEvent(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                            if (snapshot.hasChild("totalCashTakeAway")) {
-                                                double prevAmount = Double.parseDouble(String.valueOf(snapshot.child("totalCashTakeAway").getValue()));
-                                                double currAmount = Double.parseDouble(orderAmount);
-                                                trackTotalCash.child("totalCashTakeAway").setValue(String.valueOf(currAmount + prevAmount));
-                                            } else {
-                                                trackTotalCash.child("totalCashTakeAway").setValue(String.valueOf(orderAmount));
-                                            }
-                                        }
-
-                                        @Override
-                                        public void onCancelled(@NonNull DatabaseError error) {
-
-                                        }
-                                    });
-
-
-                                    String approveTime = String.valueOf(System.currentTimeMillis());
-                                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(id).child("Recent Orders").child(time);
-                                    for (int i = 0; i < dishName.size(); i++) {
-                                        MyClass myClass = new MyClass(dishName.get(i), dishPrice.get(i), image.get(i), type.get(i), "" + approveTime, quantity.get(i), halfOr.get(i), state, String.valueOf(orderAmount), orderId, "TakeAway,Cash", "Order Approved", sharedPreferences.getString("locality", ""));
-                                        databaseReference.child(auth.getUid()).child(dishName.get(i)).setValue(myClass);
-                                    }
-
-                                    databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(sharedPreferences.getString("locality", "")).child(auth.getUid());
-                                    for (int i = 0; i < dishName.size(); i++) {
-                                        MyClass myClass = new MyClass(dishName.get(i), dishPrice.get(i), image.get(i), type.get(i), "" + approveTime, quantity.get(i), halfOr.get(i), state, String.valueOf(orderAmount), orderId, "TakeAway,Cash", "Order Approved", sharedPreferences.getString("locality", ""));
-                                        databaseReference.child("Recent Orders").child("" + time).child(id).child(dishName.get(i)).setValue(myClass);
-                                    }
-
-                                    java.lang.reflect.Type type1 = new TypeToken<HashMap<String,HashMap<String,Integer>>>(){}.getType();
-
-                                    HashMap<String,HashMap<String,Integer>> mapDishMain;
                                     //
                                     SharedPreferences dishShared = getSharedPreferences("DishOrderedWithOthers",MODE_PRIVATE);
                                     SharedPreferences.Editor dishSharedEdit = dishShared.edit();
