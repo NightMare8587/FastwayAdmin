@@ -1,5 +1,6 @@
 package com.consumers.fastwayadmin.HomeScreen.LiveChat;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -14,6 +15,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -25,6 +27,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.consumers.fastwayadmin.HomeScreen.HomeScreen;
 import com.consumers.fastwayadmin.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
@@ -221,6 +224,60 @@ public class LiveChatActivity extends AppCompatActivity {
                     return;
                 }
 
+                if(messa.equals("7")){
+                    editText.setText("");
+                    String time = String.valueOf(System.currentTimeMillis());
+
+                    liveChatClass liveChatClass = new liveChatClass(messa,time,"0");
+                    reference.child("Live Chat").child(System.currentTimeMillis() + "").setValue(liveChatClass);
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(LiveChatActivity.this);
+                    builder.setTitle("Choose one").setMessage("Which file you wanna open?\nTouch outside to close this dialog")
+                            .setPositiveButton("Open Monthly", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                                    File file12 = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS) + "/MonthlyReportTracker.pdf");
+                                    if(file12.exists()) {
+                                        Toast.makeText(LiveChatActivity.this, "Opening...", Toast.LENGTH_SHORT).show();
+                                        intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                                        intent.setDataAndType(FileProvider.getUriForFile(LiveChatActivity.this, getPackageName() + ".provider", file12), "application/pdf");
+                                        startActivity(intent);
+                                    }
+
+                                }
+                            }).setNegativeButton("Open Weekly", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                                    File file12 = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS) + "/WeeklyReportTracker.pdf");
+                                    if(file12.exists()) {
+                                        Toast.makeText(LiveChatActivity.this, "Opening...", Toast.LENGTH_SHORT).show();
+                                        intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                                        intent.setDataAndType(FileProvider.getUriForFile(LiveChatActivity.this, getPackageName() + ".provider", file12), "application/pdf");
+                                        startActivity(intent);
+                                    }
+
+                                }
+                            }).setNeutralButton("Open Daily", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                                    File file12 = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS) + "/DailyReportInsights.pdf");
+                                    if(file12.exists()) {
+                                        Toast.makeText(LiveChatActivity.this, "Opening...", Toast.LENGTH_SHORT).show();
+                                        intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                                        intent.setDataAndType(FileProvider.getUriForFile(LiveChatActivity.this, getPackageName() + ".provider", file12), "application/pdf");
+                                        startActivity(intent);
+                                    }
+
+                                }
+                            }).create();
+                    builder.show();
+
+                    return;
+                }
+
                 if(messa.length() == 10 && TextUtils.isDigitsOnly(messa)){
                     String time = String.valueOf(System.currentTimeMillis());
 
@@ -347,7 +404,7 @@ public class LiveChatActivity extends AppCompatActivity {
         reference.child("Live Chat").child(System.currentTimeMillis() + "").setValue(liveChatClass);
 
         new Handler().postDelayed(() -> {
-            liveChatClass liveChatClass1 = new liveChatClass("Choose One Option\n1.View Excel Sheet\n2.Other Options\n\n Enter number as input",System.currentTimeMillis() + "","1");
+            liveChatClass liveChatClass1 = new liveChatClass("Choose One Option\n1.View Excel Sheet\n2.Other Options\n7.View Reports\n\n Enter number as input",System.currentTimeMillis() + "","1");
             reference.child("Live Chat").child(System.currentTimeMillis() + "").setValue(liveChatClass1);
         },500);
     }
