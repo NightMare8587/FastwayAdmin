@@ -651,7 +651,7 @@ public class HomeScreen extends AppCompatActivity {
                     if (last7daysReport.contains("daysTracked")) {
                         int day = calendar.get(Calendar.DAY_OF_MONTH);
 
-                        if (Integer.parseInt(last7daysReport.getString("currentDate", "")) == day && Integer.parseInt(last7daysReport.getString("daysTracked", "")) == 9) {
+                        if (Integer.parseInt(last7daysReport.getString("currentDate", "")) == day && Integer.parseInt(last7daysReport.getString("daysTracked", "")) == 7) {
                             String json = storeOrders.getString(month, "");
                             gson = new Gson();
                             Log.i("info1414","kaaaaaaaaaaaaaaaaaaaaaaaaaaala");
@@ -679,21 +679,6 @@ public class HomeScreen extends AppCompatActivity {
                                         loopTill = date.size() - 7;
                                     int daysLeftToShow = 6;
                                     double totalSalesThatPeriod = 0;
-
-
-                                    if (!last7daysReport.contains("lastDateReport")) {
-                                        int index = date.indexOf(last7daysReport.getString("lastDateReport", ""));
-                                        runOnUiThread(() -> {
-//                                            Toast.makeText(this, "" + index, Toast.LENGTH_SHORT).show();
-                                        });
-
-                                        for (int i = date.size() - 1; i > index; i--) {
-
-                                        }
-                                    } else {
-                                        runOnUiThread(() -> {
-                                            Toast.makeText(this, "else mai hu", Toast.LENGTH_SHORT).show();
-                                        });
 
                                         endDate = date.get(date.size() - 1);
                                         startDate = date.get(loopTill);
@@ -768,31 +753,37 @@ public class HomeScreen extends AppCompatActivity {
                                             double data1 = ((totalSalesThatPeriod - prevSalesAmt) / prevSalesAmt) * 100;
                                             if (totalSalesThatPeriod > prevSalesAmt) {
                                                 canvas.drawText("Total Sales: ↑ Increase By " + new DecimalFormat("0.00").format(data1) + "%", 100, 1180, text);
+                                                canvas.drawText("Previous Sales \u20b9" + prevSalesAmt, 100, 1220, text);
                                             } else {
                                                 canvas.drawText("Total Sales: ↓ Decrease By " + new DecimalFormat("0.00").format(data1) + "%", 100, 1180, text);
+                                                canvas.drawText("Previous Sales \u20b9" + prevSalesAmt, 100, 1220, text);
                                             }
 
                                             double data2 = ((totalOrders - ordersMadeTotal) / ordersMadeTotal) * 100;
                                             if (totalOrders > ordersMadeTotal) {
-                                                canvas.drawText("Total Orders: ↑ Increase By " + new DecimalFormat("0.00").format(data2) + "%", 100, 1255, text);
+                                                canvas.drawText("Total Orders: ↑ Increase By " + new DecimalFormat("0.00").format(data2) + "%", 100, 1295, text);
+                                                canvas.drawText("Previous Orders \u20b9" + ordersMadeTotal, 100, 1335, text);
                                             } else {
-                                                canvas.drawText("Total Orders: ↓ Decrease By " + new DecimalFormat("0.00").format(data2) + "%", 100, 1255, text);
+                                                canvas.drawText("Total Orders: ↓ Decrease By " + new DecimalFormat("0.00").format(data2) + "%", 100, 1295, text);
+                                                canvas.drawText("Previous Orders \u20b9" + ordersMadeTotal, 100, 1335, text);
                                             }
 
                                             double data3 =  ((totalCust - totalCustomersTotal) / totalCustomersTotal) * 100;
                                             if (totalCust > totalCustomersTotal) {
-                                                canvas.drawText("Total Customers: ↑ Increase By " + new DecimalFormat("0.00").format(data3) + "%", 100, 1330, text);
-                                            } else
-                                                canvas.drawText("Total Customers: ↓ Decrease By " + new DecimalFormat("0.00").format(data3) + "%", 100, 1330, text);
-
+                                                canvas.drawText("Total Customers: ↑ Increase By " + new DecimalFormat("0.00").format(data3) + "%", 100, 1410, text);
+                                                canvas.drawText("Previous Customers " + totalCustomersTotal, 100, 1450, text);
+                                            } else {
+                                                canvas.drawText("Total Customers: ↓ Decrease By " + new DecimalFormat("0.00").format(data3) + "%", 100, 1410, text);
+                                                canvas.drawText("Previous Customers " + totalCustomersTotal, 100, 1450, text);
+                                            }
                                         }
 
-                                        canvas.drawText("For other info, Check Premium Activity", 100, 1470, text);
+                                        canvas.drawText("For other info, Check Premium Activity", 100, 1520, text);
                                         text.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
                                         text.setTextSize(52);
-                                        canvas.drawText("Contact Ordinalo", 1200, 1745, text);
-                                        canvas.drawText("Phone: +91-8076531395", 1200, 1815, text);
-                                        canvas.drawText("Email: fastway8587@gmail.com", 1200, 1885, text);
+                                        canvas.drawText("Contact Ordinalo", 1200, 1765, text);
+                                        canvas.drawText("Phone: +91-8076531395", 1200, 1835, text);
+                                        canvas.drawText("Email: fastway8587@gmail.com", 1200, 1905, text);
 
                                         pdfDocument.finishPage(page);
                                         String fileName = "/WeeklyReportTracker" + ".pdf";
@@ -813,7 +804,6 @@ public class HomeScreen extends AppCompatActivity {
                                         prevAnalysisInfo.put("totalOrders", totalOrders + "");
                                         prevAnalysisInfo.put("totalCustomers", totalCust + "");
                                         last7daysReportEdit.putString("lastAnalysisHashMap", gson.toJson(prevAnalysisInfo));
-                                        last7daysReportEdit.putString("lastDateReport", endDate);
                                         last7daysReportEdit.remove("daysTracked");
                                         last7daysReportEdit.apply();
 
@@ -833,16 +823,8 @@ public class HomeScreen extends AppCompatActivity {
                                             builder.show();
                                         });
                                     }
-                                }
 
                             }
-                        } else {
-//                        runOnUiThread(() -> {
-//                            double data =  (( 100 - 50) / 50 ) * 100;
-//
-//                            Toast.makeText(this, "" + new DecimalFormat("0.00").format(data), Toast.LENGTH_SHORT).show();
-//                        });
-
                         }
                     }
                 }else{
@@ -915,7 +897,7 @@ public class HomeScreen extends AppCompatActivity {
                                         text.setTextAlign(Paint.Align.LEFT);
                                         text.setTextSize(80);
                                         text.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
-                                        canvas.drawText("Last 7 days Report", 100, 155, text);
+                                        canvas.drawText("Last Remaining days Report", 100, 155, text);
                                         text.setTextSize(70);
                                         canvas.drawText("From " + startDate + " to " + endDate + " " + prevMonth, 100, 265, text);
                                         text.setTextSize(58);
@@ -940,40 +922,40 @@ public class HomeScreen extends AppCompatActivity {
                                         canvas.drawText("Customers: " + totalCust, 100, 925, text);
 
 
-                                        if (last7daysReport.contains("lastAnalysisHashMap")) {
-                                            Type typeo = new TypeToken<HashMap<String, String>>() {
-                                            }.getType();
-                                            HashMap<String, String> prevMap = new HashMap<>(gson.fromJson(last7daysReport.getString("lastAnalysisHashMap", ""), typeo));
-                                            Double prevSalesAmt = Double.parseDouble(prevMap.get("totalSales"));
-                                            double ordersMadeTotal = Double.parseDouble(prevMap.get("totalOrders"));
-                                            double totalCustomersTotal = Double.parseDouble(prevMap.get("totalCustomers"));
-                                            text.setTextSize(80);
-                                            text.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
-                                            canvas.drawText("Compare with last 7 days", 650, 1070, text);
-                                            text.setTextSize(58);
-                                            text.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.NORMAL));
-
-                                            double data1 = ((totalSalesThatPeriod - prevSalesAmt) / prevSalesAmt) * 100;
-                                            if (totalSalesThatPeriod > prevSalesAmt) {
-                                                canvas.drawText("Total Sales: ↑ Increase By " + new DecimalFormat("0.00").format(data1) + "%", 100, 1180, text);
-                                            } else {
-                                                canvas.drawText("Total Sales: ↓ Decrease By " + new DecimalFormat("0.00").format(data1) + "%", 100, 1180, text);
-                                            }
-
-                                            double data2 =  ((totalOrders - ordersMadeTotal) / ordersMadeTotal) * 100;
-                                            if (totalOrders > ordersMadeTotal) {
-                                                canvas.drawText("Total Orders: ↑ Increase By " + new DecimalFormat("0.00").format(data2) + "%", 100, 1255, text);
-                                            } else {
-                                                canvas.drawText("Total Orders: ↓ Decrease By " + new DecimalFormat("0.00").format(data2) + "%", 100, 1255, text);
-                                            }
-
-                                            double data3 =  ((totalCust - totalCustomersTotal) / totalCustomersTotal) * 100;
-                                            if (totalCust > totalCustomersTotal) {
-                                                canvas.drawText("Total Customers: ↑ Increase By " + new DecimalFormat("0.00").format(data3) + "%", 100, 1330, text);
-                                            } else
-                                                canvas.drawText("Total Customers: ↓ Decrease By " + new DecimalFormat("0.00").format(data3) + "%", 100, 1330, text);
-
-                                        }
+//                                        if (last7daysReport.contains("lastAnalysisHashMap")) {
+//                                            Type typeo = new TypeToken<HashMap<String, String>>() {
+//                                            }.getType();
+//                                            HashMap<String, String> prevMap = new HashMap<>(gson.fromJson(last7daysReport.getString("lastAnalysisHashMap", ""), typeo));
+//                                            Double prevSalesAmt = Double.parseDouble(prevMap.get("totalSales"));
+//                                            double ordersMadeTotal = Double.parseDouble(prevMap.get("totalOrders"));
+//                                            double totalCustomersTotal = Double.parseDouble(prevMap.get("totalCustomers"));
+//                                            text.setTextSize(80);
+//                                            text.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+//                                            canvas.drawText("Compare with last 7 days", 650, 1070, text);
+//                                            text.setTextSize(58);
+//                                            text.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.NORMAL));
+//
+//                                            double data1 = ((totalSalesThatPeriod - prevSalesAmt) / prevSalesAmt) * 100;
+//                                            if (totalSalesThatPeriod > prevSalesAmt) {
+//                                                canvas.drawText("Total Sales: ↑ Increase By " + new DecimalFormat("0.00").format(data1) + "%", 100, 1180, text);
+//                                            } else {
+//                                                canvas.drawText("Total Sales: ↓ Decrease By " + new DecimalFormat("0.00").format(data1) + "%", 100, 1180, text);
+//                                            }
+//
+//                                            double data2 =  ((totalOrders - ordersMadeTotal) / ordersMadeTotal) * 100;
+//                                            if (totalOrders > ordersMadeTotal) {
+//                                                canvas.drawText("Total Orders: ↑ Increase By " + new DecimalFormat("0.00").format(data2) + "%", 100, 1255, text);
+//                                            } else {
+//                                                canvas.drawText("Total Orders: ↓ Decrease By " + new DecimalFormat("0.00").format(data2) + "%", 100, 1255, text);
+//                                            }
+//
+//                                            double data3 =  ((totalCust - totalCustomersTotal) / totalCustomersTotal) * 100;
+//                                            if (totalCust > totalCustomersTotal) {
+//                                                canvas.drawText("Total Customers: ↑ Increase By " + new DecimalFormat("0.00").format(data3) + "%", 100, 1330, text);
+//                                            } else
+//                                                canvas.drawText("Total Customers: ↓ Decrease By " + new DecimalFormat("0.00").format(data3) + "%", 100, 1330, text);
+//
+//                                        }
 
                                         canvas.drawText("For other info, Check Premium Activity", 100, 1470, text);
                                         text.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
@@ -1145,31 +1127,38 @@ public class HomeScreen extends AppCompatActivity {
                                         double data1 = ((totalSalesThatPeriod - prevSalesAmt) / prevSalesAmt) * 100;
                                         if (totalSalesThatPeriod > prevSalesAmt) {
                                             canvas.drawText("Total Sales: ↑ Increase By " + new DecimalFormat("0.00").format(data1) + "%", 100, 1180, text);
+                                            canvas.drawText("Previous Sales \u20b9" + prevSalesAmt, 100, 1220, text);
                                         } else {
                                             canvas.drawText("Total Sales: ↓ Decrease By " + new DecimalFormat("0.00").format(data1) + "%", 100, 1180, text);
+                                            canvas.drawText("Previous Sales \u20b9" + prevSalesAmt, 100, 1220, text);
                                         }
 
                                         double data2 =  ((totalOrders - ordersMadeTotal) / ordersMadeTotal) * 100;
                                         if (totalOrders > ordersMadeTotal) {
-                                            canvas.drawText("Total Orders: ↑ Increase By " + new DecimalFormat("0.00").format(data2) + "%", 100, 1255, text);
+                                            canvas.drawText("Total Orders: ↑ Increase By " + new DecimalFormat("0.00").format(data2) + "%", 100, 1295, text);
+                                            canvas.drawText("Previous Orders " + ordersMadeTotal, 100, 1335, text);
                                         } else {
-                                            canvas.drawText("Total Orders: ↓ Decrease By " + new DecimalFormat("0.00").format(data2) + "%", 100, 1255, text);
+                                            canvas.drawText("Total Orders: ↓ Decrease By " + new DecimalFormat("0.00").format(data2) + "%", 100, 1295, text);
+                                            canvas.drawText("Previous Orders " + ordersMadeTotal, 100, 1335, text);
                                         }
 
                                         double data3 =  ((totalCust - totalCustomersTotal) / totalCustomersTotal) * 100;
                                         if (totalCust > totalCustomersTotal) {
-                                            canvas.drawText("Total Customers: ↑ Increase By " + new DecimalFormat("0.00").format(data3) + "%", 100, 1330, text);
-                                        } else
-                                            canvas.drawText("Total Customers: ↓ Decrease By " + new DecimalFormat("0.00").format(data3) + "%", 100, 1330, text);
+                                            canvas.drawText("Total Customers: ↑ Increase By " + new DecimalFormat("0.00").format(data3) + "%", 100, 1410, text);
+                                            canvas.drawText("Previous Customers " + totalCustomersTotal, 100, 1450, text);
+                                        } else {
+                                            canvas.drawText("Total Customers: ↓ Decrease By " + new DecimalFormat("0.00").format(data3) + "%", 100, 1410, text);
+                                            canvas.drawText("Previous Customers " + totalCustomersTotal, 100, 1450, text);
+                                        }
 
                                     }
 
-                                    canvas.drawText("For other info, Check Premium Activity", 100, 1470, text);
+                                    canvas.drawText("For other info, Check Premium Activity", 100, 1510, text);
                                     text.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
                                     text.setTextSize(52);
-                                    canvas.drawText("Contact Ordinalo", 1200, 1745, text);
-                                    canvas.drawText("Phone: +91-8076531395", 1200, 1815, text);
-                                    canvas.drawText("Email: fastway8587@gmail.com", 1200, 1885, text);
+                                    canvas.drawText("Contact Ordinalo", 1200, 1765, text);
+                                    canvas.drawText("Phone: +91-8076531395", 1200, 1835, text);
+                                    canvas.drawText("Email: fastway8587@gmail.com", 1200, 1905, text);
 
                                     pdfDocument.finishPage(page);
                                     String fileName = "/MonthlyReportTracker" + ".pdf";
