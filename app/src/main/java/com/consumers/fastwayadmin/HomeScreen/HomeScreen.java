@@ -437,32 +437,37 @@ public class HomeScreen extends AppCompatActivity {
                         double data1 = ((totalSalesThatPeriod - prevSalesAmt) / prevSalesAmt) * 100;
                 if (totalSalesThatPeriod > prevSalesAmt) {
                     canvas.drawText("Total Sales: ↑ Increase By " + new DecimalFormat("0.00").format(data1) + "%", 100, 860, text);
+                    canvas.drawText("Previous Sales \u20b9" + prevSalesAmt, 100, 900, text);
                 } else {
                         canvas.drawText("Total Sales: ↓ Decrease By " + new DecimalFormat("0.00").format(data1) + "%", 100, 860, text);
+                    canvas.drawText("Previous Sales \u20b9" + prevSalesAmt, 100, 900, text);
                 }
 
                         double data2 = (double) ((totalOrders - ordersMadeTotal) / ordersMadeTotal) * 100;
                 if (totalOrders > ordersMadeTotal) {
-                    canvas.drawText("Total Orders: ↑ Increase By" + new DecimalFormat("0.00").format(data2) + "%", 100, 960, text);
+                    canvas.drawText("Total Orders: ↑ Increase By: " + new DecimalFormat("0.00").format(data2) + "%", 100, 1000, text);
+                    canvas.drawText("Previous Orders " + ordersMadeTotal, 100, 1040, text);
                 } else {
-
-                        canvas.drawText("Total Orders: ↓ Decrease By " + new DecimalFormat("0.00").format(data2) + "%", 100, 960, text);
+                        canvas.drawText("Total Orders: ↓ Decrease By " + new DecimalFormat("0.00").format(data2) + "%", 100, 1000, text);
+                    canvas.drawText("Previous Orders " + ordersMadeTotal, 100, 1040, text);
                 }
 
                         double data3 = (double) ((totalCust - totalCustomersTotal) / totalCustomersTotal) * 100;
                 if (totalCust > totalCustomersTotal) {
-                    canvas.drawText("Total Customers: ↑ Increase By" + new DecimalFormat("0.00").format(data3) + "%", 100, 1060, text);
-                } else
-                        canvas.drawText("Total Customers: ↓ Decrease By " + new DecimalFormat("0.00").format(data3) + "%", 100, 1060, text);
-
+                    canvas.drawText("Total Customers: ↑ Increase By" + new DecimalFormat("0.00").format(data3) + "%", 100, 1140, text);
+                    canvas.drawText("Previous Customers " + totalCustomersTotal, 100, 1180, text);
+                } else {
+                    canvas.drawText("Total Customers: ↓ Decrease By " + new DecimalFormat("0.00").format(data3) + "%", 100, 1140, text);
+                    canvas.drawText("Previous Customers " + totalCustomersTotal, 100, 1180, text);
+                }
             }
 
-                        canvas.drawText("For other info, Check Premium Activity", 100, 1160, text);
+                        canvas.drawText("For other info, Check Premium Activity", 100, 1260, text);
                         text.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
                         text.setTextSize(52);
-                        canvas.drawText("Contact Ordinalo", 1200, 1260, text);
-                        canvas.drawText("Phone: +91-8076531395", 1200, 1340, text);
-                        canvas.drawText("Email: fastway8587@gmail.com", 1200, 1420, text);
+                        canvas.drawText("Contact Ordinalo", 1200, 1310, text);
+                        canvas.drawText("Phone: +91-8076531395", 1200, 1390, text);
+                        canvas.drawText("Email: fastway8587@gmail.com", 1200, 1470, text);
 
 
                         HashMap<String,String> latestAnalysis = new HashMap<>();
@@ -489,24 +494,18 @@ public class HomeScreen extends AppCompatActivity {
                         runOnUiThread(() -> {
                             AlertDialog.Builder builder = new AlertDialog.Builder(HomeScreen.this);
                             builder.setTitle("Daily Insights").setMessage("Do you wanna open your last day insights file")
-                                    .setPositiveButton("Open", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialogInterface, int i) {
-                                            Intent intent = new Intent(Intent.ACTION_VIEW);
-                                            File file12 = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS) + "/DailyReportInsights.pdf");
-                                            if(file12.exists()) {
-                                                Toast.makeText(HomeScreen.this, "Opening....", Toast.LENGTH_SHORT).show();
-                                                intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                                                intent.setDataAndType(FileProvider.getUriForFile(HomeScreen.this, getPackageName() + ".provider", file12), "application/pdf");
-                                                startActivity(intent);
-                                            }else
-                                                Toast.makeText(HomeScreen.this, "No Reports Generated", Toast.LENGTH_SHORT).show();
-                                        }
-                                    }).setNegativeButton("Later", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                    .setPositiveButton("Open", (dialogInterface, i) -> {
+                                        Intent intent = new Intent(Intent.ACTION_VIEW);
+                                        File file12 = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS) + "/DailyReportInsights.pdf");
+                                        if(file12.exists()) {
+                                            Toast.makeText(HomeScreen.this, "Opening....", Toast.LENGTH_SHORT).show();
+                                            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                                            intent.setDataAndType(FileProvider.getUriForFile(HomeScreen.this, getPackageName() + ".provider", file12), "application/pdf");
+                                            startActivity(intent);
+                                        }else
+                                            Toast.makeText(HomeScreen.this, "No Reports Generated", Toast.LENGTH_SHORT).show();
+                                    }).setNegativeButton("Later", (dialogInterface, i) -> {
 
-                                        }
                                     }).create();
                             builder.show();
                         });
