@@ -341,11 +341,9 @@ public class MainActivity extends AppCompatActivity {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            cityName = addresses.get(0).getLocality();
-            if(addresses.get(0).getSubAdminArea() != null)
-                subAdmin = addresses.get(0).getSubAdminArea();
-            else
-                subAdmin = "";
+            cityName = addresses.get(0).getAdminArea();
+            subAdmin = addresses.get(0).getAdminArea();
+
 
             if(addresses.get(0).getPostalCode() != null)
                 postalCode = addresses.get(0).getPostalCode();
@@ -358,6 +356,7 @@ public class MainActivity extends AppCompatActivity {
             Log.i("info", cityName + " " + subAdmin);
             Log.i("location",longi + " " + lati);
 
+            clientsLocation.removeLocationUpdates(mLocationCallback);
         }
     };
 

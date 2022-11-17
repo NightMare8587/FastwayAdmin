@@ -167,10 +167,10 @@ public class MapsActivity2 extends FragmentActivity implements OnMapReadyCallbac
                     longitude = address.getLongitude();
                     lon = address.getLongitude();
                     lat = address.getLatitude();
-                    cityName = address.getLocality();
-                    subAdminArea = address.getSubAdminArea();
+                    cityName = address.getAdminArea();
+                    subAdminArea = address.getAdminArea();
                     pinCode = address.getPostalCode();
-                    Toast.makeText(MapsActivity2.this, "" + subAdminArea, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MapsActivity2.this, cityName + " " + subAdminArea, Toast.LENGTH_SHORT).show();
                     mMap.addMarker(new MarkerOptions().position(current).title("Current Location"));
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(current, 15));
                 }
@@ -256,10 +256,10 @@ public class MapsActivity2 extends FragmentActivity implements OnMapReadyCallbac
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                cityName = addresses.get(0).getLocality();
-                subAdminArea = addresses.get(0).getSubAdminArea();
+                cityName = addresses.get(0).getAdminArea();
+                subAdminArea = addresses.get(0).getAdminArea();
                 pinCode = addresses.get(0).getPostalCode();
-                Toast.makeText(MapsActivity2.this, "" + subAdminArea, Toast.LENGTH_SHORT).show();
+                Toast.makeText(MapsActivity2.this, cityName + " " + subAdminArea, Toast.LENGTH_SHORT).show();
 //               RestLocation restLocation = new RestLocation(String.valueOf(latitude),String.valueOf(longitude));
 //               ref = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants");
 //               ref.child("Locations").child(auth.getUid()).setValue(restLocation);
@@ -280,7 +280,7 @@ public class MapsActivity2 extends FragmentActivity implements OnMapReadyCallbac
      * installed Google Play services and returned to the app.
      */
     @Override
-    public void onMapReady(GoogleMap googleMap) {
+    public void onMapReady(@NonNull GoogleMap googleMap) {
         mMap = googleMap;
         client = LocationServices.getFusedLocationProviderClient(this);
 //        createLocationRequest();
@@ -304,10 +304,10 @@ public class MapsActivity2 extends FragmentActivity implements OnMapReadyCallbac
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                cityName = addresses.get(0).getLocality();
-                subAdminArea = addresses.get(0).getSubAdminArea();
+                cityName = addresses.get(0).getAdminArea();
+                subAdminArea = addresses.get(0).getAdminArea();
                 pinCode = addresses.get(0).getPostalCode();
-                Toast.makeText(MapsActivity2.this, "" + subAdminArea, Toast.LENGTH_SHORT).show();
+                Toast.makeText(MapsActivity2.this, cityName + " " + subAdminArea, Toast.LENGTH_SHORT).show();
             }
         });
 
