@@ -72,7 +72,7 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
                                 if(platformFeeAmount == 0D){
                                     platformFeeAmount = 0D;
                                 }else{
-                                    if(platformFeeAmount >= 450000)
+                                    if(platformFeeAmount >= 500000)
                                         platformFeeAmount = ( platformFeeAmount * 4 ) / 100;
                                     else
                                         platformFeeAmount = ( platformFeeAmount * 3.5 ) / 100;
