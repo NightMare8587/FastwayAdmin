@@ -10,14 +10,19 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -47,6 +52,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class RestaurantEarningAnalysis extends AppCompatActivity {
     SharedPreferences storedOrders;
@@ -60,6 +66,7 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
     BubbleShowCaseBuilder bubbleShowCaseBuilder3;
     BubbleShowCaseBuilder bubbleShowCaseBuilder4;
     BubbleShowCaseBuilder bubbleShowCaseBuilder5;
+
     SharedPreferences loginInfo;
     SharedPreferences.Editor editorlogin;
     RecyclerView recyclerView;
@@ -71,6 +78,7 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
     TextView textView,totalOrderThatDay,totalAmountThatDay;
     List<String> days = new ArrayList<>();
     List<String> orders = new ArrayList<>();
+    SharedPreferences dailyInsightsStoringData;
     SharedPreferences user7daysTracker;
     List<String> amounts = new ArrayList<>();
     String[] monthName = {"January", "February",
@@ -78,6 +86,7 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
             "August", "September", "October", "November",
             "December"};
     ProgressBar progressBar;
+    Button hashMapRecycler;
     Calendar calendar = Calendar.getInstance();
     com.github.mikephil.charting.charts.BarChart barChart,barChart1;
 
@@ -89,6 +98,7 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
         setContentView(R.layout.activity_restaurant_earning_analysis);
         storedOrders = getSharedPreferences("RestaurantDailyStoreForAnalysis",MODE_PRIVATE);
         storeEditor = storedOrders.edit();
+        hashMapRecycler = findViewById(R.id.buttonShowHashMapTimeZone);
         loginInfo = getSharedPreferences("loginInfo",MODE_PRIVATE);
         editorlogin = loginInfo.edit();
         totalCustomersLast7days = findViewById(R.id.totalCustomersInLast7daysTextView);
@@ -98,6 +108,7 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
         barChart1 = findViewById(R.id.lineChartRestaurantEarn7days);
         highestSalesAmountThatDay = findViewById(R.id.highestDateNameDay);
         highestSalesOrderThatDay = findViewById(R.id.highestSalesAmountTextViewDay);
+        dailyInsightsStoringData = getSharedPreferences("DailyInsightsStoringData",MODE_PRIVATE);
         barChart = findViewById(R.id.barchartAnalysis);
         averageOrderThatDay = findViewById(R.id.averageOrderSizeThatPerticularDay);
         barChart.getDescription().setEnabled(false);
@@ -304,6 +315,50 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
                     dateThatDay.setText(date.get(date.size()-1) + "th " + month);
                     LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
                             new IntentFilter("custom-message-analysis"));
+                    Type typeses = new TypeToken<HashMap<String,HashMap<String,String>>>() {
+                    }.getType();
+                    Gson mySon = new Gson();
+                    if(dailyInsightsStoringData.contains(month)){
+                        HashMap<String,HashMap<String,String>> map = mySon.fromJson(dailyInsightsStoringData.getString(month,""),typeses);
+                        if(map.containsKey(day + "")){
+
+                            HashMap<String,String> innerMap = new HashMap<>(map.get(day + ""));
+
+                            java.lang.reflect.Type timeZoneMap = new TypeToken<HashMap<String, Integer>>() {
+                            }.getType();
+
+                            HashMap<String,Integer> timeMap = new HashMap<>(mySon.fromJson(innerMap.get("timeZoneMap"),timeZoneMap));
+                            List<String> hoursList = new ArrayList<>();
+                            List<String> totalAtHour = new ArrayList<>();
+                            for(Map.Entry<String,Integer> mapmap : timeMap.entrySet()){
+                                int dataHour = Integer.parseInt(mapmap.getKey());
+                                hoursList.add(dataHour + "-" + ++dataHour);
+                                totalAtHour.add(mapmap.getValue() + "");
+                            }
+
+                            hashMapRecycler.setOnClickListener(click -> {
+                                AlertDialog.Builder builder = new AlertDialog.Builder(RestaurantEarningAnalysis.this);
+                                builder.setTitle("Time Zone Map").setMessage("Showing Data of time zones");
+                                LinearLayout linearLayout = new LinearLayout(RestaurantEarningAnalysis.this);
+
+                                LayoutInflater inflater = (LayoutInflater) getSystemService( Context.LAYOUT_INFLATER_SERVICE );
+                                View view = inflater.inflate(R.layout.res_timezone_dialog_layout,null);
+
+                                ArrayAdapter<String> arrayAdapter1 = new ArrayAdapter<>(RestaurantEarningAnalysis.this, android.R.layout.simple_list_item_1, hoursList);
+                                ArrayAdapter<String> arrayAdapter2 = new ArrayAdapter<>(RestaurantEarningAnalysis.this, android.R.layout.simple_list_item_1, totalAtHour);
+                                ListView listView1 = view.findViewById(R.id.listDishNamesResInfo);
+                                listView1.setAdapter(arrayAdapter1);
+                                ListView listView2 = view.findViewById(R.id.listDishNamesQuantityInfo);
+                                listView2.setAdapter(arrayAdapter2);
+                                builder.setView(view);
+
+                                builder.setPositiveButton("Exit", (dialogInterface, i) -> dialogInterface.dismiss()).create().show();
+                            });
+
+                        }else
+                            hashMapRecycler.setVisibility(View.INVISIBLE);
+                    }else
+                        hashMapRecycler.setVisibility(View.INVISIBLE);
 
                     progressBar.setVisibility(View.INVISIBLE);
 

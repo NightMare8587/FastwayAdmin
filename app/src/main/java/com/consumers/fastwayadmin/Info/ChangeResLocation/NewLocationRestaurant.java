@@ -122,12 +122,7 @@ public class NewLocationRestaurant extends AppCompatActivity {
                                     Intent intent = new Intent(NewLocationRestaurant.this, MapsActivity2.class);
                                     startActivityForResult(intent,500);
                                 }
-                            }).setNegativeButton("Wait", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    finish();
-                                }
-                            }).create().show();
+                            }).setNegativeButton("Wait", (dialogInterface1, i1) -> finish()).create().show();
                 }).create();
         builder.setCancelable(false);
         builder.show();

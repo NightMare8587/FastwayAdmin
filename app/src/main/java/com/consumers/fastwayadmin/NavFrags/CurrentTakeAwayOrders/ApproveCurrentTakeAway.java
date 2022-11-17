@@ -620,8 +620,8 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                                                 mainMap.put(day + "",innerMap);
                                             }
 
-//                                            dailyInsightEditor.putString(month,gson.toJson(mainMap));
-//                                            dailyInsightEditor.apply();
+                                            dailyInsightEditor.putString(month,gson.toJson(mainMap));
+                                            dailyInsightEditor.apply();
 
 
                                         }else{
