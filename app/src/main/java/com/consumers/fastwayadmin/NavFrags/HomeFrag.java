@@ -44,6 +44,7 @@ import com.consumers.fastwayadmin.DiscountCombo.ComboAndOffers;
 import com.consumers.fastwayadmin.DiscountCombo.DiscountActivity;
 import com.consumers.fastwayadmin.NavFrags.CurrentTakeAwayOrders.CurrentTakeAway;
 import com.consumers.fastwayadmin.NavFrags.Events.OrganiseEvents;
+import com.consumers.fastwayadmin.NavFrags.PromotionAdsPack.CreateViewPromotions;
 import com.consumers.fastwayadmin.NavFrags.ResEarningTracker.ResEarningTrackerActivity;
 import com.consumers.fastwayadmin.NavFrags.homeFrag.homeFragClass;
 import com.consumers.fastwayadmin.R;
@@ -335,7 +336,7 @@ public class HomeFrag extends Fragment {
                     .setFirstButtonText("CREATE/SHOW CAMPAIGN")
                     .setSecondButtonColor(Color.parseColor("#fee9b2"))
                     .setSecondButtonTextColor(Color.parseColor("#000000"))
-                    .setSecondButtonText("COMBO/THALI")
+                    .setSecondButtonText("PROMOTION ADS")
                     .setThirdButtonText("Events")
                     .setThirdButtonColor(Color.parseColor("#b3b3ff"))
                     .setThirdButtonTextColor(Color.parseColor("#000000"))
@@ -344,7 +345,7 @@ public class HomeFrag extends Fragment {
                         flatDialog.dismiss();
                     })
                     .withSecondButtonListner(view112 -> {
-                        startActivity(new Intent(getContext(), ComboAndOffers.class));
+                        startActivity(new Intent(getContext(), CreateViewPromotions.class));
                         flatDialog.dismiss();
                     })
                     .withThirdButtonListner(new View.OnClickListener() {
