@@ -174,12 +174,9 @@ public class CreateEventOrganise extends AppCompatActivity {
             addToRTDB.child("Current Event").setValue(map);
 
             Toast.makeText(this, "Event Created Successfully", Toast.LENGTH_SHORT).show();
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    setResult(22);
-                    finish();
-                }
+            new Handler().postDelayed(() -> {
+                setResult(22);
+                finish();
             },300);
         });
 
