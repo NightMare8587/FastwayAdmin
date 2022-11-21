@@ -451,6 +451,7 @@ public class HomeScreen extends AppCompatActivity {
                         canvas.drawText("Total Orders: ↓ Decrease By " + new DecimalFormat("0.00").format(data2) + "%", 100, 1000, text);
                     canvas.drawText("Previous Orders " + ordersMadeTotal, 100, 1040, text);
                 }
+                
 
                         double data3 = (double) ((totalCust - totalCustomersTotal) / totalCustomersTotal) * 100;
                 if (totalCust > totalCustomersTotal) {
