@@ -23,6 +23,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -31,6 +33,7 @@ public class CreateViewPromotions extends AppCompatActivity {
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
     Button create;
+    boolean promotionActive = false;
     boolean coolDownActive = false;
     DatabaseReference databaseReference;
     FirebaseAuth auth = FirebaseAuth.getInstance();
@@ -60,6 +63,24 @@ public class CreateViewPromotions extends AppCompatActivity {
             builder.create().show();
         }
 
+        DatabaseReference promotionCheckDB = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("PromotionDB").child(auth.getUid());
+        promotionCheckDB.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists() && snapshot.hasChild("promotionAdded")){
+                    promotionActive = true;
+                    coolDown.setVisibility(View.VISIBLE);
+                    coolDown.setText("Promotion Is Active\n" + "Start Date: " + new SimpleDateFormat("dd/MM/yyyy").format(new Date(Long.parseLong(snapshot.child("startTime").getValue(String.class)))) + "\nEnd Date: " + new SimpleDateFormat("dd/MM/yyyy").format(new Date(Long.parseLong(snapshot.child("endTime").getValue(String.class)))));
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+
         databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid())).child("PromotionsAds");
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -78,7 +99,7 @@ public class CreateViewPromotions extends AppCompatActivity {
 
 
                 create.setOnClickListener(click -> {
-                    if(coolDownActive){
+                    if(coolDownActive || promotionActive){
                         Toast.makeText(CreateViewPromotions.this, "CoolDown/Promotion Period Active", Toast.LENGTH_SHORT).show();
                     }else{
                         AlertDialog.Builder builder = new AlertDialog.Builder(CreateViewPromotions.this);
