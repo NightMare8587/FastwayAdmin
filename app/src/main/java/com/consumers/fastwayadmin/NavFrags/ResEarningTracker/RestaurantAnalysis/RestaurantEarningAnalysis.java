@@ -537,6 +537,53 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
             new Handler().postDelayed(() -> progressBar.setVisibility(View.INVISIBLE),1155);
 //            Toast.makeText(context, "" + orders + " " + amounts + " " + MonthName, Toast.LENGTH_SHORT).show();
 
+            String val = MonthName;
+            val = val.replace(monthName[calendar.get(Calendar.MONTH)],"").trim();
+            val = val.replace("th","");
+            Type typeses = new TypeToken<HashMap<String,HashMap<String,String>>>() {
+            }.getType();
+            Gson mySon = new Gson();
+            if(dailyInsightsStoringData.contains(monthName[calendar.get(Calendar.MONTH)])){
+                HashMap<String,HashMap<String,String>> map = mySon.fromJson(dailyInsightsStoringData.getString(monthName[calendar.get(Calendar.MONTH)],""),typeses);
+                if(map.containsKey(val + "")){
+
+                    HashMap<String,String> innerMap = new HashMap<>(map.get(val + ""));
+
+                    java.lang.reflect.Type timeZoneMap = new TypeToken<HashMap<String, Integer>>() {
+                    }.getType();
+
+                    HashMap<String,Integer> timeMap = new HashMap<>(mySon.fromJson(innerMap.get("timeZoneMap"),timeZoneMap));
+                    List<String> hoursList = new ArrayList<>();
+                    List<String> totalAtHour = new ArrayList<>();
+                    for(Map.Entry<String,Integer> mapmap : timeMap.entrySet()){
+                        int dataHour = Integer.parseInt(mapmap.getKey());
+                        hoursList.add(dataHour + "-" + ++dataHour);
+                        totalAtHour.add(mapmap.getValue() + "");
+                    }
+
+                    hashMapRecycler.setOnClickListener(click -> {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(RestaurantEarningAnalysis.this);
+                        builder.setTitle("Time Zone Map").setMessage("Showing Data of time zones");
+                        LinearLayout linearLayout = new LinearLayout(RestaurantEarningAnalysis.this);
+
+                        LayoutInflater inflater = (LayoutInflater) getSystemService( Context.LAYOUT_INFLATER_SERVICE );
+                        View view = inflater.inflate(R.layout.res_timezone_dialog_layout,null);
+
+                        ArrayAdapter<String> arrayAdapter1 = new ArrayAdapter<>(RestaurantEarningAnalysis.this, android.R.layout.simple_list_item_1, hoursList);
+                        ArrayAdapter<String> arrayAdapter2 = new ArrayAdapter<>(RestaurantEarningAnalysis.this, android.R.layout.simple_list_item_1, totalAtHour);
+                        ListView listView1 = view.findViewById(R.id.listDishNamesResInfo);
+                        listView1.setAdapter(arrayAdapter1);
+                        ListView listView2 = view.findViewById(R.id.listDishNamesQuantityInfo);
+                        listView2.setAdapter(arrayAdapter2);
+                        builder.setView(view);
+
+                        builder.setPositiveButton("Exit", (dialogInterface, i) -> dialogInterface.dismiss()).create().show();
+                    });
+
+                }else
+                    hashMapRecycler.setVisibility(View.INVISIBLE);
+            }else
+                hashMapRecycler.setVisibility(View.INVISIBLE);
         }
     };
 

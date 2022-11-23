@@ -661,7 +661,7 @@ public class HomeScreen extends AppCompatActivity {
                     if (last7daysReport.contains("daysTracked")) {
                         int day = calendar.get(Calendar.DAY_OF_MONTH);
 
-                        if (Integer.parseInt(last7daysReport.getString("daysTracked", "")) == 7) {
+                        if (Integer.parseInt(last7daysReport.getString("currentDate","")) != day && Integer.parseInt(last7daysReport.getString("daysTracked", "")) == 7) {
                             String json = storeOrders.getString(month, "");
                             gson = new Gson();
                             Log.i("info1414","kaaaaaaaaaaaaaaaaaaaaaaaaaaala");
@@ -675,7 +675,6 @@ public class HomeScreen extends AppCompatActivity {
                                 List<String> date = new ArrayList<>(mainDataList.get(0));
                                 List<String> totalORders = new ArrayList<>(mainDataList.get(2));
                                 List<String> orderAmountList = new ArrayList<>(mainDataList.get(1));
-
 
                                 if (date.size() != 0) {
                                     String startDate, endDate;
