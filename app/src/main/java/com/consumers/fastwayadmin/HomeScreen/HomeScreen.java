@@ -252,6 +252,8 @@ public class HomeScreen extends AppCompatActivity {
         });
         SharedPreferences last7daysReport = getSharedPreferences("last7daysReport",MODE_PRIVATE);
         SharedPreferences.Editor last7daysReportEdit = last7daysReport.edit();
+//        last7daysReportEdit.putString("daysTracked","5");
+        last7daysReportEdit.apply();
         SharedPreferences storeOrders = getSharedPreferences("RestaurantDailyStoreForAnalysis",MODE_PRIVATE);
         new Thread(() -> {
             PdfDocument pdfDocument = new PdfDocument();
@@ -350,10 +352,12 @@ public class HomeScreen extends AppCompatActivity {
         new Thread(() -> {
             SharedPreferences dailyInsights = getSharedPreferences("DailyInsightsStoringData",MODE_PRIVATE);
             SharedPreferences.Editor editor = dailyInsights.edit();
+
             String month = monthName[calendar.get(Calendar.MONTH)];
             int day = calendar.get(Calendar.DAY_OF_MONTH);
 
-
+            editor.putString("lastDay","18");
+            editor.apply();
 
             if(dailyInsights.contains(month)){
 //                runOnUiThread(new Runnable() {
@@ -370,11 +374,11 @@ public class HomeScreen extends AppCompatActivity {
                 if(day != 1 ){
 
                     day--;
-
+//                    day = 19;
                     if(dailyInsights.contains("lastDay") && dailyInsights.getString("lastDay","").equals(day + ""))
                         return;
                     if(mainMap.containsKey(day + "")){
-
+                        Log.i("checking","here");
                         Type typeo = new TypeToken<List<String>>() {
                         }.getType();
                         HashMap<String,String> innerMap = new HashMap<>(mainMap.get(day + ""));
@@ -424,6 +428,7 @@ public class HomeScreen extends AppCompatActivity {
                 }.getType();
                 int totalOrders = orderList.size();
                 int totalCust = custList.size();
+                Log.i("checking","here");
                 Double totalSalesThatPeriod = Double.parseDouble(revenueTotal);
                 HashMap<String, String> prevMap = new HashMap<>(gson.fromJson(dailyInsights.getString("lastAnalysisHashMap", ""), typeos));
                 Double prevSalesAmt = Double.parseDouble(prevMap.get("totalSales"));
@@ -437,38 +442,38 @@ public class HomeScreen extends AppCompatActivity {
                         double data1 = ((totalSalesThatPeriod - prevSalesAmt) / prevSalesAmt) * 100;
                 if (totalSalesThatPeriod > prevSalesAmt) {
                     canvas.drawText("Total Sales: ↑ Increase By " + new DecimalFormat("0.00").format(data1) + "%", 100, 860, text);
-                    canvas.drawText("Previous Sales \u20b9" + prevSalesAmt, 100, 900, text);
+                    canvas.drawText("Previous Sales \u20b9" + prevSalesAmt, 100, 940, text);
                 } else {
                         canvas.drawText("Total Sales: ↓ Decrease By " + new DecimalFormat("0.00").format(data1) + "%", 100, 860, text);
-                    canvas.drawText("Previous Sales \u20b9" + prevSalesAmt, 100, 900, text);
+                    canvas.drawText("Previous Sales \u20b9" + prevSalesAmt, 100, 940, text);
                 }
 
                         double data2 = (double) ((totalOrders - ordersMadeTotal) / ordersMadeTotal) * 100;
                 if (totalOrders > ordersMadeTotal) {
-                    canvas.drawText("Total Orders: ↑ Increase By: " + new DecimalFormat("0.00").format(data2) + "%", 100, 1000, text);
-                    canvas.drawText("Previous Orders " + ordersMadeTotal, 100, 1040, text);
+                    canvas.drawText("Total Orders: ↑ Increase By: " + new DecimalFormat("0.00").format(data2) + "%", 100, 1010, text);
+                    canvas.drawText("Previous Orders " + ordersMadeTotal, 100, 1080, text);
                 } else {
-                        canvas.drawText("Total Orders: ↓ Decrease By " + new DecimalFormat("0.00").format(data2) + "%", 100, 1000, text);
-                    canvas.drawText("Previous Orders " + ordersMadeTotal, 100, 1040, text);
+                        canvas.drawText("Total Orders: ↓ Decrease By " + new DecimalFormat("0.00").format(data2) + "%", 100, 1010, text);
+                    canvas.drawText("Previous Orders " + ordersMadeTotal, 100, 1080, text);
                 }
 
 
                         double data3 = (double) ((totalCust - totalCustomersTotal) / totalCustomersTotal) * 100;
                 if (totalCust > totalCustomersTotal) {
-                    canvas.drawText("Total Customers: ↑ Increase By" + new DecimalFormat("0.00").format(data3) + "%", 100, 1140, text);
-                    canvas.drawText("Previous Customers " + totalCustomersTotal, 100, 1180, text);
+                    canvas.drawText("Total Customers: ↑ Increase By" + new DecimalFormat("0.00").format(data3) + "%", 100, 1150, text);
+                    canvas.drawText("Previous Customers " + totalCustomersTotal, 100, 1220, text);
                 } else {
-                    canvas.drawText("Total Customers: ↓ Decrease By " + new DecimalFormat("0.00").format(data3) + "%", 100, 1140, text);
-                    canvas.drawText("Previous Customers " + totalCustomersTotal, 100, 1180, text);
+                    canvas.drawText("Total Customers: ↓ Decrease By " + new DecimalFormat("0.00").format(data3) + "%", 100, 1150, text);
+                    canvas.drawText("Previous Customers " + totalCustomersTotal, 100, 1220, text);
                 }
             }
 
-                        canvas.drawText("For other info, Check Premium Activity", 100, 1260, text);
+                        canvas.drawText("For other info, Check Premium Activity", 100, 1320, text);
                         text.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
                         text.setTextSize(52);
-                        canvas.drawText("Contact Ordinalo", 1200, 1310, text);
-                        canvas.drawText("Phone: +91-8076531395", 1200, 1390, text);
-                        canvas.drawText("Email: fastway8587@gmail.com", 1200, 1470, text);
+                        canvas.drawText("Contact Ordinalo", 1200, 1360, text);
+                        canvas.drawText("Phone: +91-8076531395", 1200, 1410, text);
+                        canvas.drawText("Email: fastway8587@gmail.com", 1200, 1480, text);
 
 
                         HashMap<String,String> latestAnalysis = new HashMap<>();
@@ -482,10 +487,15 @@ public class HomeScreen extends AppCompatActivity {
                         pdfDocument.finishPage(page);
                         String fileName = "/DailyReportInsights" + ".pdf";
                         File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS) + fileName);
-
+                        File file1 = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS) + fileName);
+                        Log.i("checking",file1.exists() + "");
+                        if(file1.exists()) {
+                            file1.delete();
+                            Log.i("checking",file1.exists() + "");
+                        }
                         try {
                             pdfDocument.writeTo(new FileOutputStream(file));
-                            runOnUiThread(() -> Toast.makeText(HomeScreen.this, "Generated", Toast.LENGTH_SHORT).show());
+                            runOnUiThread(() -> Toast.makeText(HomeScreen.this, "Report Generated", Toast.LENGTH_SHORT).show());
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
@@ -591,17 +601,17 @@ public class HomeScreen extends AppCompatActivity {
 
                                         double data2 = (double) ((totalOrders - ordersMadeTotal) / ordersMadeTotal) * 100;
                                         if (totalOrders > ordersMadeTotal) {
-                                            canvas.drawText("Total Orders: ↑ Increase By" + new DecimalFormat("0.00").format(data2) + "%", 100, 960, text);
+                                            canvas.drawText("Total Orders: ↑ Increase By" + new DecimalFormat("0.00").format(data2) + "%", 100, 950, text);
                                         } else {
 
-                                            canvas.drawText("Total Orders: ↓ Decrease By " + new DecimalFormat("0.00").format(data2) + "%", 100, 960, text);
+                                            canvas.drawText("Total Orders: ↓ Decrease By " + new DecimalFormat("0.00").format(data2) + "%", 100, 950, text);
                                         }
 
                                         double data3 = (double) ((totalCust - totalCustomersTotal) / totalCustomersTotal) * 100;
                                         if (totalCust > totalCustomersTotal) {
-                                            canvas.drawText("Total Customers: ↑ Increase By" + new DecimalFormat("0.00").format(data3) + "%", 100, 1060, text);
+                                            canvas.drawText("Total Customers: ↑ Increase By" + new DecimalFormat("0.00").format(data3) + "%", 100, 1050, text);
                                         } else
-                                            canvas.drawText("Total Customers: ↓ Decrease By " + new DecimalFormat("0.00").format(data3) + "%", 100, 1060, text);
+                                            canvas.drawText("Total Customers: ↓ Decrease By " + new DecimalFormat("0.00").format(data3) + "%", 100, 1050, text);
 
                                     }
                                     canvas.drawText("For other info, Check Premium Activity", 100, 1160, text);
@@ -651,7 +661,7 @@ public class HomeScreen extends AppCompatActivity {
                     if (last7daysReport.contains("daysTracked")) {
                         int day = calendar.get(Calendar.DAY_OF_MONTH);
 
-                        if (Integer.parseInt(last7daysReport.getString("currentDate", "")) == day && Integer.parseInt(last7daysReport.getString("daysTracked", "")) == 7) {
+                        if (Integer.parseInt(last7daysReport.getString("daysTracked", "")) == 7) {
                             String json = storeOrders.getString(month, "");
                             gson = new Gson();
                             Log.i("info1414","kaaaaaaaaaaaaaaaaaaaaaaaaaaala");
@@ -714,7 +724,7 @@ public class HomeScreen extends AppCompatActivity {
                                         text.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
                                         canvas.drawText("Last 7 days Report", 100, 155, text);
                                         text.setTextSize(75);
-                                        canvas.drawText("From " + startDate + " to " + endDate + " " + month, 100, 265, text);
+                                        canvas.drawText("From " + startDate + "th to " + endDate + "th " + month, 100, 265, text);
                                         text.setTextSize(58);
                                         text.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.NORMAL));
                                         canvas.drawText("Total Orders Made: " + totalOrders, 100, 395, text);
@@ -753,32 +763,32 @@ public class HomeScreen extends AppCompatActivity {
                                             double data1 = ((totalSalesThatPeriod - prevSalesAmt) / prevSalesAmt) * 100;
                                             if (totalSalesThatPeriod > prevSalesAmt) {
                                                 canvas.drawText("Total Sales: ↑ Increase By " + new DecimalFormat("0.00").format(data1) + "%", 100, 1180, text);
-                                                canvas.drawText("Previous Sales \u20b9" + prevSalesAmt, 100, 1220, text);
+                                                canvas.drawText("Previous Sales \u20b9" + prevSalesAmt, 100, 1250, text);
                                             } else {
                                                 canvas.drawText("Total Sales: ↓ Decrease By " + new DecimalFormat("0.00").format(data1) + "%", 100, 1180, text);
-                                                canvas.drawText("Previous Sales \u20b9" + prevSalesAmt, 100, 1220, text);
+                                                canvas.drawText("Previous Sales \u20b9" + prevSalesAmt, 100, 1250, text);
                                             }
 
                                             double data2 = ((totalOrders - ordersMadeTotal) / ordersMadeTotal) * 100;
                                             if (totalOrders > ordersMadeTotal) {
-                                                canvas.drawText("Total Orders: ↑ Increase By " + new DecimalFormat("0.00").format(data2) + "%", 100, 1295, text);
-                                                canvas.drawText("Previous Orders \u20b9" + ordersMadeTotal, 100, 1335, text);
+                                                canvas.drawText("Total Orders: ↑ Increase By " + new DecimalFormat("0.00").format(data2) + "%", 100, 1325, text);
+                                                canvas.drawText("Previous Orders " + ordersMadeTotal, 100, 1395, text);
                                             } else {
-                                                canvas.drawText("Total Orders: ↓ Decrease By " + new DecimalFormat("0.00").format(data2) + "%", 100, 1295, text);
-                                                canvas.drawText("Previous Orders \u20b9" + ordersMadeTotal, 100, 1335, text);
+                                                canvas.drawText("Total Orders: ↓ Decrease By " + new DecimalFormat("0.00").format(data2) + "%", 100, 1325, text);
+                                                canvas.drawText("Previous Orders " + ordersMadeTotal, 100, 1395, text);
                                             }
 
                                             double data3 =  ((totalCust - totalCustomersTotal) / totalCustomersTotal) * 100;
                                             if (totalCust > totalCustomersTotal) {
-                                                canvas.drawText("Total Customers: ↑ Increase By " + new DecimalFormat("0.00").format(data3) + "%", 100, 1410, text);
-                                                canvas.drawText("Previous Customers " + totalCustomersTotal, 100, 1450, text);
+                                                canvas.drawText("Total Customers: ↑ Increase By " + new DecimalFormat("0.00").format(data3) + "%", 100, 1465, text);
+                                                canvas.drawText("Previous Customers " + totalCustomersTotal, 100, 1535, text);
                                             } else {
-                                                canvas.drawText("Total Customers: ↓ Decrease By " + new DecimalFormat("0.00").format(data3) + "%", 100, 1410, text);
-                                                canvas.drawText("Previous Customers " + totalCustomersTotal, 100, 1450, text);
+                                                canvas.drawText("Total Customers: ↓ Decrease By " + new DecimalFormat("0.00").format(data3) + "%", 100, 1465, text);
+                                                canvas.drawText("Previous Customers " + totalCustomersTotal, 100, 1535, text);
                                             }
                                         }
 
-                                        canvas.drawText("For other info, Check Premium Activity", 100, 1520, text);
+                                        canvas.drawText("For other info, Check Premium Activity", 100, 1605, text);
                                         text.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
                                         text.setTextSize(52);
                                         canvas.drawText("Contact Ordinalo", 1200, 1765, text);
@@ -805,6 +815,7 @@ public class HomeScreen extends AppCompatActivity {
                                         prevAnalysisInfo.put("totalCustomers", totalCust + "");
                                         last7daysReportEdit.putString("lastAnalysisHashMap", gson.toJson(prevAnalysisInfo));
                                         last7daysReportEdit.remove("daysTracked");
+                                        last7daysReportEdit.putString("lastDateReport",endDate);
                                         last7daysReportEdit.apply();
 
                                         runOnUiThread(() -> {
