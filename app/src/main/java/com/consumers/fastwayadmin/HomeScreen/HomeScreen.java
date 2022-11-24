@@ -356,8 +356,8 @@ public class HomeScreen extends AppCompatActivity {
             String month = monthName[calendar.get(Calendar.MONTH)];
             int day = calendar.get(Calendar.DAY_OF_MONTH);
 
-            editor.putString("lastDay","18");
-            editor.apply();
+//            editor.putString("lastDay","18");
+//            editor.apply();
 
             if(dailyInsights.contains(month)){
 //                runOnUiThread(new Runnable() {
