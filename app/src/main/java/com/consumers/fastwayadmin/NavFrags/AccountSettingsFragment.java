@@ -3,11 +3,18 @@ package com.consumers.fastwayadmin.NavFrags;
 import static android.content.Context.MODE_PRIVATE;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.RadioGroup;
+import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -16,7 +23,10 @@ import androidx.core.content.FileProvider;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.SwitchPreferenceCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.consumers.fastwayadmin.HomeScreen.ReportsClassRecycler;
 import com.consumers.fastwayadmin.ListViewActivity.CashTrans.CashTransactions;
 import com.consumers.fastwayadmin.ListViewActivity.MyAccount;
 import com.consumers.fastwayadmin.ListViewActivity.MyOrdersTransactions;
@@ -29,6 +39,7 @@ import com.developer.kalert.KAlertDialog;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.common.reflect.TypeToken;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -37,8 +48,16 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.gson.Gson;
 
 import java.io.File;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 public class AccountSettingsFragment extends PreferenceFragmentCompat {
@@ -89,8 +108,8 @@ public class AccountSettingsFragment extends PreferenceFragmentCompat {
         reports.setOnPreferenceClickListener(preference -> {
             AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
             builder.setTitle("Choose One Option")
-                    .setMessage("Choose weekly or monthly report")
-                    .setPositiveButton("Open Weekly", (dialogInterface, i) -> {
+                    .setMessage("Choose weekly or monthly report or See All\nClick anywhere outside to close the dialog")
+                    .setPositiveButton("This Week", (dialogInterface, i) -> {
 
                         Intent intent = new Intent(Intent.ACTION_VIEW);
                         File file12 = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS) + "/WeeklyReportTracker.pdf");
@@ -112,7 +131,118 @@ public class AccountSettingsFragment extends PreferenceFragmentCompat {
                             startActivity(intent);
                         }else
                             Toast.makeText(requireContext(), "No Reports Generated", Toast.LENGTH_SHORT).show();
-                    }).setNeutralButton("Exit", (dialogInterface, i) -> {
+                    }).setNeutralButton("See All", (dialogInterface, i) -> {
+                        AlertDialog.Builder alertDialog = new AlertDialog.Builder(requireContext());
+                        alertDialog.setTitle("See Reports");
+                        alertDialog.setMessage("Choose which one to see");
+
+                        View view;
+                        LayoutInflater inflater = (LayoutInflater) requireActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                        view = inflater.inflate(R.layout.viewreports_alertdialog,null);
+
+                        RecyclerView recyclerView = view.findViewById(R.id.recyclerViewAlertDialogLayout);
+                        RadioGroup radioGroup = view.findViewById(R.id.radioGroupViewAlertDialog);
+                        TextView textView = view.findViewById(R.id.textView46);
+
+                        Gson gson = new Gson();
+                        Type type = new TypeToken<HashMap<String, HashMap<String, String>>>() {
+                        }.getType();
+                        List<String> keyList = new ArrayList<>();
+                        SharedPreferences getReports = requireContext().getSharedPreferences("TrackOfAllInsights",MODE_PRIVATE);
+                        radioGroup.setOnCheckedChangeListener((radioGroup1, i12) -> {
+                            switch (i12){
+                                case R.id.WeekradioButton:
+                                    keyList.clear();
+                                    if(getReports.contains("week")){
+                                        HashMap<String,HashMap<String,String>> map = gson.fromJson(getReports.getString("week",""),type);
+
+                                        HashMap<String,String> innerMap = new HashMap<>(map.get("Weekly"));
+
+                                        for(Map.Entry<String,String> data : innerMap.entrySet()){
+                                            keyList.add(data.getKey());
+                                        }
+
+                                        recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+                                        recyclerView.setAdapter(new ReportsClassRecycler(keyList,"Weekly"));
+
+                                    }else
+                                    {
+                                        recyclerView.setVisibility(View.INVISIBLE);
+                                        textView.setVisibility(View.VISIBLE);
+                                    }
+                                    break;
+                                case R.id.MonthradioButton3:
+                                    keyList.clear();
+                                    if(getReports.contains("month")){
+                                        HashMap<String,HashMap<String,String>> map = gson.fromJson(getReports.getString("month",""),type);
+
+                                        HashMap<String,String> innerMap = new HashMap<>(map.get("Monthly"));
+
+                                        for(Map.Entry<String,String> data : innerMap.entrySet()){
+                                            keyList.add(data.getKey());
+                                        }
+
+                                        recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+                                        recyclerView.setAdapter(new ReportsClassRecycler(keyList,"Monthly"));
+
+                                    }else
+                                    {
+                                        recyclerView.setVisibility(View.INVISIBLE);
+                                        textView.setVisibility(View.VISIBLE);
+                                    }
+                                    break;
+                                case R.id.DayradioButton2:
+                                    keyList.clear();
+                                    if(getReports.contains("daily")){
+                                        HashMap<String,HashMap<String,String>> map = gson.fromJson(getReports.getString("daily",""),type);
+
+                                        HashMap<String,String> innerMap = new HashMap<>(map.get("Daily"));
+
+                                        for(Map.Entry<String,String> data : innerMap.entrySet()){
+                                            keyList.add(data.getKey());
+                                        }
+
+                                        recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+                                        recyclerView.setAdapter(new ReportsClassRecycler(keyList,"Daily"));
+
+                                    }else
+                                    {
+                                        recyclerView.setVisibility(View.INVISIBLE);
+                                        textView.setVisibility(View.VISIBLE);
+                                    }
+                                    break;
+                            }
+
+
+                        });
+
+
+//                        FirebaseStorage storage;
+//                        StorageReference storageReference;
+//                        storage = FirebaseStorage.getInstance();
+//                        storageReference = storage.getReference();
+
+
+                        if(getReports.contains("week")){
+                            HashMap<String,HashMap<String,String>> map = gson.fromJson(getReports.getString("week",""),type);
+
+                            HashMap<String,String> innerMap = new HashMap<>(map.get("Weekly"));
+
+                            for(Map.Entry<String,String> data : innerMap.entrySet()){
+                                keyList.add(data.getKey());
+                            }
+
+                            recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+                            recyclerView.setAdapter(new ReportsClassRecycler(keyList,"Weekly"));
+
+                        }else
+                        {
+                            recyclerView.setVisibility(View.INVISIBLE);
+                            textView.setVisibility(View.VISIBLE);
+                        }
+
+                        alertDialog.setView(view);
+                        alertDialog.create().show();
 
                     }).create();
             builder.show();

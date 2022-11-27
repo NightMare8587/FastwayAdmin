@@ -11,6 +11,7 @@ import android.graphics.Typeface;
 import android.graphics.pdf.PdfDocument;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -52,6 +53,7 @@ import com.consumers.fastwayadmin.NavFrags.BankVerification.VendorDetailsActivit
 import com.consumers.fastwayadmin.R;
 import com.consumers.fastwayadmin.RandomChatNoww;
 import com.gauravk.bubblenavigation.BubbleNavigationConstraintView;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.common.reflect.TypeToken;
 import com.google.firebase.auth.FirebaseAuth;
@@ -62,6 +64,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.google.gson.Gson;
 
 import org.apache.poi.ss.usermodel.Cell;
@@ -96,6 +100,10 @@ public class HomeScreen extends AppCompatActivity {
     SharedPreferences sharedPreferences;
     String subRefID;
     SharedPreferences calenderForExcel;
+    SharedPreferences trackOfAllGeneratedFiles;
+    FirebaseStorage storage;
+    StorageReference storageReference;
+    SharedPreferences.Editor editorToTrackFiles;
     SharedPreferences adminPrem;
 
     SharedPreferences.Editor premEditor;
@@ -131,6 +139,9 @@ public class HomeScreen extends AppCompatActivity {
         {
             myEditor.putString("currentYear",year + "");
         }
+        storage = FirebaseStorage.getInstance();
+        storageReference = storage.getReference();
+
 
         myEditor.apply();
         manager.beginTransaction().replace(R.id.homescreen,new HomeFrag()).commit();
@@ -141,6 +152,8 @@ public class HomeScreen extends AppCompatActivity {
         ConnectivityManager cm =
                 (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
         FirebaseMessaging.getInstance().subscribeToTopic("FastwayQueryDB");
+        trackOfAllGeneratedFiles= getSharedPreferences("TrackOfAllInsights",MODE_PRIVATE);
+        editorToTrackFiles = trackOfAllGeneratedFiles.edit();
 
 //        SharedPreferences clear = getSharedPreferences("DailyInsightsStoringData",MODE_PRIVATE);
 //        SharedPreferences.Editor clearEdit = clear.edit();
@@ -486,6 +499,10 @@ public class HomeScreen extends AppCompatActivity {
 
                         pdfDocument.finishPage(page);
                         String fileName = "/DailyReportInsights" + ".pdf";
+
+
+
+
                         File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS) + fileName);
                         File file1 = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS) + fileName);
                         Log.i("checking",file1.exists() + "");
@@ -498,6 +515,32 @@ public class HomeScreen extends AppCompatActivity {
                             runOnUiThread(() -> Toast.makeText(HomeScreen.this, "Report Generated", Toast.LENGTH_SHORT).show());
                         } catch (IOException e) {
                             e.printStackTrace();
+                        }
+
+                        String nameOfFile = day + "th " + month;
+
+                        try {
+                            StorageReference reference = storageReference.child(auth.getUid() + "/" + "InsightsReports" + "/"  + "Daily" + "/" + nameOfFile);
+                            reference.putFile(Uri.fromFile(file)).addOnCompleteListener(task -> {
+                                if (task.isSuccessful()) {
+                                    HashMap<String,HashMap<String,String>> map = new HashMap<>();
+                                    HashMap<String,String> innerMapData = new HashMap<>();
+
+                                    innerMapData.put(nameOfFile,"generated");
+                                    map.put("Daily",innerMapData);
+                                    gson = new Gson();
+                                    editorToTrackFiles.putString("daily",gson.toJson(map));
+                                    editorToTrackFiles.apply();
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+
+                                }
+                            });
+                        }catch (Exception e){
+                            Toast.makeText(HomeScreen.this, ""+e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+
                         }
 
                         pdfDocument.close();
@@ -639,6 +682,32 @@ public class HomeScreen extends AppCompatActivity {
                                         runOnUiThread(() -> Toast.makeText(HomeScreen.this, "Generated", Toast.LENGTH_SHORT).show());
                                     } catch (IOException e) {
                                         e.printStackTrace();
+                                    }
+
+                                    String nameOfFile = day + "th " + month;
+
+                                    try {
+                                        StorageReference reference = storageReference.child(auth.getUid() + "/" + "InsightsReports" + "/"  + "Daily" + "/" + nameOfFile);
+                                        reference.putFile(Uri.fromFile(file)).addOnCompleteListener(task -> {
+                                            if (task.isSuccessful()) {
+                                                HashMap<String,HashMap<String,String>> map = new HashMap<>();
+                                                HashMap<String,String> innerMapData = new HashMap<>();
+
+                                                innerMapData.put(nameOfFile,"generated");
+                                                map.put("Daily",innerMapData);
+                                                gson = new Gson();
+                                                editorToTrackFiles.putString("daily",gson.toJson(map));
+                                                editorToTrackFiles.apply();
+                                            }
+                                        }).addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+
+                                            }
+                                        });
+                                    }catch (Exception e){
+                                        Toast.makeText(HomeScreen.this, ""+e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+
                                     }
 
                                     pdfDocument.close();
@@ -805,6 +874,32 @@ public class HomeScreen extends AppCompatActivity {
                                         } catch (IOException e) {
                                             e.printStackTrace();
                                         }
+
+                                    String nameOfFile = startDate + "-" + endDate + " " + month;
+
+                                    try {
+                                        StorageReference reference = storageReference.child(auth.getUid() + "/" + "InsightsReports" + "/"  + "Weekly" + "/" + nameOfFile);
+                                        reference.putFile(Uri.fromFile(file)).addOnCompleteListener(task -> {
+                                            if (task.isSuccessful()) {
+                                                HashMap<String,HashMap<String,String>> map = new HashMap<>();
+                                                HashMap<String,String> innerMapData = new HashMap<>();
+
+                                                innerMapData.put(nameOfFile,"generated");
+                                                map.put("Weekly",innerMapData);
+                                                gson = new Gson();
+                                                editorToTrackFiles.putString("week",gson.toJson(map));
+                                                editorToTrackFiles.apply();
+                                            }
+                                        }).addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+
+                                            }
+                                        });
+                                    }catch (Exception e){
+                                        Toast.makeText(HomeScreen.this, ""+e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+
+                                    }
 
                                         pdfDocument.close();
 
@@ -986,6 +1081,32 @@ public class HomeScreen extends AppCompatActivity {
                                             e.printStackTrace();
                                         }
 
+                                        String nameOfFile = startDate + "-" + endDate + " " + month;
+
+                                        try {
+                                            StorageReference reference = storageReference.child(auth.getUid() + "/" + "InsightsReports" + "/"  + "Weekly" + "/" + nameOfFile);
+                                            reference.putFile(Uri.fromFile(file)).addOnCompleteListener(task -> {
+                                                if (task.isSuccessful()) {
+                                                    HashMap<String,HashMap<String,String>> map = new HashMap<>();
+                                                    HashMap<String,String> innerMapData = new HashMap<>();
+
+                                                    innerMapData.put(nameOfFile,"generated");
+                                                    map.put("Weekly",innerMapData);
+                                                    gson = new Gson();
+                                                    editorToTrackFiles.putString("week",gson.toJson(map));
+                                                    editorToTrackFiles.apply();
+                                                }
+                                            }).addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+
+                                                }
+                                            });
+                                        }catch (Exception e){
+                                            Toast.makeText(HomeScreen.this, ""+e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+
+                                        }
+
                                         pdfDocument.close();
 
                                         HashMap<String, String> prevAnalysisInfo = new HashMap<>();
@@ -1146,19 +1267,19 @@ public class HomeScreen extends AppCompatActivity {
                                         double data2 =  ((totalOrders - ordersMadeTotal) / ordersMadeTotal) * 100;
                                         if (totalOrders > ordersMadeTotal) {
                                             canvas.drawText("Total Orders: ↑ Increase By " + new DecimalFormat("0.00").format(data2) + "%", 100, 1295, text);
-                                            canvas.drawText("Previous Orders " + ordersMadeTotal, 100, 1335, text);
+                                            canvas.drawText("Previous Orders: " + ordersMadeTotal, 100, 1335, text);
                                         } else {
                                             canvas.drawText("Total Orders: ↓ Decrease By " + new DecimalFormat("0.00").format(data2) + "%", 100, 1295, text);
-                                            canvas.drawText("Previous Orders " + ordersMadeTotal, 100, 1335, text);
+                                            canvas.drawText("Previous Orders: " + ordersMadeTotal, 100, 1335, text);
                                         }
 
                                         double data3 =  ((totalCust - totalCustomersTotal) / totalCustomersTotal) * 100;
                                         if (totalCust > totalCustomersTotal) {
                                             canvas.drawText("Total Customers: ↑ Increase By " + new DecimalFormat("0.00").format(data3) + "%", 100, 1410, text);
-                                            canvas.drawText("Previous Customers " + totalCustomersTotal, 100, 1450, text);
+                                            canvas.drawText("Previous Customers: " + totalCustomersTotal, 100, 1450, text);
                                         } else {
                                             canvas.drawText("Total Customers: ↓ Decrease By " + new DecimalFormat("0.00").format(data3) + "%", 100, 1410, text);
-                                            canvas.drawText("Previous Customers " + totalCustomersTotal, 100, 1450, text);
+                                            canvas.drawText("Previous Customers: " + totalCustomersTotal, 100, 1450, text);
                                         }
 
                                     }
@@ -1180,6 +1301,32 @@ public class HomeScreen extends AppCompatActivity {
 
                                     } catch (IOException e) {
                                         e.printStackTrace();
+                                    }
+
+                                    String nameOfFile = startDate + "-" + endDate + " " + month;
+
+                                    try {
+                                        StorageReference reference = storageReference.child(auth.getUid() + "/" + "InsightsReports" + "/"  + "Monthly" + "/" + nameOfFile);
+                                        reference.putFile(Uri.fromFile(file)).addOnCompleteListener(task -> {
+                                            if (task.isSuccessful()) {
+                                                HashMap<String,HashMap<String,String>> map = new HashMap<>();
+                                                HashMap<String,String> innerMapData = new HashMap<>();
+
+                                                innerMapData.put(nameOfFile,"generated");
+                                                map.put("Monthly",innerMapData);
+                                                gson = new Gson();
+                                                editorToTrackFiles.putString("month",gson.toJson(map));
+                                                editorToTrackFiles.apply();
+                                            }
+                                        }).addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+
+                                            }
+                                        });
+                                    }catch (Exception e){
+                                        Toast.makeText(HomeScreen.this, ""+e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+
                                     }
 
                                     pdfDocument.close();
