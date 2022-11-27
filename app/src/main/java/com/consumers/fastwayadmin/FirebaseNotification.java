@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
+import android.util.Log;
 import android.widget.RemoteViews;
 
 import androidx.annotation.NonNull;
@@ -41,6 +42,9 @@ public class FirebaseNotification extends FirebaseMessagingService {
             // Since the notification is received directly from
             // FCM, the title and the body can be fetched
             // directly as below.
+            Log.i("info11",remoteMessage.getNotification().getTitle());
+            Log.i("info11",remoteMessage.getNotification().getBody());
+//            Log.i("info11",remoteMessage.getNotification().getClickAction());
             showNotification(
                     remoteMessage.getNotification().getTitle(),
                     remoteMessage.getNotification().getBody());
