@@ -1,9 +1,11 @@
 package com.consumers.fastwayadmin;
 
+import android.app.AlertDialog;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
@@ -13,6 +15,7 @@ import android.widget.RemoteViews;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.consumers.fastwayadmin.Login.MainActivity;
 import com.google.firebase.auth.FirebaseAuth;
@@ -74,6 +77,14 @@ public class FirebaseNotification extends FirebaseMessagingService {
                 = new Intent(this, MainActivity.class);
         // Assign channel ID
         String channel_id = "notification_channel";
+
+        if(message.contains("Customer has requested to pay amount in Cash")){
+            Intent intents = new Intent("myFunction");
+            // add data
+            intents.putExtra("value1", title);
+            intents.putExtra("value2", message);
+            LocalBroadcastManager.getInstance(this).sendBroadcast(intents);
+        }
         // Here FLAG_ACTIVITY_CLEAR_TOP flag is set to clear
         // the activities present in the activity stack,
         // on the top of the Activity that is to be launched
