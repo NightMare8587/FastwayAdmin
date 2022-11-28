@@ -154,6 +154,8 @@ public class AccountSettingsFragment extends PreferenceFragmentCompat {
                                 case R.id.WeekradioButton:
                                     keyList.clear();
                                     if(getReports.contains("week")){
+                                        recyclerView.setVisibility(View.VISIBLE);
+                                        textView.setVisibility(View.INVISIBLE);
                                         HashMap<String,HashMap<String,String>> map = gson.fromJson(getReports.getString("week",""),type);
 
                                         HashMap<String,String> innerMap = new HashMap<>(map.get("Weekly"));
@@ -174,6 +176,8 @@ public class AccountSettingsFragment extends PreferenceFragmentCompat {
                                 case R.id.MonthradioButton3:
                                     keyList.clear();
                                     if(getReports.contains("month")){
+                                        recyclerView.setVisibility(View.VISIBLE);
+                                        textView.setVisibility(View.INVISIBLE);
                                         HashMap<String,HashMap<String,String>> map = gson.fromJson(getReports.getString("month",""),type);
 
                                         HashMap<String,String> innerMap = new HashMap<>(map.get("Monthly"));
@@ -194,12 +198,19 @@ public class AccountSettingsFragment extends PreferenceFragmentCompat {
                                 case R.id.DayradioButton2:
                                     keyList.clear();
                                     if(getReports.contains("daily")){
+                                        textView.setVisibility(View.INVISIBLE);
+                                        recyclerView.setVisibility(View.VISIBLE);
                                         HashMap<String,HashMap<String,String>> map = gson.fromJson(getReports.getString("daily",""),type);
-
+//                                        Toast.makeText(requireContext(), "Hello", Toast.LENGTH_SHORT).show();
                                         HashMap<String,String> innerMap = new HashMap<>(map.get("Daily"));
-
+                                        int count = 0;
                                         for(Map.Entry<String,String> data : innerMap.entrySet()){
+                                            count++;
+
+                                            if(count > 12)
+                                                break;
                                             keyList.add(data.getKey());
+
                                         }
 
                                         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
@@ -228,8 +239,15 @@ public class AccountSettingsFragment extends PreferenceFragmentCompat {
 
                             HashMap<String,String> innerMap = new HashMap<>(map.get("Weekly"));
 
+                            int count = 0;
                             for(Map.Entry<String,String> data : innerMap.entrySet()){
+                                count++;
+
+                                if(count > 12)
+                                    break;
                                 keyList.add(data.getKey());
+
+
                             }
 
                             recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));

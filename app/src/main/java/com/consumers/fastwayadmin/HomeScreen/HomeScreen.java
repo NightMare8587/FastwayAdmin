@@ -443,14 +443,14 @@ public class HomeScreen extends AppCompatActivity {
             if (dailyInsights.contains("lastAnalysisHashMap")) {
                 Type typeos = new TypeToken<HashMap<String, String>>() {
                 }.getType();
-                int totalOrders = orderList.size();
-                int totalCust = custList.size();
+                double totalOrders = Double.parseDouble(orderList.size() + "");
+                double totalCust = Double.parseDouble(custList.size() + "");
                 Log.i("checking","here");
                 Double totalSalesThatPeriod = Double.parseDouble(revenueTotal);
                 HashMap<String, String> prevMap = new HashMap<>(gson.fromJson(dailyInsights.getString("lastAnalysisHashMap", ""), typeos));
                 Double prevSalesAmt = Double.parseDouble(prevMap.get("totalSales"));
-                int ordersMadeTotal = Integer.parseInt(prevMap.get("totalOrders"));
-                int totalCustomersTotal = Integer.parseInt(prevMap.get("totalCustomers"));
+                double ordersMadeTotal = Double.parseDouble(prevMap.get("totalOrders"));
+                double totalCustomersTotal = Double.parseDouble(prevMap.get("totalCustomers"));
                         text.setTextSize(90);
                         text.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
                         canvas.drawText("Compare with previous day", 600, 760, text);
@@ -465,23 +465,23 @@ public class HomeScreen extends AppCompatActivity {
                     canvas.drawText("Previous Sales \u20b9" + prevSalesAmt, 100, 940, text);
                 }
 
-                        double data2 = (double) ((totalOrders - ordersMadeTotal) / ordersMadeTotal) * 100;
+                        double data2 =  ((totalOrders - ordersMadeTotal) / ordersMadeTotal) * 100;
                 if (totalOrders > ordersMadeTotal) {
                     canvas.drawText("Total Orders: ↑ Increase By: " + new DecimalFormat("0.00").format(data2) + "%", 100, 1010, text);
-                    canvas.drawText("Previous Orders " + ordersMadeTotal, 100, 1080, text);
+                    canvas.drawText("Previous Orders: " + ordersMadeTotal, 100, 1080, text);
                 } else {
                         canvas.drawText("Total Orders: ↓ Decrease By " + new DecimalFormat("0.00").format(data2) + "%", 100, 1010, text);
-                    canvas.drawText("Previous Orders " + ordersMadeTotal, 100, 1080, text);
+                    canvas.drawText("Previous Orders: " + ordersMadeTotal, 100, 1080, text);
                 }
 
 
-                        double data3 = (double) ((totalCust - totalCustomersTotal) / totalCustomersTotal) * 100;
+                        double data3 =  ((totalCust - totalCustomersTotal) / totalCustomersTotal) * 100;
                 if (totalCust > totalCustomersTotal) {
                     canvas.drawText("Total Customers: ↑ Increase By" + new DecimalFormat("0.00").format(data3) + "%", 100, 1150, text);
-                    canvas.drawText("Previous Customers " + totalCustomersTotal, 100, 1220, text);
+                    canvas.drawText("Previous Customers: " + totalCustomersTotal, 100, 1220, text);
                 } else {
                     canvas.drawText("Total Customers: ↓ Decrease By " + new DecimalFormat("0.00").format(data3) + "%", 100, 1150, text);
-                    canvas.drawText("Previous Customers " + totalCustomersTotal, 100, 1220, text);
+                    canvas.drawText("Previous Customers: " + totalCustomersTotal, 100, 1220, text);
                 }
             }
 
@@ -646,15 +646,14 @@ public class HomeScreen extends AppCompatActivity {
                                             canvas.drawText("Total Sales: ↓ Decrease By " + new DecimalFormat("0.00").format(data1) + "%", 100, 860, text);
                                         }
 
-                                        double data2 = (double) ((totalOrders - ordersMadeTotal) / ordersMadeTotal) * 100;
+                                        double data2 =  ((Double.parseDouble(totalOrders + "") - Double.parseDouble(ordersMadeTotal + "")) / Double.parseDouble(ordersMadeTotal + "")) * 100;
                                         if (totalOrders > ordersMadeTotal) {
                                             canvas.drawText("Total Orders: ↑ Increase By" + new DecimalFormat("0.00").format(data2) + "%", 100, 950, text);
                                         } else {
-
                                             canvas.drawText("Total Orders: ↓ Decrease By " + new DecimalFormat("0.00").format(data2) + "%", 100, 950, text);
                                         }
 
-                                        double data3 = (double) ((totalCust - totalCustomersTotal) / totalCustomersTotal) * 100;
+                                        double data3 =  (( Double.parseDouble(totalCust + "") -  Double.parseDouble(totalCustomersTotal + "")) / Double.parseDouble(totalCustomersTotal + "")) * 100;
                                         if (totalCust > totalCustomersTotal) {
                                             canvas.drawText("Total Customers: ↑ Increase By" + new DecimalFormat("0.00").format(data3) + "%", 100, 1050, text);
                                         } else
@@ -1489,6 +1488,9 @@ public class HomeScreen extends AppCompatActivity {
                     myEditor.putString("currentYear",year + "");
                     myEditor.apply();
                     int whichY = year - 1;
+                    SharedPreferences trackInsight = getSharedPreferences("TrackOfAllInsights",MODE_PRIVATE);
+                    SharedPreferences.Editor ediTrack = trackInsight.edit();
+                    ediTrack.clear().apply();
                     SharedPreferences previousYearStore = getSharedPreferences("PreviousYearAnalysisDish" + whichY,MODE_PRIVATE);
                     SharedPreferences.Editor prevYearEdit = previousYearStore.edit();
                     SharedPreferences storeEditor = getSharedPreferences("DishAnalysis",MODE_PRIVATE);
