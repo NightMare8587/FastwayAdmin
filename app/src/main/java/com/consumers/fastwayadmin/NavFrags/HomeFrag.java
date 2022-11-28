@@ -1106,6 +1106,7 @@ public class HomeFrag extends Fragment {
                                     amountPaymentPending.add("1");
                                 else
                                     amountPaymentPending.add("0");
+
                                 if(dataSnapshot.hasChild("Current Order")){
                                     isCurrentOrder.add("1");
                                 }else
