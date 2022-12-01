@@ -95,7 +95,10 @@ public class RestaurantStaff extends AppCompatActivity {
                     for(DataSnapshot dataSnapshot : snapshot.getChildren()){
                         UUIDs.add(String.valueOf(dataSnapshot.getKey()));
                         name.add(String.valueOf(dataSnapshot.child("name").getValue()));
+                        if(dataSnapshot.hasChild("image"))
                         image.add(String.valueOf(dataSnapshot.child("image").getValue()));
+                        else
+                            image.add("");
                     }
                     recyclerView.setAdapter(new StaffAdapter(name,image,RestaurantStaff.this,UUIDs));
                 }else

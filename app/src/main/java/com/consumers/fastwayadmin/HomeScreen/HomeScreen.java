@@ -1263,33 +1263,33 @@ public class HomeScreen extends AppCompatActivity {
                                         double data1 = ((totalSalesThatPeriod - prevSalesAmt) / prevSalesAmt) * 100;
                                         if (totalSalesThatPeriod > prevSalesAmt) {
                                             canvas.drawText("Total Sales: ↑ Increase By " + new DecimalFormat("0.00").format(data1) + "%", 100, 1180, text);
-                                            canvas.drawText("Previous Sales \u20b9" + prevSalesAmt, 100, 1220, text);
+                                            canvas.drawText("Previous Sales \u20b9" + prevSalesAmt, 100, 1250, text);
                                         } else {
                                             canvas.drawText("Total Sales: ↓ Decrease By " + new DecimalFormat("0.00").format(data1) + "%", 100, 1180, text);
-                                            canvas.drawText("Previous Sales \u20b9" + prevSalesAmt, 100, 1220, text);
+                                            canvas.drawText("Previous Sales \u20b9" + prevSalesAmt, 100, 1250, text);
                                         }
 
                                         double data2 =  ((totalOrders - ordersMadeTotal) / ordersMadeTotal) * 100;
                                         if (totalOrders > ordersMadeTotal) {
-                                            canvas.drawText("Total Orders: ↑ Increase By " + new DecimalFormat("0.00").format(data2) + "%", 100, 1295, text);
-                                            canvas.drawText("Previous Orders: " + ordersMadeTotal, 100, 1335, text);
+                                            canvas.drawText("Total Orders: ↑ Increase By " + new DecimalFormat("0.00").format(data2) + "%", 100, 1320, text);
+                                            canvas.drawText("Previous Orders: " + ordersMadeTotal, 100, 1390, text);
                                         } else {
-                                            canvas.drawText("Total Orders: ↓ Decrease By " + new DecimalFormat("0.00").format(data2) + "%", 100, 1295, text);
-                                            canvas.drawText("Previous Orders: " + ordersMadeTotal, 100, 1335, text);
+                                            canvas.drawText("Total Orders: ↓ Decrease By " + new DecimalFormat("0.00").format(data2) + "%", 100, 1320, text);
+                                            canvas.drawText("Previous Orders: " + ordersMadeTotal, 100, 1390, text);
                                         }
 
                                         double data3 =  ((totalCust - totalCustomersTotal) / totalCustomersTotal) * 100;
                                         if (totalCust > totalCustomersTotal) {
-                                            canvas.drawText("Total Customers: ↑ Increase By " + new DecimalFormat("0.00").format(data3) + "%", 100, 1410, text);
-                                            canvas.drawText("Previous Customers: " + totalCustomersTotal, 100, 1450, text);
+                                            canvas.drawText("Total Customers: ↑ Increase By " + new DecimalFormat("0.00").format(data3) + "%", 100, 1460, text);
+                                            canvas.drawText("Previous Customers: " + totalCustomersTotal, 100, 1530, text);
                                         } else {
-                                            canvas.drawText("Total Customers: ↓ Decrease By " + new DecimalFormat("0.00").format(data3) + "%", 100, 1410, text);
-                                            canvas.drawText("Previous Customers: " + totalCustomersTotal, 100, 1450, text);
+                                            canvas.drawText("Total Customers: ↓ Decrease By " + new DecimalFormat("0.00").format(data3) + "%", 100, 1460, text);
+                                            canvas.drawText("Previous Customers: " + totalCustomersTotal, 100, 1530, text);
                                         }
 
                                     }
 
-                                    canvas.drawText("For other info, Check Premium Activity", 100, 1510, text);
+                                    canvas.drawText("For other info, Check Premium Activity", 100, 1600, text);
                                     text.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
                                     text.setTextSize(52);
                                     canvas.drawText("Contact Ordinalo", 1200, 1765, text);
