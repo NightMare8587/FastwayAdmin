@@ -71,7 +71,7 @@ public class FirebaseNotification extends FirebaseMessagingService {
         auth = FirebaseAuth.getInstance();
         notificationClass notificationClass = new notificationClass(title,message, ServerValue.TIMESTAMP);
         ref = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
-        ref.child("Notification").child(title).setValue(notificationClass);
+        ref.child("Notification").child(System.currentTimeMillis() + "").setValue(notificationClass);
         // Pass the intent to switch to the MainActivity
         Intent intent
                 = new Intent(this, MainActivity.class);

@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -23,7 +24,7 @@ public class NotificationActivity extends AppCompatActivity {
 
     String title,message;
     RecyclerView recyclerView;
-
+    Button delete;
     DatabaseReference reference;
     FirebaseAuth auth;
     @Override
@@ -32,7 +33,9 @@ public class NotificationActivity extends AppCompatActivity {
         setContentView(R.layout.activity_notification);
         List<String> titleList = new ArrayList<>();
         List<String> messageList = new ArrayList<>();
+        List<String> timeList = new ArrayList<>();
         messageList.clear();
+        delete = findViewById(R.id.deleteAllNotifications);
         titleList.clear();
         recyclerView = findViewById(R.id.notificationRecycleView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -47,9 +50,10 @@ public class NotificationActivity extends AppCompatActivity {
                     for(DataSnapshot dataSnapshot : snapshot.getChildren()){
                         titleList.add(Objects.requireNonNull(dataSnapshot.child("title").getValue()).toString());
                         messageList.add(Objects.requireNonNull(dataSnapshot.child("message").getValue()).toString());
+                        timeList.add(Objects.requireNonNull(dataSnapshot.getKey()));
                     }
 //                    recyclerView.setAdapter(new NotificationView(titleList,messageList));
-                    NotificationView notificationView = new NotificationView(titleList,messageList);
+                    NotificationView notificationView = new NotificationView(titleList,messageList,timeList);
                     recyclerView.setAdapter(notificationView);
                     notificationView.notifyDataSetChanged();
                 }
@@ -59,6 +63,14 @@ public class NotificationActivity extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError error) {
 
             }
+        });
+
+
+        delete.setOnClickListener(click -> {
+            reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
+            reference.child("Notification").removeValue();
+            Toast.makeText(this, "Deleted Successfully", Toast.LENGTH_SHORT).show();
+            finish();
         });
 
     }

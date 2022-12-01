@@ -53,6 +53,7 @@ import com.consumers.fastwayadmin.NavFrags.MenuFrag;
 import com.consumers.fastwayadmin.NavFrags.ReplaceOrders.ReplaceOrderRequests;
 import com.consumers.fastwayadmin.NavFrags.TablesFrag;
 import com.consumers.fastwayadmin.NavFrags.BankVerification.VendorDetailsActivity;
+import com.consumers.fastwayadmin.NotificationActivity;
 import com.consumers.fastwayadmin.R;
 import com.consumers.fastwayadmin.RandomChatNoww;
 import com.developer.kalert.KAlertDialog;
@@ -1786,6 +1787,9 @@ public class HomeScreen extends AppCompatActivity {
             startActivity(new Intent(HomeScreen.this, SupportActivity.class));
         else if(id == R.id.randomChatMessagesUsers){
             startActivity(new Intent(HomeScreen.this, ReplaceOrderRequests.class));
+        }
+        else if(id == R.id.notificationShowAdmin){
+            startActivity(new Intent(HomeScreen.this, NotificationActivity.class));
         }
         else {
             AlertDialog.Builder builder = new AlertDialog.Builder(HomeScreen.this);

@@ -3,6 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_margin="5dp"
+    app:cardElevation="6dp"
+
     android:padding="5dp"
     android:layout_width="match_parent" android:layout_height="100dp">
 
@@ -14,8 +16,9 @@
             android:id="@+id/notiTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="25dp"
-            android:layout_marginTop="18dp"
+            android:layout_marginStart="14dp"
+            android:layout_marginTop="8dp"
+            android:fontFamily="@font/inter"
             android:text="TextView"
             android:textSize="18sp"
             android:textStyle="bold"
@@ -26,12 +29,24 @@
             android:id="@+id/notiMessage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="25dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginStart="14dp"
+            android:layout_marginTop="6dp"
+            android:fontFamily="@font/inter"
             android:text="TextView"
             android:textSize="16sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/notiTitle" />
+
+        <TextView
+            android:id="@+id/notiTimeNotification"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginBottom="2dp"
+            android:fontFamily="@font/inter"
+            android:text="TextView"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

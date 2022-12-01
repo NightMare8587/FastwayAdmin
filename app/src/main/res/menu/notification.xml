@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item android:id="@+id/notificationShowAdmin"
+        app:showAsAction="always"
+        android:icon="@drawable/notification"
+        android:title="Queries"/>
     <item android:id="@+id/randomChatMessagesUsers"
         app:showAsAction="always"
-        android:icon="@drawable/ic_baseline_message_24"
+        android:icon="@drawable/replace"
         android:title="Queries"/>
 
     <item android:id="@+id/randomChatMessages"
