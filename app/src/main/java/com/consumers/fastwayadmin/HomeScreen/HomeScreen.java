@@ -1147,6 +1147,8 @@ public class HomeScreen extends AppCompatActivity {
 
             SharedPreferences lastMonthReport = getSharedPreferences("lastMonthlyReport",MODE_PRIVATE);
             SharedPreferences.Editor editorMonthly = lastMonthReport.edit();
+            editorMonthly.putString("currentMonth","November");
+            editorMonthly.apply();
             if(lastMonthReport.contains("currentMonth")){
                 if(!lastMonthReport.getString("currentMonth","").equals(month)){
                     if(calendar.get(Calendar.MONTH) != Calendar.JANUARY) {

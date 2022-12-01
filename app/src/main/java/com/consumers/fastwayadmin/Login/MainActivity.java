@@ -38,6 +38,7 @@ import com.android.volley.toolbox.Volley;
 import com.consumers.fastwayadmin.GMailSender;
 import com.consumers.fastwayadmin.HomeScreen.HomeScreen;
 import com.consumers.fastwayadmin.Info.Info;
+import com.consumers.fastwayadmin.Login.EmpLogin.ApplyForRestaurantAndDocs;
 import com.consumers.fastwayadmin.R;
 import com.developer.kalert.KAlertDialog;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -92,6 +93,7 @@ public class MainActivity extends AppCompatActivity {
     double longi,lati;
     LocationRequest locationRequest;
     GoogleSignInOptions gso;
+    TextView empLogin;
     SharedPreferences getBanInfo;
     FusedLocationProviderClient clientsLocation;
     FastDialog verifyCodeDialog,fastDialog;
@@ -126,6 +128,11 @@ public class MainActivity extends AppCompatActivity {
             Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.websitepolicies.com/policies/view/CpwDZziF"));
             startActivity(browserIntent);
         });
+        empLogin = findViewById(R.id.loginAsEmployeeTextViewMain);
+        empLogin.setOnClickListener(click -> {
+            Toast.makeText(this, "Work in progress...", Toast.LENGTH_SHORT).show();
+        });
+
         SharedPreferences stopServices = getSharedPreferences("Stop Services", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor5 = stopServices.edit();
         editor5.putString("online","true");
@@ -135,15 +142,19 @@ public class MainActivity extends AppCompatActivity {
         editor1.putString("logout","no");
         editor1.apply();
         // checking is user is currently logged in
-        if(currentUser != null){
-            startActivity(new Intent(getApplicationContext(),Info.class));
-            clientsLocation.removeLocationUpdates(mLocationCallback);
-            finish();
-        }
+
 
         //saving user login info
         loginInfo = getSharedPreferences("loginInfo",MODE_PRIVATE);
         editor = loginInfo.edit();
+        if(currentUser != null){
+            if(!loginInfo.contains("loginAsEmployee"))
+            startActivity(new Intent(getApplicationContext(),Info.class));
+            else
+            startActivity(new Intent(getApplicationContext(), ApplyForRestaurantAndDocs.class));
+            clientsLocation.removeLocationUpdates(mLocationCallback);
+            finish();
+        }
 
         //google sign in button
         signInButton.setOnClickListener(view -> {

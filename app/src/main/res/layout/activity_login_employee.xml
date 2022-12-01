@@ -3,12 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
     android:background="@drawable/mainback"
-    tools:context=".Login.MainActivity">
+    android:layout_height="match_parent"
+    tools:context=".Login.EmpLogin.LoginEmployeeActivity">
+
 
     <EditText
-        android:id="@+id/nameLogin"
+        android:id="@+id/nameLoginEmp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="25dp"
@@ -21,22 +22,10 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <EditText
-        android:id="@+id/emailLogin"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
-        android:background="@drawable/input"
-        android:ems="10"
-        android:hint="Enter Email Address"
-        android:inputType="textEmailAddress"
-        android:padding="12dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/nameLogin" />
+
 
     <com.hbb20.CountryCodePicker
-        android:id="@+id/ccp"
+        android:id="@+id/ccpEmp"
         android:layout_width="137dp"
         android:layout_height="47dp"
         android:layout_marginStart="10dp"
@@ -44,10 +33,10 @@
         android:layout_marginEnd="10dp"
         app:layout_constraintEnd_toStartOf="@+id/phoneNumber"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/emailLogin" />
+        app:layout_constraintTop_toBottomOf="@+id/nameLoginEmp" />
 
     <EditText
-        android:id="@+id/phoneNumber"
+        android:id="@+id/phoneNumberEmp"
         android:layout_width="209dp"
         android:layout_height="53dp"
         android:layout_marginTop="10dp"
@@ -58,10 +47,10 @@
         android:inputType="number"
         android:padding="12dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/emailLogin" />
+        app:layout_constraintTop_toBottomOf="@+id/nameLoginEmp" />
 
     <Button
-        android:id="@+id/startVerification"
+        android:id="@+id/startVerificationEmp"
         android:layout_width="247dp"
         android:layout_height="56dp"
         android:layout_marginTop="30dp"
@@ -75,18 +64,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/phoneNumber" />
 
-    <ImageView
-        android:id="@+id/signInButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginBottom="16dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@drawable/google" />
-
     <TextView
-        android:id="@+id/textClicktoReadTermsAndCOnditions"
+        android:id="@+id/textClicktoReadTermsAndCOnditionsEmp"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="25dp"
@@ -98,10 +77,10 @@
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/startVerification" />
+        app:layout_constraintTop_toBottomOf="@+id/startVerificationEmp" />
 
     <TextView
-        android:id="@+id/loginAsEmployeeTextViewMain"
+        android:id="@+id/loginAsAdminTextViewMain"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="35dp"
@@ -114,7 +93,6 @@
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textClicktoReadTermsAndCOnditions" />
-
+        app:layout_constraintTop_toBottomOf="@+id/textClicktoReadTermsAndCOnditionsEmp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
