@@ -32,7 +32,15 @@
         tools:replace="android:icon,android:allowBackup"
         tools:targetApi="r">
         <activity
-            android:name=".HomeScreenEMP"
+            android:name=".ListViewActivity.StaffDetails.EmpHOME.HomeScreenEMP"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+
+        <activity
+            android:name=".Login.EmpLogin.ApplyForRestaurantAndDocs"
             android:exported="false">
             <meta-data
                 android:name="android.app.lib_name"
