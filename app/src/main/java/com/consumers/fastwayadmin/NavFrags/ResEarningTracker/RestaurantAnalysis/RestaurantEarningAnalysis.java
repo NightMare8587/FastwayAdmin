@@ -28,7 +28,6 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.consumers.fastwayadmin.NavFrags.ResEarningTracker.ResEarningTrackerActivity;
 import com.consumers.fastwayadmin.R;
 import com.elconfidencial.bubbleshowcase.BubbleShowCase;
 import com.elconfidencial.bubbleshowcase.BubbleShowCaseBuilder;
@@ -50,6 +49,7 @@ import java.lang.reflect.Type;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,9 +59,11 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
     SharedPreferences.Editor storeEditor;
     Gson gson;
     int daysLeftToShow = 0;
+    LinearLayout lastDaysTrend;
     Button moreDays;
     TextView dateThatDay;
     TextView averageOrderThatDay;
+    TextView lastSalesTrend,mapHour;
     BubbleShowCaseBuilder bubbleShowCaseBuilder2;
     BubbleShowCaseBuilder bubbleShowCaseBuilder3;
     BubbleShowCaseBuilder bubbleShowCaseBuilder4;
@@ -100,10 +102,13 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
         storeEditor = storedOrders.edit();
         hashMapRecycler = findViewById(R.id.buttonShowHashMapTimeZone);
         loginInfo = getSharedPreferences("loginInfo",MODE_PRIVATE);
+        lastDaysTrend = findViewById(R.id.lastFewDaysLinearLayoutData);
         editorlogin = loginInfo.edit();
         totalCustomersLast7days = findViewById(R.id.totalCustomersInLast7daysTextView);
         highestSalesDayText = findViewById(R.id.highestSalesDayOrdersTextView);
         user7daysTracker = getSharedPreferences("DailyUserTrackingFor7days",MODE_PRIVATE);
+        lastSalesTrend = findViewById(R.id.upwardOrDownwardTrend);
+        mapHour = findViewById(R.id.mostOrdersMadeWhichHours);
         progressBar = findViewById(R.id.progressBarRestaurantEarningAnalysis);
         barChart1 = findViewById(R.id.lineChartRestaurantEarn7days);
         highestSalesAmountThatDay = findViewById(R.id.highestDateNameDay);
@@ -268,6 +273,70 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
                     totalCustomersLast7days.setText("Total Customer's: " + totalCust);
                     barChart.setData(data);
                     barChart.setFitBars(true);
+
+                    new Thread(() -> {
+                        SharedPreferences sharedPreferences = getSharedPreferences("DailyInsightsStoringData",MODE_PRIVATE);
+                        int loop = 0;
+
+                        if(date.size() == 1)
+                            return;
+
+                        if(date.size() > 7)
+                            loop = date.size() - 7;
+
+                        Type myType = new TypeToken<HashMap<String,HashMap<String,String>>>() {
+                        }.getType();
+                        if(!sharedPreferences.contains(month))
+                            return;
+
+
+                        double salesAmount = 0;
+                        double remainderAmount = 0;
+                        lastDaysTrend.setVisibility(View.VISIBLE);
+                        HashMap<String,HashMap<String,String>> map = gson.fromJson(sharedPreferences.getString(month,""),myType);
+                        HashMap<String,String> innerMaps = new HashMap<>(map.get(date.get(date.size()-1) + ""));
+                        salesAmount = Double.parseDouble(innerMaps.get("revenueTotal"));
+                        HashMap<String,Integer> hoursMapTrack = new HashMap<>();
+                        int currentHighestHour = 0;
+                        for(int ii=date.size()-2;ii >= loop; ii--){
+                            if(map.containsKey(date.get(ii) + "")){
+                                HashMap<String,String> innerMapMine = new HashMap<>(map.get(date.get(ii) + ""));
+                                remainderAmount = salesAmount - Double.parseDouble(innerMapMine.get("revenueTotal"));
+                                salesAmount = Double.parseDouble(innerMapMine.get("revenueTotal"));
+
+                                java.lang.reflect.Type timeZoneMap = new TypeToken<HashMap<String, Integer>>() {
+                                }.getType();
+
+                                HashMap<String,Integer> timeMap = new HashMap<>(gson.fromJson(innerMapMine.get("timeZoneMap"),timeZoneMap));
+
+                                for(Map.Entry<String,Integer> mapmap : timeMap.entrySet()){
+                                    int dataHour = Integer.parseInt(mapmap.getKey());
+                                    if(hoursMapTrack.containsKey(dataHour + "")){
+                                        int prev = hoursMapTrack.get(dataHour + "");
+                                        prev++;
+                                        hoursMapTrack.put(dataHour + "",prev);
+                                    }else
+                                        hoursMapTrack.put(dataHour + "",1);
+                                }
+                            }
+                        }
+
+                        if(remainderAmount > 0){
+                            lastSalesTrend.setText("Increase in sales in last days");
+                        }
+
+                        int maxVal = Collections.max(hoursMapTrack.values());
+                        for (Map.Entry<String, Integer> entry :
+                                hoursMapTrack.entrySet()) {
+
+                            if (entry.getValue() == maxVal) {
+                                int prevVall = Integer.parseInt(entry.getKey());
+                                String hourTime = entry.getKey() + "-" + ++prevVall;
+                                // Print the key with max value
+                                mapHour.setText("Max Sales in hours: " + hourTime);
+                            }
+                        }
+                    }).start();
 
 
 

@@ -351,7 +351,7 @@ public class AddTables extends AppCompatActivity {
 
     private void initialise() {
         bmp = BitmapFactory.decodeResource(getResources(),R.drawable.ordinalo);
-        scaled = Bitmap.createScaledBitmap(bmp,300,300,false);
+        scaled = Bitmap.createScaledBitmap(bmp,250,250,false);
         sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
         tableNumber = findViewById(R.id.tableNumber);
         numberOfSeats = findViewById(R.id.numberOfSeats);

@@ -3009,7 +3009,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                     int timesOrderedDish = valuesName.get(0);
 
                     SharedPreferences sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
-                    DatabaseReference addToRTDB = FirebaseDatabase.getInstance().getReference().getRoot().child("Offers").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid()));
+                    DatabaseReference addToRTDB = FirebaseDatabase.getInstance().getReference().getRoot().child("Offers").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("state","")).child(Objects.requireNonNull(auth.getUid()));
                     addToRTDB.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {

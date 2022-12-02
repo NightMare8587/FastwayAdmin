@@ -1,5 +1,7 @@
 package com.consumers.fastwayadmin.Tables;
 
+import static android.content.Context.MODE_PRIVATE;
+
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
@@ -10,6 +12,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Typeface;
@@ -72,6 +75,7 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
     List<String> timeOfBooking;
     List<String> timeOfUnavailability;
     HashMap<String,List<String>> map;
+    Bitmap bmp,scaled;
     List<String> timeInMillis;
     String URL = "https://fcm.googleapis.com/fcm/send";
     DatabaseReference reference;
@@ -123,7 +127,7 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
             });
             holder.cancel.setOnClickListener(view -> {
                 FirebaseFirestore firestore = FirebaseFirestore.getInstance();
-                SharedPreferences sharedPreferences = view.getContext().getSharedPreferences("loginInfo",Context.MODE_PRIVATE);
+                SharedPreferences sharedPreferences = view.getContext().getSharedPreferences("loginInfo", MODE_PRIVATE);
                 reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid())).child("Tables");
                         new KAlertDialog(view.getContext(),KAlertDialog.WARNING_TYPE)
                         .setTitleText("Warning!!!")
@@ -223,7 +227,7 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
         holder.checkBox.setOnCheckedChangeListener((compoundButton, b) -> {
 
             FirebaseFirestore firestore = FirebaseFirestore.getInstance();
-            SharedPreferences sharedPreferences = compoundButton.getContext().getSharedPreferences("loginInfo",Context.MODE_PRIVATE);
+            SharedPreferences sharedPreferences = compoundButton.getContext().getSharedPreferences("loginInfo", MODE_PRIVATE);
             DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid())).child("Tables").child(tables.get(position));
             if(b){
                 firestore.collection(sharedPreferences.getString("state","")).document("Restaurants").collection(sharedPreferences.getString("locality","")).document(auth.getUid())
@@ -252,7 +256,7 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
                         FirebaseAuth auth = FirebaseAuth.getInstance();
                         long time = Long.parseLong(timeInMillis.get(position));
                         time = time + 600000;
-                        SharedPreferences sharedPreferences = click.getContext().getSharedPreferences("loginInfo",Context.MODE_PRIVATE);
+                        SharedPreferences sharedPreferences = click.getContext().getSharedPreferences("loginInfo", MODE_PRIVATE);
                         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid())).child("Tables").child(tables.get(position));
                         databaseReference.child("timeInMillis").setValue(time + "");
 
@@ -280,7 +284,7 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
             });
 
             holder.cancel.setOnClickListener(view -> {
-                SharedPreferences sharedPreferences = view.getContext().getSharedPreferences("loginInfo",Context.MODE_PRIVATE);
+                SharedPreferences sharedPreferences = view.getContext().getSharedPreferences("loginInfo", MODE_PRIVATE);
                 reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid())).child("Tables");
                 new KAlertDialog(view.getContext(),KAlertDialog.WARNING_TYPE)
                         .setTitleText("Warning!!!")
@@ -432,7 +436,7 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
                 view.getContext().startActivity(intent);
             });
             holder.cancel.setOnClickListener(view -> {
-                SharedPreferences sharedPreferences = view.getContext().getSharedPreferences("loginInfo",Context.MODE_PRIVATE);
+                SharedPreferences sharedPreferences = view.getContext().getSharedPreferences("loginInfo", MODE_PRIVATE);
                 reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid())).child("Tables");
                 new KAlertDialog(view.getContext(),KAlertDialog.WARNING_TYPE)
                         .setTitleText("Warning!!!")
@@ -562,7 +566,7 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
             });
 
             holder.cancel.setOnClickListener(view -> {
-                SharedPreferences sharedPreferences = view.getContext().getSharedPreferences("loginInfo",Context.MODE_PRIVATE);
+                SharedPreferences sharedPreferences = view.getContext().getSharedPreferences("loginInfo", MODE_PRIVATE);
                 reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid())).child("Tables");
                 new KAlertDialog(view.getContext(),KAlertDialog.WARNING_TYPE)
                         .setTitleText("Warning!!!")
@@ -660,7 +664,7 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
             });
         }
         holder.cardView.setOnClickListener(v -> {
-            SharedPreferences sharedPreferences = v.getContext().getSharedPreferences("loginInfo",Context.MODE_PRIVATE);
+            SharedPreferences sharedPreferences = v.getContext().getSharedPreferences("loginInfo", MODE_PRIVATE);
             FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
             FirebaseStorage storage;
             StorageReference storageReference;
@@ -694,19 +698,25 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
                                           Toast.makeText(context, "Image Saved Successfully", Toast.LENGTH_SHORT).show();
                                           PdfDocument pdfDocument = new PdfDocument();
                                           Paint myPaint = new Paint();
-                                          PdfDocument.PageInfo myPage = new  PdfDocument.PageInfo.Builder(1024,720,1).create();
+                                          PdfDocument.PageInfo myPage = new PdfDocument.PageInfo.Builder(1240, 980, 1).create();
                                           PdfDocument.Page page = pdfDocument.startPage(myPage);
 
                                           Paint text = new Paint();
 
                                           Canvas canvas = page.getCanvas();
-
-                                          canvas.drawBitmap(bitmap,275,70,myPaint);
+                                          bmp = BitmapFactory.decodeResource(v.getContext().getResources(),R.drawable.ordinalo);
+                                          scaled = Bitmap.createScaledBitmap(bmp,300,300,false);
+                                          canvas.drawBitmap(bitmap, 345, 180, myPaint);
+                                          text.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+                                          text.setTextSize(80);
+                                          SharedPreferences resNamePref = v.getContext().getSharedPreferences("RestaurantInfo", MODE_PRIVATE);
+                                          text.setTextAlign(Paint.Align.CENTER);
+                                          canvas.drawText(resNamePref.getString("hotelName", ""), 610, 90, text);
                                           text.setTextAlign(Paint.Align.LEFT);
-                                          text.setTypeface(Typeface.create(Typeface.DEFAULT,Typeface.BOLD));
                                           text.setTextSize(70);
-                                          canvas.drawText("Table Number: " + tables.get(position),275,85,text);
-                                          canvas.drawText("Seats: " + seats.get(position),395,595,text);
+                                          canvas.drawText("Table Number: " + tables.get(position), 345, 215, text);
+                                          canvas.drawText("Seats: " + seats.get(position), 475, 710, text);
+                                          canvas.drawBitmap(scaled, 950, 700, myPaint);
 
                                           pdfDocument.finishPage(page);
 
@@ -764,12 +774,91 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
                         // Instruct the user to install a PDF reader here, or something
                     }
                 }else{
+                    imageRef.getDownloadUrl().addOnSuccessListener(uri -> Picasso.get()
+                            .load("" + uri)
+                            .into(new Target() {
+                                      @Override
+                                      public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                                          try {
+                                              String root = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).toString();
+                                              File myDir = new File(root);
 
+                                              if (!myDir.exists()) {
+                                                  myDir.mkdirs();
+                                              }
+
+                                              String name = "Table " + tables.get(position) +  ".jpg";
+                                              myDir = new File(myDir, name);
+                                              FileOutputStream out = new FileOutputStream(myDir);
+                                              bitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);
+                                              Toast.makeText(context, "Image Saved Successfully", Toast.LENGTH_SHORT).show();
+                                              PdfDocument pdfDocument = new PdfDocument();
+                                              Paint myPaint = new Paint();
+                                              PdfDocument.PageInfo myPage = new PdfDocument.PageInfo.Builder(1240, 980, 1).create();
+                                              PdfDocument.Page page = pdfDocument.startPage(myPage);
+
+                                              Paint text = new Paint();
+
+                                              Canvas canvas = page.getCanvas();
+                                              bmp = BitmapFactory.decodeResource(v.getContext().getResources(),R.drawable.ordinalo);
+                                              scaled = Bitmap.createScaledBitmap(bmp,250,250,false);
+                                              canvas.drawBitmap(bitmap, 345, 180, myPaint);
+                                              text.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+                                              text.setTextSize(80);
+                                              SharedPreferences resNamePref = v.getContext().getSharedPreferences("RestaurantInfo", MODE_PRIVATE);
+                                              text.setTextAlign(Paint.Align.CENTER);
+                                              canvas.drawText(resNamePref.getString("hotelName", ""), 610, 90, text);
+                                              text.setTextAlign(Paint.Align.LEFT);
+                                              text.setTextSize(70);
+                                              canvas.drawText("Table Number: " + tables.get(position), 345, 215, text);
+                                              canvas.drawText("Seats: " + seats.get(position), 475, 710, text);
+                                              canvas.drawBitmap(scaled, 950, 700, myPaint);
+
+                                              pdfDocument.finishPage(page);
+
+                                              String fileNames = "/Table " + tables.get(position)+ ".pdf";
+                                              File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS) + fileNames);
+
+                                              try{
+                                                  pdfDocument.writeTo(new FileOutputStream(file));
+                                                  Intent target = new Intent(Intent.ACTION_VIEW);
+                                                  target.setDataAndType(FileProvider.getUriForFile(context, context.getApplicationContext().getPackageName() + ".provider",file), "application/pdf"); // here we set correct type for PDF
+
+                                                  target.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                                                  Intent intent = Intent.createChooser(target, "Open File");
+                                                  try {
+                                                      v.getContext().startActivity(intent);
+                                                  } catch (ActivityNotFoundException e) {
+                                                      // Instruct the user to install a PDF reader here, or something
+                                                  }
+                                              } catch (IOException e) {
+                                                  e.printStackTrace();
+                                              }
+
+                                              pdfDocument.close();
+                                              out.flush();
+                                              out.close();
+                                          } catch(Exception e){
+                                              // some action
+                                          }
+                                      }
+
+                                      @Override
+                                      public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+
+                                      }
+
+                                      @Override
+                                      public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+                                      }
+                                  }
+                            )).addOnFailureListener(e -> Toast.makeText(context, "Failed :) " + e.getLocalizedMessage(), Toast.LENGTH_SHORT).show());
                 }
             });
             alertDialog.setNegativeButton("Delete Table", (dialog, which) -> {
                 if(status.get(position).equals("available")) {
-                    SharedPreferences sharedPreferences1 = v.getContext().getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
+                    SharedPreferences sharedPreferences1 = v.getContext().getSharedPreferences("loginInfo", MODE_PRIVATE);
                     reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences1.getString("state", "")).child(sharedPreferences1.getString("locality","")).child(Objects.requireNonNull(auth.getUid())).child("Tables");
                     reference.child(tables.get(position)).removeValue();
                     FirebaseFirestore firestore = FirebaseFirestore.getInstance();
