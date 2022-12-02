@@ -381,136 +381,235 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                                 .setConfirmText("Confirm Order")
                                 .setConfirmClickListener(kAlertDialog -> {
                                     kAlertDialog.dismissWithAnimation();
+
+//                                    SharedPreferences dailyUserFrequencyShared = getSharedPreferences("DailyUserFrequencyPref",MODE_PRIVATE);
+//                                    SharedPreferences.Editor dailyUserEdit = dailyUserFrequencyShared.edit();
+//
+//                                    if(dailyUserFrequencyShared.contains(month)){
+//                                        java.lang.reflect.Type type = new TypeToken<HashMap<String,String>>() {
+//                                        }.getType();
+//
+//                                        gson = new Gson();
+//                                        json = userFrequency.getString(month,"");
+//                                        HashMap<String,String> map = gson.fromJson(json,type);
+//                                        int day = calendar.get(Calendar.DAY_OF_MONTH);
+//
+//                                        if(map.containsKey(day + "")){
+//                                            int val = Integer.parseInt(map.get(day + ""));
+//                                            val++;
+//                                        }
+//                                    }
+
+//                                    }).start();
+                                    totalOrders.addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                            if (snapshot.hasChild("totalOrdersMade")) {
+                                                int totalOrder = Integer.parseInt(String.valueOf(snapshot.child("totalOrdersMade").getValue()));
+                                                totalOrder = totalOrder + 1;
+                                                totalOrders.child("totalOrdersMade").setValue(totalOrder);
+                                            } else {
+                                                totalOrders.child("totalOrdersMade").setValue("1");
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError error) {
+
+                                        }
+                                    });
+
+                                    if (restaurantDailyTrack.contains("totalOrdersToday")) {
+                                        int val = Integer.parseInt(restaurantDailyTrack.getString("totalOrdersToday", ""));
+                                        val = val + 1;
+                                        restaurantTrackEditor.putString("totalOrdersToday", String.valueOf(val));
+                                    } else {
+                                        restaurantTrackEditor.putString("totalOrdersToday", String.valueOf(1));
+                                    }
+                                    if (restaurantDailyTrack.contains("totalTransactionsToday")) {
+                                        double val = Double.parseDouble(restaurantDailyTrack.getString("totalTransactionsToday", ""));
+                                        val = val + Double.parseDouble(orderAmount);
+                                        restaurantTrackEditor.putString("totalTransactionsToday", String.valueOf(val));
+                                    } else {
+                                        restaurantTrackEditor.putString("totalTransactionsToday", String.valueOf(orderAmount));
+                                    }
+                                    updateTotalAmountValueDB(String.valueOf(orderAmount));
+                                    restaurantTrackEditor.apply();
+
+                                    FirebaseAuth auth = FirebaseAuth.getInstance();
+                                    DatabaseReference trackTotalCash = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
+                                    trackTotalCash.addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                            if (snapshot.hasChild("totalCashTakeAway")) {
+                                                double prevAmount = Double.parseDouble(String.valueOf(snapshot.child("totalCashTakeAway").getValue()));
+                                                double currAmount = Double.parseDouble(orderAmount);
+                                                trackTotalCash.child("totalCashTakeAway").setValue(String.valueOf(currAmount + prevAmount));
+                                            } else {
+                                                trackTotalCash.child("totalCashTakeAway").setValue(String.valueOf(orderAmount));
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError error) {
+
+                                        }
+                                    });
+
+
+                                    String approveTime = String.valueOf(System.currentTimeMillis());
+                                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(id).child("Recent Orders").child(time);
+                                    try {
+                                        for (int i = 0; i < dishName.size(); i++) {
+                                            MyClass myClass = new MyClass(dishName.get(i), dishPrice.get(i), image.get(i), type.get(i), "" + approveTime, quantity.get(i), halfOr.get(i), state, String.valueOf(orderAmount), orderId, "TakeAway,Cash", "Order Approved", sharedPreferences.getString("locality", ""));
+                                            databaseReference.child(auth.getUid()).child(dishName.get(i)).setValue(myClass);
+                                        }
+
+                                        databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(sharedPreferences.getString("locality", "")).child(auth.getUid());
+                                        for (int i = 0; i < dishName.size(); i++) {
+                                            MyClass myClass = new MyClass(dishName.get(i), dishPrice.get(i), image.get(i), type.get(i), "" + approveTime, quantity.get(i), halfOr.get(i), state, String.valueOf(orderAmount), orderId, "TakeAway,Cash", "Order Approved", sharedPreferences.getString("locality", ""));
+                                            databaseReference.child("Recent Orders").child("" + time).child(id).child(dishName.get(i)).setValue(myClass);
+                                        }
+                                    }catch (Exception e){
+
+                                    }
+
+
+
+                                    if (storeOrdersForAdminInfo.contains(month)) {
+                                        java.lang.reflect.Type type = new TypeToken<List<List<String>>>() {
+                                        }.getType();
+                                        gson = new Gson();
+                                        json = storeOrdersForAdminInfo.getString(month, "");
+                                        List<List<String>> mainDataList = gson.fromJson(json, type);
+                                        List<String> date = new ArrayList<>(mainDataList.get(0));
+                                        List<String> transID = new ArrayList<>(mainDataList.get(1));
+                                        List<String> userID = new ArrayList<>(mainDataList.get(2));
+                                        List<String> orderAmountList = new ArrayList<>(mainDataList.get(3));
+//                                    HashMap<String,String> map = new HashMap<String,String>(mainDataList.get(4));
+
+                                        date.add(time);
+                                        transID.add("Cash");
+                                        userID.add(id);
+                                        orderAmountList.add(orderAmount + "");
+
+                                        List<List<String>> storeNewList = new ArrayList<>();
+                                        storeNewList.add(date);
+                                        storeNewList.add(transID);
+                                        storeNewList.add(userID);
+                                        storeNewList.add(orderAmountList);
+
+                                        json = gson.toJson(storeNewList);
+                                        storeEditor.putString(month, json);
+                                        storeEditor.apply();
+                                        int day = calendar.get(Calendar.DAY_OF_MONTH);
+                                        type = new TypeToken<List<List<String>>>() {
+                                        }.getType();
+                                        gson = new Gson();
+                                        json = storeDailyTotalOrdersMade.getString(month, "");
+                                        List<List<String>> mainList = gson.fromJson(json, type);
+                                        List<String> days = new ArrayList<>(mainList.get(0));
+                                        List<String> totalAmounts = new ArrayList<>(mainList.get(1));
+                                        List<String> totalOrdersPlaced = new ArrayList<>(mainList.get(2));
+
+                                        if (Integer.parseInt(days.get(days.size() - 1)) == day) {
+                                            Double totalAmount = Double.parseDouble(totalAmounts.get(totalAmounts.size() - 1));
+                                            totalAmount += Double.parseDouble(orderAmount);
+                                            totalAmounts.set(totalAmounts.size() - 1, String.valueOf(totalAmount));
+
+                                            int totalOrder = Integer.parseInt(totalOrdersPlaced.get(totalOrdersPlaced.size() - 1));
+                                            totalOrder += 1;
+                                            totalOrdersPlaced.set(totalOrdersPlaced.size() - 1, String.valueOf(totalOrder));
+                                        } else {
+                                            days.add(String.valueOf(day));
+                                            totalOrdersPlaced.add("1");
+                                            totalAmounts.add(String.valueOf(orderAmount));
+                                        }
+
+                                        List<List<String>> newList = new ArrayList<>();
+                                        newList.add(days);
+                                        newList.add(totalAmounts);
+                                        newList.add(totalOrdersPlaced);
+                                        json = gson.toJson(newList);
+                                        storeDailyEditor.putString(month, json);
+                                        storeDailyEditor.apply();
+
+                                        Log.i("myInfo", storeNewList.toString());
+                                        Log.i("myInfo", newList.toString());
+                                    } else {
+                                        List<List<String>> mainDataList = new ArrayList<>();
+                                        List<String> date = new ArrayList<>();
+                                        List<String> transID = new ArrayList<>();
+                                        List<String> userID = new ArrayList<>();
+                                        List<String> orderAmountList = new ArrayList<>();
+
+                                        date.add(time);
+                                        transID.add("Cash");
+                                        userID.add(id);
+                                        orderAmountList.add(orderAmount + "");
+                                        mainDataList.add(date);
+                                        mainDataList.add(transID);
+                                        mainDataList.add(userID);
+                                        mainDataList.add(orderAmountList);
+
+                                        gson = new Gson();
+                                        json = gson.toJson(mainDataList);
+                                        storeEditor.putString(month, json);
+                                        storeEditor.apply();
+                                        List<List<String>> mainList = new ArrayList<>();
+                                        List<String> days = new ArrayList<>();
+                                        List<String> totalAmounts = new ArrayList<>();
+                                        List<String> totalOrdersPlaced = new ArrayList<>();
+                                        int day = calendar.get(Calendar.DAY_OF_MONTH);
+                                        days.add(String.valueOf(day));
+                                        totalAmounts.add(String.valueOf(orderAmount));
+                                        totalOrdersPlaced.add(String.valueOf(1));
+
+                                        mainList.add(days);
+                                        mainList.add(totalAmounts);
+                                        mainList.add(totalOrdersPlaced);
+
+                                        gson = new Gson();
+                                        json = gson.toJson(mainList);
+                                        storeDailyEditor.putString(month, json);
+                                        storeDailyEditor.apply();
+                                        Log.i("myInfo", mainDataList.toString());
+                                        Log.i("myInfo", mainList.toString());
+                                    }
+                                    File file = new File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "RestaurantEarningTracker.xlsx");
+                                    try {
+                                        Cell cell;
+                                        FileInputStream fileInputStream = new FileInputStream(file);
+                                        XSSFWorkbook workbook = new XSSFWorkbook(fileInputStream);
+                                        Sheet sheet = workbook.getSheetAt(0);
+                                        int max = sheet.getLastRowNum();
+                                        max = max + 1;
+                                        Row row = sheet.createRow(max);
+                                        @SuppressLint("SimpleDateFormat") DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                                        Date date = new Date(Long.parseLong(time));
+                                        cell = row.createCell(0);
+                                        cell.setCellValue(dateFormat.format(date));
+                                        cell = row.createCell(1);
+                                        cell.setCellValue(transactionIdForExcel);
+                                        cell = row.createCell(2);
+                                        cell.setCellValue("Cash");
+                                        cell = row.createCell(3);
+                                        cell.setCellValue("\u20B9" + orderAmount);
+                                        Log.i("info", max + "");
+                                        FileOutputStream fileOutputStream = new FileOutputStream(file);
+                                        workbook.write(fileOutputStream);
+                                        fileOutputStream.flush();
+                                        fileOutputStream.close();
+                                        Toast.makeText(ApproveCurrentTakeAway.this, "Completed", Toast.LENGTH_SHORT).show();
+                                        workbook.close();
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+
+
                                     new hugeBackgroundWork().execute();
                                     new Thread(() -> {
-//                                        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("ResAnalysis").child(state).child(sharedPreferences.getString("locality", ""));
-//                                        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-//                                            @Override
-//                                            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                                                if (snapshot.exists()) {
-//
-//                                                    if (snapshot.hasChild("veg")) {
-//                                                        int vegVal = Integer.parseInt(String.valueOf(snapshot.child("veg").getValue()));
-//                                                        vegVal += veg;
-//                                                        databaseReference.child("veg").setValue(vegVal + "");
-//                                                    } else
-//                                                        databaseReference.child("veg").setValue(veg + "");
-//
-//                                                    if (snapshot.hasChild("NonVeg")) {
-//                                                        int vegVal = Integer.parseInt(String.valueOf(snapshot.child("NonVeg").getValue()));
-//                                                        vegVal += nonVeg;
-//                                                        databaseReference.child("NonVeg").setValue(vegVal + "");
-//                                                    } else
-//                                                        databaseReference.child("NonVeg").setValue(nonVeg + "");
-//
-//                                                    if (snapshot.hasChild("vegan")) {
-//                                                        int vegVal = Integer.parseInt(String.valueOf(snapshot.child("vegan").getValue()));
-//                                                        vegVal += vegan;
-//                                                        databaseReference.child("vegan").setValue(vegVal + "");
-//                                                    } else
-//                                                        databaseReference.child("vegan").setValue(vegan + "");
-//
-//                                                    DatabaseReference checkRestaurant = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("ResAnalysis").child(state).child(sharedPreferences.getString("locality", "")).child(auth.getUid());
-//                                                    checkRestaurant.addListenerForSingleValueEvent(new ValueEventListener() {
-//                                                        @Override
-//                                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                                                            if (snapshot.exists()) {
-//                                                                if (snapshot.hasChild("veg")) {
-//                                                                    int vegVal = Integer.parseInt(String.valueOf(snapshot.child("veg").getValue()));
-//                                                                    vegVal += veg;
-//                                                                    checkRestaurant.child("veg").setValue(vegVal + "");
-//                                                                } else
-//                                                                    checkRestaurant.child("veg").setValue(veg + "");
-//
-//                                                                if (snapshot.hasChild("NonVeg")) {
-//                                                                    int vegVal = Integer.parseInt(String.valueOf(snapshot.child("NonVeg").getValue()));
-//                                                                    vegVal += nonVeg;
-//                                                                    checkRestaurant.child("NonVeg").setValue(vegVal + "");
-//                                                                } else
-//                                                                    checkRestaurant.child("NonVeg").setValue(nonVeg + "");
-//
-//                                                                if (snapshot.hasChild("vegan")) {
-//                                                                    int vegVal = Integer.parseInt(String.valueOf(snapshot.child("vegan").getValue()));
-//                                                                    vegVal += vegan;
-//                                                                    checkRestaurant.child("vegan").setValue(vegVal + "");
-//                                                                } else
-//                                                                    checkRestaurant.child("vegan").setValue(vegan + "");
-//                                                            } else {
-//                                                                if (!(veg == 0))
-//                                                                    checkRestaurant.child("veg").setValue(veg + "");
-//
-//                                                                if (!(vegan == 0))
-//                                                                    checkRestaurant.child("vegan").setValue(vegan + "");
-//
-//                                                                if (!(nonVeg == 0))
-//                                                                    checkRestaurant.child("NonVeg").setValue(nonVeg + "");
-//                                                            }
-//                                                        }
-//
-//                                                        @Override
-//                                                        public void onCancelled(@NonNull DatabaseError error) {
-//
-//                                                        }
-//                                                    });
-//                                                } else {
-//                                                    DatabaseReference checkRestaurant = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("ResAnalysis").child(state).child(sharedPreferences.getString("locality", "")).child(auth.getUid());
-//                                                    checkRestaurant.addListenerForSingleValueEvent(new ValueEventListener() {
-//                                                        @Override
-//                                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                                                            if (snapshot.exists()) {
-//                                                                if (snapshot.hasChild("veg")) {
-//                                                                    int vegVal = Integer.parseInt(String.valueOf(snapshot.child("veg").getValue()));
-//                                                                    vegVal += veg;
-//                                                                    checkRestaurant.child("veg").setValue(vegVal + "");
-//                                                                } else
-//                                                                    checkRestaurant.child("veg").setValue(veg + "");
-//
-//                                                                if (snapshot.hasChild("NonVeg")) {
-//                                                                    int vegVal = Integer.parseInt(String.valueOf(snapshot.child("NonVeg").getValue()));
-//                                                                    vegVal += nonVeg;
-//                                                                    checkRestaurant.child("NonVeg").setValue(vegVal + "");
-//                                                                } else
-//                                                                    checkRestaurant.child("NonVeg").setValue(nonVeg + "");
-//
-//                                                                if (snapshot.hasChild("vegan")) {
-//                                                                    int vegVal = Integer.parseInt(String.valueOf(snapshot.child("vegan").getValue()));
-//                                                                    vegVal += vegan;
-//                                                                    checkRestaurant.child("vegan").setValue(vegVal + "");
-//                                                                } else
-//                                                                    checkRestaurant.child("vegan").setValue(vegan + "");
-//                                                            } else {
-//                                                                if (!(veg == 0))
-//                                                                    checkRestaurant.child("veg").setValue(veg + "");
-//
-//                                                                if (!(vegan == 0))
-//                                                                    checkRestaurant.child("vegan").setValue(vegan + "");
-//
-//                                                                if (!(nonVeg == 0))
-//                                                                    checkRestaurant.child("NonVeg").setValue(nonVeg + "");
-//                                                            }
-//                                                        }
-//
-//                                                        @Override
-//                                                        public void onCancelled(@NonNull DatabaseError error) {
-//
-//                                                        }
-//                                                    });
-//                                                    if (!(veg == 0))
-//                                                        databaseReference.child("veg").setValue(veg + "");
-//
-//                                                    if (!(vegan == 0))
-//                                                        databaseReference.child("vegan").setValue(vegan + "");
-//
-//                                                    if (!(nonVeg == 0))
-//                                                        databaseReference.child("NonVeg").setValue(nonVeg + "");
-//                                                }
-//                                            }
-//
-//                                            @Override
-//                                            public void onCancelled(@NonNull DatabaseError error) {
-//
-//                                            }
-//                                        });
+
                                         DatabaseReference databaseReference1 = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("ResAnalysis").child(state).child(sharedPreferences.getString("locality", ""));
                                         databaseReference1.addListenerForSingleValueEvent(new ValueEventListener() {
                                             @Override
@@ -726,39 +825,39 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                                         SharedPreferences last7daysReport = getSharedPreferences("last7daysReport",MODE_PRIVATE);
                                         SharedPreferences.Editor last7daysReportEdit = last7daysReport.edit();
 //                                        new Thread(() -> {
-                                            if(last7daysReport.contains("currentMonth") && last7daysReport.getString("currentMonth","").equals(month)){
-                                                int day = calendar.get(Calendar.DAY_OF_MONTH);
-                                                if(last7daysReport.contains("daysTracked")){
-                                                    if(Integer.parseInt(last7daysReport.getString("currentDate","")) != day) {
-                                                        int prevData = Integer.parseInt(last7daysReport.getString("daysTracked", ""));
-                                                        prevData++;
-                                                        last7daysReportEdit.putString("daysTracked",prevData + "");
-                                                    }
-
-                                                    last7daysReportEdit.putString("currentDate",day + "");
-                                                    last7daysReportEdit.apply();
-                                                }else{
-                                                    int prevData = 1;
-                                                    last7daysReportEdit.putString("currentDate",day + "");
+                                        if(last7daysReport.contains("currentMonth") && last7daysReport.getString("currentMonth","").equals(month)){
+                                            int day = calendar.get(Calendar.DAY_OF_MONTH);
+                                            if(last7daysReport.contains("daysTracked")){
+                                                if(Integer.parseInt(last7daysReport.getString("currentDate","")) != day) {
+                                                    int prevData = Integer.parseInt(last7daysReport.getString("daysTracked", ""));
+                                                    prevData++;
                                                     last7daysReportEdit.putString("daysTracked",prevData + "");
-                                                    last7daysReportEdit.apply();
                                                 }
+
+                                                last7daysReportEdit.putString("currentDate",day + "");
+                                                last7daysReportEdit.apply();
                                             }else{
                                                 int prevData = 1;
-                                                int day = calendar.get(Calendar.DAY_OF_MONTH);
                                                 last7daysReportEdit.putString("currentDate",day + "");
                                                 last7daysReportEdit.putString("daysTracked",prevData + "");
-                                                last7daysReportEdit.putString("currentMonth",month + "");
                                                 last7daysReportEdit.apply();
                                             }
+                                        }else{
+                                            int prevData = 1;
+                                            int day = calendar.get(Calendar.DAY_OF_MONTH);
+                                            last7daysReportEdit.putString("currentDate",day + "");
+                                            last7daysReportEdit.putString("daysTracked",prevData + "");
+                                            last7daysReportEdit.putString("currentMonth",month + "");
+                                            last7daysReportEdit.apply();
+                                        }
 
 
-                                            if(lastMonthReport.contains("currentMonth") && lastMonthReport.getString("currentMonth","").equals(month)){
+                                        if(lastMonthReport.contains("currentMonth") && lastMonthReport.getString("currentMonth","").equals(month)){
 
-                                            }else{
-                                                editorMonthly.putString("currentMonth",month);
-                                                editorMonthly.apply();
-                                            }
+                                        }else{
+                                            editorMonthly.putString("currentMonth",month);
+                                            editorMonthly.apply();
+                                        }
 
 //                                        }).start();
 
@@ -845,44 +944,75 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                                             averageEditor.putString(month, gson.toJson(newList));
                                         }
                                         averageEditor.apply();
+                                        java.lang.reflect.Type type1 = new TypeToken<HashMap<String,HashMap<String,Integer>>>(){}.getType();
 
+                                        HashMap<String,HashMap<String,Integer>> mapDishMain;
+                                        SharedPreferences dishShared = getSharedPreferences("DishOrderedWithOthers",MODE_PRIVATE);
+                                        SharedPreferences.Editor dishSharedEdit = dishShared.edit();
+                                        if(dishShared.contains(month)){
+                                            mapDishMain = gson.fromJson(dishShared.getString(month,""),type1);
+                                            HashMap<String,Integer> innerMap;
 
-                                        totalOrders.addListenerForSingleValueEvent(new ValueEventListener() {
-                                            @Override
-                                            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                                if (snapshot.hasChild("totalOrdersMade")) {
-                                                    int totalOrder = Integer.parseInt(String.valueOf(snapshot.child("totalOrdersMade").getValue()));
-                                                    totalOrder = totalOrder + 1;
-                                                    totalOrders.child("totalOrdersMade").setValue(totalOrder);
-                                                } else {
-                                                    totalOrders.child("totalOrdersMade").setValue("1");
+                                            for(int m=0;m<dishName.size();m++){
+                                                if(mapDishMain.containsKey(dishName.get(m))){
+                                                    innerMap = new HashMap<>(mapDishMain.get(dishName.get(m)));
+                                                    for(int i=0;i<dishName.size();i++){
+                                                        if(innerMap.containsKey(dishName.get(i))){
+                                                            int prev = innerMap.get(dishName.get(i));
+                                                            prev++;
+                                                            innerMap.put(dishName.get(i),prev);
+                                                        }else
+                                                            innerMap.put(dishName.get(i),1);
+                                                    }
+                                                }else{
+                                                    innerMap = new HashMap<>();
+                                                    for(int i=0;i<dishName.size();i++)
+                                                        innerMap.put(dishName.get(i),1);
                                                 }
+
+
+                                                mapDishMain.put(dishName.get(m),innerMap);
+                                            }
+//                                        if(mapDishMain.containsKey(currDishName)){
+//                                            innerMap = new HashMap<>(mapDishMain.get(currDishName));
+//                                            for(int l=0;l<dishName.size();l++){
+//                                                if(!dishName.get(l).equals(currDishName)){
+//                                                    if(innerMap.containsKey(dishName.get(l))){
+//                                                        int prev = innerMap.get(dishName.get(l));
+//                                                        prev++;
+//                                                        innerMap.put(dishName.get(l),prev);
+//                                                    }else
+//                                                        innerMap.put(dishName.get(l),1);
+//                                                }
+//                                            }
+//
+//                                        }else{
+//                                            innerMap = new HashMap<>();
+//                                            for(int l=0;l<dishName.size();l++){
+//                                                if(!dishName.get(l).equals(currDishName)){
+//                                                    innerMap.put(dishName.get(l),1);
+//                                                }
+//                                            }
+//
+//                                        }
+
+                                        }else{
+                                            mapDishMain = new HashMap<>();
+                                            HashMap<String,Integer> innerMap = new HashMap<>();
+                                            for(int l=0;l<dishName.size();l++){
+                                                for(int i=0;i<dishName.size();i++)
+                                                    innerMap.put(dishName.get(i),1);
+
+                                                mapDishMain.put(dishName.get(l),innerMap);
                                             }
 
-                                            @Override
-                                            public void onCancelled(@NonNull DatabaseError error) {
+                                        }
 
-                                            }
-                                        });
-                                        if (restaurantDailyTrack.contains("totalOrdersToday")) {
-                                            int val = Integer.parseInt(restaurantDailyTrack.getString("totalOrdersToday", ""));
-                                            val = val + 1;
-                                            restaurantTrackEditor.putString("totalOrdersToday", String.valueOf(val));
-                                        } else {
-                                            restaurantTrackEditor.putString("totalOrdersToday", String.valueOf(1));
-                                        }
-                                        if (restaurantDailyTrack.contains("totalTransactionsToday")) {
-                                            double val = Double.parseDouble(restaurantDailyTrack.getString("totalTransactionsToday", ""));
-                                            val = val + Double.parseDouble(orderAmount);
-                                            restaurantTrackEditor.putString("totalTransactionsToday", String.valueOf(val));
-                                        } else {
-                                            restaurantTrackEditor.putString("totalTransactionsToday", String.valueOf(orderAmount));
-                                        }
-                                        updateTotalAmountValueDB(String.valueOf(orderAmount));
-                                        restaurantTrackEditor.apply();
-                                    }).start();
-                                    Calendar calendar = Calendar.getInstance();
-                                    int yearCurrent = calendar.get(Calendar.YEAR);
+                                        dishSharedEdit.putString(month,gson.toJson(mapDishMain));
+                                        dishSharedEdit.apply();
+
+                                        Calendar calendar = Calendar.getInstance();
+                                        int yearCurrent = calendar.get(Calendar.YEAR);
 //                                    new Thread(() -> {
                                         if (userFrequency.contains(month)) {
                                             java.lang.reflect.Type type = new TypeToken<HashMap<String, String>>() {
@@ -935,271 +1065,8 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                                         trackingDineAndWay.apply();
 
 
-//                                    SharedPreferences dailyUserFrequencyShared = getSharedPreferences("DailyUserFrequencyPref",MODE_PRIVATE);
-//                                    SharedPreferences.Editor dailyUserEdit = dailyUserFrequencyShared.edit();
-//
-//                                    if(dailyUserFrequencyShared.contains(month)){
-//                                        java.lang.reflect.Type type = new TypeToken<HashMap<String,String>>() {
-//                                        }.getType();
-//
-//                                        gson = new Gson();
-//                                        json = userFrequency.getString(month,"");
-//                                        HashMap<String,String> map = gson.fromJson(json,type);
-//                                        int day = calendar.get(Calendar.DAY_OF_MONTH);
-//
-//                                        if(map.containsKey(day + "")){
-//                                            int val = Integer.parseInt(map.get(day + ""));
-//                                            val++;
-//                                        }
-//                                    }
-
-//                                    }).start();
-
-
-
-                                    FirebaseAuth auth = FirebaseAuth.getInstance();
-                                    DatabaseReference trackTotalCash = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
-                                    trackTotalCash.addListenerForSingleValueEvent(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                            if (snapshot.hasChild("totalCashTakeAway")) {
-                                                double prevAmount = Double.parseDouble(String.valueOf(snapshot.child("totalCashTakeAway").getValue()));
-                                                double currAmount = Double.parseDouble(orderAmount);
-                                                trackTotalCash.child("totalCashTakeAway").setValue(String.valueOf(currAmount + prevAmount));
-                                            } else {
-                                                trackTotalCash.child("totalCashTakeAway").setValue(String.valueOf(orderAmount));
-                                            }
-                                        }
-
-                                        @Override
-                                        public void onCancelled(@NonNull DatabaseError error) {
-
-                                        }
-                                    });
-
-
-                                    String approveTime = String.valueOf(System.currentTimeMillis());
-                                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(id).child("Recent Orders").child(time);
-                                    try {
-                                        for (int i = 0; i < dishName.size(); i++) {
-                                            MyClass myClass = new MyClass(dishName.get(i), dishPrice.get(i), image.get(i), type.get(i), "" + approveTime, quantity.get(i), halfOr.get(i), state, String.valueOf(orderAmount), orderId, "TakeAway,Cash", "Order Approved", sharedPreferences.getString("locality", ""));
-                                            databaseReference.child(auth.getUid()).child(dishName.get(i)).setValue(myClass);
-                                        }
-
-                                        databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(sharedPreferences.getString("locality", "")).child(auth.getUid());
-                                        for (int i = 0; i < dishName.size(); i++) {
-                                            MyClass myClass = new MyClass(dishName.get(i), dishPrice.get(i), image.get(i), type.get(i), "" + approveTime, quantity.get(i), halfOr.get(i), state, String.valueOf(orderAmount), orderId, "TakeAway,Cash", "Order Approved", sharedPreferences.getString("locality", ""));
-                                            databaseReference.child("Recent Orders").child("" + time).child(id).child(dishName.get(i)).setValue(myClass);
-                                        }
-                                    }catch (Exception e){
-                                        for (int i = 0; i < dishName.size(); i++) {
-                                            MyClass myClass = new MyClass(dishName.get(i), dishPrice.get(i), image.get(i), type.get(i), "" + approveTime, quantity.get(i), halfOr.get(i), state, String.valueOf(orderAmount), orderId, "TakeAway,Cash", "Order Approved", sharedPreferences.getString("locality", ""));
-                                            databaseReference.child(auth.getUid()).child(dishName.get(i)).setValue(myClass);
-                                        }
-
-                                        databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(sharedPreferences.getString("locality", "")).child(auth.getUid());
-                                        for (int i = 0; i < dishName.size(); i++) {
-                                            MyClass myClass = new MyClass(dishName.get(i), dishPrice.get(i), image.get(i), type.get(i), "" + approveTime, quantity.get(i), halfOr.get(i), state, String.valueOf(orderAmount), orderId, "TakeAway,Cash", "Order Approved", sharedPreferences.getString("locality", ""));
-                                            databaseReference.child("Recent Orders").child("" + time).child(id).child(dishName.get(i)).setValue(myClass);
-                                        }
-                                    }
-
-                                    java.lang.reflect.Type type1 = new TypeToken<HashMap<String,HashMap<String,Integer>>>(){}.getType();
-
-                                    HashMap<String,HashMap<String,Integer>> mapDishMain;
-
-                                    if (storeOrdersForAdminInfo.contains(month)) {
-                                        java.lang.reflect.Type type = new TypeToken<List<List<String>>>() {
-                                        }.getType();
-                                        gson = new Gson();
-                                        json = storeOrdersForAdminInfo.getString(month, "");
-                                        List<List<String>> mainDataList = gson.fromJson(json, type);
-                                        List<String> date = new ArrayList<>(mainDataList.get(0));
-                                        List<String> transID = new ArrayList<>(mainDataList.get(1));
-                                        List<String> userID = new ArrayList<>(mainDataList.get(2));
-                                        List<String> orderAmountList = new ArrayList<>(mainDataList.get(3));
-//                                    HashMap<String,String> map = new HashMap<String,String>(mainDataList.get(4));
-
-                                        date.add(time);
-                                        transID.add("Cash");
-                                        userID.add(id);
-                                        orderAmountList.add(orderAmount + "");
-
-                                        List<List<String>> storeNewList = new ArrayList<>();
-                                        storeNewList.add(date);
-                                        storeNewList.add(transID);
-                                        storeNewList.add(userID);
-                                        storeNewList.add(orderAmountList);
-
-                                        json = gson.toJson(storeNewList);
-                                        storeEditor.putString(month, json);
-                                        storeEditor.apply();
-                                        int day = calendar.get(Calendar.DAY_OF_MONTH);
-                                        type = new TypeToken<List<List<String>>>() {
-                                        }.getType();
-                                        gson = new Gson();
-                                        json = storeDailyTotalOrdersMade.getString(month, "");
-                                        List<List<String>> mainList = gson.fromJson(json, type);
-                                        List<String> days = new ArrayList<>(mainList.get(0));
-                                        List<String> totalAmounts = new ArrayList<>(mainList.get(1));
-                                        List<String> totalOrdersPlaced = new ArrayList<>(mainList.get(2));
-
-                                        if (Integer.parseInt(days.get(days.size() - 1)) == day) {
-                                            Double totalAmount = Double.parseDouble(totalAmounts.get(totalAmounts.size() - 1));
-                                            totalAmount += Double.parseDouble(orderAmount);
-                                            totalAmounts.set(totalAmounts.size() - 1, String.valueOf(totalAmount));
-
-                                            int totalOrder = Integer.parseInt(totalOrdersPlaced.get(totalOrdersPlaced.size() - 1));
-                                            totalOrder += 1;
-                                            totalOrdersPlaced.set(totalOrdersPlaced.size() - 1, String.valueOf(totalOrder));
-                                        } else {
-                                            days.add(String.valueOf(day));
-                                            totalOrdersPlaced.add("1");
-                                            totalAmounts.add(String.valueOf(orderAmount));
-                                        }
-
-                                        List<List<String>> newList = new ArrayList<>();
-                                        newList.add(days);
-                                        newList.add(totalAmounts);
-                                        newList.add(totalOrdersPlaced);
-                                        json = gson.toJson(newList);
-                                        storeDailyEditor.putString(month, json);
-                                        storeDailyEditor.apply();
-
-                                        Log.i("myInfo", storeNewList.toString());
-                                        Log.i("myInfo", newList.toString());
-                                    } else {
-                                        List<List<String>> mainDataList = new ArrayList<>();
-                                        List<String> date = new ArrayList<>();
-                                        List<String> transID = new ArrayList<>();
-                                        List<String> userID = new ArrayList<>();
-                                        List<String> orderAmountList = new ArrayList<>();
-
-                                        date.add(time);
-                                        transID.add("Cash");
-                                        userID.add(id);
-                                        orderAmountList.add(orderAmount + "");
-                                        mainDataList.add(date);
-                                        mainDataList.add(transID);
-                                        mainDataList.add(userID);
-                                        mainDataList.add(orderAmountList);
-
-                                        gson = new Gson();
-                                        json = gson.toJson(mainDataList);
-                                        storeEditor.putString(month, json);
-                                        storeEditor.apply();
-                                        List<List<String>> mainList = new ArrayList<>();
-                                        List<String> days = new ArrayList<>();
-                                        List<String> totalAmounts = new ArrayList<>();
-                                        List<String> totalOrdersPlaced = new ArrayList<>();
-                                        int day = calendar.get(Calendar.DAY_OF_MONTH);
-                                        days.add(String.valueOf(day));
-                                        totalAmounts.add(String.valueOf(orderAmount));
-                                        totalOrdersPlaced.add(String.valueOf(1));
-
-                                        mainList.add(days);
-                                        mainList.add(totalAmounts);
-                                        mainList.add(totalOrdersPlaced);
-
-                                        gson = new Gson();
-                                        json = gson.toJson(mainList);
-                                        storeDailyEditor.putString(month, json);
-                                        storeDailyEditor.apply();
-                                        Log.i("myInfo", mainDataList.toString());
-                                        Log.i("myInfo", mainList.toString());
-                                    }
-                                    File file = new File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "RestaurantEarningTracker.xlsx");
-                                    try {
-                                        Cell cell;
-                                        FileInputStream fileInputStream = new FileInputStream(file);
-                                        XSSFWorkbook workbook = new XSSFWorkbook(fileInputStream);
-                                        Sheet sheet = workbook.getSheetAt(0);
-                                        int max = sheet.getLastRowNum();
-                                        max = max + 1;
-                                        Row row = sheet.createRow(max);
-                                        @SuppressLint("SimpleDateFormat") DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-                                        Date date = new Date(Long.parseLong(time));
-                                        cell = row.createCell(0);
-                                        cell.setCellValue(dateFormat.format(date));
-                                        cell = row.createCell(1);
-                                        cell.setCellValue(transactionIdForExcel);
-                                        cell = row.createCell(2);
-                                        cell.setCellValue("Cash");
-                                        cell = row.createCell(3);
-                                        cell.setCellValue("\u20B9" + orderAmount);
-                                        Log.i("info", max + "");
-                                        FileOutputStream fileOutputStream = new FileOutputStream(file);
-                                        workbook.write(fileOutputStream);
-                                        fileOutputStream.flush();
-                                        fileOutputStream.close();
-                                        Toast.makeText(ApproveCurrentTakeAway.this, "Completed", Toast.LENGTH_SHORT).show();
-                                        workbook.close();
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
-                                    }
+                                    }).start();
                                     //
-                                    SharedPreferences dishShared = getSharedPreferences("DishOrderedWithOthers",MODE_PRIVATE);
-                                    SharedPreferences.Editor dishSharedEdit = dishShared.edit();
-                                    if(dishShared.contains(month)){
-                                        mapDishMain = gson.fromJson(dishShared.getString(month,""),type1);
-                                        HashMap<String,Integer> innerMap;
-
-                                        for(int m=0;m<dishName.size();m++){
-                                            if(mapDishMain.containsKey(dishName.get(m))){
-                                                innerMap = new HashMap<>(mapDishMain.get(dishName.get(m)));
-                                                for(int i=0;i<dishName.size();i++){
-                                                    if(innerMap.containsKey(dishName.get(i))){
-                                                        int prev = innerMap.get(dishName.get(i));
-                                                        prev++;
-                                                        innerMap.put(dishName.get(i),prev);
-                                                    }else
-                                                        innerMap.put(dishName.get(i),1);
-                                                }
-                                            }else{
-                                                innerMap = new HashMap<>();
-                                                for(int i=0;i<dishName.size();i++)
-                                                   innerMap.put(dishName.get(i),1);
-                                            }
-
-
-                                            mapDishMain.put(dishName.get(m),innerMap);
-                                        }
-//                                        if(mapDishMain.containsKey(currDishName)){
-//                                            innerMap = new HashMap<>(mapDishMain.get(currDishName));
-//                                            for(int l=0;l<dishName.size();l++){
-//                                                if(!dishName.get(l).equals(currDishName)){
-//                                                    if(innerMap.containsKey(dishName.get(l))){
-//                                                        int prev = innerMap.get(dishName.get(l));
-//                                                        prev++;
-//                                                        innerMap.put(dishName.get(l),prev);
-//                                                    }else
-//                                                        innerMap.put(dishName.get(l),1);
-//                                                }
-//                                            }
-//
-//                                        }else{
-//                                            innerMap = new HashMap<>();
-//                                            for(int l=0;l<dishName.size();l++){
-//                                                if(!dishName.get(l).equals(currDishName)){
-//                                                    innerMap.put(dishName.get(l),1);
-//                                                }
-//                                            }
-//
-//                                        }
-
-                                    }else{
-                                        mapDishMain = new HashMap<>();
-                                        HashMap<String,Integer> innerMap = new HashMap<>();
-                                        for(int l=0;l<dishName.size();l++){
-                                            for(int i=0;i<dishName.size();i++)
-                                                innerMap.put(dishName.get(i),1);
-
-                                            mapDishMain.put(dishName.get(l),innerMap);
-                                        }
-
-                                    }
-                                    dishSharedEdit.putString(month,gson.toJson(mapDishMain));
-                                    dishSharedEdit.apply();
 
 
                                     Toast.makeText(ApproveCurrentTakeAway.this, "Order Confirmed", Toast.LENGTH_SHORT).show();
@@ -1241,7 +1108,6 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                                         @Override
                                         public void onDataChange(@NonNull DataSnapshot snapshot) {
                                             if (snapshot.exists()) {
-
                                                 if (snapshot.hasChild("veg")) {
                                                     int vegVal = Integer.parseInt(String.valueOf(snapshot.child("veg").getValue()));
                                                     vegVal += veg;
@@ -1364,7 +1230,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
 
                                         }
                                     });
-                                    new Handler().postDelayed(this::finish, 1000);
+                                    new Handler().postDelayed(this::finish, 1500);
                                 }).setCancelText("No Wait")
                                 .setCancelClickListener(KAlertDialog::dismissWithAnimation).show();
                     } else {
