@@ -53,6 +53,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class RestaurantEarningAnalysis extends AppCompatActivity {
     SharedPreferences storedOrders;
@@ -241,7 +242,7 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
                         if(mainMap.containsKey(date.get(i) + "")) {
                             addToVal = 0;
 
-                            HashMap<String, Integer> innerMap = new HashMap<>(mainMap.get(date.get(i) + ""));
+                            HashMap<String, Integer> innerMap = new HashMap<>(Objects.requireNonNull(mainMap.get(date.get(i) + "")));
                             for(String ii : innerMap.keySet()){
                                 totalCust++;
                                 addToVal++;
@@ -294,20 +295,20 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
                         double remainderAmount = 0;
                         lastDaysTrend.setVisibility(View.VISIBLE);
                         HashMap<String,HashMap<String,String>> map = gson.fromJson(sharedPreferences.getString(month,""),myType);
-                        HashMap<String,String> innerMaps = new HashMap<>(map.get(date.get(date.size()-1) + ""));
-                        salesAmount = Double.parseDouble(innerMaps.get("revenueTotal"));
+                        HashMap<String,String> innerMaps = new HashMap<>(Objects.requireNonNull(map.get(date.get(date.size() - 1) + "")));
+                        salesAmount = Double.parseDouble(Objects.requireNonNull(innerMaps.get("revenueTotal")));
                         HashMap<String,Integer> hoursMapTrack = new HashMap<>();
                         int currentHighestHour = 0;
                         for(int ii=date.size()-2;ii >= loop; ii--){
                             if(map.containsKey(date.get(ii) + "")){
-                                HashMap<String,String> innerMapMine = new HashMap<>(map.get(date.get(ii) + ""));
-                                remainderAmount = salesAmount - Double.parseDouble(innerMapMine.get("revenueTotal"));
-                                salesAmount = Double.parseDouble(innerMapMine.get("revenueTotal"));
+                                HashMap<String,String> innerMapMine = new HashMap<>(Objects.requireNonNull(map.get(date.get(ii) + "")));
+                                remainderAmount = salesAmount - Double.parseDouble(Objects.requireNonNull(innerMapMine.get("revenueTotal")));
+                                salesAmount = Double.parseDouble(Objects.requireNonNull(innerMapMine.get("revenueTotal")));
 
                                 java.lang.reflect.Type timeZoneMap = new TypeToken<HashMap<String, Integer>>() {
                                 }.getType();
 
-                                HashMap<String,Integer> timeMap = new HashMap<>(gson.fromJson(innerMapMine.get("timeZoneMap"),timeZoneMap));
+                                HashMap<String,Integer> timeMap = new HashMap<>(Objects.requireNonNull(gson.fromJson(innerMapMine.get("timeZoneMap"), timeZoneMap)));
 
                                 for(Map.Entry<String,Integer> mapmap : timeMap.entrySet()){
                                     int dataHour = Integer.parseInt(mapmap.getKey());
@@ -322,8 +323,9 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
                         }
 
                         if(remainderAmount > 0){
-                            lastSalesTrend.setText("Increase in sales in last days");
-                        }
+                            lastSalesTrend.setText("Increase in sales in last days: " + remainderAmount);
+                        }else
+                            lastSalesTrend.setText("Decrease in sales in last days: " + remainderAmount);
 
                         int maxVal = Collections.max(hoursMapTrack.values());
                         for (Map.Entry<String, Integer> entry :
@@ -391,12 +393,12 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
                         HashMap<String,HashMap<String,String>> map = mySon.fromJson(dailyInsightsStoringData.getString(month,""),typeses);
                         if(map.containsKey(day + "")){
 
-                            HashMap<String,String> innerMap = new HashMap<>(map.get(day + ""));
+                            HashMap<String,String> innerMap = new HashMap<>(Objects.requireNonNull(map.get(day + "")));
 
                             java.lang.reflect.Type timeZoneMap = new TypeToken<HashMap<String, Integer>>() {
                             }.getType();
 
-                            HashMap<String,Integer> timeMap = new HashMap<>(mySon.fromJson(innerMap.get("timeZoneMap"),timeZoneMap));
+                            HashMap<String,Integer> timeMap = new HashMap<>(Objects.requireNonNull(mySon.fromJson(innerMap.get("timeZoneMap"), timeZoneMap)));
                             List<String> hoursList = new ArrayList<>();
                             List<String> totalAtHour = new ArrayList<>();
                             for(Map.Entry<String,Integer> mapmap : timeMap.entrySet()){
@@ -616,12 +618,12 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
                 HashMap<String,HashMap<String,String>> map = mySon.fromJson(dailyInsightsStoringData.getString(monthName[calendar.get(Calendar.MONTH)],""),typeses);
                 if(map.containsKey(val + "")){
 
-                    HashMap<String,String> innerMap = new HashMap<>(map.get(val + ""));
+                    HashMap<String,String> innerMap = new HashMap<>(Objects.requireNonNull(map.get(val + "")));
 
                     java.lang.reflect.Type timeZoneMap = new TypeToken<HashMap<String, Integer>>() {
                     }.getType();
 
-                    HashMap<String,Integer> timeMap = new HashMap<>(mySon.fromJson(innerMap.get("timeZoneMap"),timeZoneMap));
+                    HashMap<String,Integer> timeMap = new HashMap<>(Objects.requireNonNull(mySon.fromJson(innerMap.get("timeZoneMap"), timeZoneMap)));
                     List<String> hoursList = new ArrayList<>();
                     List<String> totalAtHour = new ArrayList<>();
                     for(Map.Entry<String,Integer> mapmap : timeMap.entrySet()){
@@ -672,7 +674,7 @@ public class RestaurantEarningAnalysis extends AppCompatActivity {
 
     public class MyDecimalValueFormatter extends ValueFormatter {
 
-        private DecimalFormat mFormat;
+        private final DecimalFormat mFormat;
 
         public MyDecimalValueFormatter() {
             mFormat = new DecimalFormat("#");
