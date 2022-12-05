@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,6 +37,7 @@ public class CreateViewPromotions extends AppCompatActivity {
     boolean promotionActive = false;
     boolean coolDownActive = false;
     DatabaseReference databaseReference;
+    String DisplayImage;
     FirebaseAuth auth = FirebaseAuth.getInstance();
     TextView coolDown;
     RecyclerView recyclerView;
@@ -46,6 +48,18 @@ public class CreateViewPromotions extends AppCompatActivity {
         sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
         editor = sharedPreferences.edit();
         recyclerView = findViewById(R.id.previousPromotionsRecyclerView);
+        DatabaseReference getImg = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("state","")).child(auth.getUid());
+        getImg.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                DisplayImage = snapshot.child("DisplayImage").getValue(String.class);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
         coolDown = findViewById(R.id.coolDownPeriodTextPromotion);
         create = findViewById(R.id.createPromotionButtonActivity);
         if(!sharedPreferences.contains("promotionActivityShown")){
@@ -116,6 +130,7 @@ public class CreateViewPromotions extends AppCompatActivity {
                                             {
                                                 HashMap<String,String>map = new HashMap<>();
                                                 SharedPreferences resInfo = getSharedPreferences("RestaurantInfo",MODE_PRIVATE);
+                                                map.put("DisplayImage",DisplayImage);
                                                 map.put("resName",resInfo.getString("hotelName",""));
                                                 map.put("resNumber",resInfo.getString("hotelNumber",""));
                                                 map.put("resAddress",resInfo.getString("hotelAddress",""));
