@@ -41,6 +41,8 @@ import com.consumers.fastwayadmin.Info.Info;
 import com.consumers.fastwayadmin.Login.EmpLogin.ApplyForRestaurantAndDocs;
 import com.consumers.fastwayadmin.R;
 import com.developer.kalert.KAlertDialog;
+import com.firebase.geofire.GeoFireUtils;
+import com.firebase.geofire.GeoLocation;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -217,7 +219,7 @@ public class MainActivity extends AppCompatActivity {
                         editor.putString("testAdmin","8AzmseJgrNcYL7GcH05B3mYcDfp2");
                         editor.apply();
                         AsyncTask.execute(() -> {
-                            DatabaseReference addResTest = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child("TestRes").child("Test").child("8AzmseJgrNcYL7GcH05B3mYcDfp2");
+                            DatabaseReference addResTest = FirebaseDatabase.getInstance().getReference().getRoot().child("TestRes").child("Test").child("Test").child("8AzmseJgrNcYL7GcH05B3mYcDfp2");
                             addResTest.addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -239,6 +241,39 @@ public class MainActivity extends AppCompatActivity {
                                         addResTest.child("location").child("lat").setValue("28.647849374299167");
                                         addResTest.child("location").child("lon").setValue("77.13484514504671");
                                         addResTest.child("count").setValue("1");
+
+                                        Map<String,String> map = new HashMap<>();
+                                        map.put("name","Chaudari Dhaba");
+                                        map.put("address","1234qwert");
+                                        map.put("number","1234567892");
+                                        map.put("nearby","near ratan park");
+                                        map.put("pin","110015");
+                                        map.put("rating","0");
+                                        map.put("DisplayImage","https://firebasestorage.googleapis.com/v0/b/fastway-e3c4a.appspot.com/o/BKkZjAAB9fQmleexouAb2zSRtQm2%2FresImages%2FDisplayImage?alt=media&token=02bd9e2d-fd2f-4570-97f5-4213c5ad4a87");
+                                        map.put("totalRate","0");
+                                        map.put("count","0");
+                                        map.put("TakeAwayAllowed","yes");
+                                        map.put("TableBookAllowed","yes");
+                                        map.put("location","77.13484514504671" + "/" + "28.647849374299167");
+                                        String hash = GeoFireUtils.getGeoHashForLocation(new GeoLocation(Double.parseDouble("28.647849374299167"), Double.parseDouble("77.13484514504671")));
+                                        map.put("geoHash",hash);
+                                        SharedPreferences sharedPreferences1 = getSharedPreferences("LocationMaps",MODE_PRIVATE);
+                                        SharedPreferences.Editor editor1 = sharedPreferences1.edit();
+                                        editor1.putString("location","yes");
+                                        editor1.apply();
+                                        SharedPreferences sharedPreferences = getSharedPreferences("RestaurantInfo", MODE_PRIVATE);
+                                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                                        editor.putString("hotelName", "Chaudari Dhaba");
+                                        editor.putString("hotelAddress", "1234qwert");
+                                        editor.putString("hotelNumber", "1234567892");
+                                        map.put("status","online");
+                                        map.put("acceptingOrders","yes");
+                                        map.put("totalReports","0");
+
+                                        FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+                                        firestore.collection("TestRes").document("Test").collection("Test").document("8AzmseJgrNcYL7GcH05B3mYcDfp2")
+                                                .set(map);
+
                                     }
                                 }
 
