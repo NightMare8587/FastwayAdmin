@@ -3,6 +3,7 @@ package com.consumers.fastwayadmin;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.RemoteInput;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -45,10 +46,16 @@ public class FirebaseNotification extends FirebaseMessagingService {
             // directly as below.
             Log.i("info11",remoteMessage.getNotification().getTitle());
             Log.i("info11",remoteMessage.getNotification().getBody());
+            String action;
+            if(remoteMessage.getNotification().getClickAction() == null){
+                Log.i("thisHere","null");
+                action = "";
+            }else
+                action = remoteMessage.getNotification().getClickAction().toString();
 //            Log.i("info11",remoteMessage.getNotification().getClickAction());
             showNotification(
                     remoteMessage.getNotification().getTitle(),
-                    remoteMessage.getNotification().getBody());
+                    remoteMessage.getNotification().getBody(),action);
         }
     }
     private RemoteViews getCustomDesign(String title,
@@ -65,7 +72,7 @@ public class FirebaseNotification extends FirebaseMessagingService {
     // Method to display the notifications
     @RequiresApi(api = Build.VERSION_CODES.N)
     public void showNotification(String title,
-                                 String message) {
+                                 String message, String action) {
         auth = FirebaseAuth.getInstance();
         notificationClass notificationClass = new notificationClass(title,message, ServerValue.TIMESTAMP);
         ref = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
@@ -75,6 +82,24 @@ public class FirebaseNotification extends FirebaseMessagingService {
                 = new Intent(this, MainActivity.class);
         // Assign channel ID
         String channel_id = "notification_channel";
+//        boolean reply = false;
+//        String[] arr = action.split(",");
+//        RemoteInput remoteInput;
+//        if(arr[0].equals("Chat")){
+//            final String KEY_TEXT_REPLY = "key_text_reply";
+//
+////            String replyLabel = getResources().getString(R.string.reply_label);
+//             remoteInput = new RemoteInput.Builder(KEY_TEXT_REPLY)
+//                    .setLabel("Reply")
+//                    .build();
+//
+//            NotificationCompat.Action actions =
+//                    new NotificationCompat.Action.Builder(R.drawable.ic_baseline_send_24,)
+//                            .addRemoteInput(remoteInput)
+//                            .build();
+//
+//             return;
+//        }
 
         if(message.contains("Customer has requested to pay amount in Cash")){
             Intent intents = new Intent("myFunction");
@@ -116,7 +141,7 @@ public class FirebaseNotification extends FirebaseMessagingService {
                 = new NotificationCompat
                 .Builder(getApplicationContext(),
                 channel_id)
-                .setPriority(NotificationManager.IMPORTANCE_HIGH)
+                .setPriority(NotificationManager.IMPORTANCE_MAX)
                 .setSmallIcon(R.drawable.foodinelogo)
                 .setAutoCancel(true)
                 .setVibrate(new long[]{1000, 1000, 1000,
