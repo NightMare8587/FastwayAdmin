@@ -54,7 +54,7 @@ public class SupportActivity extends AppCompatActivity{
                 case 1:
                     Intent emailIntent = new Intent(Intent.ACTION_SEND);
                     emailIntent.setType("plain/text");
-                    emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[] { "fastway8587@gmail.com" });
+                    emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[] { "ordinalo.services@gmail.com" });
                     startActivity(emailIntent);
                     break;
             }

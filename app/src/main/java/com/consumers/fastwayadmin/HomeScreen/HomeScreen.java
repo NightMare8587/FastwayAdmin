@@ -351,7 +351,7 @@ public class HomeScreen extends AppCompatActivity {
             text.setTextSize(52);
             canvas.drawText("Contact Ordinalo", 1200, 1745, text);
             canvas.drawText("Phone: +91-8076531395", 1200, 1815, text);
-            canvas.drawText("Email: fastway8587@gmail.com", 1200, 1885, text);
+            canvas.drawText("Email: ordinalo.services@gmail.com", 1200, 1885, text);
 
             pdfDocument.finishPage(page);
             String fileName = "/MonthlyReportTrackerhhhh" + ".pdf";
@@ -491,7 +491,7 @@ public class HomeScreen extends AppCompatActivity {
                         text.setTextSize(52);
                         canvas.drawText("Contact Ordinalo", 1200, 1360, text);
                         canvas.drawText("Phone: +91-8076531395", 1200, 1410, text);
-                        canvas.drawText("Email: fastway8587@gmail.com", 1200, 1480, text);
+                        canvas.drawText("Email: ordinalo.services@gmail.com", 1200, 1480, text);
 
 
                         HashMap<String,String> latestAnalysis = new HashMap<>();
@@ -666,7 +666,7 @@ public class HomeScreen extends AppCompatActivity {
                                     text.setTextSize(52);
                                     canvas.drawText("Contact Ordinalo", 1200, 1260, text);
                                     canvas.drawText("Phone: +91-8076531395", 1200, 1340, text);
-                                    canvas.drawText("Email: fastway8587@gmail.com", 1200, 1420, text);
+                                    canvas.drawText("Email: ordinalo.services@gmail.com", 1200, 1420, text);
 
 
                                     HashMap<String,String> latestAnalysis = new HashMap<>();
@@ -865,7 +865,7 @@ public class HomeScreen extends AppCompatActivity {
                                         text.setTextSize(52);
                                         canvas.drawText("Contact Ordinalo", 1200, 1765, text);
                                         canvas.drawText("Phone: +91-8076531395", 1200, 1835, text);
-                                        canvas.drawText("Email: fastway8587@gmail.com", 1200, 1905, text);
+                                        canvas.drawText("Email: ordinalo.services@gmail.com", 1200, 1905, text);
 
                                         pdfDocument.finishPage(page);
                                         String fileName = "/WeeklyReportTracker" + ".pdf";
@@ -1071,7 +1071,7 @@ public class HomeScreen extends AppCompatActivity {
                                         text.setTextSize(52);
                                         canvas.drawText("Contact Ordinalo", 1200, 1745, text);
                                         canvas.drawText("Phone: +91-8076531395", 1200, 1815, text);
-                                        canvas.drawText("Email: fastway8587@gmail.com", 1200, 1885, text);
+                                        canvas.drawText("Email: ordinalo.services@gmail.com", 1200, 1885, text);
 
                                         pdfDocument.finishPage(page);
                                         String fileName = "/WeeklyReportTracker" + ".pdf";
@@ -1295,7 +1295,7 @@ public class HomeScreen extends AppCompatActivity {
                                     text.setTextSize(52);
                                     canvas.drawText("Contact Ordinalo", 1200, 1765, text);
                                     canvas.drawText("Phone: +91-8076531395", 1200, 1835, text);
-                                    canvas.drawText("Email: fastway8587@gmail.com", 1200, 1905, text);
+                                    canvas.drawText("Email: ordinalo.services@gmail.com", 1200, 1905, text);
 
                                     pdfDocument.finishPage(page);
                                     String fileName = "/MonthlyReportTracker" + ".pdf";
