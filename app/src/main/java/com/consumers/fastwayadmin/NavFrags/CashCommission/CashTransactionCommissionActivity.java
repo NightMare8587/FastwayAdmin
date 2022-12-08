@@ -63,17 +63,14 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
                         if(System.currentTimeMillis() - date >= 2073600000L){
                             totalCashTransaction.setText("Total Cash Transactions " + "\u20B9" + snapshot.child("totalCashTakeAway").getValue(String.class));
                             double totalCash = Double.parseDouble(Objects.requireNonNull(snapshot.child("totalCashTakeAway").getValue(String.class)));
-                            commissionAmount = (totalCash * 3)/100;
+                            commissionAmount = (totalCash * 1.5)/100;
                             gstToBePaid = (totalCash * 5)/100;
                             if(snapshot.hasChild("totalMonthAmount")){
                                 platformFeeAmount = Double.parseDouble(Objects.requireNonNull(snapshot.child("totalMonthAmount").getValue(String.class)));
                                 if(platformFeeAmount == 0D){
                                     platformFeeAmount = 0D;
                                 }else{
-                                    if(platformFeeAmount >= 500000)
-                                        platformFeeAmount = ( platformFeeAmount * 4 ) / 100;
-                                    else
-                                        platformFeeAmount = ( platformFeeAmount * 3.5 ) / 100;
+                                        platformFeeAmount = ( platformFeeAmount * 3.7 ) / 100;
                                 }
                                 platformFee.setText("Platform Fee: " + "\u20B9" + df.format(platformFeeAmount));
                                 platformFeeBool = true;
@@ -196,17 +193,14 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
                                                 click.dismissWithAnimation();
                                         totalCashTransaction.setText("Total Cash Transactions " + "\u20B9" + snapshot.child("totalCashTakeAway").getValue(String.class));
                                         double totalCash = Double.parseDouble(Objects.requireNonNull(snapshot.child("totalCashTakeAway").getValue(String.class)));
-                                        commissionAmount = (totalCash * 3)/100;
+                                        commissionAmount = (totalCash * 1.5)/100;
                                         gstToBePaid = (totalCash * 5)/100;
                                         if(snapshot.hasChild("totalMonthAmount")){
                                             platformFeeAmount = Double.parseDouble(Objects.requireNonNull(snapshot.child("totalMonthAmount").getValue(String.class)));
                                             if(platformFeeAmount == 0D){
                                                 platformFeeAmount = 0D;
                                             }else{
-                                                if(platformFeeAmount >= 450000)
-                                                    platformFeeAmount = ( platformFeeAmount * 4 ) / 100;
-                                                else
-                                                    platformFeeAmount = ( platformFeeAmount * 3.5 ) / 100;
+                                                    platformFeeAmount = ( platformFeeAmount * 3.7 ) / 100;
                                             }
                                             platformFee.setText("Platform Fee: " + "\u20B9" + df.format(platformFeeAmount));
                                             platformFeeBool = true;
@@ -327,17 +321,14 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
                         if(System.currentTimeMillis() - date >= 2073600000L){
                             totalCashTransaction.setText("Total Cash Transactions " + "\u20B9" + snapshot.child("totalCashTakeAway").getValue(String.class));
                             double totalCash = Double.parseDouble(Objects.requireNonNull(snapshot.child("totalCashTakeAway").getValue(String.class)));
-                            commissionAmount = (totalCash * 3)/100;
+                            commissionAmount = (totalCash * 1.5)/100;
                             gstToBePaid = (totalCash * 5)/100;
                             if(snapshot.hasChild("totalMonthAmount")){
                                 platformFeeAmount = Double.parseDouble(Objects.requireNonNull(snapshot.child("totalMonthAmount").getValue(String.class)));
                                 if(platformFeeAmount == 0D){
                                     platformFeeAmount = 0D;
                                 }else{
-                                    if(platformFeeAmount >= 450000)
-                                        platformFeeAmount = ( platformFeeAmount * 4 ) / 100;
-                                    else
-                                        platformFeeAmount = ( platformFeeAmount * 3.5 ) / 100;
+                                        platformFeeAmount = ( platformFeeAmount * 3.7 ) / 100;
                                 }
                                 platformFee.setText("Platform Fee: " + "\u20B9" + df.format(platformFeeAmount));
                                 platformFeeBool = true;
@@ -456,17 +447,15 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
                                         click.dismissWithAnimation();
                                         totalCashTransaction.setText("Total Cash Transactions " + "\u20B9" + snapshot.child("totalCashTakeAway").getValue(String.class));
                                         double totalCash = Double.parseDouble(Objects.requireNonNull(snapshot.child("totalCashTakeAway").getValue(String.class)));
-                                        commissionAmount = (totalCash * 3)/100;
+                                        commissionAmount = (totalCash * 1.5)/100;
                                         gstToBePaid = (totalCash * 5)/100;
                                         if(snapshot.hasChild("totalMonthAmount")){
                                             platformFeeAmount = Double.parseDouble(Objects.requireNonNull(snapshot.child("totalMonthAmount").getValue(String.class)));
                                             if(platformFeeAmount == 0D){
                                                 platformFeeAmount = 0D;
                                             }else{
-                                                if(platformFeeAmount >= 450000)
-                                                    platformFeeAmount = ( platformFeeAmount * 4 ) / 100;
-                                                else
-                                                    platformFeeAmount = ( platformFeeAmount * 3.5 ) / 100;
+
+                                                    platformFeeAmount = ( platformFeeAmount * 3.7 ) / 100;
                                             }
                                             platformFee.setText("Platform Fee: " + "\u20B9" + df.format(platformFeeAmount));
                                             platformFeeBool = true;
