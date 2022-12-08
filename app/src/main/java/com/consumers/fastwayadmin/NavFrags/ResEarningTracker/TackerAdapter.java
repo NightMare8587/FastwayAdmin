@@ -42,7 +42,7 @@ public class TackerAdapter extends RecyclerView.Adapter<TackerAdapter.Holder> {
         holder.monthName.setText(monthNames.get(position));
         if(monthNames.get(position).equals(month)) {
             holder.monthName.setBackgroundColor(Color.CYAN);
-            oldPosition = holder.getAbsoluteAdapterPosition();
+//            oldPosition = holder.getAbsoluteAdapterPosition();
         }
         holder.monthName.setOnClickListener(click -> {
 

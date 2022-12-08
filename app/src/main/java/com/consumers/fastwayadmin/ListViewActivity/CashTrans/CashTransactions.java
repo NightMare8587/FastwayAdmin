@@ -33,7 +33,9 @@ public class CashTransactions extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cash_transactions);
         recyclerView = findViewById(R.id.cashTransactionRecyclerView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        linearLayoutManager.setReverseLayout(true);
+        recyclerView.setLayoutManager(linearLayoutManager);
         reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid())).child("Cash Transactions");
         reference.limitToLast(20).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override

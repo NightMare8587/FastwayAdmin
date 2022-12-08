@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.consumers.fastwayadmin.R;
 
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -41,11 +42,11 @@ public class CashAdapter extends RecyclerView.Adapter<CashAdapter.holder> {
         return new holder(view);
     }
 
-    @SuppressLint("SetTextI18n")
+    @SuppressLint({"SetTextI18n", "SimpleDateFormat"})
     @Override
     public void onBindViewHolder(@NonNull holder holder, int position) {
         holder.status.setTextColor(Color.GREEN);
-        holder.timeofOrder.setText(DateFormat.getInstance().format(Long.parseLong(Objects.requireNonNull(time.get(position)))));
+        holder.timeofOrder.setText(new SimpleDateFormat("dd/MM/yyyy hh:mm").format(Long.parseLong(Objects.requireNonNull(time.get(position)))));
         holder.orderAmount.setText("\u20B9" + orderAmount.get(position));
 
     }
