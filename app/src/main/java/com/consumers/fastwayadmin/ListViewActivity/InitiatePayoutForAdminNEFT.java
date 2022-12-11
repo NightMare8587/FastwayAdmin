@@ -48,6 +48,7 @@ public class InitiatePayoutForAdminNEFT extends AppCompatActivity {
     String genratedToken;
     long coolDownTime;
     boolean cooldown = false;
+    boolean initiateCooldown = false;
     FastDialog fastDialog;
     boolean moreThan20 = false;
     boolean availableForPayout = false;
@@ -111,6 +112,98 @@ public class InitiatePayoutForAdminNEFT extends AppCompatActivity {
                 if(cooldown) {
                     if(System.currentTimeMillis() < coolDownTime){
                         Toast.makeText(this, "Cooldown period is active", Toast.LENGTH_SHORT).show();
+                        AlertDialog.Builder builder = new AlertDialog.Builder(InitiatePayoutForAdminNEFT.this);
+                        builder.setTitle("Cooldown").setMessage("Cooldown period is active. You can initiate payout after cooldown period has ended")
+                                .setPositiveButton("Exit", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                                    }
+                                }).setNegativeButton("Initiate (Extra charges)", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        dialogInterface.dismiss();
+                                        AlertDialog.Builder alert = new AlertDialog.Builder(InitiatePayoutForAdminNEFT.this);
+                                        alert.setMessage("You can initiate payout but extra charges will be applied (\u20b925)")
+                                                .setPositiveButton("Initiate Payout", new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                                        dialogInterface.dismiss();
+                                                        initiateCooldown = true;
+                                                        if(amount > 30000D){
+                                                            moreThan20 = true;
+                                                            AlertDialog.Builder alert = new AlertDialog.Builder(InitiatePayoutForAdminNEFT.this);
+                                                            alert.setTitle("Message").setMessage("You can initiate payout of amount less than \u20b930000 at a time. You can initiate again after a cooldown period of 6 hours");
+                                                            LinearLayout linearLayout = new LinearLayout(InitiatePayoutForAdminNEFT.this);
+                                                            linearLayout.setOrientation(LinearLayout.VERTICAL);
+                                                            EditText editText = new EditText(InitiatePayoutForAdminNEFT.this);
+                                                            editText.setHint("Enter Amount Here");
+                                                            editText.setInputType(InputType.TYPE_CLASS_NUMBER);
+                                                            linearLayout.addView(editText);
+                                                            alert.setPositiveButton("Initiate Payout", (dialogInterfaces, ii) -> {
+                                                                dialogInterface.dismiss();
+                                                                if(Double.parseDouble(editText.getText().toString()) > 30000D)
+                                                                    Toast.makeText(InitiatePayoutForAdminNEFT.this, "Amount Should be less than 30k", Toast.LENGTH_SHORT).show();
+                                                                else{
+                                                                    enteredAmount = Double.parseDouble(editText.getText().toString());
+                                                                    if(enteredAmount > amount) {
+                                                                        Toast.makeText(InitiatePayoutForAdminNEFT.this, "Invalid Input", Toast.LENGTH_SHORT).show();
+                                                                        return;
+                                                                    }
+                                                                    AlertDialog.Builder builder = new AlertDialog.Builder(InitiatePayoutForAdminNEFT.this);
+                                                                    builder.setTitle("Choose one option").setMessage("Choose one payout option\nGet payout after 2 to 4 hours (NEFT) \nGet Instant Payout (IMPS \u20b95 charge)")
+                                                                            .setPositiveButton("Choose NEFT", (dialog, which) -> {
+                                                                                initiateCooldown = true;
+                                                                                new MakePayout().execute();
+
+                                                                                fastDialog.show();
+                                                                                dialog.dismiss();
+                                                                            }).setNegativeButton("Choose IMPS", (dialog, which) -> {
+                                                                                initiateCooldown = true;
+                                                                                new MakePayoutIMPS().execute();
+                                                                                fastDialog.show();
+                                                                                dialog.dismiss();
+                                                                            }).setNeutralButton("Exit", (dialog, which) -> dialog.dismiss()).create().show();
+                                                                }
+                                                            }).setNegativeButton("Wait", (dialogInterfaces, ii) -> {
+
+                                                            }).create();
+                                                            alert.setView(linearLayout);
+                                                            alert.show();
+                                                        }else{
+                                                            AlertDialog.Builder builder = new AlertDialog.Builder(InitiatePayoutForAdminNEFT.this);
+                                                            builder.setTitle("Choose one option").setMessage("Choose one payout option\nGet payout after 2 to 4 hours (NEFT)\nGet Instant Payout (IMPS \u20b95 charge)")
+                                                                    .setPositiveButton("Choose NEFT", new DialogInterface.OnClickListener() {
+                                                                        @Override
+                                                                        public void onClick(DialogInterface dialog, int which) {
+                                                                            initiateCooldown = true;
+                                                                            new MakePayout().execute();
+                                                                            fastDialog.show();
+                                                                            dialog.dismiss();
+                                                                        }
+                                                                    }).setNegativeButton("Choose IMPS", new DialogInterface.OnClickListener() {
+                                                                        @Override
+                                                                        public void onClick(DialogInterface dialog, int which) {
+                                                                            initiateCooldown = true;
+                                                                            new MakePayoutIMPS().execute();
+                                                                            fastDialog.show();
+                                                                            dialog.dismiss();
+                                                                        }
+                                                                    }).setNeutralButton("Exit", (dialog, which) -> dialog.dismiss()).create().show();
+                                                        }
+
+
+                                                    }
+                                                }).setNegativeButton("Exit", new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                                                    }
+                                                }).create();
+                                        alert.show();
+                                    }
+                                }).create();
+                        builder.show();
 //                        Toast.makeText(this, "Remaining: " + TimeUnit.MILLISECONDS.to(coolDownTime - System.currentTimeMillis()), Toast.LENGTH_SHORT).show();
                         return;
                     }
@@ -187,6 +280,9 @@ public class InitiatePayoutForAdminNEFT extends AppCompatActivity {
                 Log.i("response",response);
                 genratedToken = response.trim();
                 amount = amount - 5;
+
+                if(initiateCooldown)
+                    amount = amount - 20;
                 new AuthorizeToken().execute();
             }, error -> {
 
@@ -204,6 +300,8 @@ public class InitiatePayoutForAdminNEFT extends AppCompatActivity {
             StringRequest stringRequest = new StringRequest(Request.Method.POST, testPayoutToken, response -> {
                 Log.i("response",response);
                 genratedToken = response.trim();
+                if(initiateCooldown)
+                    amount = amount - 25;
                 new AuthorizeToken().execute();
             }, error -> {
 
@@ -251,6 +349,10 @@ public class InitiatePayoutForAdminNEFT extends AppCompatActivity {
                     databaseReference.child("totalPayoutAmount").setValue("0");
                     long timeCool = System.currentTimeMillis() + 21600000L;
                     databaseReference.child("coolDownPeriod").setValue(timeCool + "");
+                    textView.setText("0");
+                    Toast.makeText(InitiatePayoutForAdminNEFT.this, "Payout Initiated", Toast.LENGTH_SHORT).show();
+
+                    finish();
                 }else{
                     databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
@@ -262,9 +364,12 @@ public class InitiatePayoutForAdminNEFT extends AppCompatActivity {
                             else
                                 databaseReference.child("totalPayoutAmount").setValue("" + current);
 
+                            textView.setText("\u20b9" + current + "");
 
+                            Toast.makeText(InitiatePayoutForAdminNEFT.this, "Payout Initiated", Toast.LENGTH_SHORT).show();
                             long timeCool = System.currentTimeMillis() + 21600000L;
                             databaseReference.child("coolDownPeriod").setValue(timeCool + "");
+                            finish();
 
                         }
 
