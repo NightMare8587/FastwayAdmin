@@ -1,13 +1,7 @@
 package com.consumers.fastwayadmin.ListViewActivity;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.InputType;
@@ -19,13 +13,16 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.consumers.fastwayadmin.NavFrags.BankVerification.SelectPayoutMethodType;
-import com.consumers.fastwayadmin.NavFrags.homeFrag.ApproveCurrentOrder;
 import com.consumers.fastwayadmin.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -33,13 +30,11 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.thecode.aestheticdialogs.DialogType;
 
 import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 
 import karpuzoglu.enes.com.fastdialog.FastDialog;
 import karpuzoglu.enes.com.fastdialog.FastDialogBuilder;
@@ -121,10 +116,10 @@ public class InitiatePayoutForAdminNEFT extends AppCompatActivity {
                     }
                 }
 
-                if(amount >= 20000) {
+                if(amount > 30000D) {
                     moreThan20 = true;
                     AlertDialog.Builder alert = new AlertDialog.Builder(InitiatePayoutForAdminNEFT.this);
-                    alert.setTitle("Message").setMessage("You can initiate payout of amount less than \u20b920000 at a time. You can initiate again after a cooldown period of 6 hours");
+                    alert.setTitle("Message").setMessage("You can initiate payout of amount less than \u20b930000 at a time. You can initiate again after a cooldown period of 6 hours");
                     LinearLayout linearLayout = new LinearLayout(InitiatePayoutForAdminNEFT.this);
                     linearLayout.setOrientation(LinearLayout.VERTICAL);
                     EditText editText = new EditText(InitiatePayoutForAdminNEFT.this);
@@ -133,8 +128,8 @@ public class InitiatePayoutForAdminNEFT extends AppCompatActivity {
                     linearLayout.addView(editText);
                     alert.setPositiveButton("Initiate Payout", (dialogInterface, i) -> {
                         dialogInterface.dismiss();
-                        if(Double.parseDouble(editText.getText().toString()) > 20000D)
-                            Toast.makeText(InitiatePayoutForAdminNEFT.this, "Amount Should be less than 20k", Toast.LENGTH_SHORT).show();
+                        if(Double.parseDouble(editText.getText().toString()) > 30000D)
+                            Toast.makeText(InitiatePayoutForAdminNEFT.this, "Amount Should be less than 30k", Toast.LENGTH_SHORT).show();
                         else{
                             enteredAmount = Double.parseDouble(editText.getText().toString());
                             if(enteredAmount > amount) {
@@ -142,7 +137,7 @@ public class InitiatePayoutForAdminNEFT extends AppCompatActivity {
                                 return;
                             }
                             AlertDialog.Builder builder = new AlertDialog.Builder(InitiatePayoutForAdminNEFT.this);
-                            builder.setTitle("Choose one option").setMessage("Choose one payout option\nGet payout after 2 to 4 hours (NEFT \u20b93 charge) \nGet Instant Payout (IMPS \u20b97 charge)")
+                            builder.setTitle("Choose one option").setMessage("Choose one payout option\nGet payout after 2 to 4 hours (NEFT) \nGet Instant Payout (IMPS \u20b95 charge)")
                                     .setPositiveButton("Choose NEFT", (dialog, which) -> {
                                         new MakePayout().execute();
                                         fastDialog.show();
@@ -162,7 +157,7 @@ public class InitiatePayoutForAdminNEFT extends AppCompatActivity {
                     return;
                 }
                 AlertDialog.Builder builder = new AlertDialog.Builder(InitiatePayoutForAdminNEFT.this);
-                builder.setTitle("Choose one option").setMessage("Choose one payout option\nGet payout after 4 to 5 hours (NEFT \u20b93 charge)\nGet Instant Payout (IMPS \u20b97 charge)")
+                builder.setTitle("Choose one option").setMessage("Choose one payout option\nGet payout after 2 to 4 hours (NEFT)\nGet Instant Payout (IMPS \u20b95 charge)")
                         .setPositiveButton("Choose NEFT", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
@@ -196,7 +191,7 @@ public class InitiatePayoutForAdminNEFT extends AppCompatActivity {
             StringRequest stringRequest = new StringRequest(Request.Method.POST, testPayoutToken, response -> {
                 Log.i("response",response);
                 genratedToken = response.trim();
-                amount = amount - 7;
+                amount = amount - 5;
                 new AuthorizeToken().execute();
             }, error -> {
 
@@ -213,7 +208,6 @@ public class InitiatePayoutForAdminNEFT extends AppCompatActivity {
             RequestQueue requestQueue = Volley.newRequestQueue(InitiatePayoutForAdminNEFT.this);
             StringRequest stringRequest = new StringRequest(Request.Method.POST, testPayoutToken, response -> {
                 Log.i("response",response);
-                amount = amount - 3;
                 genratedToken = response.trim();
                 new AuthorizeToken().execute();
             }, error -> {
