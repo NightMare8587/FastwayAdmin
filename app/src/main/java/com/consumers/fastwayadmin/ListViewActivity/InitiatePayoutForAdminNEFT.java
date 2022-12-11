@@ -172,14 +172,9 @@ public class InitiatePayoutForAdminNEFT extends AppCompatActivity {
                                 fastDialog.show();
                                 dialog.dismiss();
                             }
-                        }).setNeutralButton("Exit", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        }).create().show();
+                        }).setNeutralButton("Exit", (dialog, which) -> dialog.dismiss()).create().show();
             }else
-                Toast.makeText(this, "Amount should not be 0", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Amount should not be \u20b90", Toast.LENGTH_SHORT).show();
         });
     }
 
