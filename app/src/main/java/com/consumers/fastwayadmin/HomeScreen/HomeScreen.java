@@ -1085,7 +1085,7 @@ public class HomeScreen extends AppCompatActivity {
                                             e.printStackTrace();
                                         }
 
-                                        String nameOfFile = startDate + "-" + endDate + " " + month;
+                                        String nameOfFile = startDate + "-" + endDate + " " + prevMonth;
 
                                         try {
                                             StorageReference reference = storageReference.child(auth.getUid() + "/" + "InsightsReports" + "/"  + "Weekly" + "/" + nameOfFile);
@@ -1309,7 +1309,7 @@ public class HomeScreen extends AppCompatActivity {
                                         e.printStackTrace();
                                     }
 
-                                    String nameOfFile = startDate + "-" + endDate + " " + month;
+                                    String nameOfFile = startDate + "-" + endDate + " " + prevMonth;
 
                                     try {
                                         StorageReference reference = storageReference.child(auth.getUid() + "/" + "InsightsReports" + "/"  + "Monthly" + "/" + nameOfFile);

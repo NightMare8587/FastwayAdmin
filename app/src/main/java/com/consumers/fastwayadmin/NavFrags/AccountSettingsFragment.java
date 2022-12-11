@@ -304,14 +304,18 @@ public class AccountSettingsFragment extends PreferenceFragmentCompat {
         tableOrder.setChecked(sharedPreferences.getString("TableBookAllowed", "").equals("yes"));
         terms.setOnPreferenceClickListener(preference -> {
             AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-            builder.setTitle("Choose one option").setMessage("Open Privacy Policy or Terms And Conditions")
+            builder.setTitle("Choose one option").setMessage("Open Privacy Policy or Terms And Conditions Or Cancellation and Refund Policy\n Click Anywhere outside to close dialog")
                     .setPositiveButton("Open Terms & Condition", (dialogInterface, i) -> {
-                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.websitepolicies.com/policies/view/CpwDZziF"));
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://merchant.razorpay.com/policy/Kq6A4G44q0wBXo/terms"));
                         startActivity(browserIntent);
                     }).setNeutralButton("Open Privacy Policy", (dialogInterface, i) -> {
-                        Intent privacyIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://fastway.flycricket.io/privacy.html"));
+                        Intent privacyIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://merchant.razorpay.com/policy/Kq6A4G44q0wBXo/privacy"));
                         startActivity(privacyIntent);
-                    }).setNegativeButton("Exit", (dialogInterface, i) -> dialogInterface.dismiss()).create();
+                    }).setNegativeButton("Cancellation And Refund", (dialogInterface, i) -> {
+                        Intent privacyIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://merchant.razorpay.com/policy/Kq6A4G44q0wBXo/refund"));
+                        startActivity(privacyIntent);
+
+                    }).create();
             builder.show();
 
             return true;
