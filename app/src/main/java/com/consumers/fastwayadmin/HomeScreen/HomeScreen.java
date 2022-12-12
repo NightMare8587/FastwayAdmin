@@ -1554,6 +1554,10 @@ public class HomeScreen extends AppCompatActivity {
                     SharedPreferences.Editor editor7days = last7daysReportShared.edit();
                     editor7days.clear().apply();
 
+                    SharedPreferences lastMonthReportShared = getSharedPreferences("lastMonthlyReport",MODE_PRIVATE);
+                    SharedPreferences.Editor ditorMonths = lastMonthReportShared.edit();
+                    ditorMonths.clear().apply();
+
                     SharedPreferences usersF = getSharedPreferences("UsersFrequencyPerMonth",MODE_PRIVATE);
                     SharedPreferences prevUserF = getSharedPreferences("PreviousUserFrequency" + whichY,MODE_PRIVATE);
                     Map<String,?> prevF = usersF.getAll();
@@ -1589,28 +1593,28 @@ public class HomeScreen extends AppCompatActivity {
                     dishOrderedTogetherEditor.clear().apply();
 
 //
-//                    SharedPreferences trackTake = getSharedPreferences("TrackingOfTakeAway", MODE_PRIVATE);
-//                    trackTake.edit().clear().apply();
-//                    SharedPreferences trackFood = getSharedPreferences("TrackingOfFoodDining", MODE_PRIVATE);
-//                    trackFood.edit().clear().apply();
-//                    SharedPreferences DailyUserTrackingFor7days = getSharedPreferences("DailyUserTrackingFor7days", MODE_PRIVATE);
-//                    DailyUserTrackingFor7days.edit().clear().apply();
+                    SharedPreferences trackTake = getSharedPreferences("TrackingOfTakeAway", MODE_PRIVATE);
+                    trackTake.edit().clear().apply();
+                    SharedPreferences trackFood = getSharedPreferences("TrackingOfFoodDining", MODE_PRIVATE);
+                    trackFood.edit().clear().apply();
+                    SharedPreferences DailyUserTrackingFor7days = getSharedPreferences("DailyUserTrackingFor7days", MODE_PRIVATE);
+                    DailyUserTrackingFor7days.edit().clear().apply();
+
+                    SharedPreferences DailyAverageOrderMonthly = getSharedPreferences("DailyAverageOrderMonthly", MODE_PRIVATE);
+                    DailyAverageOrderMonthly.edit().clear().apply();
+
+                    SharedPreferences RestaurantTrackingDaily = getSharedPreferences("RestaurantTrackingDaily", MODE_PRIVATE);
+                    RestaurantTrackingDaily.edit().clear().apply();
 //
-//                    SharedPreferences DailyAverageOrderMonthly = getSharedPreferences("DailyAverageOrderMonthly", MODE_PRIVATE);
-//                    DailyAverageOrderMonthly.edit().clear().apply();
-//
-//                    SharedPreferences RestaurantTrackingDaily = getSharedPreferences("RestaurantTrackingDaily", MODE_PRIVATE);
-//                    RestaurantTrackingDaily.edit().clear().apply();
-//
-//                    SharedPreferences RestaurantTrackRecords = getSharedPreferences("RestaurantTrackRecords", MODE_PRIVATE);
-//                    RestaurantTrackRecords.edit().clear().apply();
-//
+                    SharedPreferences RestaurantTrackRecords = getSharedPreferences("RestaurantTrackRecords", MODE_PRIVATE);
+                    RestaurantTrackRecords.edit().clear().apply();
+
 //                    SharedPreferences UserFrequencyPerMonth = getSharedPreferences("UserFrequencyPerMonth", MODE_PRIVATE);
 //                    UserFrequencyPerMonth.edit().clear().apply();
-//
+
 //                    SharedPreferences resDailyStore = getSharedPreferences("RestaurantDailyStoreForAnalysis", MODE_PRIVATE);
 //                    resDailyStore.edit().clear().apply();
-//
+
 //
 //                    SharedPreferences last7days = getSharedPreferences("last7daysReport", MODE_PRIVATE);
 //                    last7days.edit().clear().apply();
