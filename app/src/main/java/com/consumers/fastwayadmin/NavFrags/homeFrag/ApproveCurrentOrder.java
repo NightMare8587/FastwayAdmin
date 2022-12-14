@@ -39,6 +39,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.consumers.fastwayadmin.CancelClass;
+import com.consumers.fastwayadmin.HomeScreen.ReportSupport.RequestRefundClass;
 import com.consumers.fastwayadmin.NavFrags.CurrentTakeAwayOrders.ApproveCurrentTakeAway;
 import com.consumers.fastwayadmin.NavFrags.CurrentTakeAwayOrders.MyClass;
 import com.consumers.fastwayadmin.PaymentClass;
@@ -288,8 +289,17 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                         databaseReference.child("Recent Orders").child("" + time).child(auth.getUid()).child(dishNames.get(i)).setValue(myClass);
                     }
                     DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid())).child("Tables").child(table);
-                    if(!paymentType.equals("endCheckOut"))
-                    new InitiateRefund().execute();
+                    if(!paymentType.equals("endCheckOut")) {
+                        DatabaseReference requestRefundOrdinalo = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("RefundRequest").child(auth.getUid());
+                        RequestRefundClass requestRefundClass = new RequestRefundClass(orderID,orderAmount,time,"Order Cancelled because not approved/denied by restaurant");
+                        requestRefundOrdinalo.setValue(requestRefundClass);
+
+                        runOnUiThread(() -> {
+                            Toast.makeText(ApproveCurrentOrder.this, "Refund Request Initiated", Toast.LENGTH_SHORT).show();
+                        });
+
+//                        new InitiateRefund().execute();
+                    }
                     try {
                         main.put("to", "/topics/" + id + "");
                         JSONObject notification = new JSONObject();
@@ -1873,14 +1883,22 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                     }
 
 
-                    databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(sharedPreferences.getString("locality","")).child(auth.getUid());
+                    databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid()));
                     for(int i=0;i<dishNames.size();i++){
                         MyClass myClass = new MyClass(dishNames.get(i),dishPrices.get(i),image.get(i),type.get(i),""+approveTime,dishQuantity.get(i),dishHalfOr.get(i),state,String.valueOf(orderAmount),orderID,orderAndPayment.get(i),"Order Declined",sharedPreferences.getString("locality",""));
                         databaseReference.child("Recent Orders").child("" + time).child(auth.getUid()).child(dishNames.get(i)).setValue(myClass);
                     }
                     DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid())).child("Tables").child(table);
-                    if(!paymentType.equals("endCheckOut"))
-                    new InitiateRefund().execute();
+                    if(!paymentType.equals("endCheckOut")) {
+                        DatabaseReference requestRefundOrdinalo = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("RefundRequest").child(auth.getUid());
+                        RequestRefundClass requestRefundClass = new RequestRefundClass(orderID,orderAmount,time,"Order Cancelled because denied by restaurant");
+                        requestRefundOrdinalo.setValue(requestRefundClass);
+
+                        runOnUiThread(() -> {
+                            Toast.makeText(ApproveCurrentOrder.this, "Refund Request Initiated", Toast.LENGTH_SHORT).show();
+                        });
+//                        new InitiateRefund().execute();
+                    }
                     try {
                         main.put("to", "/topics/" + id + "");
                         JSONObject notification = new JSONObject();

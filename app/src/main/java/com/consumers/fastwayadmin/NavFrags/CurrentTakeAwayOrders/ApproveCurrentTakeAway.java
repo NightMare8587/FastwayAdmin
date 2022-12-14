@@ -38,6 +38,8 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.consumers.fastwayadmin.CancelClass;
+import com.consumers.fastwayadmin.HomeScreen.ReportSupport.RequestRefundClass;
+import com.consumers.fastwayadmin.NavFrags.homeFrag.ApproveCurrentOrder;
 import com.consumers.fastwayadmin.R;
 import com.developer.kalert.KAlertDialog;
 import com.google.common.reflect.TypeToken;
@@ -254,7 +256,14 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                     MyClass myClass = new MyClass(dishName.get(i),dishPrice.get(i),image.get(i),type.get(i),""+approveTime,quantity.get(i),halfOr.get(i),state,String.valueOf(orderAmount),orderId,"TakeAway,Online","Order Declined",sharedPreferences.getString("locality",""));
                     databaseReference.child("Recent Orders").child("" + time).child(id).child(dishName.get(i)).setValue(myClass);
                 }
-                new InitiateRefund().execute();
+//                new InitiateRefund().execute();
+                DatabaseReference requestRefundOrdinalo = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("RefundRequest").child(auth.getUid());
+                RequestRefundClass requestRefundClass = new RequestRefundClass(orderId,orderAmount,time,"Order Cancelled because not approved/denied by restaurant");
+                requestRefundOrdinalo.setValue(requestRefundClass);
+
+                runOnUiThread(() -> {
+                    Toast.makeText(ApproveCurrentTakeAway.this, "Refund Request Initiated", Toast.LENGTH_SHORT).show();
+                });
                 try {
                     main.put("to", "/topics/" + id + "");
                     JSONObject notification = new JSONObject();
@@ -1845,7 +1854,14 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                                 MyClass myClass = new MyClass(dishName.get(i),dishPrice.get(i),image.get(i),type.get(i),""+approveTime,quantity.get(i),halfOr.get(i),state,String.valueOf(orderAmount),orderId,"TakeAway,Online","Order Declined",sharedPreferences.getString("locality",""));
                                 databaseReference.child("Recent Orders").child("" + time).child(id).child(dishName.get(i)).setValue(myClass);
                             }
-                            new InitiateRefund().execute();
+                            DatabaseReference requestRefundOrdinalo = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("RefundRequest").child(auth.getUid());
+                            RequestRefundClass requestRefundClass = new RequestRefundClass(orderId,orderAmount,time,"Order Cancelled because denied by restaurant");
+                            requestRefundOrdinalo.setValue(requestRefundClass);
+
+                            runOnUiThread(() -> {
+                                Toast.makeText(ApproveCurrentTakeAway.this, "Refund Request Initiated", Toast.LENGTH_SHORT).show();
+                            });
+//                            new InitiateRefund().execute();
                             try {
                                 main.put("to", "/topics/" + id + "");
                                 JSONObject notification = new JSONObject();
