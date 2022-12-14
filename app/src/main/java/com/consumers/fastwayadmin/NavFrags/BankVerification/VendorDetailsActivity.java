@@ -4,12 +4,14 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -41,14 +43,16 @@ import karpuzoglu.enes.com.fastdialog.Type;
 
 public class VendorDetailsActivity extends AppCompatActivity {
     boolean verifyIFSC;
+    String contactResponse;
     boolean ifscVerified = false;
+    String addContactRazor = "https://intercellular-stabi.000webhostapp.com/razorpay/payouts/addContact.php";
     String testPayoutToken = "https://intercellular-stabi.000webhostapp.com/CheckoutPayouts/testToken.php";
     String testBearerToken = "https://intercellular-stabi.000webhostapp.com/CheckoutPayouts/test/testBearerToken.php";
     String testPaymentToVendor = "https://intercellular-stabi.000webhostapp.com/CheckoutPayouts/test/addTEstBen.php";
     String name, email, phone, acNumber, acName, acIFSC,acAddress;
     String url = "https://intercellular-stabi.000webhostapp.com/CheckoutPayouts/addBenificiary.php";
     FirebaseAuth mAuth;
-
+    String addBankAcRazorpay = "https://intercellular-stabi.000webhostapp.com/razorpay/payouts/addBankAccount.php";
     
     String ifscURL = "https://intercellular-stabi.000webhostapp.com/verifyIFSCBank/verifyIFSC.php";
     String mauthId;
@@ -190,17 +194,14 @@ public class VendorDetailsActivity extends AppCompatActivity {
         @Override
         protected Void doInBackground(Void... voids) {
             RequestQueue requestQueue = Volley.newRequestQueue(VendorDetailsActivity.this);
-            StringRequest stringRequest = new StringRequest(Request.Method.POST, authToken, new Response.Listener<String>() {
-                @Override
-                public void onResponse(String response) {
-                    Log.i("response",response);
+            StringRequest stringRequest = new StringRequest(Request.Method.POST, authToken, response -> {
+                Log.i("response",response);
 
-                    if(response.trim().equals("Token is valid")){
-                        if(verifyIFSC)
-                        new verifyBankIFSC().execute();
-                        else
-                            new verifyBankAcc().execute();
-                    }
+                if(response.trim().equals("Token is valid")){
+                    if(verifyIFSC)
+                    new verifyBankIFSC().execute();
+                    else
+                        new AddBenificiary().execute();
                 }
             }, new Response.ErrorListener() {
                 @Override
@@ -226,19 +227,13 @@ public class VendorDetailsActivity extends AppCompatActivity {
         @Override
         protected Void doInBackground(Void... voids) {
             RequestQueue requestQueue = Volley.newRequestQueue(VendorDetailsActivity.this);
-            StringRequest stringRequest = new StringRequest(Request.Method.POST, prodVerifyBankAccount, new Response.Listener<String>() {
-                @Override
-                public void onResponse(String response) {
-                    List<String> lst = Arrays.asList(response.split("/"));
-                    if(lst.get(0).equals("SUCCESS") && lst.get(0).equals("VALID") && lst.get(1).equals("ACCOUNT_IS_VALID")){
-                        new AddBenificiary().execute();
-                    }
+            StringRequest stringRequest = new StringRequest(Request.Method.POST, prodVerifyBankAccount, response -> {
+                List<String> lst = Arrays.asList(response.split("/"));
+                if(lst.get(0).equals("SUCCESS") && lst.get(0).equals("VALID") && lst.get(1).equals("ACCOUNT_IS_VALID")){
+                    new AddBenificiary().execute();
                 }
-            }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
+            }, error -> {
 
-                }
             }){
                 @Override
                 public Map<String, String> getParams(){
@@ -272,11 +267,13 @@ public class VendorDetailsActivity extends AppCompatActivity {
                     nameEdit.setEnabled(false);
                     IFSCcode.setText(acIFSC);
                     IFSCcode.setEnabled(false);
+
+
                 }
             }, error -> {
 
             }){
-                @Nullable
+                @NonNull
                 @Override
                 protected Map<String, String> getParams() {
                     Map<String,String> params = new HashMap<>();
@@ -295,48 +292,119 @@ public class VendorDetailsActivity extends AppCompatActivity {
         @Override
         protected Void doInBackground(Void... voids) {
             RequestQueue requestQueue = Volley.newRequestQueue(VendorDetailsActivity.this);
-            StringRequest stringRequest = new StringRequest(Request.Method.POST, url, response -> {
-                Log.i("response",response.trim());
-//                Log.i("response",response.trim());
-                Toast.makeText(VendorDetailsActivity.this, "" + response.trim(), Toast.LENGTH_SHORT).show();
-                fastDialog.dismiss();
-                if(response.trim().equals("SUCCESS"))
-                    Toast.makeText(VendorDetailsActivity.this, "Beneficiary added successfully", Toast.LENGTH_SHORT).show();
-                else
-                    Toast.makeText(VendorDetailsActivity.this, "Something went wrong", Toast.LENGTH_SHORT).show();
+            StringRequest request = new StringRequest(Request.Method.POST,addContactRazor,response -> {
+                contactResponse = response;
+                Log.i("fundId",contactResponse);
 
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        finish();
-                    }
-                });
-            }, error -> {
+                new Handler().postDelayed(() -> {
+                    RequestQueue queue =  Volley.newRequestQueue(VendorDetailsActivity.this);
+                    StringRequest stringRequest = new StringRequest(Request.Method.POST,addBankAcRazorpay,responses -> {
+                        Log.i("fundId", responses);
+                        editor.putString("vendorDetails", "yes");
+                        editor.putString("accountNumber", acNumber);
+                        editor.putString("address", acAddress);
+                        editor.putString("ifscCode", acIFSC);
+                        editor.putString("contactID", response);
+                        editor.putString("fundId", responses);
+                        editor.apply();
+
+                        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
+                        HashMap<String,String> map = new HashMap<>();
+                        map.put("acNum",acNumber);
+                        map.put("acName",acName);
+                        map.put("acIfsc",acIFSC);
+                        map.put("fundId",responses);
+                        map.put("contactID",response);
+                        map.put("bankName",nameEdit.getText().toString());
+
+                        databaseReference.child("Bank Details").setValue(map);
+
+                        runOnUiThread(() -> {
+                            Toast.makeText(VendorDetailsActivity.this, "Bank Details Added Successfully", Toast.LENGTH_SHORT).show();
+                            finish();
+                        });
+
+                    }, error -> {
+
+                    }){
+                        @NonNull
+                        @Override
+                        protected Map<String, String> getParams() {
+                            Map<String,String> params = new HashMap<>();
+                            params.put("ids",contactResponse + "");
+                            params.put("name",acName + "");
+                            params.put("ifsc",acIFSC + "");
+                            params.put("acNum",acNumber + "");
+                            Log.i("fundIDs",acName + " " + contactResponse + " " + acNumber + " " + acIFSC);
+                            return params;
+                        }
+                    };
+                    queue.add(stringRequest);
+                },2500);
+
+
+
+            },error -> {
 
             }){
-                @Nullable
+                @NonNull
                 @Override
                 protected Map<String, String> getParams() {
                     Map<String,String> params = new HashMap<>();
-                    VendorBankClass vendorBankClass = new VendorBankClass(nameEdit.getText().toString(), email, acNumber, acName, acIFSC, phone, mauthId,acAddress);
-                    editor.putString("vendorDetails", "yes");
-                    editor.putString("accountNumber", acNumber);
-                    editor.putString("address", acAddress);
-                    editor.putString("ifscCode", acIFSC);
-                    editor.apply();
-                    reference.child("Bank Details").setValue(vendorBankClass);
-                    params.put("token",genratedToken);
-                    params.put("benID",mauthId);
-                    params.put("name",accountName.getText().toString());
-                    params.put("email",email);
-                    params.put("phone",phone);
-                    params.put("bankAc",acNumber);
-                    params.put("ifsc",acIFSC);
-                    params.put("address",acAddress);
+                    params.put("name",acName + "");
+                    params.put("email",email + "");
+                    params.put("contact",phone + "");
                     return params;
                 }
             };
-            requestQueue.add(stringRequest);
+
+            requestQueue.add(request);
+
+
+
+
+//            StringRequest stringRequest = new StringRequest(Request.Method.POST, url, response -> {
+//                Log.i("response",response.trim());
+////                Log.i("response",response.trim());
+//                Toast.makeText(VendorDetailsActivity.this, "" + response.trim(), Toast.LENGTH_SHORT).show();
+//                fastDialog.dismiss();
+//                if(response.trim().equals("SUCCESS"))
+//                    Toast.makeText(VendorDetailsActivity.this, "Beneficiary added successfully", Toast.LENGTH_SHORT).show();
+//                else
+//                    Toast.makeText(VendorDetailsActivity.this, "Something went wrong", Toast.LENGTH_SHORT).show();
+//
+//                runOnUiThread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        finish();
+//                    }
+//                });
+//            }, error -> {
+//
+//            }){
+//                @Nullable
+//                @Override
+//                protected Map<String, String> getParams() {
+//                    Map<String,String> params = new HashMap<>();
+//                    VendorBankClass vendorBankClass = new VendorBankClass(nameEdit.getText().toString(), email, acNumber, acName, acIFSC, phone, mauthId,acAddress);
+//                    editor.putString("vendorDetails", "yes");
+//                    editor.putString("accountNumber", acNumber);
+//                    editor.putString("address", acAddress);
+//                    editor.putString("ifscCode", acIFSC);
+//                    editor.apply();
+//                    reference.child("Bank Details").setValue(vendorBankClass);
+//                    params.put("token",genratedToken);
+//                    params.put("benID",mauthId);
+//                    params.put("name",accountName.getText().toString());
+//                    params.put("email",email);
+//                    params.put("phone",phone);
+//                    params.put("bankAc",acNumber);
+//                    params.put("ifsc",acIFSC);
+//                    params.put("address",acAddress);
+//                    return params;
+//                }
+//            };
+//            requestQueue.add(stringRequest);
             return null;
         }
     }

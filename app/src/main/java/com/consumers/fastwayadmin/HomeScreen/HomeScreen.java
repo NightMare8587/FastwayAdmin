@@ -581,7 +581,7 @@ public class HomeScreen extends AppCompatActivity {
                                 if(mainMaps.containsKey(LocalDate.now().withDayOfMonth(1).minusDays(1) + "")){
                                     Type typeo = new TypeToken<List<String>>() {
                                     }.getType();
-                                    HashMap<String,String> innerMap = new HashMap<>(mainMap.get(day + ""));
+                                    HashMap<String,String> innerMap = new HashMap<>(Objects.requireNonNull(mainMap.get(day + "")));
 
                                     List<String> orderList = new ArrayList<>(gson.fromJson(innerMap.get("orderList"),typeo));
                                     List<String> custList = new ArrayList<>(gson.fromJson(innerMap.get("custList"),typeo));
@@ -1667,7 +1667,7 @@ public class HomeScreen extends AppCompatActivity {
                                 .setMessage("Your restaurant is not yet verified so you can't accept orders until verified")
                                 .setPositiveButton("Exit", (dialogInterface, i) -> {
                                     dialogInterface.dismiss();
-                                }).setNegativeButton("Contact Fastway", (dialogInterface, i) -> {
+                                }).setNegativeButton("Contact Ordinalo", (dialogInterface, i) -> {
                                     dialogInterface.dismiss();
 
                                 }).create();
@@ -1679,7 +1679,7 @@ public class HomeScreen extends AppCompatActivity {
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
             }
-        }),20);
+        }),90);
 
 
 //        new Handler().postDelayed(() -> {
@@ -1835,7 +1835,7 @@ public class HomeScreen extends AppCompatActivity {
                     if(snapshot.hasChild("fastwayReply")){
                         AlertDialog.Builder alert = new AlertDialog.Builder(HomeScreen.this);
                         alert.setTitle("Reply")
-                                .setMessage("You have a new reply from fastway")
+                                .setMessage("You have a new reply from Ordinalo")
                                 .setCancelable(false)
                                 .setPositiveButton("Exit", (dialog, which) -> {
                                     resRef.child("fastwayReply").removeValue();
