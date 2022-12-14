@@ -32,6 +32,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.consumers.fastwayadmin.HomeScreen.ReportSupport.RequestRefundClass;
 import com.consumers.fastwayadmin.R;
 import com.developer.kalert.KAlertDialog;
 import com.google.firebase.auth.FirebaseAuth;
@@ -153,8 +154,16 @@ public class OrganiseEvents extends AppCompatActivity {
 
                                             for(int i=0;i<authIds.size();i++){
                                                 sendNotification(authIds.get(i));
-                                                sendRefund(orderIDs.get(i),totalPrice.get(i));
+                                                DatabaseReference requestRefundOrdinalo = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("RefundRequest").child(authIds.get(i));
+                                                RequestRefundClass requestRefundClass = new RequestRefundClass(orderIDs.get(i),totalPrice.get(i),"","Event Cancelled by restaurant");
+                                                requestRefundOrdinalo.setValue(requestRefundClass);
+
+//                                                Toast.makeText(OrganiseEvents.this, "Refund Request Initiated", Toast.LENGTH_SHORT).show();
+//                                                sendRefund(orderIDs.get(i),totalPrice.get(i));
                                             }
+
+//                                            SharedPreferences userDetails = getSharedPreferences("AccountInfo",MODE_PRIVATE);
+
 
 
                                             DatabaseReference removeFromGeo = FirebaseDatabase.getInstance().getReference().getRoot().child("Offers").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality",""))
@@ -164,13 +173,10 @@ public class OrganiseEvents extends AppCompatActivity {
                                             removeFromGeo = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid()).child("Current Event");
                                             removeFromGeo.removeValue();
 
-                                            new Handler().postDelayed(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    fastDialog.dismiss();
-                                                    Toast.makeText(OrganiseEvents.this, "Cancelled Show", Toast.LENGTH_SHORT).show();
-                                                    finish();
-                                                }
+                                            new Handler().postDelayed(() -> {
+                                                fastDialog.dismiss();
+                                                Toast.makeText(OrganiseEvents.this, "Cancelled Show", Toast.LENGTH_SHORT).show();
+                                                finish();
                                             },7500);
                                         }else{
                                             DatabaseReference removeFromGeo = FirebaseDatabase.getInstance().getReference().getRoot().child("Offers").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality",""))

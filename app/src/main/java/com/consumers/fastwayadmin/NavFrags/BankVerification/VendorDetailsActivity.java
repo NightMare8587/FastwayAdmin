@@ -21,6 +21,7 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.consumers.fastwayadmin.R;
@@ -28,6 +29,8 @@ import com.developer.kalert.KAlertDialog;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+
+import org.json.JSONObject;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -45,6 +48,7 @@ public class VendorDetailsActivity extends AppCompatActivity {
     boolean verifyIFSC;
     String contactResponse;
     boolean ifscVerified = false;
+    String URL = "https://fcm.googleapis.com/fcm/send";
     String addContactRazor = "https://intercellular-stabi.000webhostapp.com/razorpay/payouts/addContact.php";
     String testPayoutToken = "https://intercellular-stabi.000webhostapp.com/CheckoutPayouts/testToken.php";
     String testBearerToken = "https://intercellular-stabi.000webhostapp.com/CheckoutPayouts/test/testBearerToken.php";
@@ -74,32 +78,32 @@ public class VendorDetailsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_vendor_details);
         initialise();
-        AlertDialog.Builder builder = new AlertDialog.Builder(VendorDetailsActivity.this);
-        builder.setTitle("IFSC Code").setMessage("Enter you IFSC Code");
-        EditText editText = new EditText(VendorDetailsActivity.this);
-        editText.setHint("Enter Code Here");
-        editText.setMaxLines(11);
-        LinearLayout linearLayout = new LinearLayout(VendorDetailsActivity.this);
-        linearLayout.setOrientation(LinearLayout.VERTICAL);
-        linearLayout.addView(editText);
-        builder.setView(linearLayout);
-        builder.setCancelable(false);
+//        AlertDialog.Builder builder = new AlertDialog.Builder(VendorDetailsActivity.this);
+//        builder.setTitle("IFSC Code").setMessage("Enter you IFSC Code");
+//        EditText editText = new EditText(VendorDetailsActivity.this);
+//        editText.setHint("Enter Code Here");
+//        editText.setMaxLines(11);
+//        LinearLayout linearLayout = new LinearLayout(VendorDetailsActivity.this);
+//        linearLayout.setOrientation(LinearLayout.VERTICAL);
+//        linearLayout.addView(editText);
+//        builder.setView(linearLayout);
+//        builder.setCancelable(false);
         fastDialog = new FastDialogBuilder(VendorDetailsActivity.this,Type.PROGRESS)
                 .progressText("Verifying Please Wait.....")
                 .setAnimation(Animations.SLIDE_TOP)
                 .create();
-        builder.setPositiveButton("Verify", (dialogInterface, i) -> {
-            if(editText.length() == 11){
-                acIFSC = editText.getText().toString().toUpperCase(Locale.ROOT);
-                fastDialog.show();
-                new MakePayout().execute();
-                verifyIFSC = true;
-            }else
-                Toast.makeText(VendorDetailsActivity.this, "Check your IFSC code again", Toast.LENGTH_SHORT).show();
-        }).setNegativeButton("Cancel", (dialogInterface, i) -> {
-            finish();
-        });
-        builder.create().show();
+//        builder.setPositiveButton("Verify", (dialogInterface, i) -> {
+//            if(editText.length() == 11){
+//                acIFSC = editText.getText().toString().toUpperCase(Locale.ROOT);
+//                fastDialog.show();
+//                new MakePayout().execute();
+//                verifyIFSC = true;
+//            }else
+//                Toast.makeText(VendorDetailsActivity.this, "Check your IFSC code again", Toast.LENGTH_SHORT).show();
+//        }).setNegativeButton("Cancel", (dialogInterface, i) -> {
+//            finish();
+//        });
+//        builder.create().show();
         mAuth = FirebaseAuth.getInstance();
         mauthId = String.valueOf(mAuth.getUid());
 
@@ -107,7 +111,13 @@ public class VendorDetailsActivity extends AppCompatActivity {
         sharedPreferences = getSharedPreferences("VendorID", MODE_PRIVATE);
         editor = sharedPreferences.edit();
         proceed.setOnClickListener(v -> {
-            if(ifscVerified) {
+
+                if(IFSCcode.getText().toString().equals("")) {
+                    IFSCcode.requestFocus();
+                    IFSCcode.setError("Field can't be empty");
+                    return;
+                }
+
                 if (phoneEdit.getText().toString().equals("")) {
                     phoneEdit.setError("Field can't be empty");
                     phoneEdit.requestFocus();
@@ -121,7 +131,10 @@ public class VendorDetailsActivity extends AppCompatActivity {
                 } else if (accountName.getText().toString().equals("")) {
                     accountName.requestFocus();
                     accountName.setError("Field can't be empty");
-                } else {
+                } else if(nameEdit.getText().toString().equals("")){
+                    nameEdit.requestFocus();
+                    nameEdit.setError("Field can't be empty");
+                }else {
                     name = nameEdit.getText().toString();
                     email = emailEdit.getText().toString();
                     phone = phoneEdit.getText().toString();
@@ -136,9 +149,65 @@ public class VendorDetailsActivity extends AppCompatActivity {
                             .setConfirmText("Yes")
                             .setCancelText("No, Wait")
                             .setConfirmClickListener(kAlertDialog1 -> {
+                                RequestQueue requestQueue = Volley.newRequestQueue(VendorDetailsActivity.this);
+                                JSONObject main = new JSONObject();
+                                try{
+                                    main.put("to","/topics/"+"RequestPayout");
+                                    JSONObject notification = new JSONObject();
+                                    notification.put("title","Add Bank Account");
+                                    notification.put("body","You have a new request to add Bank Account. Check now");
+                                    main.put("notification",notification);
 
-                                new MakePayout().execute();
-                                fastDialog.show();
+                                    JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, main, response -> {
+
+                                    }, error -> Toast.makeText(VendorDetailsActivity.this, error.getLocalizedMessage()+"null", Toast.LENGTH_SHORT).show()){
+                                        @Override
+                                        public Map<String, String> getHeaders() {
+                                            Map<String,String> header = new HashMap<>();
+                                            header.put("content-type","application/json");
+                                            header.put("authorization","key=AAAAjq_WsHs:APA91bGZV-uH-NJddxIniy8h1tDGDHqxhgvFdyNRDaV_raxjvSM_FkKu7JSwtSp4Q_iSmPuTKGGIB2M_07c9rKgPXUH43-RzpK6zkaSaIaNgmeiwUO40rYxYUZAkKoLAQQVeVJ7mXboD");
+                                            return header;
+                                        }
+                                    };
+
+                                    requestQueue.add(jsonObjectRequest);
+
+                                }
+                                catch (Exception e){
+                                    Toast.makeText(VendorDetailsActivity.this, e.getLocalizedMessage()+"null", Toast.LENGTH_SHORT).show();
+                                }
+                                editor.putString("vendorDetails", "yes");
+                                editor.putString("accountNumber", acNumber);
+                                editor.putString("address", acAddress);
+                                editor.putString("ifscCode", acIFSC);
+                                editor.apply();
+
+                                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
+                                HashMap<String,String> map = new HashMap<>();
+                                map.put("acNum",acNumber);
+                                map.put("acName",acName);
+                                map.put("acIfsc",acIFSC);
+                                map.put("bankName",nameEdit.getText().toString());
+
+                                databaseReference.child("Bank Details").setValue(map);
+                                SharedPreferences login = getSharedPreferences("RestaurantInfo",MODE_PRIVATE);
+                                SharedPreferences loginPersonal = getSharedPreferences("loginInfo",MODE_PRIVATE);
+                                Map<String,String> myMap = new HashMap<>();
+                                myMap.put("name",login.getString("hotelName",""));
+                                myMap.put("number",login.getString("hotelNumber",""));
+                                myMap.put("email",loginPersonal.getString("email",""));
+                                myMap.put("accountNumber",acNumber);
+                                myMap.put("accountName",acName);
+                                myMap.put("ifscCode",acIFSC);
+
+                                DatabaseReference addBankOrdinalo = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Changes Credentials");
+                                addBankOrdinalo.child(auth.getUid()).setValue(myMap);
+
+
+                                Toast.makeText(this, "Success", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(this, "Verification in progress", Toast.LENGTH_SHORT).show();
+//                                new MakePayout().execute();
+//                                fastDialog.show();
                                 kAlertDialog1.dismissWithAnimation();
                             }).setCancelClickListener(KAlertDialog::dismissWithAnimation);
 
@@ -147,8 +216,7 @@ public class VendorDetailsActivity extends AppCompatActivity {
                     kAlertDialog.show();
 //                verifyAuthURL();
                 }
-            }else
-                Toast.makeText(this, "IFSC not verified", Toast.LENGTH_SHORT).show();
+
         });
 
     }
@@ -199,7 +267,7 @@ public class VendorDetailsActivity extends AppCompatActivity {
 
                 if(response.trim().equals("Token is valid")){
                     if(verifyIFSC)
-                    new verifyBankIFSC().execute();
+                      new verifyBankIFSC().execute();
                     else
                         new AddBenificiary().execute();
                 }
