@@ -5,8 +5,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.InputType;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -20,6 +22,13 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDialog;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+import com.consumers.fastwayadmin.NavFrags.FastwayPremiumActivites.FastwayPremiums;
 import com.consumers.fastwayadmin.R;
 import com.developer.kalert.KAlertDialog;
 import com.google.firebase.auth.FirebaseAuth;
@@ -28,6 +37,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.razorpay.Checkout;
 
 import java.text.DecimalFormat;
 import java.util.Objects;
@@ -39,6 +49,8 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
     Button payCommissionNow;
     TextView seeBreakDown;
     boolean platformFeeBool = false;
+    String testKey;
+    String getApiKeyTest = "https://intercellular-stabi.000webhostapp.com/razorpay/returnApiKey.php";
     Double platformFeeAmount;
     double gstToBePaid;
     double commissionAmount;
@@ -50,6 +62,24 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
         totalCashTransaction = findViewById(R.id.totalCashTakeAwayCommission);
         totalCommission = findViewById(R.id.totalCommissionToBePaidByAdmin);
         seeBreakDown = findViewById(R.id.seeFeesBreakdownAdminAppCash);
+        AsyncTask.execute(() -> {
+            RequestQueue requestQueue = Volley.newRequestQueue(CashTransactionCommissionActivity.this);
+            StringRequest stringRequest = new StringRequest(Request.Method.GET, getApiKeyTest, response -> runOnUiThread(() -> {
+                Checkout.preload(CashTransactionCommissionActivity.this);
+//                        Checkout checkout = new Cas();
+                // ...
+                testKey = response;
+                String[] arr = response.split(",");
+                Log.i("responseKey",response);
+//                        checkout.setKeyID(arr[0]);
+            }), new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.i("responseError",error.toString());
+                }
+            });
+            requestQueue.add(stringRequest);
+        });
         platformFee = findViewById(R.id.platformFeeToBePaid);
         payCommissionNow = findViewById(R.id.PayCommissionNowButton);
         databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
@@ -139,6 +169,7 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
 
                                                 Intent intent = new Intent(CashTransactionCommissionActivity.this, CashFreeGateway.class);
                                                 intent.putExtra("amount",df.format(commissionAmount + platformFeeAmount + gstToBePaid));
+                                                intent.putExtra("keys",testKey);
                                                 startActivityForResult(intent,2);
                                             }else
                                                 Toast.makeText(CashTransactionCommissionActivity.this, "Invalid Number", Toast.LENGTH_SHORT).show();
@@ -160,8 +191,9 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
                                                     dialogInterface.dismiss();
                                                     double fineAmount = (commissionAmount * 10)/100;
                                                     commissionAmount = commissionAmount + fineAmount;
-                                                    Intent intent = new Intent(CashTransactionCommissionActivity.this, CashFreeGateway.class);
+                                                    Intent intent = new Intent(CashTransactionCommissionActivity.this, CommissionGWordinalo.class);
                                                     intent.putExtra("amount",df.format(commissionAmount + platformFeeAmount + gstToBePaid));
+                                                    intent.putExtra("keys",testKey);
                                                     startActivityForResult(intent, 2);
                                                 }).create();
                                         builder.show();
@@ -170,9 +202,10 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
                                         builder.setTitle("Pay Commission").setMessage("Do you sure wanna proceed to pay commission")
                                                 .setNegativeButton("No", (dialogInterface, i) -> dialogInterface.dismiss()).setPositiveButton("Yes", (dialogInterface, i) -> {
                                                     dialogInterface.dismiss();
-                                                    Intent intent = new Intent(CashTransactionCommissionActivity.this, CashFreeGateway.class);
+                                                    Intent intent = new Intent(CashTransactionCommissionActivity.this, CommissionGWordinalo.class);
 
                                                     intent.putExtra("amount",df.format(commissionAmount + platformFeeAmount + gstToBePaid));
+                                                    intent.putExtra("keys",testKey);
                                                     startActivityForResult(intent, 2);
                                                 }).create();
                                         builder.show();
@@ -233,8 +266,9 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
                                                             acEdit.putString("number",editText.getText().toString());
                                                             acEdit.apply();
 
-                                                            Intent intent = new Intent(CashTransactionCommissionActivity.this, CashFreeGateway.class);
+                                                            Intent intent = new Intent(CashTransactionCommissionActivity.this, CommissionGWordinalo.class);
                                                             intent.putExtra("amount",df.format(commissionAmount + platformFeeAmount + gstToBePaid));
+                                                            intent.putExtra("keys",testKey);
                                                             startActivityForResult(intent,2);
                                                         }else
                                                             Toast.makeText(CashTransactionCommissionActivity.this, "Invalid Number", Toast.LENGTH_SHORT).show();
@@ -256,8 +290,9 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
                                                                 dialogInterface.dismiss();
                                                                 double fineAmount = (commissionAmount * 10)/100;
                                                                 commissionAmount = commissionAmount + fineAmount;
-                                                                Intent intent = new Intent(CashTransactionCommissionActivity.this, CashFreeGateway.class);
+                                                                Intent intent = new Intent(CashTransactionCommissionActivity.this, CommissionGWordinalo.class);
                                                                 intent.putExtra("amount",df.format(commissionAmount + platformFeeAmount + gstToBePaid));
+                                                                intent.putExtra("keys",testKey);
                                                                 startActivityForResult(intent, 2);
                                                             }).create();
                                                     builder.show();
@@ -266,9 +301,10 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
                                                     builder.setTitle("Pay Commission").setMessage("Do you sure wanna proceed to pay commission")
                                                             .setNegativeButton("No", (dialogInterface, i) -> dialogInterface.dismiss()).setPositiveButton("Yes", (dialogInterface, i) -> {
                                                                 dialogInterface.dismiss();
-                                                                Intent intent = new Intent(CashTransactionCommissionActivity.this, CashFreeGateway.class);
+                                                                Intent intent = new Intent(CashTransactionCommissionActivity.this, CommissionGWordinalo.class);
 
                                                                 intent.putExtra("amount",df.format(commissionAmount + platformFeeAmount + gstToBePaid));
+                                                                intent.putExtra("keys",testKey);
                                                                 startActivityForResult(intent, 2);
                                                             }).create();
                                                     builder.show();
@@ -358,8 +394,9 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
                                             acEdit.putString("number",editText.getText().toString());
                                             acEdit.apply();
 
-                                            Intent intent = new Intent(CashTransactionCommissionActivity.this, CashFreeGateway.class);
+                                            Intent intent = new Intent(CashTransactionCommissionActivity.this, CommissionGWordinalo.class);
                                             intent.putExtra("amount",df.format(commissionAmount + platformFeeAmount + gstToBePaid));
+                                            intent.putExtra("keys",testKey);
                                             startActivityForResult(intent,2);
                                         }else
                                             Toast.makeText(CashTransactionCommissionActivity.this, "Invalid Number", Toast.LENGTH_SHORT).show();
@@ -380,8 +417,9 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
                                                     dialogInterface.dismiss();
                                                     double fineAmount = (commissionAmount * 10)/100;
                                                     commissionAmount = commissionAmount + fineAmount;
-                                                    Intent intent = new Intent(CashTransactionCommissionActivity.this, CashFreeGateway.class);
+                                                    Intent intent = new Intent(CashTransactionCommissionActivity.this, CommissionGWordinalo.class);
                                                     intent.putExtra("amount",df.format(commissionAmount + platformFeeAmount + gstToBePaid));
+                                                    intent.putExtra("keys",testKey);
                                                     startActivityForResult(intent, 2);
                                                 }).create();
                                         builder.show();
@@ -390,9 +428,10 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
                                         builder.setTitle("Pay Commission").setMessage("Do you sure wanna proceed to pay commission")
                                                 .setNegativeButton("No", (dialogInterface, i) -> dialogInterface.dismiss()).setPositiveButton("Yes", (dialogInterface, i) -> {
                                                     dialogInterface.dismiss();
-                                                    Intent intent = new Intent(CashTransactionCommissionActivity.this, CashFreeGateway.class);
+                                                    Intent intent = new Intent(CashTransactionCommissionActivity.this, CommissionGWordinalo.class);
 
                                                     intent.putExtra("amount",df.format(commissionAmount + platformFeeAmount + gstToBePaid));
+                                                    intent.putExtra("keys",testKey);
                                                     startActivityForResult(intent, 2);
                                                 }).create();
                                         builder.show();
@@ -485,8 +524,9 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
                                                         acEdit.putString("number",editText.getText().toString());
                                                         acEdit.apply();
 
-                                                        Intent intent = new Intent(CashTransactionCommissionActivity.this, CashFreeGateway.class);
+                                                        Intent intent = new Intent(CashTransactionCommissionActivity.this, CommissionGWordinalo.class);
                                                         intent.putExtra("amount",df.format(commissionAmount + platformFeeAmount + gstToBePaid));
+                                                        intent.putExtra("keys",testKey);
                                                         startActivityForResult(intent,2);
                                                     }else
                                                         Toast.makeText(CashTransactionCommissionActivity.this, "Invalid Number", Toast.LENGTH_SHORT).show();
@@ -508,8 +548,9 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
                                                                 dialogInterface.dismiss();
                                                                 double fineAmount = (commissionAmount * 10)/100;
                                                                 commissionAmount = commissionAmount + fineAmount;
-                                                                Intent intent = new Intent(CashTransactionCommissionActivity.this, CashFreeGateway.class);
+                                                                Intent intent = new Intent(CashTransactionCommissionActivity.this, CommissionGWordinalo.class);
                                                                 intent.putExtra("amount",df.format(commissionAmount + platformFeeAmount + gstToBePaid));
+                                                                intent.putExtra("keys",testKey);
                                                                 startActivityForResult(intent, 2);
                                                             }).create();
                                                     builder.show();
@@ -518,9 +559,10 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
                                                     builder.setTitle("Pay Commission").setMessage("Do you sure wanna proceed to pay commission")
                                                             .setNegativeButton("No", (dialogInterface, i) -> dialogInterface.dismiss()).setPositiveButton("Yes", (dialogInterface, i) -> {
                                                                 dialogInterface.dismiss();
-                                                                Intent intent = new Intent(CashTransactionCommissionActivity.this, CashFreeGateway.class);
+                                                                Intent intent = new Intent(CashTransactionCommissionActivity.this, CommissionGWordinalo.class);
 
                                                                 intent.putExtra("amount",df.format(commissionAmount + platformFeeAmount + gstToBePaid));
+                                                                intent.putExtra("keys",testKey);
                                                                 startActivityForResult(intent, 2);
                                                             }).create();
                                                     builder.show();

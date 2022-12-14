@@ -5,8 +5,10 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.InputType;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -18,6 +20,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.consumers.fastwayadmin.NavFrags.CashCommission.CashFreeGateway;
 import com.consumers.fastwayadmin.R;
 import com.google.firebase.auth.FirebaseAuth;
@@ -26,6 +34,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.razorpay.Checkout;
 
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -35,7 +44,9 @@ public class FastwayPremiums extends AppCompatActivity {
     SharedPreferences.Editor editor;
     SharedPreferences logininfo;
     boolean freeTrial = false;
+    String testKey;
     SharedPreferences.Editor premEdit;
+    String getApiKeyTest = "https://intercellular-stabi.000webhostapp.com/razorpay/returnApiKey.php";
     FirebaseAuth auth = FirebaseAuth.getInstance();
     SharedPreferences allPremsIDS;
 //    String subRefURL = "https://intercellular-stabi.000webhostapp.com/payouts/initialisedSub.php";
@@ -51,6 +62,24 @@ public class FastwayPremiums extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         sharedPreferences = getSharedPreferences("AdminPremiumDetails",MODE_PRIVATE);
         editor = sharedPreferences.edit();
+        AsyncTask.execute(() -> {
+            RequestQueue requestQueue = Volley.newRequestQueue(FastwayPremiums.this);
+            StringRequest stringRequest = new StringRequest(Request.Method.GET, getApiKeyTest, response -> runOnUiThread(() -> {
+                Checkout.preload(FastwayPremiums.this);
+//                        Checkout checkout = new Checkout();
+                // ...
+                testKey = response;
+                String[] arr = response.split(",");
+                Log.i("responseKey",response);
+//                        checkout.setKeyID(arr[0]);
+            }), new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.i("responseError",error.toString());
+                }
+            });
+            requestQueue.add(stringRequest);
+        });
         databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @SuppressLint("SetTextI18n")
@@ -89,7 +118,8 @@ public class FastwayPremiums extends AppCompatActivity {
                                             acEdit.apply();
                                             freeTrial = true;
                                             Intent intent = new Intent(FastwayPremiums.this, CashFreeGateway.class);
-                                            intent.putExtra("amount","599.00");
+                                            intent.putExtra("amount","59900");
+                                            intent.putExtra("keys",testKey);
                                             startActivityForResult(intent,2);
                                         }else
                                             Toast.makeText(FastwayPremiums.this, "Invalid Number", Toast.LENGTH_SHORT).show();
@@ -102,7 +132,8 @@ public class FastwayPremiums extends AppCompatActivity {
                             }
                             freeTrial = true;
                             Intent intent = new Intent(FastwayPremiums.this, CashFreeGateway.class);
-                            intent.putExtra("amount","599.00");
+                            intent.putExtra("amount","59900");
+                            intent.putExtra("keys",testKey);
                             startActivityForResult(intent,2);
                         });
                     }else{
@@ -116,7 +147,8 @@ public class FastwayPremiums extends AppCompatActivity {
                         Button button = findViewById(R.id.subscribeFastwayPremium);
                         button.setOnClickListener(click -> {
                             Intent intent = new Intent(FastwayPremiums.this, CashFreeGateway.class);
-                            intent.putExtra("amount", "599.00");
+                            intent.putExtra("amount","59900");
+                            intent.putExtra("keys",testKey);
                             startActivityForResult(intent,2);
                         });
                     }else{
@@ -130,7 +162,8 @@ public class FastwayPremiums extends AppCompatActivity {
                             button.setText("Subscribe Now");
                             button.setOnClickListener(click -> {
                                 Intent intent = new Intent(FastwayPremiums.this, CashFreeGateway.class);
-                                intent.putExtra("amount","599.00");
+                                intent.putExtra("amount","59900");
+                                intent.putExtra("keys",testKey);
                                 startActivityForResult(intent,2);
                             });
                         }else{

@@ -21,21 +21,35 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.cashfree.pg.CFPaymentService;
+import com.consumers.fastwayadmin.NavFrags.generateSignature;
 import com.consumers.fastwayadmin.R;
 import com.developer.kalert.KAlertDialog;
 import com.google.firebase.auth.FirebaseAuth;
+import com.razorpay.Checkout;
+import com.razorpay.Order;
+import com.razorpay.PaymentData;
+import com.razorpay.PaymentResultWithDataListener;
+import com.razorpay.RazorpayClient;
+import com.razorpay.RazorpayException;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.security.SignatureException;
 import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 
-public class CashFreeGateway extends AppCompatActivity {
+public class CashFreeGateway extends AppCompatActivity implements PaymentResultWithDataListener {
     private static final String TAG = "CashFreeGateway";
     String urls = "https://intercellular-stabi.000webhostapp.com/hash.php";
     String test = "https://intercellular-stabi.000webhostapp.com/testhash.php";
     String token;
     String amount;
+    String orderID;
+    String testKeys;
     String platformFee;
     DecimalFormat df = new DecimalFormat("0.00");
     int ran;
@@ -46,6 +60,43 @@ public class CashFreeGateway extends AppCompatActivity {
     String appID,stage,finalUrl;
     String ranV;
     SharedPreferences.Editor editor;
+
+    @Override
+    public void onPaymentSuccess(String s, PaymentData paymentData) {
+        String razorpaySign = paymentData.getSignature();
+        String razorpayPayID = paymentData.getPaymentId();
+        Log.i("WhatS",razorpaySign + "," + s);
+        Log.i("WhatP",razorpayPayID);
+        Log.i("WhatO",orderID);
+        Log.i("WhatOO",paymentData.getOrderId());
+        try {
+            String[] arr = testKeys.split(",");
+//            generateSignature generateSignature = new generateSignature(orderID,razorpayPayID,razorpaySign,arr[1]);
+
+            String result = generateSignature.calculateRFC2104HMAC(orderID + "|" + razorpayPayID,arr[1]);
+            Log.i("WhatR",result);
+            if(Objects.equals(result, razorpaySign)){
+
+                Log.i("WhatH","Signature Success");
+//                Intent sendData = new Intent();
+//                sendData.putExtra("orderId",s);
+//        sendData.putExtra("referID",bundle.getString("referenceId"));
+                setResult(2);
+                finish();
+            }else{
+                Log.i("WhatH","Signature Failed");
+            }
+
+        } catch (SignatureException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onPaymentError(int i, String s, PaymentData paymentData) {
+        setResult(3);
+        finish();
+    }
 
     enum SeamlessMode {
         CARD, WALLET, NET_BANKING, UPI_COLLECT, PAY_PAL
@@ -65,23 +116,76 @@ public class CashFreeGateway extends AppCompatActivity {
         name = acInfo.getString("name","");
         email = acInfo.getString("email","");
         number = "8076531395";
+        testKeys = getIntent().getStringExtra("keys");
+        String[] arr = testKeys.split(",");
+        Checkout checkout = new Checkout();
+        checkout.setKeyID(arr[0]);
 
-        if(acInfo.contains("testAdmin")){
-            appID = "61532dad5cd9ca634ae8ca59d23516";
-            finalUrl = test;
-            stage = "TEST";
-        }else{
-            finalUrl = urls;
-            appID = "107263678b9b7b22cd717e2519362701";
-            stage = "PROD";
-        }
+
+        SharedPreferences acc = getSharedPreferences("loginInfo",MODE_PRIVATE);
+
+        new Thread(() -> {
+            try {
+                RazorpayClient razorpay = new RazorpayClient(arr[0], arr[1]);
+
+                JSONObject orderRequest = new JSONObject();
+                orderRequest.put("amount", 59900); // amount in the smallest currency unit
+                orderRequest.put("currency", "INR");
+                orderRequest.put("receipt", "order_rcptid_11");
+
+                Order order = razorpay.orders.create(orderRequest);
+                Log.i("infoOrder",order.toString() + "");
+                Log.i("infoOrder",order.get("id") + "");
+                orderID = order.get("id");
+
+
+                try {
+                    JSONObject options = new JSONObject();
+
+                    options.put("name", "" + acc.getString("name",""));
+                    options.put("description", "Reference No. #123456");
+                    options.put("image", "https://s3.amazonaws.com/rzp-mobile/images/rzp.jpg");
+                    options.put("order_id", orderID);//from response of step 3.
+                    options.put("theme.color", "#3399cc");
+                    options.put("currency", "INR");
+                    options.put("amount", 59900);//pass amount in currency subunits
+                    options.put("prefill.email", "" + acc.getString("email",""));
+                    options.put("prefill.contact","" + acc.getString("number",""));
+                    JSONObject retryObj = new JSONObject();
+                    retryObj.put("enabled", true);
+                    retryObj.put("max_count", 4);
+                    options.put("retry", retryObj);
+
+                    runOnUiThread(() -> {
+                        checkout.open(CashFreeGateway.this, options);
+                    });
+
+
+
+                } catch(Exception e) {
+                    Log.i("TAG", "Error in starting Razorpay Checkout", e);
+                }
+            } catch (JSONException | RazorpayException e) {
+                e.printStackTrace();
+            }
+        }).start();
+
+//        if(acInfo.contains("testAdmin")){
+//            appID = "61532dad5cd9ca634ae8ca59d23516";
+//            finalUrl = test;
+//            stage = "TEST";
+//        }else{
+//            finalUrl = urls;
+//            appID = "107263678b9b7b22cd717e2519362701";
+//            stage = "PROD";
+//        }
 //        Double am = Double.parseDouble(amount);
 //        platformFee = getIntent().getStringExtra("platformFee");
 //        if(!platformFee.equals("0")){
 //            Double pf = Double.parseDouble(platformFee);
 //            amount = String.valueOf(am + pf);
 //        }
-        makePaymentRequest();
+//        makePaymentRequest();
     }
 
     private void makePaymentRequest() {

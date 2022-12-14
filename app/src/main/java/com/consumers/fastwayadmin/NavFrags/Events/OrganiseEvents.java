@@ -30,9 +30,11 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.consumers.fastwayadmin.HomeScreen.ReportSupport.RequestRefundClass;
+import com.consumers.fastwayadmin.ListViewActivity.InitiatePayoutForAdminNEFT;
 import com.consumers.fastwayadmin.R;
 import com.developer.kalert.KAlertDialog;
 import com.google.firebase.auth.FirebaseAuth;
@@ -44,6 +46,8 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
+
+import org.json.JSONObject;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -62,6 +66,7 @@ public class OrganiseEvents extends AppCompatActivity {
     String genratedToken;
     String customisation;
     double payoutAmt;
+    String URL = "https://fcm.googleapis.com/fcm/send";
     String testPayoutToken = "https://intercellular-stabi.000webhostapp.com/CheckoutPayouts/testToken.php";
     String prodPayoutToken = "https://intercellular-stabi.000webhostapp.com/CheckoutPayouts/payoutIMPS.php";
     String testBearerToken = "https://intercellular-stabi.000webhostapp.com/CheckoutPayouts/test/testBearerToken.php";
@@ -223,7 +228,54 @@ public class OrganiseEvents extends AppCompatActivity {
                                             amt = amt - cmmisn;
 
                                             payoutAmt = amt;
-                                            new MakePayout().execute();
+
+                                            RequestQueue requestQueue = Volley.newRequestQueue(OrganiseEvents.this);
+                                            JSONObject main = new JSONObject();
+                                            try{
+                                                main.put("to","/topics/"+"RequestPayout");
+                                                JSONObject notification = new JSONObject();
+                                                notification.put("title","New Payout Request");
+                                                notification.put("body","You have a new request to create payout for event ended. Check now");
+                                                main.put("notification",notification);
+
+                                                JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, main, response -> {
+
+                                                }, error -> Toast.makeText(OrganiseEvents.this, error.getLocalizedMessage()+"null", Toast.LENGTH_SHORT).show()){
+                                                    @Override
+                                                    public Map<String, String> getHeaders() {
+                                                        Map<String,String> header = new HashMap<>();
+                                                        header.put("content-type","application/json");
+                                                        header.put("authorization","key=AAAAjq_WsHs:APA91bGZV-uH-NJddxIniy8h1tDGDHqxhgvFdyNRDaV_raxjvSM_FkKu7JSwtSp4Q_iSmPuTKGGIB2M_07c9rKgPXUH43-RzpK6zkaSaIaNgmeiwUO40rYxYUZAkKoLAQQVeVJ7mXboD");
+                                                        return header;
+                                                    }
+                                                };
+
+                                                requestQueue.add(jsonObjectRequest);
+
+                                            }
+                                            catch (Exception e){
+                                                Toast.makeText(OrganiseEvents.this, e.getLocalizedMessage()+"null", Toast.LENGTH_SHORT).show();
+                                            }
+
+                                            DatabaseReference requestPayout = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Payouts").child(auth.getUid());
+                                            HashMap<String,String> map = new HashMap<>();
+                                            SharedPreferences resInfo = getSharedPreferences("RestaurantInfo",MODE_PRIVATE);
+                                            map.put("amount",payoutAmt + "");
+                                            map.put("contactId",sharedPreferences.getString("contactID",""));
+                                            map.put("fundId",sharedPreferences.getString("fundId",""));
+                                            map.put("name",resInfo.getString("hotelName",""));
+                                            map.put("number",resInfo.getString("hotelNumber",""));
+                                            requestPayout.setValue(map);
+                                            new KAlertDialog(OrganiseEvents.this,KAlertDialog.SUCCESS_TYPE)
+                                                    .setTitleText("Payout Request")
+                                                    .setContentText("Payout will be initiated after request is verified by ordinalo")
+                                                    .setConfirmText("Exit")
+                                                    .setConfirmClickListener(clicks -> {
+                                                        clicks.dismissWithAnimation();
+                                                        finish();
+                                                    }).show();
+                                            Toast.makeText(OrganiseEvents.this, "Payout Request Generated", Toast.LENGTH_SHORT).show();
+//                                            new MakePayout().execute();
 
                                             DatabaseReference removeFromGeo = FirebaseDatabase.getInstance().getReference().getRoot().child("Offers").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality",""))
                                                     .child(auth.getUid());
