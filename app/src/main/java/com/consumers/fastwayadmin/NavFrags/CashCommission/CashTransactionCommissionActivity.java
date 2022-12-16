@@ -26,8 +26,10 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.consumers.fastwayadmin.HomeScreen.ReportSupport.RequestRefundClass;
 import com.consumers.fastwayadmin.NavFrags.FastwayPremiumActivites.FastwayPremiums;
 import com.consumers.fastwayadmin.R;
 import com.developer.kalert.KAlertDialog;
@@ -39,7 +41,11 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.razorpay.Checkout;
 
+import org.json.JSONObject;
+
 import java.text.DecimalFormat;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class CashTransactionCommissionActivity extends AppCompatActivity {
@@ -168,7 +174,7 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
                                                 acEdit.putString("number",editText.getText().toString());
                                                 acEdit.apply();
 
-                                                Intent intent = new Intent(CashTransactionCommissionActivity.this, CashFreeGateway.class);
+                                                Intent intent = new Intent(CashTransactionCommissionActivity.this, CommissionGWordinalo.class);
                                                 intent.putExtra("amount",df.format(commissionAmount + platformFeeAmount + gstToBePaid));
                                                 intent.putExtra("keys",testKey);
                                                 startActivityForResult(intent,2);
@@ -182,7 +188,7 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
                                     return;
                                 }
 
-                                if(commissionAmount != 0) {
+                                if(commissionAmount != 0 || platformFeeAmount != 0) {
                                     SharedPreferences cash = getSharedPreferences("CashCommission",MODE_PRIVATE);
                                     if(cash.contains("fine")) {
                                         String fine = cash.getString("fine","");
@@ -281,7 +287,7 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
                                                 return;
                                             }
 
-                                            if(commissionAmount != 0) {
+                                            if(commissionAmount != 0 || platformFeeAmount!=0) {
                                                 SharedPreferences cash = getSharedPreferences("CashCommission",MODE_PRIVATE);
                                                 if(cash.contains("fine")) {
                                                     String fine = cash.getString("fine","");
@@ -408,7 +414,7 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
                                     return;
                                 }
 
-                                if(commissionAmount != 0) {
+                                if(commissionAmount != 0 || platformFeeAmount!=0) {
                                     SharedPreferences cash = getSharedPreferences("CashCommission",MODE_PRIVATE);
                                     if(cash.contains("fine")) {
                                         String fine = cash.getString("fine","");
@@ -539,7 +545,7 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
                                             }
 
 
-                                            if(commissionAmount != 0) {
+                                            if(commissionAmount != 0 || platformFeeAmount!=0) {
                                                 SharedPreferences cash = getSharedPreferences("CashCommission",MODE_PRIVATE);
                                                 if(cash.contains("fine")) {
                                                     String fine = cash.getString("fine","");
@@ -667,6 +673,8 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
                     .setConfirmClickListener(AppCompatDialog::dismiss);
             kAlertDialog.setCancelable(false);
             kAlertDialog.show();
+
+
         }
     }
 }

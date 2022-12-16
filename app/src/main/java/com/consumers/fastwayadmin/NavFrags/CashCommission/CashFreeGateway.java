@@ -10,21 +10,27 @@ import static com.cashfree.pg.CFPaymentService.PARAM_ORDER_ID;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.cashfree.pg.CFPaymentService;
+import com.consumers.fastwayadmin.HomeScreen.ReportSupport.RequestRefundClass;
 import com.consumers.fastwayadmin.NavFrags.generateSignature;
 import com.consumers.fastwayadmin.R;
 import com.developer.kalert.KAlertDialog;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.razorpay.Checkout;
 import com.razorpay.Order;
 import com.razorpay.PaymentData;
@@ -49,6 +55,7 @@ public class CashFreeGateway extends AppCompatActivity implements PaymentResultW
     String token;
     String amount;
     String orderID;
+    String URL = "https://fcm.googleapis.com/fcm/send";
     String testKeys;
     String platformFee;
     DecimalFormat df = new DecimalFormat("0.00");
@@ -94,6 +101,46 @@ public class CashFreeGateway extends AppCompatActivity implements PaymentResultW
 
     @Override
     public void onPaymentError(int i, String s, PaymentData paymentData) {
+
+        AsyncTask.execute(() -> {
+
+            RequestQueue requestQueue = Volley.newRequestQueue(CashFreeGateway.this);
+            JSONObject main = new JSONObject();
+            try{
+                main.put("to","/topics/"+"RequestPayout");
+                JSONObject notification = new JSONObject();
+                notification.put("title","Refund Request");
+                notification.put("body","You have a new refund request. Check now");
+                main.put("notification",notification);
+
+                JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, main, response -> {
+
+                }, error -> Toast.makeText(CashFreeGateway.this, error.getLocalizedMessage()+"null", Toast.LENGTH_SHORT).show()){
+                    @Override
+                    public Map<String, String> getHeaders() {
+                        Map<String,String> header = new HashMap<>();
+                        header.put("content-type","application/json");
+                        header.put("authorization","key=AAAAjq_WsHs:APA91bGZV-uH-NJddxIniy8h1tDGDHqxhgvFdyNRDaV_raxjvSM_FkKu7JSwtSp4Q_iSmPuTKGGIB2M_07c9rKgPXUH43-RzpK6zkaSaIaNgmeiwUO40rYxYUZAkKoLAQQVeVJ7mXboD");
+                        return header;
+                    }
+                };
+
+                requestQueue.add(jsonObjectRequest);
+
+            }
+            catch (Exception e){
+                Toast.makeText(CashFreeGateway.this, e.getLocalizedMessage()+"null", Toast.LENGTH_SHORT).show();
+            }
+        });
+        SharedPreferences sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        SharedPreferences userDetails = getSharedPreferences("RestaurantInfo",MODE_PRIVATE);
+        DatabaseReference requestRefundOrdinalo = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("RefundRequest").child(Objects.requireNonNull(auth.getUid()));
+        RequestRefundClass requestRefundClass = new RequestRefundClass(sharedPreferences.getString("lastOrderId",""), amount, userDetails.getString("hotelName",""), "Commission payment got crashed issue refund");
+        requestRefundOrdinalo.setValue(requestRefundClass);
+
+        editor.remove("lastOrderId").apply();
         setResult(3);
         finish();
     }
@@ -138,6 +185,10 @@ public class CashFreeGateway extends AppCompatActivity implements PaymentResultW
                 Log.i("infoOrder",order.get("id") + "");
                 orderID = order.get("id");
 
+                if(!acInfo.contains("lastOrderId")){
+                    editor.putString("lastOrderId",orderID);
+                    editor.apply();
+                }
 
                 try {
                     JSONObject options = new JSONObject();
@@ -148,6 +199,7 @@ public class CashFreeGateway extends AppCompatActivity implements PaymentResultW
                     options.put("order_id", orderID);//from response of step 3.
                     options.put("theme.color", "#3399cc");
                     options.put("currency", "INR");
+                    options.put("payment_capture", "1");
                     options.put("amount", 59900);//pass amount in currency subunits
                     options.put("prefill.email", "" + acc.getString("email",""));
                     options.put("prefill.contact","" + acc.getString("number",""));
