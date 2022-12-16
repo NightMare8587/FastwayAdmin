@@ -51,6 +51,7 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
     boolean platformFeeBool = false;
     String testKey;
     String getApiKeyTest = "https://intercellular-stabi.000webhostapp.com/razorpay/returnApiKey.php";
+    String getApiKeyLive = "https://intercellular-stabi.000webhostapp.com/razorpay/returnLiveApiKey.php";
     Double platformFeeAmount;
     double gstToBePaid;
     double commissionAmount;
@@ -64,7 +65,7 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
         seeBreakDown = findViewById(R.id.seeFeesBreakdownAdminAppCash);
         AsyncTask.execute(() -> {
             RequestQueue requestQueue = Volley.newRequestQueue(CashTransactionCommissionActivity.this);
-            StringRequest stringRequest = new StringRequest(Request.Method.GET, getApiKeyTest, response -> runOnUiThread(() -> {
+            StringRequest stringRequest = new StringRequest(Request.Method.GET, getApiKeyLive, response -> runOnUiThread(() -> {
                 Checkout.preload(CashTransactionCommissionActivity.this);
 //                        Checkout checkout = new Cas();
                 // ...

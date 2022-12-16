@@ -47,6 +47,7 @@ public class FastwayPremiums extends AppCompatActivity {
     String testKey;
     SharedPreferences.Editor premEdit;
     String getApiKeyTest = "https://intercellular-stabi.000webhostapp.com/razorpay/returnApiKey.php";
+    String getApiKeyLive = "https://intercellular-stabi.000webhostapp.com/razorpay/returnLiveApiKey.php";
     FirebaseAuth auth = FirebaseAuth.getInstance();
     SharedPreferences allPremsIDS;
 //    String subRefURL = "https://intercellular-stabi.000webhostapp.com/payouts/initialisedSub.php";
@@ -64,7 +65,7 @@ public class FastwayPremiums extends AppCompatActivity {
         editor = sharedPreferences.edit();
         AsyncTask.execute(() -> {
             RequestQueue requestQueue = Volley.newRequestQueue(FastwayPremiums.this);
-            StringRequest stringRequest = new StringRequest(Request.Method.GET, getApiKeyTest, response -> runOnUiThread(() -> {
+            StringRequest stringRequest = new StringRequest(Request.Method.GET, getApiKeyLive, response -> runOnUiThread(() -> {
                 Checkout.preload(FastwayPremiums.this);
 //                        Checkout checkout = new Checkout();
                 // ...
