@@ -1,5 +1,6 @@
 package com.consumers.fastwayadmin;
 
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -44,18 +45,37 @@ public class FirebaseNotification extends FirebaseMessagingService {
             // Since the notification is received directly from
             // FCM, the title and the body can be fetched
             // directly as below.
-            Log.i("info11",remoteMessage.getNotification().getTitle());
-            Log.i("info11",remoteMessage.getNotification().getBody());
-            String action;
-            if(remoteMessage.getNotification().getClickAction() == null){
-                Log.i("thisHere","null");
-                action = "";
-            }else
-                action = remoteMessage.getNotification().getClickAction().toString();
-//            Log.i("info11",remoteMessage.getNotification().getClickAction());
-            showNotification(
-                    remoteMessage.getNotification().getTitle(),
-                    remoteMessage.getNotification().getBody(),action);
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                String title = remoteMessage.getNotification().getTitle();
+                String message = remoteMessage.getNotification().getBody();
+                if(message.contains("Customer has requested to pay amount in Cash")){
+                    Intent intents = new Intent("myFunction");
+                    // add data
+                    intents.putExtra("value1", title);
+                    intents.putExtra("value2", message);
+                    LocalBroadcastManager.getInstance(this).sendBroadcast(intents);
+                }
+
+
+                NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                NotificationChannel notificationChannel = new NotificationChannel("notification_channel", "web_app", NotificationManager.IMPORTANCE_HIGH);
+                notificationManager.createNotificationChannel(notificationChannel);
+                NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, "notification_channel");
+                notificationBuilder.setAutoCancel(true)
+                        .setStyle(new NotificationCompat.BigTextStyle().bigText(remoteMessage.getNotification().getBody()))
+                        .setDefaults(Notification.DEFAULT_ALL)
+                        .setWhen(System.currentTimeMillis())
+                        .setSmallIcon(R.drawable.ordinalo)
+                        .setTicker(remoteMessage.getNotification().getTitle())
+                        .setPriority(NotificationManager.IMPORTANCE_HIGH)
+                        .setContentTitle(remoteMessage.getNotification().getTitle())
+                        .setContentText(remoteMessage.getNotification().getBody());
+                notificationManager.notify(1, notificationBuilder.build());
+            }else {
+                showNotification(
+                        remoteMessage.getNotification().getTitle(),
+                        remoteMessage.getNotification().getBody() , "");
+            }
         }
     }
     private RemoteViews getCustomDesign(String title,

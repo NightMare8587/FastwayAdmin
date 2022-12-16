@@ -101,6 +101,21 @@
         app:layout_constraintTop_toBottomOf="@+id/startVerification" />
 
     <TextView
+        android:id="@+id/textClicktoReadTermsAndCOnditionsSecondOne"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="25dp"
+        android:layout_marginEnd="25dp"
+        android:layout_marginBottom="110dp"
+        android:text="By logging in, you are agreeing to the Terms of Service."
+        android:textColor="#194A71"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/signInButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
         android:id="@+id/loginAsEmployeeTextViewMain"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -112,6 +127,7 @@
         android:textColor="#334757"
         android:textSize="19sp"
         android:textStyle="bold"
+        android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textClicktoReadTermsAndCOnditions" />

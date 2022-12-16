@@ -1,6 +1,7 @@
 package com.consumers.fastwayadmin.Tables;
 
 import android.Manifest;
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -265,35 +266,53 @@ public class AddTables extends AppCompatActivity {
                         );
 
 
-                        String channel_id = "notification_channel";
-                        NotificationCompat.Builder builder
-                                = new NotificationCompat
-                                .Builder(getApplicationContext(),
-                                channel_id)
-                                .setPriority(NotificationManager.IMPORTANCE_MAX)
-                                .setSmallIcon(R.drawable.foodinelogo)
-                                .setAutoCancel(true)
-                                .setVibrate(new long[]{1000, 1000, 1000,
-                                        1000, 1000})
-                                .setOnlyAlertOnce(true)
-                                .setContentIntent(pendingIntent);
-                        builder = builder.setContent(
-                                getCustomDesign());
-                        NotificationManager notificationManager
-                                = (NotificationManager) getSystemService(
-                                Context.NOTIFICATION_SERVICE);
-                        // Check if the Android Version is greater than Oreo
-                        if (Build.VERSION.SDK_INT
-                                >= Build.VERSION_CODES.O) {
-                            NotificationChannel notificationChannel
-                                    = new NotificationChannel(
-                                    channel_id, "web_app",
-                                    NotificationManager.IMPORTANCE_HIGH);
-                            notificationManager.createNotificationChannel(
-                                    notificationChannel);
-                        }
+                        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S){
+                            NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                            NotificationChannel notificationChannel = new NotificationChannel("notification_channel", "web_app", NotificationManager.IMPORTANCE_HIGH);
+                            notificationManager.createNotificationChannel(notificationChannel);
+                            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, "notification_channel");
+                            notificationBuilder.setContentIntent(pendingIntent);
+                            notificationBuilder.setAutoCancel(true)
+                                    .setStyle(new NotificationCompat.BigTextStyle().bigText("Click here to check Invoice PDF (Print and paste on Table)"))
+                                    .setDefaults(Notification.DEFAULT_ALL)
+                                    .setWhen(System.currentTimeMillis())
+                                    .setSmallIcon(R.drawable.ordinalo)
+                                    .setTicker("Invoice")
+                                    .setPriority(NotificationManager.IMPORTANCE_HIGH)
+                                    .setContentTitle("Invoice")
+                                    .setContentText("Click here to check Invoice PDF (Print and paste on Table)");
+                            notificationManager.notify(1, notificationBuilder.build());
+                        }else {
+                            String channel_id = "notification_channel";
+                            NotificationCompat.Builder builder
+                                    = new NotificationCompat
+                                    .Builder(getApplicationContext(),
+                                    channel_id)
+                                    .setPriority(NotificationManager.IMPORTANCE_MAX)
+                                    .setSmallIcon(R.drawable.foodinelogo)
+                                    .setAutoCancel(true)
+                                    .setVibrate(new long[]{1000, 1000, 1000,
+                                            1000, 1000})
+                                    .setOnlyAlertOnce(true)
+                                    .setContentIntent(pendingIntent);
+                            builder = builder.setContent(
+                                    getCustomDesign());
+                            NotificationManager notificationManager
+                                    = (NotificationManager) getSystemService(
+                                    Context.NOTIFICATION_SERVICE);
+                            // Check if the Android Version is greater than Oreo
+                            if (Build.VERSION.SDK_INT
+                                    >= Build.VERSION_CODES.O) {
+                                NotificationChannel notificationChannel
+                                        = new NotificationChannel(
+                                        channel_id, "web_app",
+                                        NotificationManager.IMPORTANCE_HIGH);
+                                notificationManager.createNotificationChannel(
+                                        notificationChannel);
+                            }
 
-                        notificationManager.notify(10101, builder.build());
+                            notificationManager.notify(10101, builder.build());
+                        }
                     }
                 }else {
                     Toast.makeText(this, "Error Occurred Creating QR", Toast.LENGTH_SHORT).show();

@@ -127,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
         checkPermissions();
         readTAndC = findViewById(R.id.textClicktoReadTermsAndCOnditions);
         readTAndC.setOnClickListener(click -> {
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.websitepolicies.com/policies/view/CpwDZziF"));
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://merchant.razorpay.com/policy/Kq6A4G44q0wBXo/terms"));
             startActivity(browserIntent);
         });
         empLogin = findViewById(R.id.loginAsEmployeeTextViewMain);
@@ -183,11 +183,8 @@ public class MainActivity extends AppCompatActivity {
                 fullName.requestFocus();
                 fullName.setError("Field can't be Empty");
                 return;
-            }if(emailAddress.length() == 0){
-                emailAddress.requestFocus();
-                emailAddress.setError("Field can't be Empty");
-                return;
-            }if(phoneNumber.length() != 10){
+            }
+            if(phoneNumber.length() != 10){
                 phoneNumber.requestFocus();
                 phoneNumber.setError("Enter valid number");
                 return;
@@ -521,7 +518,7 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot snapshot) {
                                 if(!snapshot.hasChild(Objects.requireNonNull(loginAuth.getUid()))){
-                                    sendEmailFunction(email);
+//                                    sendEmailFunction(email);
                                     reference.child("Admin").child(Objects.requireNonNull(loginAuth.getUid())).setValue(user);
                                     reference.child("Admin").child(loginAuth.getUid()).child("registrationDate").setValue(System.currentTimeMillis() + "");
                                     FirebaseFirestore firestore = FirebaseFirestore.getInstance();
@@ -662,7 +659,7 @@ public class MainActivity extends AppCompatActivity {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                                         if(!snapshot.hasChild(Objects.requireNonNull(loginAuth.getUid()))){
-                                            sendEmailFunction(account.getEmail());
+//                                            sendEmailFunction(account.getEmail());
                                             GoogleSignInDB googleSignInDB = new GoogleSignInDB(account.getDisplayName(),account.getEmail());
                                             reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(user.getUid());
                                             reference.setValue(googleSignInDB);
