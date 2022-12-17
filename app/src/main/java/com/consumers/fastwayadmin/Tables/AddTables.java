@@ -276,7 +276,7 @@ public class AddTables extends AppCompatActivity {
                                     .setStyle(new NotificationCompat.BigTextStyle().bigText("Click here to check Invoice PDF (Print and paste on Table)"))
                                     .setDefaults(Notification.DEFAULT_ALL)
                                     .setWhen(System.currentTimeMillis())
-                                    .setSmallIcon(R.drawable.ordinalo)
+                                    .setSmallIcon(R.drawable.foodinelogo)
                                     .setTicker("Invoice")
                                     .setPriority(NotificationManager.IMPORTANCE_HIGH)
                                     .setContentTitle("Invoice")
@@ -369,7 +369,7 @@ public class AddTables extends AppCompatActivity {
     }
 
     private void initialise() {
-        bmp = BitmapFactory.decodeResource(getResources(),R.drawable.ordinalo);
+        bmp = BitmapFactory.decodeResource(getResources(),R.drawable.foodinelogo);
         scaled = Bitmap.createScaledBitmap(bmp,250,250,false);
         sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
         tableNumber = findViewById(R.id.tableNumber);

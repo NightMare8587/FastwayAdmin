@@ -155,7 +155,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
         id = getIntent().getStringExtra("id");
         showCustom = findViewById(R.id.showCustomisationCurrentTakeaway);
         DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(id);
-        bmp = BitmapFactory.decodeResource(getResources(), R.drawable.logo);
+        bmp = BitmapFactory.decodeResource(getResources(), R.drawable.foodinelogo);
         restaurantDailyTrack = getSharedPreferences("RestaurantTrackingDaily", Context.MODE_PRIVATE);
         restaurantTrackRecords = getSharedPreferences("RestaurantTrackRecords",Context.MODE_PRIVATE);
         userFrequency = getSharedPreferences("UsersFrequencyPerMonth",MODE_PRIVATE);
@@ -174,8 +174,8 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
         dailyAverageOrder = getSharedPreferences("DailyAverageOrderMonthly",MODE_PRIVATE);
         averageEditor = dailyAverageOrder.edit();
         dishAnalysis = storeForDishAnalysis.edit();
-        bmp1 = BitmapFactory.decodeResource(getResources(), R.drawable.orderdeclined);
-        scaled1 = Bitmap.createScaledBitmap(bmp1,500,500,false);
+//        bmp1 = BitmapFactory.decodeResource(getResources(), R.drawable.orderdeclined);
+//        scaled1 = Bitmap.createScaledBitmap(bmp1,500,500,false);
         sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
         editor = sharedPreferences.edit();
         state = sharedPreferences.getString("state","");

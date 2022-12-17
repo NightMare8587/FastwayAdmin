@@ -704,7 +704,7 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
                                           Paint text = new Paint();
 
                                           Canvas canvas = page.getCanvas();
-                                          bmp = BitmapFactory.decodeResource(v.getContext().getResources(),R.drawable.ordinalo);
+                                          bmp = BitmapFactory.decodeResource(v.getContext().getResources(),R.drawable.foodinelogo);
                                           scaled = Bitmap.createScaledBitmap(bmp,300,300,false);
                                           canvas.drawBitmap(bitmap, 345, 180, myPaint);
                                           text.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
@@ -800,7 +800,7 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
                                               Paint text = new Paint();
 
                                               Canvas canvas = page.getCanvas();
-                                              bmp = BitmapFactory.decodeResource(v.getContext().getResources(),R.drawable.ordinalo);
+                                              bmp = BitmapFactory.decodeResource(v.getContext().getResources(),R.drawable.foodinelogo);
                                               scaled = Bitmap.createScaledBitmap(bmp,250,250,false);
                                               canvas.drawBitmap(bitmap, 345, 180, myPaint);
                                               text.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));

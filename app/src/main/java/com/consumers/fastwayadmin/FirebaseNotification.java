@@ -65,7 +65,7 @@ public class FirebaseNotification extends FirebaseMessagingService {
                         .setStyle(new NotificationCompat.BigTextStyle().bigText(remoteMessage.getNotification().getBody()))
                         .setDefaults(Notification.DEFAULT_ALL)
                         .setWhen(System.currentTimeMillis())
-                        .setSmallIcon(R.drawable.ordinalo)
+                        .setSmallIcon(R.drawable.foodinelogo)
                         .setTicker(remoteMessage.getNotification().getTitle())
                         .setPriority(NotificationManager.IMPORTANCE_HIGH)
                         .setContentTitle(remoteMessage.getNotification().getTitle())

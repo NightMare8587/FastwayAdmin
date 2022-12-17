@@ -184,10 +184,10 @@ public class ApproveCurrentOrder extends AppCompatActivity {
         showCustomisation = findViewById(R.id.showCustomisationButton);
         storeTotalAmountMonth = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid());
         SharedPreferences sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
-        bmp = BitmapFactory.decodeResource(getResources(), R.drawable.logo);
+        bmp = BitmapFactory.decodeResource(getResources(), R.drawable.foodinelogo);
         scaled = Bitmap.createScaledBitmap(bmp,500,500,false);
-        bmp1 = BitmapFactory.decodeResource(getResources(), R.drawable.orderdeclined);
-        scaled1 = Bitmap.createScaledBitmap(bmp1,500,500,false);
+//        bmp1 = BitmapFactory.decodeResource(getResources(), R.drawable.orderdeclined);
+//        scaled1 = Bitmap.createScaledBitmap(bmp1,500,500,false);
         initialise();
         textView.setText("Table Number: " + table);
         path = getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
