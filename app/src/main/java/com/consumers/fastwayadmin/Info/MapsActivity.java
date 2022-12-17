@@ -101,19 +101,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         actionButton.setOnClickListener(view -> {
             createLocationRequest();
-            client.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
-                @Override
-                public void onSuccess(Location location) {
-                    if (location != null) {
-                        Toast.makeText(MapsActivity.this, "Yes", Toast.LENGTH_SHORT).show();
-                        mMap.clear();
-                        LatLng current = new LatLng(location.getLatitude(), location.getLongitude());
-                        mMap.addMarker(new MarkerOptions().position(current).title("Current Location"));
+            client.getLastLocation().addOnSuccessListener(location -> {
+                if (location != null) {
+                    Toast.makeText(MapsActivity.this, "Yes", Toast.LENGTH_SHORT).show();
+                    mMap.clear();
+                    LatLng current = new LatLng(location.getLatitude(), location.getLongitude());
+                    mMap.addMarker(new MarkerOptions().position(current).title("Current Location"));
 //                            mMap.animateCamera(CameraUpdateFactory.zoomIn());
-                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(current, 15));
-                    }else
-                        createLocationRequest();
-                }
+                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(current, 15));
+                }else
+                    createLocationRequest();
             });
         });
 

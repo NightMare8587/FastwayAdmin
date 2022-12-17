@@ -43,6 +43,7 @@ public class FastwayPremiums extends AppCompatActivity {
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
     SharedPreferences logininfo;
+    boolean gotKey = false;
     boolean freeTrial = false;
     String testKey;
     SharedPreferences.Editor premEdit;
@@ -69,6 +70,7 @@ public class FastwayPremiums extends AppCompatActivity {
                 Checkout.preload(FastwayPremiums.this);
 //                        Checkout checkout = new Checkout();
                 // ...
+                gotKey = true;
                 testKey = response;
                 String[] arr = response.split(",");
                 Log.i("responseKey",response);
@@ -81,6 +83,8 @@ public class FastwayPremiums extends AppCompatActivity {
             });
             requestQueue.add(stringRequest);
         });
+
+
         databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @SuppressLint("SetTextI18n")
@@ -96,6 +100,11 @@ public class FastwayPremiums extends AppCompatActivity {
                         button.setVisibility(View.VISIBLE);
                         button.setText("Subscribe Now");
                         button.setOnClickListener(click -> {
+                            if(!gotKey)
+                            {
+                                Toast.makeText(FastwayPremiums.this,"One Second....",Toast.LENGTH_SHORT).show();
+                                return;
+                            }
                             SharedPreferences acc = getSharedPreferences("loginInfo",MODE_PRIVATE);
                             SharedPreferences.Editor acEdit = acc.edit();
                             if(!acc.contains("number")) {
@@ -147,6 +156,11 @@ public class FastwayPremiums extends AppCompatActivity {
                         setContentView(R.layout.subscribe_fastway_prem);
                         Button button = findViewById(R.id.subscribeFastwayPremium);
                         button.setOnClickListener(click -> {
+                            if(!gotKey)
+                            {
+                                Toast.makeText(FastwayPremiums.this,"One Second....",Toast.LENGTH_SHORT).show();
+                                return;
+                            }
                             Intent intent = new Intent(FastwayPremiums.this, CashFreeGateway.class);
                             intent.putExtra("amount","59900");
                             intent.putExtra("keys",testKey);
@@ -162,6 +176,11 @@ public class FastwayPremiums extends AppCompatActivity {
                             button.setVisibility(View.VISIBLE);
                             button.setText("Subscribe Now");
                             button.setOnClickListener(click -> {
+                                if(!gotKey)
+                                {
+                                    Toast.makeText(FastwayPremiums.this,"One Second....",Toast.LENGTH_SHORT).show();
+                                    return;
+                                }
                                 Intent intent = new Intent(FastwayPremiums.this, CashFreeGateway.class);
                                 intent.putExtra("amount","59900");
                                 intent.putExtra("keys",testKey);
