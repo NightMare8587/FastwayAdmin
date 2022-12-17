@@ -16,7 +16,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.453"
-        app:srcCompat="@drawable/foodinelogonew" />
+        app:srcCompat="@drawable/foodinelogo" />
 
     <!--    <TextView-->
 <!--        android:id="@+id/textView6"-->

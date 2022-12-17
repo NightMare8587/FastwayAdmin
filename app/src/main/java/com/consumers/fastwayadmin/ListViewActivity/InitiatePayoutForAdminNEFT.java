@@ -166,6 +166,153 @@ public class InitiatePayoutForAdminNEFT extends AppCompatActivity {
                 if(cooldown) {
                     if(System.currentTimeMillis() < coolDownTime){
                         Toast.makeText(this, "Cooldown period is active", Toast.LENGTH_SHORT).show();
+                        AlertDialog.Builder builder = new AlertDialog.Builder(InitiatePayoutForAdminNEFT.this);
+                        builder.setTitle("Cooldown active").setMessage("Cooldowm period is active. You can ask for payout after cooldown period has ended or pay \u20b925 fee to make payout")
+                                .setPositiveButton("Ask for payout", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterfaces, int ii) {
+                                        if(amount > 25000){
+                                            AlertDialog.Builder alert = new AlertDialog.Builder(InitiatePayoutForAdminNEFT.this);
+                                            alert.setTitle("Message").setMessage("You can initiate payout of amount less than \u20b930000 at a time. You can initiate again after a cooldown period of 6 hours");
+                                            LinearLayout linearLayout = new LinearLayout(InitiatePayoutForAdminNEFT.this);
+                                            linearLayout.setOrientation(LinearLayout.VERTICAL);
+                                            EditText editText = new EditText(InitiatePayoutForAdminNEFT.this);
+                                            editText.setHint("Enter Amount Here");
+                                            editText.setInputType(InputType.TYPE_CLASS_NUMBER);
+                                            linearLayout.addView(editText);
+                                            alert.setPositiveButton("Initiate Payout", (dialogInterface, i) -> {
+                                                dialogInterface.dismiss();
+                                                if(Double.parseDouble(editText.getText().toString()) > 25000D)
+                                                    Toast.makeText(InitiatePayoutForAdminNEFT.this, "Amount Should be less than \u20b925000", Toast.LENGTH_SHORT).show();
+                                                else{
+                                                    enteredAmount = Double.parseDouble(editText.getText().toString());
+                                                    if(enteredAmount > amount) {
+                                                        Toast.makeText(InitiatePayoutForAdminNEFT.this, "Invalid Input", Toast.LENGTH_SHORT).show();
+                                                        return;
+                                                    }
+
+                                                    RequestQueue requestQueue = Volley.newRequestQueue(InitiatePayoutForAdminNEFT.this);
+                                                    JSONObject main = new JSONObject();
+                                                    try{
+                                                        main.put("to","/topics/"+"RequestPayout");
+                                                        JSONObject notification = new JSONObject();
+                                                        notification.put("title","New Payout Request");
+                                                        notification.put("body","You have a new request to create payout. Check now");
+                                                        main.put("notification",notification);
+
+                                                        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, main, response -> {
+
+                                                        }, error -> Toast.makeText(InitiatePayoutForAdminNEFT.this, error.getLocalizedMessage()+"null", Toast.LENGTH_SHORT).show()){
+                                                            @Override
+                                                            public Map<String, String> getHeaders() {
+                                                                Map<String,String> header = new HashMap<>();
+                                                                header.put("content-type","application/json");
+                                                                header.put("authorization","key=AAAAjq_WsHs:APA91bGZV-uH-NJddxIniy8h1tDGDHqxhgvFdyNRDaV_raxjvSM_FkKu7JSwtSp4Q_iSmPuTKGGIB2M_07c9rKgPXUH43-RzpK6zkaSaIaNgmeiwUO40rYxYUZAkKoLAQQVeVJ7mXboD");
+                                                                return header;
+                                                            }
+                                                        };
+
+                                                        requestQueue.add(jsonObjectRequest);
+
+                                                    }
+                                                    catch (Exception e){
+                                                        Toast.makeText(InitiatePayoutForAdminNEFT.this, e.getLocalizedMessage()+"null", Toast.LENGTH_SHORT).show();
+                                                    }
+
+                                                    DatabaseReference requestPayout = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Payouts").child(auth.getUid());
+                                                    HashMap<String,String> map = new HashMap<>();
+                                                    SharedPreferences resInfo = getSharedPreferences("RestaurantInfo",MODE_PRIVATE);
+                                                    map.put("amount",enteredAmount + "");
+                                                    map.put("contactId",sharedPreferences.getString("contactID",""));
+                                                    map.put("fundId",sharedPreferences.getString("fundId",""));
+                                                    map.put("name",resInfo.getString("hotelName","") + ". Deduct 25 ruppe");
+                                                    map.put("number",resInfo.getString("hotelNumber",""));
+                                                    requestPayout.setValue(map);
+                                                    new KAlertDialog(InitiatePayoutForAdminNEFT.this,KAlertDialog.SUCCESS_TYPE)
+                                                            .setTitleText("Payout Request")
+                                                            .setContentText("Payout will be initiated after request is verified by ordinalo")
+                                                            .setConfirmText("Exit")
+                                                            .setConfirmClickListener(clicks -> {
+                                                                clicks.dismissWithAnimation();
+                                                                finish();
+                                                            }).show();
+                                                    Toast.makeText(InitiatePayoutForAdminNEFT.this, "Payout Request Generated", Toast.LENGTH_SHORT).show();
+
+//                            AlertDialog.Builder builder = new AlertDialog.Builder(InitiatePayoutForAdminNEFT.this);
+//                            builder.setTitle("Choose one option").setMessage("Choose one payout option\nGet payout after 2 to 4 hours (NEFT) \nGet Instant Payout (IMPS \u20b95 charge)")
+//                                    .setPositiveButton("Choose NEFT", (dialog, which) -> {
+//                                        new MakePayout().execute();
+//                                        fastDialog.show();
+//                                        dialog.dismiss();
+//                                    }).setNegativeButton("Choose IMPS", (dialog, which) -> {
+//                                        new MakePayoutIMPS().execute();
+//                                        fastDialog.show();
+//                                        dialog.dismiss();
+//                                    }).setNeutralButton("Exit", (dialog, which) -> dialog.dismiss()).create().show();
+                                                }
+                                            }).setNegativeButton("Wait", (dialogInterface, i) -> {
+
+                                            }).create();
+                                            alert.setView(linearLayout);
+                                            alert.show();
+                                            return;
+                                        }
+
+                                        RequestQueue requestQueue = Volley.newRequestQueue(InitiatePayoutForAdminNEFT.this);
+                                        JSONObject main = new JSONObject();
+                                        try{
+                                            main.put("to","/topics/"+"RequestPayout");
+                                            JSONObject notification = new JSONObject();
+                                            notification.put("title","New Payout Request");
+                                            notification.put("body","You have a new request to create payout. Check now");
+                                            main.put("notification",notification);
+
+                                            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, main, response -> {
+
+                                            }, error -> Toast.makeText(InitiatePayoutForAdminNEFT.this, error.getLocalizedMessage()+"null", Toast.LENGTH_SHORT).show()){
+                                                @Override
+                                                public Map<String, String> getHeaders() {
+                                                    Map<String,String> header = new HashMap<>();
+                                                    header.put("content-type","application/json");
+                                                    header.put("authorization","key=AAAAjq_WsHs:APA91bGZV-uH-NJddxIniy8h1tDGDHqxhgvFdyNRDaV_raxjvSM_FkKu7JSwtSp4Q_iSmPuTKGGIB2M_07c9rKgPXUH43-RzpK6zkaSaIaNgmeiwUO40rYxYUZAkKoLAQQVeVJ7mXboD");
+                                                    return header;
+                                                }
+                                            };
+
+                                            requestQueue.add(jsonObjectRequest);
+
+                                        }
+                                        catch (Exception e){
+                                            Toast.makeText(InitiatePayoutForAdminNEFT.this, e.getLocalizedMessage()+"null", Toast.LENGTH_SHORT).show();
+                                        }
+
+                                        Toast.makeText(InitiatePayoutForAdminNEFT.this, "Payout Request Generated", Toast.LENGTH_SHORT).show();
+                                        DatabaseReference requestPayout = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Payouts").child(auth.getUid());
+                                        HashMap<String,String> map = new HashMap<>();
+                                        SharedPreferences resInfo = getSharedPreferences("RestaurantInfo",MODE_PRIVATE);
+                                        map.put("amount",amount + "");
+                                        map.put("contactId",sharedPreferences.getString("contactID",""));
+                                        map.put("fundId",sharedPreferences.getString("fundId",""));
+                                        map.put("name",resInfo.getString("hotelName","") + ". Deduct 25 ruppe");
+                                        map.put("number",resInfo.getString("hotelNumber",""));
+                                        requestPayout.setValue(map);
+
+                                        new KAlertDialog(InitiatePayoutForAdminNEFT.this,KAlertDialog.SUCCESS_TYPE)
+                                                .setTitleText("Payout Request")
+                                                .setContentText("Payout will be initiated after request is verified by ordinalo")
+                                                .setConfirmText("Exit")
+                                                .setConfirmClickListener(clicks -> {
+                                                    clicks.dismissWithAnimation();
+                                                    finish();
+                                                }).show();
+                                    }
+                                }).setNegativeButton("Later", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                                    }
+                                }).create();
+                        builder.show();
                         return;
 //                        AlertDialog.Builder builder = new AlertDialog.Builder(InitiatePayoutForAdminNEFT.this);
 //                        builder.setTitle("Cooldown").setMessage("Cooldown period is active. You can initiate payout after cooldown period has ended")
@@ -264,7 +411,7 @@ public class InitiatePayoutForAdminNEFT extends AppCompatActivity {
                     }
                 }
 
-                if(amount > 30000D) {
+                if(amount > 25000) {
                     moreThan20 = true;
                     AlertDialog.Builder alert = new AlertDialog.Builder(InitiatePayoutForAdminNEFT.this);
                     alert.setTitle("Message").setMessage("You can initiate payout of amount less than \u20b930000 at a time. You can initiate again after a cooldown period of 6 hours");
@@ -276,8 +423,8 @@ public class InitiatePayoutForAdminNEFT extends AppCompatActivity {
                     linearLayout.addView(editText);
                     alert.setPositiveButton("Initiate Payout", (dialogInterface, i) -> {
                         dialogInterface.dismiss();
-                        if(Double.parseDouble(editText.getText().toString()) > 30000D)
-                            Toast.makeText(InitiatePayoutForAdminNEFT.this, "Amount Should be less than \u20b930000", Toast.LENGTH_SHORT).show();
+                        if(Double.parseDouble(editText.getText().toString()) > 25000D)
+                            Toast.makeText(InitiatePayoutForAdminNEFT.this, "Amount Should be less than \u20b925000", Toast.LENGTH_SHORT).show();
                         else{
                             enteredAmount = Double.parseDouble(editText.getText().toString());
                             if(enteredAmount > amount) {
