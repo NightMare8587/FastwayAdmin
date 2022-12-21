@@ -146,7 +146,8 @@ public class HomeScreen extends AppCompatActivity {
         }
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
-
+        SharedPreferences storeImages = getSharedPreferences("storeImages",MODE_PRIVATE);
+        SharedPreferences.Editor imageEdit = storeImages.edit();
 
         myEditor.apply();
         manager.beginTransaction().replace(R.id.homescreen,new HomeFrag()).commit();
@@ -184,6 +185,28 @@ public class HomeScreen extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError error) {
 
             }
+        });
+
+        AsyncTask.execute(() -> {
+            DatabaseReference checkRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("state","")).child(auth.getUid()).child("List of Dish");
+            checkRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                        for(DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()){
+                            if(!storeImages.contains(dataSnapshot1.getKey())){
+                                imageEdit.putString(dataSnapshot1.getKey(),dataSnapshot1.child("image").getValue(String.class));
+                            }
+                        }
+                        imageEdit.apply();
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
         });
 
         DatabaseReference adminCheck = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(UID);
