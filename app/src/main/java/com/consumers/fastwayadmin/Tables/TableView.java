@@ -21,6 +21,7 @@ import android.graphics.pdf.PdfDocument;
 import android.net.Uri;
 import android.os.Environment;
 import android.os.StrictMode;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -80,7 +81,7 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
     String URL = "https://fcm.googleapis.com/fcm/send";
     DatabaseReference reference;
     Context context;
-    FirebaseAuth auth;
+    FirebaseAuth auth = FirebaseAuth.getInstance();
     public TableView(List<String> tables,List<String> status,HashMap<String,List<String>> map,Context context,List<String> timeInMillis,List<String> timeOfBooking,List<String> timeOfUnavailability,List<String> seats){
         this.status = status;
         this.map = map;
@@ -293,6 +294,7 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
                         .setCancelClickListener(KAlertDialog::dismissWithAnimation)
                         .setConfirmText("Yes")
                         .setConfirmClickListener(kAlertDialog -> {
+
                             kAlertDialog.dismissWithAnimation();
                             AlertDialog.Builder alertD = new AlertDialog.Builder(view.getContext());
                             alertD.setTitle("Important");
@@ -319,14 +321,11 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
                                             JSONObject notification = new JSONObject();
                                             notification.put("title", "Reserved Table Cancelled");
                                             notification.put("click_action", "Table Frag");
-                                            notification.put("body", "Your Reserved Tables is cancelled by the owner\n" + editText.getText().toString() + "\n" + "You have been provided with 70% discount coupon which you can use on your next order :)");
+                                            notification.put("body", "Your Reserved Tables is cancelled by the owner\n" + editText.getText().toString() + "\n" + "You have been provided with a discount coupon which you can use on your next order :)");
                                             main.put("notification", notification);
                                             dialogInterface.dismiss();
-                                            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, main, new Response.Listener<JSONObject>() {
-                                                @Override
-                                                public void onResponse(JSONObject response) {
+                                            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, main, response -> {
 
-                                                }
                                             }, error -> Toast.makeText(view.getContext(), error.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show()) {
                                                 @Override
                                                 public Map<String, String> getHeaders() {
@@ -386,22 +385,79 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
 
                                         }
                                     });
-                                    FirebaseFirestore firestore = FirebaseFirestore.getInstance();
-                                    HashMap<String,String> myMap = new HashMap<>();
-                                    myMap.put("status","available");
-                                    myMap.put("tableNum",tables.get(position));
-                                    myMap.put("seats",seats.get(position));
-                                    firestore.collection(sharedPreferences.getString("state","")).document("Restaurants").collection(sharedPreferences.getString("locality","")).document(auth.getUid())
-                                            .collection("Tables").document(tables.get(position)).set(myMap);
-                                    reference.child(tables.get(position)).child("customerId").removeValue();
-                                    reference.child(tables.get(position)).child("status").setValue("available");
-                                    reference.child(tables.get(position)).child("time").removeValue();
-                                    reference.child(tables.get(position)).child("timeInMillis").removeValue();
-                                    reference.child(tables.get(position)).child("timeOfBooking").removeValue();
-                                    reference.child(tables.get(position)).child("time").removeValue();
-                                    holder.chatWith.setVisibility(View.INVISIBLE);
-                                    holder.cancel.setVisibility(View.INVISIBLE);
-                                    holder.status.setText("available");
+//                                    FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+//                                    HashMap<String,String> myMap = new HashMap<>();
+//                                    myMap.put("status","available");
+//                                    myMap.put("tableNum",tables.get(position));
+//                                    myMap.put("seats",seats.get(position));
+//                                    firestore.collection(sharedPreferences.getString("state","")).document("Restaurants").collection(sharedPreferences.getString("locality","")).document(auth.getUid())
+//                                            .collection("Tables").document(tables.get(position)).set(myMap);
+//                                    reference.child(tables.get(position)).child("customerId").removeValue();
+//                                    reference.child(tables.get(position)).child("status").setValue("available");
+//                                    reference.child(tables.get(position)).child("time").removeValue();
+//                                    reference.child(tables.get(position)).child("timeInMillis").removeValue();
+//                                    reference.child(tables.get(position)).child("timeOfBooking").removeValue();
+//                                    reference.child(tables.get(position)).child("time").removeValue();
+
+
+                                    DatabaseReference checkIfAnotherInQueue = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("state","")).child(auth.getUid())
+                                            .child("Tables").child(tables.get(position));
+                                    checkIfAnotherInQueue.child("nextReservation").limitToFirst(1).addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                            if(snapshot.exists()){
+                                                String timeInMillis = "",timeOfBook = "",custId = "",time1 = "";
+                                                for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                                                     timeInMillis = dataSnapshot.child("timeInMillis").getValue(String.class);
+                                                     timeOfBook = dataSnapshot.child("timeOfBooking").getValue(String.class);
+                                                     custId = dataSnapshot.child("customerId").getValue(String.class);
+                                                     time1 = dataSnapshot.child("time").getValue(String.class);
+                                                }
+
+                                                FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+                                                firestore.collection(sharedPreferences.getString("state","")).document("Restaurants").collection(sharedPreferences.getString("state","")).document(auth.getUid())
+                                                        .collection("Tables").document(tables.get(position))
+                                                        .update("timeInMillis",String.valueOf(timeInMillis),"timeOfBooking",String.valueOf(timeOfBook)
+                                                                ,"customerId",custId + "","status","Reserved","seats",seats.get(position));
+
+                                                reference.child(tables.get(position)).child("timeInMillis").setValue(String.valueOf(timeInMillis));
+                                                reference.child(tables.get(position)).child("timeOfBooking").setValue(String.valueOf(timeOfBook));
+                                                reference.child(tables.get(position)).child("customerId").setValue(custId);
+                                                reference.child(tables.get(position)).child("time").setValue(time1);
+                                                reference.child(tables.get(position)).child("status").setValue("Reserved");
+
+                                                holder.chatWith.setVisibility(View.VISIBLE);
+                                                holder.cancel.setVisibility(View.VISIBLE);
+                                                holder.status.setText("Reserved");
+
+                                                DatabaseReference delete = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("state","")).child(auth.getUid())
+                                                        .child("Tables").child(tables.get(position)).child("nextReservation").child(timeInMillis);
+                                                delete.removeValue();
+                                            }else{
+                                                FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+                                                HashMap<String,String> myMap = new HashMap<>();
+                                                myMap.put("status","available");
+                                                myMap.put("tableNum",tables.get(position));
+                                                myMap.put("seats",seats.get(position));
+                                                firestore.collection(sharedPreferences.getString("state","")).document("Restaurants").collection(sharedPreferences.getString("locality","")).document(auth.getUid())
+                                                        .collection("Tables").document(tables.get(position)).set(myMap);
+                                                reference.child(tables.get(position)).child("customerId").removeValue();
+                                                reference.child(tables.get(position)).child("status").setValue("available");
+                                                reference.child(tables.get(position)).child("time").removeValue();
+                                                reference.child(tables.get(position)).child("timeInMillis").removeValue();
+                                                reference.child(tables.get(position)).child("timeOfBooking").removeValue();
+                                                reference.child(tables.get(position)).child("time").removeValue();
+                                                holder.chatWith.setVisibility(View.INVISIBLE);
+                                                holder.cancel.setVisibility(View.INVISIBLE);
+                                                holder.status.setText("available");
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError error) {
+
+                                        }
+                                    });
 //                                    holder.timeOfReserved.setVisibility(View.INVISIBLE);
 
                                 }
@@ -639,6 +695,10 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
 
                                         }
                                     });
+
+
+
+
                                     reference.child(tables.get(position)).child("customerId").removeValue();
                                     reference.child(tables.get(position)).child("timeOfUnavailability").removeValue();
                                     reference.child(tables.get(position)).child("status").setValue("available");

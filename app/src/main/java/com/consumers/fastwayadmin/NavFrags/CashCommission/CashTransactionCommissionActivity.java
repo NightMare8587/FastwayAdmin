@@ -26,11 +26,8 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.consumers.fastwayadmin.HomeScreen.ReportSupport.RequestRefundClass;
-import com.consumers.fastwayadmin.NavFrags.FastwayPremiumActivites.FastwayPremiums;
 import com.consumers.fastwayadmin.R;
 import com.developer.kalert.KAlertDialog;
 import com.google.firebase.auth.FirebaseAuth;
@@ -41,11 +38,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.razorpay.Checkout;
 
-import org.json.JSONObject;
-
 import java.text.DecimalFormat;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 
 public class CashTransactionCommissionActivity extends AppCompatActivity {
@@ -70,8 +63,13 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
         totalCommission = findViewById(R.id.totalCommissionToBePaidByAdmin);
         seeBreakDown = findViewById(R.id.seeFeesBreakdownAdminAppCash);
         AsyncTask.execute(() -> {
+            String requestKey;
+            if(Objects.equals(auth.getUid(), "scfmpDeOKFMW0HNJps0F6T4A2j82"))
+                requestKey = getApiKeyTest;
+            else
+                requestKey = getApiKeyLive;
             RequestQueue requestQueue = Volley.newRequestQueue(CashTransactionCommissionActivity.this);
-            StringRequest stringRequest = new StringRequest(Request.Method.GET, getApiKeyLive, response -> runOnUiThread(() -> {
+            StringRequest stringRequest = new StringRequest(Request.Method.GET, requestKey, response -> runOnUiThread(() -> {
                 Checkout.preload(CashTransactionCommissionActivity.this);
 //                        Checkout checkout = new Cas();
                 // ...

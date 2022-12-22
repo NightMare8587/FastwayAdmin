@@ -46,6 +46,8 @@ public class FastwayPremiums extends AppCompatActivity {
     boolean gotKey = false;
     boolean freeTrial = false;
     String testKey;
+    SharedPreferences acc;
+    SharedPreferences.Editor acEdit;
     SharedPreferences.Editor premEdit;
     String getApiKeyTest = "https://intercellular-stabi.000webhostapp.com/razorpay/returnApiKey.php";
     String getApiKeyLive = "https://intercellular-stabi.000webhostapp.com/razorpay/returnLiveApiKey.php";
@@ -64,9 +66,16 @@ public class FastwayPremiums extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         sharedPreferences = getSharedPreferences("AdminPremiumDetails",MODE_PRIVATE);
         editor = sharedPreferences.edit();
+        acc = getSharedPreferences("loginInfo",MODE_PRIVATE);
+        acEdit = acc.edit();
         AsyncTask.execute(() -> {
+            String requestKey;
+            if(Objects.equals(auth.getUid(), "scfmpDeOKFMW0HNJps0F6T4A2j82"))
+                requestKey = getApiKeyTest;
+            else
+                requestKey = getApiKeyLive;
             RequestQueue requestQueue = Volley.newRequestQueue(FastwayPremiums.this);
-            StringRequest stringRequest = new StringRequest(Request.Method.GET, getApiKeyLive, response -> runOnUiThread(() -> {
+            StringRequest stringRequest = new StringRequest(Request.Method.GET, requestKey, response -> runOnUiThread(() -> {
                 Checkout.preload(FastwayPremiums.this);
 //                        Checkout checkout = new Checkout();
                 // ...
@@ -83,6 +92,33 @@ public class FastwayPremiums extends AppCompatActivity {
             });
             requestQueue.add(stringRequest);
         });
+
+
+        if(!acc.contains("number")) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(FastwayPremiums.this);
+            builder.setTitle("Contact").setMessage("You need to provide contact number for payment. No need to add +91");
+            LinearLayout linearLayout = new LinearLayout(FastwayPremiums.this);
+            linearLayout.setOrientation(LinearLayout.VERTICAL);
+            EditText editText = new EditText(FastwayPremiums.this);
+            editText.setInputType(InputType.TYPE_CLASS_NUMBER);
+            editText.setHint("Enter Number");
+            editText.setMaxLines(10);
+            linearLayout.addView(editText);
+            builder.setPositiveButton("Proceed", (dialog, which) -> {
+                dialog.dismiss();
+                if(editText.length() == 10)
+                {
+                    Toast.makeText(FastwayPremiums.this, "Number Saved Successfully", Toast.LENGTH_SHORT).show();
+                    acEdit.putString("number",editText.getText().toString());
+                    acEdit.apply();
+                }else
+                    Toast.makeText(FastwayPremiums.this, "Invalid Number", Toast.LENGTH_SHORT).show();
+            }).setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss()).create();
+            builder.setCancelable(false);
+            builder.setView(linearLayout);
+            builder.show();
+
+        }
 
 
         databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid()));
