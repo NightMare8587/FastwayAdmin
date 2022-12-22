@@ -1737,51 +1737,164 @@ public class HomeScreen extends AppCompatActivity {
                                         final String id = String.valueOf(dataSnapshot.child("customerId").getValue());
                                         int result = time.compareTo(String.valueOf(System.currentTimeMillis()));
                                         if (result < 0) {
-                                            assert tableNum != null;
-                                            databaseReference.child(tableNum).child("customerId").removeValue();
-                                            databaseReference.child(tableNum).child("time").removeValue();
-                                            databaseReference.child(tableNum).child("timeInMillis").removeValue();
-                                            databaseReference.child(tableNum).child("timeOfBooking").removeValue();
-                                            databaseReference.child(tableNum).child("status").setValue("available");
-                                            Toast.makeText(HomeScreen.this, "" + seats, Toast.LENGTH_SHORT).show();
-                                            HashMap<String,String> myMap = new HashMap<>();
-                                            myMap.put("status","available");
-                                            myMap.put("tableNum",tableNum);
-                                            myMap.put("seats",seats);
-                                            FirebaseFirestore firestore = FirebaseFirestore.getInstance();
-                                            firestore.collection(sharedPreferences.getString("state","")).document("Restaurants").collection(sharedPreferences.getString("locality","")).document(Objects.requireNonNull(auth.getUid()))
-                                                    .collection("Tables").document(tableNum).set(myMap);
 
-                                            DatabaseReference removeFromUser = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(id).child("Reserve Tables").child(UID);
-                                            removeFromUser.child(Objects.requireNonNull(dataSnapshot.getKey())).removeValue();
-                                            RequestQueue requestQueue = Volley.newRequestQueue(HomeScreen.this);
-                                            JSONObject main = new JSONObject();
-                                            try {
-                                                main.put("to", "/topics/" + id + "");
-                                                JSONObject notification = new JSONObject();
-                                                notification.put("title", "Cancelled");
-                                                notification.put("click_action", "Table Frag");
-                                                notification.put("body", "Your Reserved Tables is cancelled because you didn't make it on time");
-                                                main.put("notification", notification);
+                                            DatabaseReference checkForNextReservation = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(auth.getUid())
+                                                    .child("Tables").child(tableNum).child("nextReservation");
 
-                                                JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, main, response -> {
+                                            checkForNextReservation.limitToFirst(1).addListenerForSingleValueEvent(new ValueEventListener() {
+                                                @Override
+                                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                                    if(snapshot.exists()){
+                                                        for(DataSnapshot dataSnapshotMine : snapshot.getChildren()){
+                                                            FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+                                                            firestore.collection(sharedPreferences.getString("state","")).document("Restaurants").collection(sharedPreferences.getString("state","")).document(auth.getUid())
+                                                                    .collection("Tables").document(tableNum)
+                                                                    .update("timeInMillis",dataSnapshotMine.child("timeInMillis").getValue(String.class),"timeOfBooking",dataSnapshotMine.child("timeOfBooking").getValue(String.class)
+                                                                            ,"customerId",dataSnapshotMine.child("customerId").getValue(String.class) + "","status","Reserved","seats",seats);
+                                                            String storeVal = dataSnapshotMine.child("timeInMillis").getValue(String.class);
+                                                            databaseReference.child(tableNum).child("customerId").setValue(dataSnapshotMine.child("customerId").getValue(String.class));
+                                                            databaseReference.child(tableNum).child("time").setValue(dataSnapshotMine.child("time").getValue(String.class));
+                                                            databaseReference.child(tableNum).child("status").setValue("Reserved");
+                                                            databaseReference.child(tableNum).child("timeInMillis").setValue(dataSnapshotMine.child("timeInMillis").getValue(String.class));
+                                                            databaseReference.child(tableNum).child("timeOfBooking").setValue(dataSnapshotMine.child("timeOfBooking").getValue(String.class));
 
-                                                }, error -> {
+                                                            DatabaseReference removeFromUser = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(id).child("Reserve Tables").child(UID);
+                                                            removeFromUser.child(Objects.requireNonNull(dataSnapshot.getKey())).removeValue();
+                                                            RequestQueue requestQueue = Volley.newRequestQueue(HomeScreen.this);
+
+
+                                                            DatabaseReference checkForNextReservationDelete = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("locality","")).child(auth.getUid())
+                                                                    .child("Tables").child(tableNum).child("nextReservation");
+                                                            checkForNextReservationDelete.child(storeVal).removeValue();
+                                                            JSONObject main = new JSONObject();
+                                                            try {
+                                                                main.put("to", "/topics/" + id + "");
+                                                                JSONObject notification = new JSONObject();
+                                                                notification.put("title", "Cancelled");
+                                                                notification.put("click_action", "Table Frag");
+                                                                notification.put("body", "Your Reserved Tables is cancelled because you didn't make it on time");
+                                                                main.put("notification", notification);
+
+                                                                JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, main, response -> {
+
+                                                                }, error -> {
 //                                               Toast.makeText(, error.getLocalizedMessage()+"null", Toast.LENGTH_SHORT).show();
-                                                }) {
-                                                    @Override
-                                                    public Map<String, String> getHeaders() {
-                                                        Map<String, String> header = new HashMap<>();
-                                                        header.put("content-type", "application/json");
-                                                        header.put("authorization", "key=AAAAsigSEMs:APA91bEUF9ZFwIu84Jctci56DQd0TQOepztGOIKIBhoqf7N3ueQrkClw0xBTlWZEWyvwprXZmZgW2MNywF1pNBFpq1jFBr0CmlrJ0wygbZIBOnoZ0jP1zZC6nPxqF2MAP6iF3wuBHD2R");
-                                                        return header;
-                                                    }
-                                                };
+                                                                }) {
+                                                                    @Override
+                                                                    public Map<String, String> getHeaders() {
+                                                                        Map<String, String> header = new HashMap<>();
+                                                                        header.put("content-type", "application/json");
+                                                                        header.put("authorization", "key=AAAAjq_WsHs:APA91bGZV-uH-NJddxIniy8h1tDGDHqxhgvFdyNRDaV_raxjvSM_FkKu7JSwtSp4Q_iSmPuTKGGIB2M_07c9rKgPXUH43-RzpK6zkaSaIaNgmeiwUO40rYxYUZAkKoLAQQVeVJ7mXboD");
+                                                                        return header;
+                                                                    }
+                                                                };
 
-                                                requestQueue.add(jsonObjectRequest);
-                                            } catch (Exception e) {
-                                                Toast.makeText(HomeScreen.this, e.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
-                                            }
+                                                                requestQueue.add(jsonObjectRequest);
+                                                            } catch (Exception e) {
+                                                                Toast.makeText(HomeScreen.this, e.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
+                                                            }
+
+                                                        }
+                                                    }else {
+                                                        assert tableNum != null;
+                                                        databaseReference.child(tableNum).child("customerId").removeValue();
+                                                        databaseReference.child(tableNum).child("time").removeValue();
+                                                        databaseReference.child(tableNum).child("timeInMillis").removeValue();
+                                                        databaseReference.child(tableNum).child("timeOfBooking").removeValue();
+                                                        databaseReference.child(tableNum).child("status").setValue("available");
+                                                        Toast.makeText(HomeScreen.this, "" + seats, Toast.LENGTH_SHORT).show();
+                                                        HashMap<String,String> myMap = new HashMap<>();
+                                                        myMap.put("status","available");
+                                                        myMap.put("tableNum",tableNum);
+                                                        myMap.put("seats",seats);
+                                                        FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+                                                        firestore.collection(sharedPreferences.getString("state","")).document("Restaurants").collection(sharedPreferences.getString("locality","")).document(Objects.requireNonNull(auth.getUid()))
+                                                                .collection("Tables").document(tableNum).set(myMap);
+
+                                                        DatabaseReference removeFromUser = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(id).child("Reserve Tables").child(UID);
+                                                        removeFromUser.child(Objects.requireNonNull(dataSnapshot.getKey())).removeValue();
+                                                        RequestQueue requestQueue = Volley.newRequestQueue(HomeScreen.this);
+                                                        JSONObject main = new JSONObject();
+                                                        try {
+                                                            main.put("to", "/topics/" + id + "");
+                                                            JSONObject notification = new JSONObject();
+                                                            notification.put("title", "Cancelled");
+                                                            notification.put("click_action", "Table Frag");
+                                                            notification.put("body", "Your Reserved Tables is cancelled because you didn't make it on time");
+                                                            main.put("notification", notification);
+
+                                                            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, main, response -> {
+
+                                                            }, error -> {
+//                                               Toast.makeText(, error.getLocalizedMessage()+"null", Toast.LENGTH_SHORT).show();
+                                                            }) {
+                                                                @Override
+                                                                public Map<String, String> getHeaders() {
+                                                                    Map<String, String> header = new HashMap<>();
+                                                                    header.put("content-type", "application/json");
+                                                                    header.put("authorization", "key=AAAAjq_WsHs:APA91bGZV-uH-NJddxIniy8h1tDGDHqxhgvFdyNRDaV_raxjvSM_FkKu7JSwtSp4Q_iSmPuTKGGIB2M_07c9rKgPXUH43-RzpK6zkaSaIaNgmeiwUO40rYxYUZAkKoLAQQVeVJ7mXboD");
+                                                                    return header;
+                                                                }
+                                                            };
+
+                                                            requestQueue.add(jsonObjectRequest);
+                                                        } catch (Exception e) {
+                                                            Toast.makeText(HomeScreen.this, e.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
+                                                        }
+                                                    }
+                                                }
+
+                                                @Override
+                                                public void onCancelled(@NonNull DatabaseError error) {
+
+                                                }
+                                            });
+
+//                                            assert tableNum != null;
+//                                            databaseReference.child(tableNum).child("customerId").removeValue();
+//                                            databaseReference.child(tableNum).child("time").removeValue();
+//                                            databaseReference.child(tableNum).child("timeInMillis").removeValue();
+//                                            databaseReference.child(tableNum).child("timeOfBooking").removeValue();
+//                                            databaseReference.child(tableNum).child("status").setValue("available");
+//                                            Toast.makeText(HomeScreen.this, "" + seats, Toast.LENGTH_SHORT).show();
+//                                            HashMap<String,String> myMap = new HashMap<>();
+//                                            myMap.put("status","available");
+//                                            myMap.put("tableNum",tableNum);
+//                                            myMap.put("seats",seats);
+//                                            FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+//                                            firestore.collection(sharedPreferences.getString("state","")).document("Restaurants").collection(sharedPreferences.getString("locality","")).document(Objects.requireNonNull(auth.getUid()))
+//                                                    .collection("Tables").document(tableNum).set(myMap);
+//
+//                                            DatabaseReference removeFromUser = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(id).child("Reserve Tables").child(UID);
+//                                            removeFromUser.child(Objects.requireNonNull(dataSnapshot.getKey())).removeValue();
+//                                            RequestQueue requestQueue = Volley.newRequestQueue(HomeScreen.this);
+//                                            JSONObject main = new JSONObject();
+//                                            try {
+//                                                main.put("to", "/topics/" + id + "");
+//                                                JSONObject notification = new JSONObject();
+//                                                notification.put("title", "Cancelled");
+//                                                notification.put("click_action", "Table Frag");
+//                                                notification.put("body", "Your Reserved Tables is cancelled because you didn't make it on time");
+//                                                main.put("notification", notification);
+//
+//                                                JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, main, response -> {
+//
+//                                                }, error -> {
+////                                               Toast.makeText(, error.getLocalizedMessage()+"null", Toast.LENGTH_SHORT).show();
+//                                                }) {
+//                                                    @Override
+//                                                    public Map<String, String> getHeaders() {
+//                                                        Map<String, String> header = new HashMap<>();
+//                                                        header.put("content-type", "application/json");
+//                                                        header.put("authorization", "key=AAAAjq_WsHs:APA91bGZV-uH-NJddxIniy8h1tDGDHqxhgvFdyNRDaV_raxjvSM_FkKu7JSwtSp4Q_iSmPuTKGGIB2M_07c9rKgPXUH43-RzpK6zkaSaIaNgmeiwUO40rYxYUZAkKoLAQQVeVJ7mXboD");
+//                                                        return header;
+//                                                    }
+//                                                };
+//
+//                                                requestQueue.add(jsonObjectRequest);
+//                                            } catch (Exception e) {
+//                                                Toast.makeText(HomeScreen.this, e.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
+//                                            }
                                         }
                                     }
                                 }

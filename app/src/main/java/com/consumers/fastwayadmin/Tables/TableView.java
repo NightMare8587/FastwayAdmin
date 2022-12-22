@@ -25,10 +25,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -63,6 +66,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -1031,6 +1035,172 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
             }
 
             alertDialog.create().show();
+
+
+            if(status.get(position).equals("Reserved")){
+                List<String> allTimeMillis = new ArrayList<>();
+                List<String> allTimeBook = new ArrayList<>();
+                List<String> allUserId = new ArrayList<>();
+                List<String> allTime = new ArrayList<>();
+
+                allTimeMillis.add(timeInMillis.get(position));
+                allTimeBook.add(timeOfBooking.get(position));
+
+                List<String> myList = map.get(""+tables.get(position));
+                allUserId.add(myList.get(0));
+                allTime.add(myList.get(1));
+                SharedPreferences sharedPreferences1 = v.getContext().getSharedPreferences("loginInfo", MODE_PRIVATE);
+                DatabaseReference getDetailsMf = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences1.getString("state","")).child(sharedPreferences1.getString("state","")).child(auth.getUid()).child("Tables")
+                        .child(tables.get(position)).child("nextReservation");
+
+                getDetailsMf.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if(!snapshot.exists())
+                            return;
+                        for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                            allTimeMillis.add(dataSnapshot.getKey());
+                            allTimeBook.add(dataSnapshot.child("timeOfBooking").getValue(String.class));
+                            allUserId.add(dataSnapshot.child("customerId").getValue(String.class));
+                            allTime.add(dataSnapshot.child("time").getValue(String.class));
+                        }
+
+                        AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+                        builder.setTitle("All Bookings").setMessage("Below all the bookings are shown. Click on particular booking to show more options");
+                        LinearLayout linearLayout = new LinearLayout(v.getContext());
+                        ListView listView = new ListView(v.getContext());
+                        ArrayAdapter<String> adapter = new ArrayAdapter<>(v.getContext(), android.R.layout.simple_list_item_1,allTime);
+                        listView.setAdapter(adapter);
+                        linearLayout.setOrientation(LinearLayout.VERTICAL);
+                        linearLayout.addView(listView);
+
+                        builder.setView(linearLayout);
+                        AlertDialog dialog;
+
+                        listView.setOnItemClickListener((adapterView, view, i, l) -> {
+                            AlertDialog.Builder newBuild = new AlertDialog.Builder(v.getContext());
+                            newBuild.setTitle("Information").setMessage("Information about booking/reservation\nReservation Time: " + allTime.get(i) + "\nTime of Booking: " + allTimeBook.get(i))
+                                    .setPositiveButton("Cancel Reservation", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int ii) {
+                                            if(i != 0) {
+                                                dialogInterface.dismiss();
+                                                DatabaseReference cancelReser = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences1.getString("state", "")).child(sharedPreferences1.getString("state", "")).child(auth.getUid())
+                                                        .child("Tables").child(tables.get(position)).child("nextReservation");
+                                                cancelReser.child(timeInMillis.get(i)).removeValue();
+
+                                                DatabaseReference removeFromUser = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(allUserId.get(i)).child("Reserve Tables").child(auth.getUid());
+                                                removeFromUser.child(allTimeMillis.get(i)).removeValue();
+
+                                                Toast.makeText(v.getContext(), "Table Cancelled", Toast.LENGTH_SHORT).show();
+                                                RequestQueue requestQueue = Volley.newRequestQueue(view.getContext());
+                                                JSONObject main = new JSONObject();
+                                                try {
+
+                                                    assert myList != null;
+                                                    main.put("to", "/topics/" + allUserId.get(i) + "");
+                                                    JSONObject notification = new JSONObject();
+                                                    notification.put("title", "Table Cancelled");
+                                                    notification.put("click_action", "Table Frag");
+                                                    notification.put("body", "Your Tables is cancelled by the owner\nContact Restaurant for more info.");
+                                                    main.put("notification", notification);
+                                                    dialogInterface.dismiss();
+                                                    JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, main, response -> {
+
+                                                    }, error -> Toast.makeText(view.getContext(), error.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show()) {
+                                                        @Override
+                                                        public Map<String, String> getHeaders() {
+                                                            Map<String, String> header = new HashMap<>();
+                                                            header.put("content-type", "application/json");
+                                                            header.put("authorization", "key=AAAAjq_WsHs:APA91bGZV-uH-NJddxIniy8h1tDGDHqxhgvFdyNRDaV_raxjvSM_FkKu7JSwtSp4Q_iSmPuTKGGIB2M_07c9rKgPXUH43-RzpK6zkaSaIaNgmeiwUO40rYxYUZAkKoLAQQVeVJ7mXboD");
+                                                            return header;
+                                                        }
+                                                    };
+
+                                                    requestQueue.add(jsonObjectRequest);
+                                                } catch (Exception e) {
+                                                    Toast.makeText(view.getContext(), e.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
+                                                }
+                                            }else{
+                                                DatabaseReference cancelReser = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences1.getString("state", "")).child(sharedPreferences1.getString("state", "")).child(auth.getUid())
+                                                        .child("Tables");
+
+                                                DatabaseReference removeFromUser = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(allUserId.get(0)).child("Reserve Tables").child(auth.getUid());
+                                                removeFromUser.child(allTimeMillis.get(0)).removeValue();
+
+                                                FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+                                                firestore.collection(sharedPreferences1.getString("state","")).document("Restaurants").collection(sharedPreferences1.getString("state","")).document(auth.getUid())
+                                                        .collection("Tables").document(tables.get(position))
+                                                        .update("timeInMillis",allTimeMillis.get(1),"timeOfBooking",allTimeBook.get(1)
+                                                                ,"customerId",allUserId.get(1) + "","status","Reserved","seats",seats.get(position));
+
+                                                cancelReser.child(tables.get(position)).child("customerId").setValue(allUserId.get(1));
+                                                cancelReser.child(tables.get(position)).child("time").setValue(allTime.get(1));
+                                                cancelReser.child(tables.get(position)).child("timeInMillis").setValue(allTimeMillis.get(1));
+                                                cancelReser.child(tables.get(position)).child("timeOfBooking").setValue(allTimeBook.get(1));
+
+
+                                                cancelReser = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences1.getString("state", "")).child(sharedPreferences1.getString("state", "")).child(auth.getUid())
+                                                        .child("Tables").child(tables.get(position)).child("nextReservation");
+
+                                                cancelReser.child(allTimeMillis.get(1)).removeValue();
+
+                                                Toast.makeText(v.getContext(), "Table Cancelled", Toast.LENGTH_SHORT).show();
+                                                RequestQueue requestQueue = Volley.newRequestQueue(view.getContext());
+                                                JSONObject main = new JSONObject();
+                                                try {
+
+                                                    assert myList != null;
+                                                    main.put("to", "/topics/" + myList.get(0) + "");
+                                                    JSONObject notification = new JSONObject();
+                                                    notification.put("title", "Table Cancelled");
+                                                    notification.put("click_action", "Table Frag");
+                                                    notification.put("body", "Your Tables is cancelled by the owner\nContact Restaurant for more info.");
+                                                    main.put("notification", notification);
+                                                    dialogInterface.dismiss();
+                                                    JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, main, response -> {
+
+                                                    }, error -> Toast.makeText(view.getContext(), error.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show()) {
+                                                        @Override
+                                                        public Map<String, String> getHeaders() {
+                                                            Map<String, String> header = new HashMap<>();
+                                                            header.put("content-type", "application/json");
+                                                            header.put("authorization", "key=AAAAjq_WsHs:APA91bGZV-uH-NJddxIniy8h1tDGDHqxhgvFdyNRDaV_raxjvSM_FkKu7JSwtSp4Q_iSmPuTKGGIB2M_07c9rKgPXUH43-RzpK6zkaSaIaNgmeiwUO40rYxYUZAkKoLAQQVeVJ7mXboD");
+                                                            return header;
+                                                        }
+                                                    };
+
+                                                    requestQueue.add(jsonObjectRequest);
+                                                } catch (Exception e) {
+                                                    Toast.makeText(view.getContext(), e.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
+                                                }
+                                            }
+                                        }
+                                    }).setNegativeButton("Exit", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                            dialogInterface.dismiss();
+                                        }
+                                    }).create();
+                            newBuild.show();
+                        });
+                        builder.setPositiveButton("Exit", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialogInterface.dismiss();
+                            }
+                        });
+                        builder.create().show();
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+
+
+            }
         });
     }
 
