@@ -182,22 +182,82 @@ public class TableView extends RecyclerView.Adapter<TableView.TableAdapter> {
                                         Toast.makeText(view.getContext(), e.getLocalizedMessage() + "null", Toast.LENGTH_SHORT).show();
                                     }
 
-                                    reference.child(tables.get(position)).child("customerId").removeValue();
-                                    reference.child(tables.get(position)).child("timeOfUnavailability").removeValue();
-                                    reference.child(tables.get(position)).child("CurrentOrdersMade").removeValue();
-                                    reference.child(tables.get(position)).child("StoreOrdersCheckOut").removeValue();
-                                    reference.child(tables.get(position)).child("foodOrdered").removeValue();
-                                    reference.child(tables.get(position)).child("status").setValue("available");
-                                    reference.child(tables.get(position)).child("time").removeValue();
-                                    HashMap<String,String> myMap = new HashMap<>();
-                                    myMap.put("status","available");
-                                    myMap.put("tableNum",tables.get(position));
-                                    myMap.put("seats",seats.get(position));
-                                    firestore.collection(sharedPreferences.getString("state","")).document("Restaurants").collection(sharedPreferences.getString("locality","")).document(auth.getUid())
-                                                    .collection("Tables").document(tables.get(position)).set(myMap);
-                                    holder.chatWith.setVisibility(View.INVISIBLE);
-                                    holder.cancel.setVisibility(View.INVISIBLE);
-                                    holder.status.setText("available");
+                                    DatabaseReference checkIfAnotherInQueue = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("state","")).child(auth.getUid())
+                                            .child("Tables").child(tables.get(position));
+                                    checkIfAnotherInQueue.child("nextReservation").limitToFirst(1).addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                            if(snapshot.exists()){
+                                                String timeInMillis = "",timeOfBook = "",custId = "",time1 = "";
+                                                for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                                                    timeInMillis = dataSnapshot.child("timeInMillis").getValue(String.class);
+                                                    timeOfBook = dataSnapshot.child("timeOfBooking").getValue(String.class);
+                                                    custId = dataSnapshot.child("customerId").getValue(String.class);
+                                                    time1 = dataSnapshot.child("time").getValue(String.class);
+                                                }
+
+                                                FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+                                                firestore.collection(sharedPreferences.getString("state","")).document("Restaurants").collection(sharedPreferences.getString("state","")).document(auth.getUid())
+                                                        .collection("Tables").document(tables.get(position))
+                                                        .update("timeInMillis",String.valueOf(timeInMillis),"timeOfBooking",String.valueOf(timeOfBook)
+                                                                ,"customerId",custId + "","status","Reserved","seats",seats.get(position));
+
+                                                reference.child(tables.get(position)).child("timeInMillis").setValue(String.valueOf(timeInMillis));
+                                                reference.child(tables.get(position)).child("timeOfBooking").setValue(String.valueOf(timeOfBook));
+                                                reference.child(tables.get(position)).child("customerId").setValue(custId);
+                                                reference.child(tables.get(position)).child("time").setValue(time1);
+                                                reference.child(tables.get(position)).child("status").setValue("Reserved");
+
+                                                holder.chatWith.setVisibility(View.VISIBLE);
+                                                holder.cancel.setVisibility(View.VISIBLE);
+                                                holder.status.setText("Reserved");
+
+                                                DatabaseReference delete = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("state","")).child(auth.getUid())
+                                                        .child("Tables").child(tables.get(position)).child("nextReservation").child(timeInMillis);
+                                                delete.removeValue();
+                                            }else{
+                                                reference.child(tables.get(position)).child("customerId").removeValue();
+                                                reference.child(tables.get(position)).child("timeOfUnavailability").removeValue();
+                                                reference.child(tables.get(position)).child("CurrentOrdersMade").removeValue();
+                                                reference.child(tables.get(position)).child("StoreOrdersCheckOut").removeValue();
+                                                reference.child(tables.get(position)).child("foodOrdered").removeValue();
+                                                reference.child(tables.get(position)).child("status").setValue("available");
+                                                reference.child(tables.get(position)).child("time").removeValue();
+                                                HashMap<String,String> myMap = new HashMap<>();
+                                                myMap.put("status","available");
+                                                myMap.put("tableNum",tables.get(position));
+                                                myMap.put("seats",seats.get(position));
+                                                firestore.collection(sharedPreferences.getString("state","")).document("Restaurants").collection(sharedPreferences.getString("locality","")).document(auth.getUid())
+                                                        .collection("Tables").document(tables.get(position)).set(myMap);
+                                                holder.chatWith.setVisibility(View.INVISIBLE);
+                                                holder.cancel.setVisibility(View.INVISIBLE);
+                                                holder.status.setText("available");
+//                                                FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+//                                                HashMap<String,String> myMap = new HashMap<>();
+//                                                myMap.put("status","available");
+//                                                myMap.put("tableNum",tables.get(position));
+//                                                myMap.put("seats",seats.get(position));
+//                                                firestore.collection(sharedPreferences.getString("state","")).document("Restaurants").collection(sharedPreferences.getString("locality","")).document(auth.getUid())
+//                                                        .collection("Tables").document(tables.get(position)).set(myMap);
+//                                                reference.child(tables.get(position)).child("customerId").removeValue();
+//                                                reference.child(tables.get(position)).child("status").setValue("available");
+//                                                reference.child(tables.get(position)).child("time").removeValue();
+//                                                reference.child(tables.get(position)).child("timeInMillis").removeValue();
+//                                                reference.child(tables.get(position)).child("timeOfBooking").removeValue();
+//                                                reference.child(tables.get(position)).child("time").removeValue();
+//                                                holder.chatWith.setVisibility(View.INVISIBLE);
+//                                                holder.cancel.setVisibility(View.INVISIBLE);
+//                                                holder.status.setText("available");
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError error) {
+
+                                        }
+                                    });
+
+
 //                                    holder.timeOfReserved.setVisibility(View.INVISIBLE);
                                 }
                             });
