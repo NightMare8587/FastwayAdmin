@@ -28,6 +28,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.consumers.fastwayadmin.NavFrags.FastwayPremiumActivites.FastwayPremiums;
 import com.consumers.fastwayadmin.NavFrags.ResDishTracker.RecyclerClassView;
 import com.consumers.fastwayadmin.NavFrags.ResDishTracker.seeAllDishAnalysis;
+import com.consumers.fastwayadmin.NavFrags.ResEarningTracker.OrdersNotFromOrdinalo.OtherOrdersNotFromOrdinalo;
 import com.consumers.fastwayadmin.NavFrags.ResEarningTracker.RestaurantAnalysis.RestaurantEarningAnalysis;
 import com.consumers.fastwayadmin.R;
 import com.elconfidencial.bubbleshowcase.BubbleShowCase;
@@ -103,6 +104,7 @@ public class ResEarningTrackerActivity extends AppCompatActivity{
     Gson gson;
     TextView totalOrdersMade,totalTransactionsMade;
     String json;
+    TextView addOrdersNotMadeFromOrdinalo;
     Spinner spinner;
     List<String> prevYears = new ArrayList<>();
     TextView totalCustomers,oneTime,Recuuring;
@@ -124,6 +126,7 @@ public class ResEarningTrackerActivity extends AppCompatActivity{
         initialise();
         prevYears.add(String.valueOf(calendar.get(Calendar.YEAR)));
         totalCustomersTable = findViewById(R.id.totalCustomerInTableAquisition);
+        addOrdersNotMadeFromOrdinalo = findViewById(R.id.addOrdersNotMadeFromOrdinalo);
         SharedPreferences dishShared = getSharedPreferences("DishOrderedWithOthers",MODE_PRIVATE);
         tableRateLinear = findViewById(R.id.customerAquisitionRateLinearLayout);
         customerTableRecycler = findViewById(R.id.tableAquisitionRateRecyclerView);
@@ -184,6 +187,9 @@ public class ResEarningTrackerActivity extends AppCompatActivity{
         storeOrdersForAdminInfo = getSharedPreferences("StoreOrders",MODE_PRIVATE);
         totalOrdersMade = findViewById(R.id.totalOrdersMadeTextViewResTransactions);
         totalTransactionsMade = findViewById(R.id.totalTransactionAmountTextViewResTrans);
+        addOrdersNotMadeFromOrdinalo.setOnClickListener(click -> {
+            startActivity(new Intent(click.getContext(), OtherOrdersNotFromOrdinalo.class));
+        });
         String month = monthName[calendar.get(Calendar.MONTH)];
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false);
         java.lang.reflect.Type type = new TypeToken<List<List<String>>>() {
