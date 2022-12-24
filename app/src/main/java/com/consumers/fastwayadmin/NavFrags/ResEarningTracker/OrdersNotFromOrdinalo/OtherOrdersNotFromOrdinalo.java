@@ -1,13 +1,5 @@
 package com.consumers.fastwayadmin.NavFrags.ResEarningTracker.OrdersNotFromOrdinalo;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -22,12 +14,23 @@ import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.Toast;
 
-import com.consumers.fastwayadmin.NavFrags.CurrentTakeAwayOrders.ApproveCurrentTakeAway;
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.consumers.fastwayadmin.R;
 import com.google.common.reflect.TypeToken;
 import com.google.firebase.auth.FirebaseAuth;
@@ -62,6 +65,7 @@ public class OtherOrdersNotFromOrdinalo extends AppCompatActivity {
     RecyclerView recyclerView;
     Button button;
     List<String> dishName = new ArrayList<>();
+    Button seeAllDishAdded;
     String json;
     String month;
     List<String> dishImage = new ArrayList<>();
@@ -90,9 +94,10 @@ public class OtherOrdersNotFromOrdinalo extends AppCompatActivity {
         recyclerView = findViewById(R.id.recyclerViewhDish);
         button = findViewById(R.id.proceedToAddOrders);
         recyclerView.setLayoutManager(new LinearLayoutManager(OtherOrdersNotFromOrdinalo.this));
-
+        seeAllDishAdded = findViewById(R.id.seeAllAddedDishOrders);
         databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(loginInfo.getString("state","")).child(loginInfo.getString("state","")).child(Objects.requireNonNull(auth.getUid())).child("List of Dish");
-
+        LocalBroadcastManager.getInstance(OtherOrdersNotFromOrdinalo.this).registerReceiver(mMessageReceiver,
+                new IntentFilter("sendback-dishdetails"));
         searchDishName.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -101,12 +106,17 @@ public class OtherOrdersNotFromOrdinalo extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                dishName.clear();
+                dishType.clear();
+                dishImage.clear();
+                menuType.clear();
                 String s = charSequence.toString().toLowerCase(Locale.ROOT);
                 if(s.equals("")) {
                     dishName.clear();
                     menuType.clear();
                     dishImage.clear();
                     dishType.clear();
+                    seeAllDishAdded.setVisibility(View.INVISIBLE);
                     recyclerView.setAdapter(new recyclerOrderAdp(dishName,dishImage,dishType,menuType));
                     return;
                 }
@@ -116,12 +126,12 @@ public class OtherOrdersNotFromOrdinalo extends AppCompatActivity {
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         if(snapshot.exists()){
                             dishName.clear();
-                            menuType.clear();
-                            dishImage.clear();
                             dishType.clear();
+                            dishImage.clear();
+                            menuType.clear();
                             for(DataSnapshot dataSnapshot : snapshot.getChildren()){
                                 for(DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()){
-                                    if(dataSnapshot1.getKey().toLowerCase(Locale.ROOT).contains(s)){
+                                    if(Objects.requireNonNull(dataSnapshot1.getKey()).toLowerCase(Locale.ROOT).contains(s)){
                                         dishName.add(dataSnapshot1.getKey());
                                         dishImage.add(dataSnapshot1.child("image").getValue(String.class));
                                         dishType.add(dataSnapshot1.child("dishType").getValue(String.class));
@@ -133,9 +143,9 @@ public class OtherOrdersNotFromOrdinalo extends AppCompatActivity {
                                 }
                             }
 
+                            Log.i("infoDish",dishName.toString());
                             recyclerView.setAdapter(new recyclerOrderAdp(dishName,dishImage,dishType,menuType));
-                            LocalBroadcastManager.getInstance(OtherOrdersNotFromOrdinalo.this).registerReceiver(mMessageReceiver,
-                                    new IntentFilter("sendback-dishdetails"));
+
                         }
                     }
 
@@ -150,6 +160,43 @@ public class OtherOrdersNotFromOrdinalo extends AppCompatActivity {
             public void afterTextChanged(Editable editable) {
 
             }
+        });
+
+        seeAllDishAdded.setOnClickListener(click -> {
+            AlertDialog.Builder builder = new AlertDialog.Builder(OtherOrdersNotFromOrdinalo.this);
+            builder.setTitle("List of dish").setMessage("Below are the dish added. Click on dish to remove them")
+                    .setPositiveButton("Exit", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.dismiss();
+                        }
+                    });
+            LinearLayout linearLayout = new LinearLayout(OtherOrdersNotFromOrdinalo.this);
+            linearLayout.setOrientation(LinearLayout.VERTICAL);
+            ListView listView = new ListView(OtherOrdersNotFromOrdinalo.this);
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(OtherOrdersNotFromOrdinalo.this, android.R.layout.simple_list_item_1,selectedDishName);
+            listView.setAdapter(adapter);
+
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                    Toast.makeText(OtherOrdersNotFromOrdinalo.this, "Dish Removed :)", Toast.LENGTH_SHORT).show();
+                    selectedDishImage.remove(i);
+                    selectedDishName.remove(i);
+                    selectedDishMenuType.remove(i);
+                    selectedDishType.remove(i);
+
+                    adapter.notifyDataSetChanged();
+
+                    if(selectedDishName.size() == 0) {
+                        seeAllDishAdded.setVisibility(View.INVISIBLE);
+                    }
+                }
+            });
+            linearLayout.addView(listView);
+            builder.setView(linearLayout);
+            builder.create().show();
+
         });
 
         button.setOnClickListener(click -> {
@@ -546,10 +593,12 @@ public class OtherOrdersNotFromOrdinalo extends AppCompatActivity {
         @SuppressLint("SetTextI18n")
         @Override
         public void onReceive(Context context, Intent intent) {
+            Log.i("infoY",intent.getStringExtra("dishName"));
             selectedDishName.add(intent.getStringExtra("dishName"));
             selectedDishImage.add(intent.getStringExtra("dishImage"));
             selectedDishMenuType.add(intent.getStringExtra("menuType"));
             selectedDishType.add(intent.getStringExtra("dishType"));
+            seeAllDishAdded.setVisibility(View.VISIBLE);
         }
     };
 }
