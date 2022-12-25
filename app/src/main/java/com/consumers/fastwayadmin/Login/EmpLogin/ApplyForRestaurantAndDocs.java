@@ -25,6 +25,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 public class ApplyForRestaurantAndDocs extends AppCompatActivity {
     EditText editText;
@@ -51,7 +52,7 @@ public class ApplyForRestaurantAndDocs extends AppCompatActivity {
             finish();
             return;
         }
-        checkIfApproved = FirebaseDatabase.getInstance().getReference().getRoot().child("EmployeeDB").child(auth.getUid()).child("ResDetails");
+        checkIfApproved = FirebaseDatabase.getInstance().getReference().getRoot().child("EmployeeDB").child(Objects.requireNonNull(auth.getUid())).child("ResDetails");
         checkIfApproved.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -64,7 +65,6 @@ public class ApplyForRestaurantAndDocs extends AppCompatActivity {
 
                     startActivity(new Intent(ApplyForRestaurantAndDocs.this, HomeScreenEMP.class));
                     finish();
-                    return;
                 }
             }
 
@@ -84,6 +84,10 @@ public class ApplyForRestaurantAndDocs extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                resID.clear();
+                name.clear();
+                resImage.clear();
+                address.clear();
                 if(charSequence.length() == 0){
                     resID.clear();
                     name.clear();

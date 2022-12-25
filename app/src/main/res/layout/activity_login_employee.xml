@@ -31,7 +31,7 @@
         android:layout_marginStart="10dp"
         android:layout_marginTop="13dp"
         android:layout_marginEnd="10dp"
-        app:layout_constraintEnd_toStartOf="@+id/phoneNumber"
+        app:layout_constraintEnd_toStartOf="@+id/phoneNumberEmp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/nameLoginEmp" />
 
@@ -62,7 +62,7 @@
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/phoneNumber" />
+        app:layout_constraintTop_toBottomOf="@+id/phoneNumberEmp" />
 
     <TextView
         android:id="@+id/textClicktoReadTermsAndCOnditionsEmp"
@@ -86,7 +86,7 @@
         android:layout_marginStart="35dp"
         android:layout_marginTop="41dp"
         android:layout_marginEnd="35dp"
-        android:text="Login As Employee"
+        android:text="Login As Admin"
         android:textAlignment="center"
         android:textColor="#334757"
         android:textSize="19sp"

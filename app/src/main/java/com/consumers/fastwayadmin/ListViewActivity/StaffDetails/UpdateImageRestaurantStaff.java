@@ -65,7 +65,7 @@ public class UpdateImageRestaurantStaff extends AppCompatActivity {
                 dialogInterface.dismiss();
                 Intent intent = new Intent();
                 intent.setType("image/*");
-                intent.setAction(Intent.ACTION_GET_CONTENT);
+                intent.setAction("android.intent.action.PICK");
                 startActivityForResult(Intent.createChooser(intent, "Select Picture"), 4);
 
             }
@@ -116,24 +116,18 @@ public class UpdateImageRestaurantStaff extends AppCompatActivity {
             }
             try {
                 StorageReference reference = storageReference.child(auth.getUid() + "/" + "Staff" + "/"  + currentString);
-                reference.putFile(Uri.fromFile(file)).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-                        StorageReference reference = storageReference.child(auth.getUid() + "/" + "Staff" + "/"  + currentString);
-                        reference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                            @Override
-                            public void onSuccess(@NonNull Uri uri) {
-                                Toast.makeText(UpdateImageRestaurantStaff.this, "Upload Complete and image saved in phone successfully", Toast.LENGTH_SHORT).show();
-                                loading.dismiss();
+                reference.putFile(Uri.fromFile(file)).addOnCompleteListener(task -> {
+                    StorageReference reference1 = storageReference.child(auth.getUid() + "/" + "Staff" + "/"  + currentString);
+                    reference1.getDownloadUrl().addOnSuccessListener(uri -> {
+                        Toast.makeText(UpdateImageRestaurantStaff.this, "Upload Complete and image saved in phone successfully", Toast.LENGTH_SHORT).show();
+                        loading.dismiss();
 
-                                DatabaseReference dish = FirebaseDatabase.getInstance().getReference().getRoot();
+                        DatabaseReference dish = FirebaseDatabase.getInstance().getReference().getRoot();
 
-                                dish.child("Admin").child(Objects.requireNonNull(auth.getUid())).child("Restaurant Staff").child(currentUUID).child("image").setValue(uri + "");
-                                finish();
-                            }
-                        });
+                        dish.child("Admin").child(Objects.requireNonNull(auth.getUid())).child("Registered Staff").child(currentUUID).child("image").setValue(uri + "");
+                        finish();
+                    });
 
-                    }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
@@ -167,7 +161,7 @@ public class UpdateImageRestaurantStaff extends AppCompatActivity {
                                 Toast.makeText(UpdateImageRestaurantStaff.this, "Upload Complete and image saved in phone successfully", Toast.LENGTH_SHORT).show();
                                 loading.dismiss();
                                 DatabaseReference dish = FirebaseDatabase.getInstance().getReference().getRoot();
-                                dish.child("Admin").child(Objects.requireNonNull(auth.getUid())).child("Restaurant Staff").child(currentUUID).child("image").setValue(uri + "");
+                                dish.child("Admin").child(Objects.requireNonNull(auth.getUid())).child("Registered Staff").child(currentUUID).child("image").setValue(uri + "");
                                 finish();
                             }
                         });

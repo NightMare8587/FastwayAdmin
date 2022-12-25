@@ -63,6 +63,9 @@ public class RestaurantStaff extends AppCompatActivity {
     List<String> name = new ArrayList<>();
     List<String> image = new ArrayList<>();
     List<String> UUIDs = new ArrayList<>();
+    List<String> rname = new ArrayList<>();
+    List<String> Rimage = new ArrayList<>();
+    List<String> rUUIDs = new ArrayList<>();
     Bitmap bitmap;
     OutputStream outputStream;
     String currentUUID;
@@ -73,8 +76,10 @@ public class RestaurantStaff extends AppCompatActivity {
     RecyclerView recyclerView;
     StorageReference storageReference;
     String currentString = "";
+    RecyclerView registeredRecycler;
     Uri filePath;
     FirebaseStorage storage;
+    DatabaseReference registeredRef;
     Button addStaff;
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -85,9 +90,12 @@ public class RestaurantStaff extends AppCompatActivity {
         checkPermissions();
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
-        addStaff = findViewById(R.id.addRestaurantStaffDetails);
+        registeredRecycler = findViewById(R.id.alreadyRegisteredStaffRcyclerView);
+        registeredRecycler.setLayoutManager(new LinearLayoutManager(this));
+//        addStaff = findViewById(R.id.addRestaurantStaffDetails);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid())).child("Restaurant Staff");
+        registeredRef = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid())).child("Registered Staff");
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -104,6 +112,38 @@ public class RestaurantStaff extends AppCompatActivity {
                 }else
                 {
                     Toast.makeText(RestaurantStaff.this, "Add Staff Details", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        registeredRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists()){
+                    rUUIDs.clear();
+                    rname.clear();
+                    Rimage.clear();
+                    for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                        rUUIDs.add(String.valueOf(dataSnapshot.getKey()));
+                        rname.add(String.valueOf(dataSnapshot.child("name").getValue()));
+                        if(dataSnapshot.hasChild("image"))
+                            Rimage.add(String.valueOf(dataSnapshot.child("image").getValue()));
+                        else
+                            Rimage.add("");
+                    }
+                    registeredRecycler.setAdapter(new registeredStaffRecycler(rname,Rimage,rUUIDs,RestaurantStaff.this));
+                }else
+                {
+                    Rimage.clear();
+                    rname.clear();
+                    rUUIDs.clear();
+                    isBankAvailable.clear();
+                    registeredRecycler.setAdapter(new registeredStaffRecycler(rname,Rimage,rUUIDs,RestaurantStaff.this));
                 }
             }
 
@@ -140,66 +180,129 @@ public class RestaurantStaff extends AppCompatActivity {
             }
         });
 
-        addStaff.setOnClickListener(new View.OnClickListener() {
+        registeredRef.addChildEventListener(new ChildEventListener() {
             @Override
-            public void onClick(View view) {
-                AlertDialog.Builder alert = new AlertDialog.Builder(RestaurantStaff.this);
-                alert.setTitle("Dialog");
-                alert.setMessage("Add Name in below field");
-                LinearLayout linearLayout = new LinearLayout(RestaurantStaff.this);
-                linearLayout.setOrientation(LinearLayout.VERTICAL);
-                EditText editText = new EditText(RestaurantStaff.this);
-                editText.setHint("Enter Name Here");
-                editText.setMaxLines(100);
-                alert.setPositiveButton("Add Name", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        if(!editText.getText().toString().equals("")) {
-                            dialogInterface.dismiss();
-                            currentString = editText.getText().toString();
-                            currentUUID = String.valueOf(UUID.randomUUID());
-                            DatabaseReference addStaff = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid()).child("Restaurant Staff");
-                            addStaff.child(currentUUID).child("name").setValue(editText.getText().toString());
-                            AlertDialog.Builder builder = new AlertDialog.Builder(RestaurantStaff.this);
-                            builder.setTitle("Add Image").setMessage("Do you wanna image of your staff\n\nYou can also add image later").setPositiveButton("Choose From Gallery", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    dialogInterface.dismiss();
-                                    Intent intent = new Intent();
-                                    intent.setType("image/*");
-                                    intent.setAction(Intent.ACTION_GET_CONTENT);
-                                    startActivityForResult(Intent.createChooser(intent, "Select Picture"), 4);
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                RupdateChild();
+            }
 
-                                }
-                            }).setNegativeButton("Take Photo", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    dialogInterface.dismiss();
-                                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE); //IMAGE CAPTURE CODE
-                                    startActivityForResult(intent, 22);
-                                }
-                            }).setNeutralButton("Not Now", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    dialogInterface.dismiss();
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                RupdateChild();
+            }
 
-                                }
-                            }).create();
-                            builder.show();
-                        }else
-                            Toast.makeText(RestaurantStaff.this, "Field can't be empty", Toast.LENGTH_SHORT).show();
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+                RupdateChild();
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+//        addStaff.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                AlertDialog.Builder alert = new AlertDialog.Builder(RestaurantStaff.this);
+//                alert.setTitle("Dialog");
+//                alert.setMessage("Add Name in below field");
+//                LinearLayout linearLayout = new LinearLayout(RestaurantStaff.this);
+//                linearLayout.setOrientation(LinearLayout.VERTICAL);
+//                EditText editText = new EditText(RestaurantStaff.this);
+//                editText.setHint("Enter Name Here");
+//                editText.setMaxLines(100);
+//                alert.setPositiveButton("Add Name", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialogInterface, int i) {
+//                        if(!editText.getText().toString().equals("")) {
+//                            dialogInterface.dismiss();
+//                            currentString = editText.getText().toString();
+//                            currentUUID = String.valueOf(UUID.randomUUID());
+//                            DatabaseReference addStaff = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid()).child("Restaurant Staff");
+//                            addStaff.child(currentUUID).child("name").setValue(editText.getText().toString());
+//                            AlertDialog.Builder builder = new AlertDialog.Builder(RestaurantStaff.this);
+//                            builder.setTitle("Add Image").setMessage("Do you wanna image of your staff\n\nYou can also add image later").setPositiveButton("Choose From Gallery", new DialogInterface.OnClickListener() {
+//                                @Override
+//                                public void onClick(DialogInterface dialogInterface, int i) {
+//                                    dialogInterface.dismiss();
+//                                    Intent intent = new Intent();
+//                                    intent.setType("image/*");
+//                                    intent.setAction(Intent.ACTION_GET_CONTENT);
+//                                    startActivityForResult(Intent.createChooser(intent, "Select Picture"), 4);
+//
+//                                }
+//                            }).setNegativeButton("Take Photo", new DialogInterface.OnClickListener() {
+//                                @Override
+//                                public void onClick(DialogInterface dialogInterface, int i) {
+//                                    dialogInterface.dismiss();
+//                                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE); //IMAGE CAPTURE CODE
+//                                    startActivityForResult(intent, 22);
+//                                }
+//                            }).setNeutralButton("Not Now", new DialogInterface.OnClickListener() {
+//                                @Override
+//                                public void onClick(DialogInterface dialogInterface, int i) {
+//                                    dialogInterface.dismiss();
+//
+//                                }
+//                            }).create();
+//                            builder.show();
+//                        }else
+//                            Toast.makeText(RestaurantStaff.this, "Field can't be empty", Toast.LENGTH_SHORT).show();
+//                    }
+//                }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialogInterface, int i) {
+//                        dialogInterface.dismiss();
+//                        Toast.makeText(RestaurantStaff.this, "Cancelled", Toast.LENGTH_SHORT).show();
+//                    }
+//                });
+//                linearLayout.addView(editText);
+//                alert.setView(linearLayout);
+//                alert.create();
+//                alert.show();
+//            }
+//        });
+    }
+
+    private void RupdateChild() {
+        registeredRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists()){
+                    Rimage.clear();
+                    rname.clear();
+                    rUUIDs.clear();
+                    isBankAvailable.clear();
+                    for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                        rUUIDs.add(String.valueOf(dataSnapshot.getKey()));
+                        rname.add(String.valueOf(dataSnapshot.child("name").getValue()));
+                        if(dataSnapshot.hasChild("image"))
+                            Rimage.add(String.valueOf(dataSnapshot.child("image").getValue()));
+                        else
+                            Rimage.add("");
                     }
-                }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                        Toast.makeText(RestaurantStaff.this, "Cancelled", Toast.LENGTH_SHORT).show();
-                    }
-                });
-                linearLayout.addView(editText);
-                alert.setView(linearLayout);
-                alert.create();
-                alert.show();
+                    registeredRecycler.setAdapter(new registeredStaffRecycler(rname,Rimage,rUUIDs,RestaurantStaff.this));
+                }else
+                {
+                    Toast.makeText(RestaurantStaff.this, "Add Staff Details", Toast.LENGTH_SHORT).show();
+                    Rimage.clear();
+                    rname.clear();
+                    rUUIDs.clear();
+                    isBankAvailable.clear();
+                    registeredRecycler.setAdapter(new registeredStaffRecycler(rname,Rimage,rUUIDs,RestaurantStaff.this));
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
             }
         });
     }
@@ -216,12 +319,19 @@ public class RestaurantStaff extends AppCompatActivity {
                     for(DataSnapshot dataSnapshot : snapshot.getChildren()){
                         UUIDs.add(String.valueOf(dataSnapshot.getKey()));
                         name.add(String.valueOf(dataSnapshot.child("name").getValue()));
+                        if(dataSnapshot.hasChild("image"))
                         image.add(String.valueOf(dataSnapshot.child("image").getValue()));
+                        else
+                            image.add("");
                     }
                     recyclerView.setAdapter(new StaffAdapter(name,image,RestaurantStaff.this,UUIDs));
                 }else
                 {
-                    Toast.makeText(RestaurantStaff.this, "Add Staff Details", Toast.LENGTH_SHORT).show();
+                    image.clear();
+                    name.clear();
+                    UUIDs.clear();
+                    isBankAvailable.clear();
+                    recyclerView.setAdapter(new StaffAdapter(name,image,RestaurantStaff.this,UUIDs));
                 }
             }
 

@@ -26,6 +26,7 @@ import com.google.firebase.auth.PhoneAuthProvider;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.hbb20.CountryCodePicker;
@@ -68,9 +69,10 @@ public class LoginEmployeeActivity extends AppCompatActivity {
         phoneNumber = findViewById(R.id.phoneNumberEmp);
         loginInfo = getSharedPreferences("loginInfo",MODE_PRIVATE);
         editor = loginInfo.edit();
-        ccp = findViewById(R.id.ccp);
+        ccp = findViewById(R.id.ccpEmp);
         startVerification = findViewById(R.id.startVerificationEmp);
         termsAndCon = findViewById(R.id.textClicktoReadTermsAndCOnditionsEmp);
+        reference = FirebaseDatabase.getInstance().getReference().getRoot();
         login.setOnClickListener(click -> {
             startActivity(new Intent(LoginEmployeeActivity.this, MainActivity.class));
             finish();

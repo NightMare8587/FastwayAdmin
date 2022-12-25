@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,6 +28,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -55,114 +57,32 @@ public class StaffAdapter extends RecyclerView.Adapter<StaffAdapter.Holder> {
     @Override
     public void onBindViewHolder(@NonNull Holder holder, @SuppressLint("RecyclerView") int position) {
         holder.name.setText(name.get(position));
-        holder.cardView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
-                builder.setTitle("Dialog").setMessage("Choose one option")
-                        .setPositiveButton("Add/Update Bank Details", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                dialogInterface.dismiss();
-                                AlertDialog.Builder alert = new AlertDialog.Builder(context);
-                                alert.setTitle("Bank Details").setMessage("Do wanna add bank details of your staff\nIf customer wanna report something or give tip to your staff")
-                                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialogInterface, int i) {
-                                                dialogInterface.dismiss();
-                                                AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                                                builder.setTitle("Add Details").setMessage("Add Details Below");
-                                                LinearLayout linearLayout = new LinearLayout(context);
-                                                linearLayout.setOrientation(LinearLayout.VERTICAL);
-                                                EditText holderAccountNumber = new EditText(context);
-                                                holderAccountNumber.setHint("Enter Account number here");
-                                                holderAccountNumber.setMaxLines(100);
-                                                holderAccountNumber.setInputType(InputType.TYPE_CLASS_NUMBER);
-
-                                                EditText holderAccountIFSC = new EditText(context);
-                                                holderAccountIFSC.setHint("Enter IFSC code here");
-                                                holderAccountIFSC.setMaxLines(100);
-
-                                                EditText holderName = new EditText(context);
-                                                holderName.setHint("Enter Holder Name here");
-
-                                                linearLayout.addView(holderAccountNumber);
-                                                linearLayout.addView(holderAccountIFSC);
-                                                linearLayout.addView(holderName);
-                                                builder.setView(linearLayout);
-                                                builder.setPositiveButton("Add Details", new DialogInterface.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(DialogInterface dialogInterface, int i) {
-                                                        dialogInterface.dismiss();
-                                                        if(holderAccountNumber.getText().toString().equals("")){
-                                                            holderAccountNumber.requestFocus();
-                                                            holderAccountNumber.setError("Field can't be empty");
-                                                            Toast.makeText(context, "Wrong Input", Toast.LENGTH_SHORT).show();
-                                                            return;
-                                                        }
-
-                                                        if(holderAccountIFSC.getText().toString().equals("")){
-                                                            holderAccountIFSC.requestFocus();
-                                                            Toast.makeText(context, "Wrong Input", Toast.LENGTH_SHORT).show();
-                                                            holderAccountIFSC.setError("Field can't be empty");
-                                                            return;
-                                                        }
-
-                                                        if(holderAccountIFSC.getText().toString().length() != 11){
-                                                            holderAccountIFSC.requestFocus();
-                                                            Toast.makeText(context, "Wrong Input Add 11 digit IFSC", Toast.LENGTH_SHORT).show();
-                                                            holderAccountIFSC.setError("Invalid IFSC code (11 digit)");
-                                                            return;
-                                                        }
-
-                                                        if(holderName.getText().toString().equals("")){
-                                                            holderName.requestFocus();
-                                                            Toast.makeText(context, "Wrong Input", Toast.LENGTH_SHORT).show();
-                                                            holderName.setError("Field can't be empty");
-                                                            return;
-                                                        }
-
-                                                        DatabaseReference addBank = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid())).child("Restaurant Staff").child(UUID.get(position));
-                                                        addBank.child("Bank Details").child("accountNumber").setValue(holderAccountNumber.getText().toString());
-                                                        addBank.child("Bank Details").child("accountIFSC").setValue(holderAccountIFSC.getText().toString());
-                                                        addBank.child("Bank Details").child("accountName").setValue(holderName.getText().toString());
-
-                                                        Toast.makeText(context, "Details Added Successfully", Toast.LENGTH_SHORT).show();
-
-                                                    }
-                                                }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(DialogInterface dialogInterface, int i) {
-                                                        dialogInterface.dismiss();
-                                                    }
-                                                }).create();
-
-                                            }
-                                        }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialogInterface, int i) {
-                                        dialogInterface.dismiss();
-                                    }
-                                }).create();
-                                alert.show();
-                            }
-                        }).setNegativeButton("Add/update image", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
+        holder.cardView.setOnClickListener(view -> {
+            AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
+            builder.setTitle("Dialog").setMessage("Approve this new staff ?")
+                    .setPositiveButton("Yes Approve", (dialogInterface, i) -> {
                         dialogInterface.dismiss();
-                        Intent intent = new Intent(view.getContext(),UpdateImageRestaurantStaff.class);
-                        intent.putExtra("uuid",UUID.get(position) + "");
-                        intent.putExtra("name",name.get(position) + "");
-                        view.getContext().startActivity(intent);
-                    }
-                }).setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
+                        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid()).child("Registered Staff").child(UUID.get(position));
+                        databaseReference.child("name").setValue(name.get(position));
+                         databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid()).child("Restaurant Staff").child(UUID.get(position));
+                         databaseReference.removeValue();
+
+                        SharedPreferences resInfo = view.getContext().getSharedPreferences("RestaurantInfo",Context.MODE_PRIVATE);
+                        HashMap<String,String> map = new HashMap<>();
+                        map.put("resName",resInfo.getString("hotelName",""));
+                        map.put("resAddress",resInfo.getString("hotelAddress",""));
+                        map.put("resContact",resInfo.getString("hotelNumber",""));
+
+                        databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("EmployeeDB").child(UUID.get(position)).child("ResDetails");
+                        databaseReference.setValue(map);
+                        Toast.makeText(context, "New Staff Added", Toast.LENGTH_SHORT).show();
+                    }).setNeutralButton("No, Remove", (dialogInterface, i) -> {
                         dialogInterface.dismiss();
-                    }
-                });
-                builder.create().show();
-            }
+                        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid()).child("Restaurant Staff").child(UUID.get(position));
+                        databaseReference.removeValue();
+                        Toast.makeText(context, "New Staff Removed", Toast.LENGTH_SHORT).show();
+                    });
+            builder.create().show();
         });
         if(!image.get(position).equals("")) {
             Picasso.get().load(image.get(position)).into(holder.imageView, new Callback() {

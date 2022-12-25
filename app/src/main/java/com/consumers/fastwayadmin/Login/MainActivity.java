@@ -39,6 +39,7 @@ import com.consumers.fastwayadmin.GMailSender;
 import com.consumers.fastwayadmin.HomeScreen.HomeScreen;
 import com.consumers.fastwayadmin.Info.Info;
 import com.consumers.fastwayadmin.Login.EmpLogin.ApplyForRestaurantAndDocs;
+import com.consumers.fastwayadmin.Login.EmpLogin.LoginEmployeeActivity;
 import com.consumers.fastwayadmin.R;
 import com.developer.kalert.KAlertDialog;
 import com.firebase.geofire.GeoFireUtils;
@@ -132,7 +133,7 @@ public class MainActivity extends AppCompatActivity {
         });
         empLogin = findViewById(R.id.loginAsEmployeeTextViewMain);
         empLogin.setOnClickListener(click -> {
-            Toast.makeText(this, "Work in progress...", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(click.getContext(), LoginEmployeeActivity.class));
         });
 
         SharedPreferences stopServices = getSharedPreferences("Stop Services", Context.MODE_PRIVATE);
