@@ -72,6 +72,7 @@ public class StaffAdapter extends RecyclerView.Adapter<StaffAdapter.Holder> {
                         map.put("resName",resInfo.getString("hotelName",""));
                         map.put("resAddress",resInfo.getString("hotelAddress",""));
                         map.put("resContact",resInfo.getString("hotelNumber",""));
+                        map.put("resId",auth.getUid());
 
                         databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("EmployeeDB").child(UUID.get(position)).child("ResDetails");
                         databaseReference.setValue(map);

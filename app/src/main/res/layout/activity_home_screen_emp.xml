@@ -6,4 +6,64 @@
     android:layout_height="match_parent"
     tools:context=".ListViewActivity.StaffDetails.EmpHOME.HomeScreenEMP">
 
+    <TextView
+        android:id="@+id/textView49"
+        android:layout_width="wrap_content"
+        android:textColor="@color/dark_background"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="15dp"
+        android:text="Table Orders"
+        android:textSize="24sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbarHomeEmp" />
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbarHomeEmp"
+        android:layout_width="0dp"
+        android:layout_marginStart="1dp"
+        app:title="Home"
+        android:layout_height="50dp"
+        android:background="@drawable/toolbar_background_layout"
+        android:layout_marginEnd="1dp"
+        android:minHeight="?attr/actionBarSize"
+        app:titleTextColor="@color/dark_background"
+        android:theme="?attr/actionBarTheme"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewEmpTable"
+        android:layout_width="0dp"
+        android:layout_height="150dp"
+        android:layout_marginStart="3dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="3dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView49" />
+
+    <TextView
+        android:id="@+id/textView50"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="12dp"
+        android:textColor="@color/dark_background"
+        android:text="TakeAway Orders"
+        android:textSize="24sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/recyclerViewEmpTable" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewEmpTakeAway"
+        android:layout_width="0dp"
+        android:layout_height="150dp"
+        android:layout_marginStart="3dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="3dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView50" />
 </androidx.constraintlayout.widget.ConstraintLayout>

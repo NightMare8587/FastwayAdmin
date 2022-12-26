@@ -2291,11 +2291,36 @@ public class HomeScreen extends AppCompatActivity {
         super.onResume();
         LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
                 new IntentFilter("myFunction"));
+        SharedPreferences sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("state",""))
+                .child(auth.getUid());
+        databaseReference.child("isAdminLive").setValue("yes");
     }
 
     @Override
     public void onPause() {
         super.onPause();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        SharedPreferences sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("state",""))
+                .child(auth.getUid());
+        databaseReference.child("isAdminLive").setValue("no");
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        SharedPreferences sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("state",""))
+                .child(auth.getUid());
+        databaseReference.child("isAdminLive").setValue("no");
     }
 }

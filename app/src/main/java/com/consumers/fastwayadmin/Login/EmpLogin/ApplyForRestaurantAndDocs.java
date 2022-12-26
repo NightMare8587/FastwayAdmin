@@ -60,7 +60,7 @@ public class ApplyForRestaurantAndDocs extends AppCompatActivity {
                     editor.putString("resDetails","yes");
                     editor.putString("resName",snapshot.child("resName").getValue(String.class));
                     editor.putString("resAddress",snapshot.child("resAddress").getValue(String.class));
-                    editor.putString("resID",snapshot.child("resID").getValue(String.class));
+                    editor.putString("resID",snapshot.child("resId").getValue(String.class));
                     editor.apply();
 
                     startActivity(new Intent(ApplyForRestaurantAndDocs.this, HomeScreenEMP.class));
