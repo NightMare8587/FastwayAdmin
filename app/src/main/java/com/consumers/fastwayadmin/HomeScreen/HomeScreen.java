@@ -24,6 +24,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -41,6 +43,8 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 //import com.aspose.cells.Workbook;
 import com.consumers.fastwayadmin.Chat.RandomChatFolder.RandomChatWithUsers;
+import com.consumers.fastwayadmin.Info.FoodDeliveryIntegration;
+import com.consumers.fastwayadmin.Info.Info;
 import com.consumers.fastwayadmin.Info.RestaurantDocuments.ReUploadDocumentsAgain;
 import com.consumers.fastwayadmin.Info.RestaurantDocuments.UploadRemainingDocs;
 import com.consumers.fastwayadmin.NavFrags.AccountSettingsFragment;
@@ -128,6 +132,7 @@ public class HomeScreen extends AppCompatActivity {
     DatabaseReference resRef;
     String UID;
     DatabaseReference reference;
+    SharedPreferences resInfo;
     @RequiresApi(api = Build.VERSION_CODES.N)
     @SuppressLint("CommitPrefEdits")
     @Override
@@ -137,6 +142,7 @@ public class HomeScreen extends AppCompatActivity {
         initialise();
         sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
         int year = calendar.get(Calendar.YEAR);
+        resInfo = getSharedPreferences("RestaurantInfo",MODE_PRIVATE);
         myEditor = sharedPreferences.edit();
 //        myEditor.remove("FileGeneratedExcel");
         myEditor.putString("payoutMethodChoosen","imps");
@@ -160,6 +166,25 @@ public class HomeScreen extends AppCompatActivity {
         FirebaseMessaging.getInstance().subscribeToTopic("FastwayQueryDB");
         trackOfAllGeneratedFiles= getSharedPreferences("TrackOfAllInsights",MODE_PRIVATE);
         editorToTrackFiles = trackOfAllGeneratedFiles.edit();
+        if(!resInfo.contains("foodDelivery")) {
+            AlertDialog.Builder foodDelivery = new AlertDialog.Builder(HomeScreen.this);
+            foodDelivery.setTitle("Food delivery");
+            foodDelivery.setMessage("Does your restaurant provide food delivery service ?");
+            foodDelivery.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    startActivity(new Intent(HomeScreen.this, FoodDeliveryIntegration.class));
+                    dialogInterface.dismiss();
+                }
+            });
+            foodDelivery.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+
+                }
+            });
+            foodDelivery.create().show();
+        }
 
 //        SharedPreferences clear = getSharedPreferences("DailyInsightsStoringData",MODE_PRIVATE);
 //        SharedPreferences.Editor clearEdit = clear.edit();

@@ -49,6 +49,13 @@
         tools:replace="android:icon,android:allowBackup"
         tools:targetApi="r">
         <activity
+            android:name=".Info.FoodDeliveryIntegration"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
             android:name=".NavFrags.ResEarningTracker.OrdersNotFromOrdinalo.OtherOrdersNotFromOrdinalo"
             android:exported="false">
             <meta-data
