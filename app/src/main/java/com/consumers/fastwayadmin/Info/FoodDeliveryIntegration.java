@@ -102,6 +102,7 @@ public class FoodDeliveryIntegration extends AppCompatActivity {
                 databaseReference.child("distance").setValue(distanceFood);
                 databaseReference.child("price").setValue(priceFood);
 
+
                 editor.putString("foodDelivery","yes");
                 editor.putString("price",priceFood);
                 editor.putString("distance",distanceFood);
