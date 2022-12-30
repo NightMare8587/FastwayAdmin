@@ -1854,6 +1854,34 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                         FirebaseAuth auth = FirebaseAuth.getInstance();
                         DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid())).child("Current TakeAway").child(id);
                         if (paymentMode.equals("online")) {
+
+                            AsyncTask.execute(() -> {
+                                try{
+                                    main.put("to","/topics/"+"RequestPayout");
+                                    JSONObject notification = new JSONObject();
+                                    notification.put("title","Refund Request");
+                                    notification.put("body","You have a new refund request. Check now");
+                                    main.put("notification",notification);
+
+                                    JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, URL, main, response -> {
+
+                                    }, error -> Toast.makeText(ApproveCurrentTakeAway.this, error.getLocalizedMessage()+"null", Toast.LENGTH_SHORT).show()){
+                                        @Override
+                                        public Map<String, String> getHeaders() {
+                                            Map<String,String> header = new HashMap<>();
+                                            header.put("content-type","application/json");
+                                            header.put("authorization","key=AAAAjq_WsHs:APA91bGZV-uH-NJddxIniy8h1tDGDHqxhgvFdyNRDaV_raxjvSM_FkKu7JSwtSp4Q_iSmPuTKGGIB2M_07c9rKgPXUH43-RzpK6zkaSaIaNgmeiwUO40rYxYUZAkKoLAQQVeVJ7mXboD");
+                                            return header;
+                                        }
+                                    };
+
+                                    requestQueue.add(jsonObjectRequest);
+
+                                }
+                                catch (Exception e){
+                                    Toast.makeText(ApproveCurrentTakeAway.this, e.getLocalizedMessage()+"null", Toast.LENGTH_SHORT).show();
+                                }
+                            });
                             String approveTime = String.valueOf(System.currentTimeMillis());
                             DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(id).child("Recent Orders").child(time);
                             for(int i=0;i<dishName.size();i++){
@@ -1867,7 +1895,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                                 MyClass myClass = new MyClass(dishName.get(i),dishPrice.get(i),image.get(i),type.get(i),""+approveTime,quantity.get(i),halfOr.get(i),state,String.valueOf(orderAmount),orderId,"TakeAway,Online","Order Declined",sharedPreferences.getString("locality",""));
                                 databaseReference.child("Recent Orders").child("" + time).child(id).child(dishName.get(i)).setValue(myClass);
                             }
-                            DatabaseReference requestRefundOrdinalo = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("RefundRequest").child(auth.getUid());
+                            DatabaseReference requestRefundOrdinalo = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("RefundRequest").child(id);
                             RequestRefundClass requestRefundClass = new RequestRefundClass(orderId,orderAmount,time,"Order Cancelled because denied by restaurant");
                             requestRefundOrdinalo.setValue(requestRefundClass);
 
