@@ -107,6 +107,7 @@ public class HomeFrag extends Fragment {
     List<String> image = new ArrayList<>();
     List<String> type = new ArrayList<>();
     List<String> orderAndPayment = new ArrayList<>();
+    List<String> deliveryInformation = new ArrayList<>();
     List<String> price = new ArrayList<>();
     SharedPreferences.Editor resInfoSharedEdit;
     @SuppressLint("UseSwitchCompatOrMaterialCode")
@@ -544,6 +545,10 @@ public class HomeFrag extends Fragment {
                                 userNameTakeAway.add(String.valueOf(dataSnapshot1.child("nameOfUser").getValue()));
                                 usernameOfTakeAway = String.valueOf(dataSnapshot1.child("nameOfUser").getValue());
                                 currentTime = String.valueOf(dataSnapshot1.child("time").getValue());
+                                if(dataSnapshot1.hasChild("deliveryInformation"))
+                                    deliveryInformation.add(dataSnapshot1.child("deliveryInformation").getValue(String.class));
+                                else
+                                    deliveryInformation.add("");
                                 cus = String.valueOf(dataSnapshot.child("customisation").getValue());
                             }
                             time.add(currentTime);
@@ -572,13 +577,14 @@ public class HomeFrag extends Fragment {
                         homeFragTakeAwayRecucler.setLayoutManager(anotherHori);
                         Log.i("message",finalDishNames.toString() + "\n" + finalPayment.toString() + "\n" + finalDishQuantity.toString());
 //                        homeFragTakeAwayRecucler.setAdapter(new CurrentTakeAway(currentTakeAwayAuth,dishNameCurrentTakeAway,dishQuantityCurrentTakeAway,userNameTakeAway,halfOr,paymentMode));
-                        homeFragTakeAwayRecucler.setAdapter(new CurrentTakeAway(finalDishNames,finalDishQuantity,finalHalfOr,finalUserNames,finalPayment,orderIDs,orderAmounts,currentTakeAwayAuth,time,customisationList,finalOrderAndPayments,finalDishPrices,finalImages,finalTypes));
+                        homeFragTakeAwayRecucler.setAdapter(new CurrentTakeAway(finalDishNames,finalDishQuantity,finalHalfOr,finalUserNames,finalPayment,orderIDs,orderAmounts,currentTakeAwayAuth,time,customisationList,finalOrderAndPayments,finalDishPrices,finalImages,finalTypes,deliveryInformation));
                     }else
                     {
                         currentTakeAwayAuth.clear();
                         finalDishNames.clear();
                         dishNameCurrentTakeAway.clear();
                         userNameTakeAway.clear();
+                        deliveryInformation.clear();
                         halfOr.clear();
                         finalDishQuantity.clear();
                         finalPayment.clear();
@@ -592,7 +598,7 @@ public class HomeFrag extends Fragment {
                         finalHalfOr.clear();
                         dishQuantityCurrentTakeAway.clear();
                         homeFragTakeAwayRecucler.setLayoutManager(anotherHori);
-                        homeFragTakeAwayRecucler.setAdapter(new CurrentTakeAway(finalDishNames,finalDishQuantity,finalHalfOr,finalUserNames,finalPayment,orderIDs,orderAmounts,currentTakeAwayAuth,time,customisationList,finalOrderAndPayments,finalDishPrices,finalImages,finalTypes));
+                        homeFragTakeAwayRecucler.setAdapter(new CurrentTakeAway(finalDishNames,finalDishQuantity,finalHalfOr,finalUserNames,finalPayment,orderIDs,orderAmounts,currentTakeAwayAuth,time,customisationList,finalOrderAndPayments,finalDishPrices,finalImages,finalTypes,deliveryInformation));
 
                     }
                 }
@@ -1291,6 +1297,10 @@ public class HomeFrag extends Fragment {
                                 usernameOfTakeAway = String.valueOf(dataSnapshot1.child("nameOfUser").getValue());
                                 currentTime = String.valueOf(dataSnapshot1.child("time").getValue());
                                 cus = String.valueOf(dataSnapshot1.child("customisation").getValue());
+                                if(dataSnapshot1.hasChild("deliveryInformation"))
+                                    deliveryInformation.add(dataSnapshot1.child("deliveryInformation").getValue(String.class));
+                                else
+                                    deliveryInformation.add("");
                             }
                             customisationList.add(cus);
                             time.add(currentTime);
@@ -1332,6 +1342,7 @@ public class HomeFrag extends Fragment {
                         finalPayment.clear();
                         finalUserNames.clear();
                         orderIDs.clear();
+                        deliveryInformation.clear();
                         finalImages.clear();
                         finalTypes.clear();
                         orderAmounts.clear();
@@ -1342,7 +1353,7 @@ public class HomeFrag extends Fragment {
                         homeFragTakeAwayRecucler.setLayoutManager(anotherHori);
 
                     }
-                    homeFragTakeAwayRecucler.setAdapter(new CurrentTakeAway(finalDishNames,finalDishQuantity,finalHalfOr,finalUserNames,finalPayment,orderIDs,orderAmounts,currentTakeAwayAuth,time,customisationList,finalOrderAndPayments,finalDishPrices,finalImages,finalTypes));
+                    homeFragTakeAwayRecucler.setAdapter(new CurrentTakeAway(finalDishNames,finalDishQuantity,finalHalfOr,finalUserNames,finalPayment,orderIDs,orderAmounts,currentTakeAwayAuth,time,customisationList,finalOrderAndPayments,finalDishPrices,finalImages,finalTypes,deliveryInformation));
                 }
 
                 @Override

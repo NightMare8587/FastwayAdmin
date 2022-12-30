@@ -2,7 +2,6 @@ package com.consumers.fastwayadmin.NavFrags.CurrentTakeAwayOrders;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.text.Layout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,27 +19,29 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CurrentTakeAway extends RecyclerView.Adapter<CurrentTakeAway.Holder> {
-    List<List<String>> finalDishNames = new ArrayList<>();
-    List<List<String>> finalOrderAndPayments = new ArrayList<>();
-    List<List<String>> finalDishQuantity = new ArrayList<>();
-    List<List<String>> finalImages = new ArrayList<>();
-    List<List<String>> finalTypes = new ArrayList<>();
-    List<List<String>> finalDishPrices = new ArrayList<>();
-    List<List<String>> finalHalfOr = new ArrayList<>();
-    List<String> currentTakeAwayAuth = new ArrayList<>();
-    List<String> finalUserNames = new ArrayList<>();
-    List<String> customisationList = new ArrayList<>();
-    List<String> orderId = new ArrayList<>();
-    List<String> orderAmount = new ArrayList<>();
+    List<List<String>> finalDishNames;
+    List<List<String>> finalOrderAndPayments;
+    List<List<String>> finalDishQuantity;
+    List<List<String>> finalImages;
+    List<List<String>> finalTypes;
+    List<List<String>> finalDishPrices;
+    List<List<String>> finalHalfOr;
+    List<String> currentTakeAwayAuth;
+    List<String> finalUserNames;
+    List<String> customisationList;
+    List<String> orderId;
+    List<String> orderAmount;
+    List<String> deliveryInformation;
     List<String> time;
 
     public CurrentTakeAway(List<List<String>> finalDishNames, List<List<String>> finalDishQuantity, List<List<String>> finalHalfOr, List<String> finalUserNames,
                            List<String> finalPayment,List<String> orderId,List<String> orderAmount,List<String> currentTakeAwayAuth,List<String> time,List<String> customisationList,
-                           List<List<String>> finalOrderAndPayments,List<List<String>> finalDishPrices,List<List<String>> finalImages,List<List<String>> finalTypes) {
+                           List<List<String>> finalOrderAndPayments,List<List<String>> finalDishPrices,List<List<String>> finalImages,List<List<String>> finalTypes,List<String> deliveryInformation) {
         this.finalDishNames = finalDishNames;
         this.finalDishQuantity = finalDishQuantity;
         this.finalHalfOr = finalHalfOr;
         this.finalDishPrices = finalDishPrices;
+        this.deliveryInformation = deliveryInformation;
         this.finalImages = finalImages;
         this.finalTypes = finalTypes;
         this.finalOrderAndPayments = finalOrderAndPayments;
@@ -104,6 +105,10 @@ public class CurrentTakeAway extends RecyclerView.Adapter<CurrentTakeAway.Holder
             intent.putExtra("time",time.get(position));
             intent.putExtra("orderAmount",orderAmount.get(position));
             intent.putExtra("customisation",customisationList.get(position));
+            if(deliveryInformation.get(position).equals(""))
+                intent.putExtra("deliveryInformation","no");
+            else
+                intent.putExtra("deliveryInformation",deliveryInformation.get(position));
             Log.i("log",customisationList.get(position));
             view.getContext().startActivity(intent);
         });

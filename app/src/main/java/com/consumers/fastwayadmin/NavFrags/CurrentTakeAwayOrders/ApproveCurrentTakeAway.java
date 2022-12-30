@@ -84,6 +84,7 @@ import karpuzoglu.enes.com.fastdialog.Type;
 public class ApproveCurrentTakeAway extends AppCompatActivity {
     List<String> quantity;
     List<String> dishName;
+    String deliveryInformation;
     List<String> image;
     List<String> type;
     List<String> dishPrice;
@@ -161,6 +162,18 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
         userFrequency = getSharedPreferences("UsersFrequencyPerMonth",MODE_PRIVATE);
         trackingOfTakeAway = getSharedPreferences("TrackingOfTakeAway",MODE_PRIVATE);
         dailyUserTrackingFor7days = getSharedPreferences("DailyUserTrackingFor7days",MODE_PRIVATE);
+        deliveryInformation = getIntent().getStringExtra("deliveryInformation");
+        if(!deliveryInformation.equals("no")){
+            AlertDialog.Builder builder = new AlertDialog.Builder(ApproveCurrentTakeAway.this);
+            builder.setTitle("Delivery Information").setMessage("Below are the delivery information\n\n" + deliveryInformation)
+                    .setPositiveButton("Exit", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.dismiss();
+                        }
+                    }).create();
+            builder.show();
+        }
         user7daysEdit = dailyUserTrackingFor7days.edit();
         trackingDineAndWay = trackingOfTakeAway.edit();
         userFedit = userFrequency.edit();
