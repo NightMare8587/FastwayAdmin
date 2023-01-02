@@ -15,6 +15,7 @@ import android.graphics.Color;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
@@ -83,7 +84,12 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
+import com.opencsv.CSVWriter;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.net.URL;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -223,7 +229,11 @@ public class HomeFrag extends Fragment {
         restaurantTrackRecords = view.getContext().getSharedPreferences("RestaurantTrackRecords",Context.MODE_PRIVATE);
         restaurantTrackRecordsEditor = restaurantTrackRecords.edit();
         restaurantTrackEditor = restaurantDailyTrack.edit();
-         dailyRestaurantTrackUpdate();
+        try {
+            dailyRestaurantTrackUpdate();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 //         SharedPreferences clearJust = requireContext().getSharedPreferences("DishOrderedWithOthers",Context.MODE_PRIVATE);
 //         SharedPreferences.Editor editorClear = clearJust.edit();
 //         editorClear.clear().apply();
@@ -657,7 +667,7 @@ public class HomeFrag extends Fragment {
 
     }
 
-    private void dailyRestaurantTrackUpdate() {
+    private void dailyRestaurantTrackUpdate() throws IOException {
         if(restaurantDailyTrack.contains("currentDate")){
             if(Integer.parseInt(restaurantDailyTrack.getString("currentDate","")) == currentDay){
                 if(restaurantDailyTrack.contains("totalOrdersToday"))
@@ -666,6 +676,43 @@ public class HomeFrag extends Fragment {
                 if(restaurantDailyTrack.contains("totalTransactionsToday"))
                     totalTransactionsToday.setText("\u20B9" + decimalFormat.format(Double.parseDouble(restaurantDailyTrack.getString("totalTransactionsToday",""))));
             }else{
+                SharedPreferences trackingOfFiles = requireContext().getSharedPreferences("TrackingFilesForML",Context.MODE_PRIVATE);
+                if(trackingOfFiles.contains("dailyStoringFile")){
+                    Calendar calendar = Calendar.getInstance();
+                    String[] monthName = {"January", "February",
+                            "March", "April", "May", "June", "July",
+                            "August", "September", "October", "November",
+                            "December"};
+                    String month = monthName[calendar.get(Calendar.MONTH)];
+
+                    SharedPreferences restaurantDailyStoreTrack = requireContext().getSharedPreferences("RestaurantDailyStoreForAnalysis",Context.MODE_PRIVATE);
+                    java.lang.reflect.Type type = new TypeToken<List<List<String>>>() {
+                    }.getType();
+                    Gson gson = new Gson();
+                    if(restaurantDailyTrack.getString("totalOrdersToday","").equals("0"))
+                        return;
+                    if(restaurantDailyStoreTrack.contains(month)){
+                        String json = restaurantDailyStoreTrack.getString(month, "");
+                        List<List<String>> mainList = gson.fromJson(json, type);
+                        List<String> days = new ArrayList<>(mainList.get(0));
+                        List<String> totalAmounts = new ArrayList<>(mainList.get(1));
+                        List<String> totalOrdersPlaced = new ArrayList<>(mainList.get(2));
+
+                        File file = new File(requireContext().getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS),"RestaurantDailyStoringData.csv");
+                        try{
+                            CSVWriter csvWriter = new CSVWriter(new FileWriter(file.getAbsoluteFile(),true));
+                            String[] record = new String[4];
+                            record[0] = month;
+                            record[1] = days.get(days.size()-1);
+                            record[2] = totalAmounts.get(totalAmounts.size()-1);
+                            record[3] = totalOrdersPlaced.get(totalOrdersPlaced.size()-1);
+                            csvWriter.writeNext(record,false);
+                            csvWriter.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
                 restaurantTrackEditor.putString("currentDate", String.valueOf(currentDay));
                 restaurantTrackEditor.putString("totalOrdersToday","0");
                 restaurantTrackEditor.putString("totalTransactionsToday","0");

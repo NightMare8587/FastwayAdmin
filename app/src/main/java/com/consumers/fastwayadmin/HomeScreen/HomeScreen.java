@@ -76,6 +76,7 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.gson.Gson;
+import com.opencsv.CSVWriter;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -86,6 +87,7 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.text.DecimalFormat;
@@ -177,14 +179,49 @@ public class HomeScreen extends AppCompatActivity {
                     dialogInterface.dismiss();
                 }
             });
-            foodDelivery.setNegativeButton("No", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
+            foodDelivery.setNegativeButton("No", (dialogInterface, i) -> {
 
-                }
             });
             foodDelivery.create().show();
         }
+
+
+
+        SharedPreferences trackingOfFile = getSharedPreferences("TrackingFilesForML",MODE_PRIVATE);
+        SharedPreferences.Editor trackFileEdit = trackingOfFile.edit();
+
+        if(!trackingOfFile.contains("dailyStoringFile")){
+            File file = new File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS),"RestaurantDailyStoringData.csv");
+            try{
+                CSVWriter csvWriter = new CSVWriter(new FileWriter(file.getAbsoluteFile()));
+                String month = monthName[calendar.get(Calendar.MONTH)];
+                String[] record = "Month,Date,Orders,Amount".split(",");
+                csvWriter.writeNext(record,false);
+                trackFileEdit.putString("dailyStoringFile","yes");
+                trackFileEdit.apply();
+                csvWriter.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+//        SharedPreferences restaurantDailyTrack = getSharedPreferences("RestaurantTrackingDaily",MODE_PRIVATE);
+//        String filePath;
+//        File files = new File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "RestaurantDailyStoringData.csv");
+//        String dateS = restaurantDailyTrack.getString("currentDate","");
+//        String totalOrdersS = restaurantDailyTrack.getString("totalOrdersToday","");
+//        String totalTransS = restaurantDailyTrack.getString("totalTransactionsToday","");
+//        try {
+//            CSVWriter writer = new CSVWriter(new FileWriter(files.getAbsoluteFile(),true));
+//            String month = monthName[calendar.get(Calendar.MONTH)];
+//            String[] record = "3,KK,Menor,India,69".split(",");
+//            writer.writeNext(record, false);
+//
+//            //close the writer
+//            writer.close();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+
 
 //        SharedPreferences clear = getSharedPreferences("DailyInsightsStoringData",MODE_PRIVATE);
 //        SharedPreferences.Editor clearEdit = clear.edit();
@@ -1594,9 +1631,30 @@ public class HomeScreen extends AppCompatActivity {
 
                     }
                     prevEditorStoreOrder.apply();
+                    
 
                     SharedPreferences.Editor storeEditORder = storeOrder.edit();
                     storeEditORder.clear().apply();
+                    
+                    
+                    SharedPreferences dailyInsightsStoring = getSharedPreferences("DailyInsightsStoringData",MODE_PRIVATE);
+                    SharedPreferences.Editor insightEditor = dailyInsightsStoring.edit();
+                    
+                    SharedPreferences prevDailyInsightsStoring = getSharedPreferences("PreviousDailyInsightsStoringData" + whichY,MODE_PRIVATE);
+                    SharedPreferences.Editor PrevinsightEditor = prevDailyInsightsStoring.edit();
+                    Map<String,?> dailyInsightsAll = dailyInsightsStoring.getAll();
+                    for(Map.Entry<String,?> entry : dailyInsightsAll.entrySet()){
+                        Log.d("map values",entry.getKey() + ": " + entry.getValue().toString());
+                        String value = (String) entry.getValue();
+                        String key = entry.getKey();
+
+                        PrevinsightEditor.putString(key,value);
+
+                    }
+
+                    PrevinsightEditor.apply();
+                    insightEditor.clear().apply();
+
 
                     SharedPreferences last7daysReportShared = getSharedPreferences("last7daysReport",MODE_PRIVATE);
                     SharedPreferences.Editor editor7days = last7daysReportShared.edit();
