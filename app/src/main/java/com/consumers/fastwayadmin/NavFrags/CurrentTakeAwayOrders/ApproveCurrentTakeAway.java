@@ -455,6 +455,11 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                                     } else {
                                         restaurantTrackEditor.putString("totalTransactionsToday", String.valueOf(orderAmount));
                                     }
+//                                    Calendar cal = Calendar.getInstance();
+//                                    cal.setTime(new Date());
+//                                    DateFormat formatter = new SimpleDateFormat("EEEE");
+//                                    String dayOfWeekString = formatter.format(cal.getTime());
+//                                    restaurantTrackEditor.putString("currentDay",dayOfWeekString);
                                     updateTotalAmountValueDB(String.valueOf(orderAmount));
                                     restaurantTrackEditor.apply();
 

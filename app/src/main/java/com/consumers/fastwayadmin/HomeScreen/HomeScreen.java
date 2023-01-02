@@ -189,13 +189,14 @@ public class HomeScreen extends AppCompatActivity {
 
         SharedPreferences trackingOfFile = getSharedPreferences("TrackingFilesForML",MODE_PRIVATE);
         SharedPreferences.Editor trackFileEdit = trackingOfFile.edit();
+//        trackFileEdit.clear().apply();
 
         if(!trackingOfFile.contains("dailyStoringFile")){
             File file = new File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS),"RestaurantDailyStoringData.csv");
             try{
                 CSVWriter csvWriter = new CSVWriter(new FileWriter(file.getAbsoluteFile()));
                 String month = monthName[calendar.get(Calendar.MONTH)];
-                String[] record = "Month,Date,Orders,Amount".split(",");
+                String[] record = "Month,Date,Day,Orders,Amount".split(",");
                 csvWriter.writeNext(record,false);
                 trackFileEdit.putString("dailyStoringFile","yes");
                 trackFileEdit.apply();

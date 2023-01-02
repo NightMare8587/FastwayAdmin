@@ -90,9 +90,14 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
+import java.text.DateFormat;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
@@ -684,7 +689,8 @@ public class HomeFrag extends Fragment {
                             "August", "September", "October", "November",
                             "December"};
                     String month = monthName[calendar.get(Calendar.MONTH)];
-
+                    String[] daysName = {"Monday","Tuesday","Wednesday","Thursday","Friday"
+                    ,"Saturday","Sunday"};
                     SharedPreferences restaurantDailyStoreTrack = requireContext().getSharedPreferences("RestaurantDailyStoreForAnalysis",Context.MODE_PRIVATE);
                     java.lang.reflect.Type type = new TypeToken<List<List<String>>>() {
                     }.getType();
@@ -701,11 +707,12 @@ public class HomeFrag extends Fragment {
                         File file = new File(requireContext().getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS),"RestaurantDailyStoringData.csv");
                         try{
                             CSVWriter csvWriter = new CSVWriter(new FileWriter(file.getAbsoluteFile(),true));
-                            String[] record = new String[4];
+                            String[] record = new String[5];
                             record[0] = month;
                             record[1] = days.get(days.size()-1);
-                            record[2] = totalAmounts.get(totalAmounts.size()-1);
-                            record[3] = totalOrdersPlaced.get(totalOrdersPlaced.size()-1);
+                            record[2] = restaurantDailyTrack.getString("currentDay","");
+                            record[3] = totalAmounts.get(totalAmounts.size()-1);
+                            record[4] = totalOrdersPlaced.get(totalOrdersPlaced.size()-1);
                             csvWriter.writeNext(record,false);
                             csvWriter.close();
                         } catch (IOException e) {
@@ -714,6 +721,12 @@ public class HomeFrag extends Fragment {
                     }
                 }
                 restaurantTrackEditor.putString("currentDate", String.valueOf(currentDay));
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(new Date());
+                DateFormat formatter = new SimpleDateFormat("EEEE");
+                String dayOfWeekString = formatter.format(cal.getTime());
+                restaurantTrackEditor.putString("totalOrdersToday","0");
+                restaurantTrackEditor.putString("currentDay",dayOfWeekString);
                 restaurantTrackEditor.putString("totalOrdersToday","0");
                 restaurantTrackEditor.putString("totalTransactionsToday","0");
                 restaurantTrackEditor.apply();

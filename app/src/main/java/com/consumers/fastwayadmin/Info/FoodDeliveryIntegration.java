@@ -41,35 +41,27 @@ public class FoodDeliveryIntegration extends AppCompatActivity {
         resInfo = getSharedPreferences("RestaurantInfo",MODE_PRIVATE);
         editor = resInfo.edit();
 
-        one.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup radioGroup, int i) {
-                switch (i){
-                    case R.id.noRadioButton:
-                        default1 = "no";
-                        break;
-                    case R.id.yesRadioButton:
-                        default1 = "yes";
-                        break;
-                }
+        one.setOnCheckedChangeListener((radioGroup, i) -> {
+            switch (i){
+                case R.id.noRadioButton:
+                    default1 = "no";
+                    break;
+                case R.id.yesRadioButton:
+                    default1 = "yes";
+                    break;
             }
         });
 
-        two.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup radioGroup, int i) {
-                switch (i){
-                    case R.id.ownRadioButton:
-                        default2 = "own";
-                        own = true;
-                        linearLayout.setVisibility(View.VISIBLE);
-                        break;
-                    case R.id.thirdPartyRadioButton:
-                        default2 = "thirdParty";
-                        own = false;
-                        linearLayout.setVisibility(View.INVISIBLE);
-                        break;
-                }
+        two.setOnCheckedChangeListener((radioGroup, i) -> {
+            switch (i){
+                case R.id.ownRadioButton:
+                    default2 = "own";
+                    own = true;
+                    linearLayout.setVisibility(View.VISIBLE);
+                    break;
+                case R.id.thirdPartyRadioButton:
+                    Toast.makeText(FoodDeliveryIntegration.this, "Not Available", Toast.LENGTH_SHORT).show();
+                    break;
             }
         });
 
@@ -96,7 +88,7 @@ public class FoodDeliveryIntegration extends AppCompatActivity {
                 else
                     priceFood = price.getText().toString();
                 FirebaseAuth auth = FirebaseAuth.getInstance();
-                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid()).child("FoodDelivery");
+                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid())).child("FoodDelivery");
                 databaseReference.child("foodDelivery").setValue("yes");
                 databaseReference.child("foodDeliveryType").setValue("own");
                 databaseReference.child("distance").setValue(distanceFood);
@@ -109,14 +101,15 @@ public class FoodDeliveryIntegration extends AppCompatActivity {
                 editor.putString("foodDeliveryType","own");
                 editor.apply();
             }else{
-                FirebaseAuth auth = FirebaseAuth.getInstance();
-                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid())).child("FoodDelivery");
-                databaseReference.child("foodDelivery").setValue("yes");
-                databaseReference.child("foodDeliveryType").setValue("thirdParty");
-
-                editor.putString("foodDelivery","yes");
-                editor.putString("foodDeliveryType","thirdParty");
-                editor.apply();
+                Toast.makeText(this, "Nothing Selected", Toast.LENGTH_SHORT).show();
+//                FirebaseAuth auth = FirebaseAuth.getInstance();
+//                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid())).child("FoodDelivery");
+//                databaseReference.child("foodDelivery").setValue("yes");
+//                databaseReference.child("foodDeliveryType").setValue("thirdParty");
+//
+//                editor.putString("foodDelivery","yes");
+//                editor.putString("foodDeliveryType","thirdParty");
+//                editor.apply();
             }
 
             Toast.makeText(this, "Completed", Toast.LENGTH_SHORT).show();
