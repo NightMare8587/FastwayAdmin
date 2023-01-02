@@ -24,8 +24,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -41,14 +39,13 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-//import com.aspose.cells.Workbook;
 import com.consumers.fastwayadmin.Chat.RandomChatFolder.RandomChatWithUsers;
 import com.consumers.fastwayadmin.Info.FoodDeliveryIntegration;
-import com.consumers.fastwayadmin.Info.Info;
 import com.consumers.fastwayadmin.Info.RestaurantDocuments.ReUploadDocumentsAgain;
 import com.consumers.fastwayadmin.Info.RestaurantDocuments.UploadRemainingDocs;
 import com.consumers.fastwayadmin.NavFrags.AccountSettingsFragment;
 import com.consumers.fastwayadmin.NavFrags.BankVerification.SelectPayoutMethodType;
+import com.consumers.fastwayadmin.NavFrags.BankVerification.VendorDetailsActivity;
 import com.consumers.fastwayadmin.NavFrags.CashCommission.CashTransactionCommissionActivity;
 import com.consumers.fastwayadmin.NavFrags.FastwayPremiumActivites.FastwayPremiums;
 import com.consumers.fastwayadmin.NavFrags.FastwayPremiumActivites.NotifyAdminSubscribePremium;
@@ -56,11 +53,9 @@ import com.consumers.fastwayadmin.NavFrags.HomeFrag;
 import com.consumers.fastwayadmin.NavFrags.MenuFrag;
 import com.consumers.fastwayadmin.NavFrags.ReplaceOrders.ReplaceOrderRequests;
 import com.consumers.fastwayadmin.NavFrags.TablesFrag;
-import com.consumers.fastwayadmin.NavFrags.BankVerification.VendorDetailsActivity;
 import com.consumers.fastwayadmin.NotificationActivity;
 import com.consumers.fastwayadmin.R;
 import com.consumers.fastwayadmin.RandomChatNoww;
-import com.developer.kalert.KAlertDialog;
 import com.gauravk.bubblenavigation.BubbleNavigationConstraintView;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.material.snackbar.Snackbar;
@@ -172,12 +167,9 @@ public class HomeScreen extends AppCompatActivity {
             AlertDialog.Builder foodDelivery = new AlertDialog.Builder(HomeScreen.this);
             foodDelivery.setTitle("Food delivery");
             foodDelivery.setMessage("Does your restaurant provide food delivery service ?");
-            foodDelivery.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    startActivity(new Intent(HomeScreen.this, FoodDeliveryIntegration.class));
-                    dialogInterface.dismiss();
-                }
+            foodDelivery.setPositiveButton("Yes", (dialogInterface, i) -> {
+                startActivity(new Intent(HomeScreen.this, FoodDeliveryIntegration.class));
+                dialogInterface.dismiss();
             });
             foodDelivery.setNegativeButton("No", (dialogInterface, i) -> {
 
