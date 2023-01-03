@@ -188,7 +188,7 @@ public class HomeScreen extends AppCompatActivity {
             try{
                 CSVWriter csvWriter = new CSVWriter(new FileWriter(file.getAbsoluteFile()));
                 String month = monthName[calendar.get(Calendar.MONTH)];
-                String[] record = "Month,Date,Day,Orders,Amount".split(",");
+                String[] record = "Month,Date,Day,Amount,Orders".split(",");
                 csvWriter.writeNext(record,false);
                 trackFileEdit.putString("dailyStoringFile","yes");
                 trackFileEdit.apply();
