@@ -173,7 +173,7 @@ public class InitiatePayoutForAdminNEFT extends AppCompatActivity {
                                     public void onClick(DialogInterface dialogInterfaces, int ii) {
                                         if(amount > 25000){
                                             AlertDialog.Builder alert = new AlertDialog.Builder(InitiatePayoutForAdminNEFT.this);
-                                            alert.setTitle("Message").setMessage("You can initiate payout of amount less than \u20b930000 at a time. You can initiate again after a cooldown period of 6 hours");
+                                            alert.setTitle("Message").setMessage("You can initiate payout of amount less than \u20b925000 at a time. You can initiate again after a cooldown period of 6 hours");
                                             LinearLayout linearLayout = new LinearLayout(InitiatePayoutForAdminNEFT.this);
                                             linearLayout.setOrientation(LinearLayout.VERTICAL);
                                             EditText editText = new EditText(InitiatePayoutForAdminNEFT.this);
@@ -414,7 +414,7 @@ public class InitiatePayoutForAdminNEFT extends AppCompatActivity {
                 if(amount > 25000) {
                     moreThan20 = true;
                     AlertDialog.Builder alert = new AlertDialog.Builder(InitiatePayoutForAdminNEFT.this);
-                    alert.setTitle("Message").setMessage("You can initiate payout of amount less than \u20b930000 at a time. You can initiate again after a cooldown period of 6 hours");
+                    alert.setTitle("Message").setMessage("You can initiate payout of amount less than \u20b925000 at a time. You can initiate again after a cooldown period of 6 hours");
                     LinearLayout linearLayout = new LinearLayout(InitiatePayoutForAdminNEFT.this);
                     linearLayout.setOrientation(LinearLayout.VERTICAL);
                     EditText editText = new EditText(InitiatePayoutForAdminNEFT.this);

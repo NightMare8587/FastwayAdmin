@@ -223,7 +223,7 @@ public class OrganiseEvents extends AppCompatActivity {
                                         if(snapshot.hasChild("totalSalesPrice")){
                                             fastDialog1.show();
                                             double amt = Double.parseDouble(Objects.requireNonNull(snapshot.child("totalSalesPrice").getValue(String.class)));
-                                            double cmmisn = (amt * 5) / 100;
+                                            double cmmisn = (amt * 3) / 100;
 
                                             amt = amt - cmmisn;
 

@@ -725,7 +725,6 @@ public class HomeFrag extends Fragment {
                 cal.setTime(new Date());
                 DateFormat formatter = new SimpleDateFormat("EEEE");
                 String dayOfWeekString = formatter.format(cal.getTime());
-                restaurantTrackEditor.putString("totalOrdersToday","0");
                 restaurantTrackEditor.putString("currentDay",dayOfWeekString);
                 restaurantTrackEditor.putString("totalOrdersToday","0");
                 restaurantTrackEditor.putString("totalTransactionsToday","0");

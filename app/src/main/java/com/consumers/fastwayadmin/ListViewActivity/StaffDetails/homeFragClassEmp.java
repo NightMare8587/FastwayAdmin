@@ -75,16 +75,13 @@ public class homeFragClassEmp extends RecyclerView.Adapter<homeFragClassEmp.View
             }
         });
 
-        holder.isCurrentOrderMade.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                SharedPreferences sharedPreferences = v.getContext().getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
-                Intent intent = new Intent(v.getContext(), ApproveCurrentOrder.class);
-                intent.putExtra("table",tableNum.get(position));
-                intent.putExtra("state",sharedPreferences.getString("state",""));
-                intent.putExtra("id",resId.get(position));
-                v.getContext().startActivity(intent);
-            }
+        holder.isCurrentOrderMade.setOnClickListener(v -> {
+            SharedPreferences sharedPreferences = v.getContext().getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
+            Intent intent = new Intent(v.getContext(), ApproveCurrentOrder.class);
+            intent.putExtra("table",tableNum.get(position));
+            intent.putExtra("state",sharedPreferences.getString("state",""));
+            intent.putExtra("id",resId.get(position));
+            v.getContext().startActivity(intent);
         });
 
         if(isCurrentOrder.get(position).equals("1"))

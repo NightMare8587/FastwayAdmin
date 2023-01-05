@@ -11,7 +11,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.consumers.fastwayadmin.R;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class PrevCampAdap extends RecyclerView.Adapter<PrevCampAdap.Holder> {
@@ -43,7 +45,7 @@ public class PrevCampAdap extends RecyclerView.Adapter<PrevCampAdap.Holder> {
         holder.cust.setText("Total Customers: " + campCustomersList.get(position));
         holder.orders.setText("Total Orders: " + campOrdersList.get(position));
         holder.trans.setText("Total Transactions: \u20b9" + campTransList.get(position));
-        holder.time.setText("Date Ended: " + timeMillis.get(position));
+        holder.time.setText("Date Ended: " + new SimpleDateFormat("dd/MM/yyyy").format(new Date(Long.parseLong(timeMillis.get(position)))));
     }
 
     @Override

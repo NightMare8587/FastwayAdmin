@@ -497,7 +497,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                                             MyClass myClass = new MyClass(dishName.get(i), dishPrice.get(i), image.get(i), type.get(i), "" + approveTime, quantity.get(i), halfOr.get(i), state, String.valueOf(orderAmount), orderId, "TakeAway,Cash", "Order Approved", sharedPreferences.getString("locality", ""));
                                             databaseReference.child("Recent Orders").child("" + time).child(id).child(dishName.get(i)).setValue(myClass);
                                         }
-                                    }catch (Exception e){
+                                    }catch (Exception ignored){
 
                                     }
 
