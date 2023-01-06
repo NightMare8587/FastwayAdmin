@@ -66,13 +66,10 @@ public class homeFragClassEmp extends RecyclerView.Adapter<homeFragClassEmp.View
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.remove(tableNum.get(position)).apply();
         }
-        holder.chat.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(view.getContext(), ChatWithCustomer.class);
-                intent.putExtra("id",resId.get(position));
-                view.getContext().startActivity(intent);
-            }
+        holder.chat.setOnClickListener(view -> {
+            Intent intent = new Intent(view.getContext(), ChatWithCustomer.class);
+            intent.putExtra("id",resId.get(position));
+            view.getContext().startActivity(intent);
         });
 
         holder.isCurrentOrderMade.setOnClickListener(v -> {

@@ -77,12 +77,7 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
                 String[] arr = response.split(",");
                 Log.i("responseKey",response);
 //                        checkout.setKeyID(arr[0]);
-            }), new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    Log.i("responseError",error.toString());
-                }
-            });
+            }), error -> Log.i("responseError",error.toString()));
             requestQueue.add(stringRequest);
         });
         platformFee = findViewById(R.id.platformFeeToBePaid);
@@ -105,7 +100,7 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
                                 if(platformFeeAmount == 0D){
                                     platformFeeAmount = 0D;
                                 }else{
-                                        platformFeeAmount = ( platformFeeAmount * 3.7 ) / 100;
+                                        platformFeeAmount = ( platformFeeAmount * 3 ) / 100;
                                 }
                                 platformFee.setText("Platform Fee: " + "\u20B9" + df.format(platformFeeAmount));
                                 platformFeeBool = true;
@@ -238,7 +233,7 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
                                             if(platformFeeAmount == 0D){
                                                 platformFeeAmount = 0D;
                                             }else{
-                                                    platformFeeAmount = ( platformFeeAmount * 3.7 ) / 100;
+                                                    platformFeeAmount = ( platformFeeAmount * 3 ) / 100;
                                             }
                                             platformFee.setText("Platform Fee: " + "\u20B9" + df.format(platformFeeAmount));
                                             platformFeeBool = true;
@@ -369,7 +364,7 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
                                 if(platformFeeAmount == 0D){
                                     platformFeeAmount = 0D;
                                 }else{
-                                        platformFeeAmount = ( platformFeeAmount * 3.7 ) / 100;
+                                        platformFeeAmount = ( platformFeeAmount * 3 ) / 100;
                                 }
                                 platformFee.setText("Platform Fee: " + "\u20B9" + df.format(platformFeeAmount));
                                 platformFeeBool = true;
@@ -499,7 +494,7 @@ public class CashTransactionCommissionActivity extends AppCompatActivity {
                                                 platformFeeAmount = 0D;
                                             }else{
 
-                                                    platformFeeAmount = ( platformFeeAmount * 3.7 ) / 100;
+                                                    platformFeeAmount = ( platformFeeAmount * 3 ) / 100;
                                             }
                                             platformFee.setText("Platform Fee: " + "\u20B9" + df.format(platformFeeAmount));
                                             platformFeeBool = true;

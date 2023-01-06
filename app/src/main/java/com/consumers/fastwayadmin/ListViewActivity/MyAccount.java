@@ -1,11 +1,14 @@
 package com.consumers.fastwayadmin.ListViewActivity;
 
 import android.annotation.SuppressLint;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.text.InputType;
 import android.util.Log;
 import android.view.View;
@@ -50,7 +53,9 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -72,7 +77,7 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
     ModalBottomSheetDialog modalBottomSheetDialog;
     SharedPreferences.Editor editor;
     TextView textView;
-    String[] names = {"Change Credentials (Admin)","Change Credentials (Restaurants)","Restaurant Images","Delete Account","Change Bank Credentials","Restaurant Documents","Restaurant Staff Details","Leave Ordinalo","Initiate Payouts"};
+    String[] names = {"Change Credentials (Admin)","Change Credentials (Restaurants)","Restaurant Images","Delete Account","Change Bank Credentials","Restaurant Documents","Restaurant Staff Details","Leave Ordinalo","Initiate Payouts","Transfer Ownership"};
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -181,6 +186,33 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
                     break;
                 case 8:
                     startActivity(new Intent(MyAccount.this, InitiatePayoutForAdminNEFT.class));
+                    break;
+                case 9:
+                    AlertDialog.Builder builder = new AlertDialog.Builder(MyAccount.this);
+                    builder.setTitle("Transfer Ownership")
+                            .setMessage("Transfer Ownerships means giving other person all admin rights ( in simple words transferring account access to another person)\nDo you sure wanna proceed?\nAn executive from ordinalo will visit and will start the transfer process")
+                            .setPositiveButton("Transfer Initiate", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    File file = new File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS),"RestaurantEarningTracker.xlsx");
+                                    storageReference.child(Objects.requireNonNull(auth.getUid()) + "/" + "RestaurantEarningTracker.xlsx").putFile(Uri.fromFile(file))
+                                            .addOnCompleteListener(task -> {
+                                                if(task.isSuccessful())
+                                                    Toast.makeText(MyAccount.this, "Completed", Toast.LENGTH_SHORT).show();
+                                            });
+                                    DatabaseReference transferRequest = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("TransferRequest").child(UID);
+                                    Map<String,String> map = new HashMap();
+                                    map.put("id",UID);
+                                    transferRequest.setValue(map);
+                                }
+                            }).setNegativeButton("No, Wait", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+
+                                }
+                            }).create();
+                    builder.setCancelable(false);
+                    builder.show();
                     break;
 
             }
