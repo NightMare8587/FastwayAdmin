@@ -20,6 +20,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -68,9 +69,11 @@ public class Info extends AppCompatActivity {
     EditText nameOfRestaurant,AddressOfRestaurant,nearbyPlace,pinCode,contactNumber;
     Button proceed;
     boolean resCreated = false;
+    String serviceChargeVal;
     FastDialog loading;
 //    LocationRequest locationRequest;
     FirebaseFirestore infoStore;
+    boolean serviceChargeApplied = false;
     Bitmap bitmap;
     StorageReference storageReference;
     AlertDialog.Builder builder;
@@ -82,7 +85,7 @@ public class Info extends AppCompatActivity {
     Uri filePath;
     boolean subLocal = false;
     FirebaseStorage storage;
-    CheckBox optForTakeaway,optForTableBook;
+    CheckBox optForTakeaway,optForTableBook,optForServiceCharge;
     OutputStream outputStream;
     File file;
 //    FusedLocationProviderClient clientsLocation;
@@ -95,6 +98,7 @@ public class Info extends AppCompatActivity {
     DatabaseReference checkRef;
     SharedPreferences.Editor editor;
     String name,address,nearby,pin,number;
+
     SharedPreferences checkLocationInfo;
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -120,6 +124,7 @@ public class Info extends AppCompatActivity {
         storageReference = storage.getReference();
         optForTableBook = findViewById(R.id.checkBoxOptForFoodTable);
         optForTakeaway = findViewById(R.id.checkBoxOptForTakeAway);
+        optForServiceCharge = findViewById(R.id.checkBoxOptForServiceCharge);
         checkLocationInfo = getSharedPreferences("LocationMaps",MODE_PRIVATE);
         checkPermissions();
         sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
@@ -137,6 +142,47 @@ public class Info extends AppCompatActivity {
             finish();
             return;
         }
+
+        optForServiceCharge.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if(b){
+                    AlertDialog.Builder builderS = new AlertDialog.Builder(Info.this);
+                    builderS.setTitle("Service Charge").setMessage("Service charge is only applicable on dining not on takeaway");
+                    LinearLayout linearLayout = new LinearLayout(Info.this);
+                    linearLayout.setOrientation(LinearLayout.VERTICAL);
+                    EditText editText = new EditText(Info.this);
+                    editText.setHint("Enter % to be applied");
+                    linearLayout.addView(editText);
+                    builderS.setCancelable(false);
+                    builderS.setPositiveButton("Proceed", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            String s = editText.getText().toString();
+                            if(s.equals("") || s.equals("0")) {
+                                Toast.makeText(Info.this, "Invalid Input", Toast.LENGTH_SHORT).show();
+                                dialogInterface.dismiss();
+                                optForServiceCharge.setChecked(false);
+                            }
+                            else{
+                                Toast.makeText(Info.this, "Saved Successfully", Toast.LENGTH_SHORT).show();
+                                serviceChargeVal = s;
+                                serviceChargeApplied = true;
+                            }
+                        }
+                    }).setNegativeButton("Exit", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+
+                        }
+                    });
+                    builderS.setView(linearLayout);
+                    builderS.create().show();
+                }else{
+                    serviceChargeApplied = false;
+                }
+            }
+        });
         alertDialog.show();
         FirebaseFirestore checkStore = FirebaseFirestore.getInstance();
         checkStore.collection(sharedPreferences.getString("state","")).document("Restaurants").collection(sharedPreferences.getString("locality","")).document(Objects.requireNonNull(infoAuth.getUid()))
@@ -382,6 +428,13 @@ public class Info extends AppCompatActivity {
             infoRef.child("status").setValue("online");
             infoRef.child("acceptingOrders").setValue("yes");
             infoRef.child("totalReports").setValue("0");
+
+
+            if(serviceChargeApplied){
+                map.put("serviceCharge",serviceChargeVal);
+                infoRef.child("serviceCharge").setValue(serviceChargeVal);
+                this.editor.putString("serviceCharge", serviceChargeVal);
+            }
 
 
 

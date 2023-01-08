@@ -12,6 +12,8 @@ import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,6 +23,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.consumers.fastwayadmin.Info.ChangeResLocation.NewLocationRestaurant;
+import com.consumers.fastwayadmin.Info.Info;
 import com.consumers.fastwayadmin.Info.RestaurantDocuments.ReUploadDocuments.ViewAndReuploadDocuments;
 import com.consumers.fastwayadmin.ListViewActivity.LeaveFastwayPackage.LeaveFastway;
 import com.consumers.fastwayadmin.ListViewActivity.StaffDetails.RestaurantStaff;
@@ -36,7 +39,9 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -63,7 +68,7 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
     ModalBottomSheetDialog modalBottomSheetDialog;
     SharedPreferences.Editor editor;
     TextView textView;
-    String[] names = {"Change Credentials (Admin)","Change Credentials (Restaurants)","Restaurant Images","Delete Account","Change Bank Credentials","Restaurant Documents","Restaurant Staff Details","Leave Ordinalo","Initiate Payouts","Transfer Ownership"};
+    String[] names = {"Change Credentials (Admin)","Change Credentials (Restaurants)","Restaurant Images","Delete Account","Change Bank Credentials","Restaurant Documents","Restaurant Staff Details","Leave Ordinalo","Initiate Payouts","Transfer Ownership","Service Charge"};
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,7 +81,9 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
         editor = resInfoSharedPref.edit();
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this, R.layout.list, names);
         listView.setAdapter(arrayAdapter);
+        SharedPreferences.Editor loginEdit;
         SharedPreferences sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
+        loginEdit = sharedPreferences.edit();
         if(resInfoSharedPref.contains("hotelName")) {
             resNameText.setText(resInfoSharedPref.getString("hotelName", ""));
         }else{
@@ -199,6 +206,101 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
                             }).create();
                     builder.setCancelable(false);
                     builder.show();
+                    break;
+
+                case 10:
+                    if(sharedPreferences.contains("serviceCharge")){
+                        AlertDialog.Builder builderS = new AlertDialog.Builder(MyAccount.this);
+                        builderS.setTitle("Service Charge").setMessage("Choose one option from below buttons")
+                                .setPositiveButton("Remove Service Charge", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+                                        DocumentReference documentReference = firestore.collection(sharedPreferences.getString("state","")).document("Restaurants").collection(sharedPreferences.getString("state","")).document(UID);
+                                        Map<String,Object> updates = new HashMap<>();
+                                        updates.put("serviceCharge", FieldValue.delete());
+                                        documentReference.update(updates);
+
+                                        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("state",""))
+                                                .child(UID);
+                                        databaseReference.child("serviceCharge").removeValue();
+                                        loginEdit.remove("serviceCharge").apply();
+                                    }
+                                }).setNegativeButton("Change % charge", (dialogInterface, i1) -> {
+                                    AlertDialog.Builder builderN = new AlertDialog.Builder(MyAccount.this);
+                                    builderN.setTitle("Service Charge").setMessage("Service charge is only applicable on dining not on takeaway");
+                                    LinearLayout linearLayout = new LinearLayout(MyAccount.this);
+                                    linearLayout.setOrientation(LinearLayout.VERTICAL);
+                                    EditText editText = new EditText(MyAccount.this);
+                                    editText.setHint("Enter % to be applied");
+                                    linearLayout.addView(editText);
+                                    builderN.setView(linearLayout);
+                                    builderN.setPositiveButton("Proceed", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i1) {
+                                            String s = editText.getText().toString();
+                                            if(s.equals("") || s.equals("0")) {
+                                                Toast.makeText(MyAccount.this, "Invalid Input", Toast.LENGTH_SHORT).show();
+                                            }else{
+                                                FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+                                                firestore.collection(sharedPreferences.getString("state","")).document("Restaurants").collection(sharedPreferences.getString("state","")).document(UID)
+                                                        .update("serviceCharge",s);
+                                                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("state",""))
+                                                        .child(UID);
+                                                databaseReference.child("serviceCharge").setValue(s);
+                                                loginEdit.putString("serviceCharge",s);
+                                                loginEdit.apply();
+                                            }
+                                        }
+                                    }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i1) {
+
+                                        }
+                                    });
+                                    builderN.create().show();
+                                }).setNeutralButton("Exit", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                                    }
+                                });
+                        builderS.create().show();
+                    }else{
+                        AlertDialog.Builder builderN = new AlertDialog.Builder(MyAccount.this);
+                        builderN.setTitle("Service Charge").setMessage("Service charge is only applicable on dining not on takeaway");
+                        LinearLayout linearLayout = new LinearLayout(MyAccount.this);
+                        linearLayout.setOrientation(LinearLayout.VERTICAL);
+                        EditText editText = new EditText(MyAccount.this);
+                        editText.setHint("Enter % to be applied");
+                        linearLayout.addView(editText);
+
+                        builderN.setPositiveButton("Proceed", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i1) {
+                                String s = editText.getText().toString();
+                                if(s.equals("") || s.equals("0")) {
+                                    Toast.makeText(MyAccount.this, "Invalid Input", Toast.LENGTH_SHORT).show();
+                                }else{
+                                    FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+                                    firestore.collection(sharedPreferences.getString("state","")).document("Restaurants").collection(sharedPreferences.getString("state","")).document(UID)
+                                            .update("serviceCharge",s);
+                                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(sharedPreferences.getString("state","")).child(sharedPreferences.getString("state",""))
+                                            .child(UID);
+                                    databaseReference.child("serviceCharge").setValue(s);
+                                    loginEdit.putString("serviceCharge",s);
+                                    loginEdit.apply();
+                                }
+                            }
+                        }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i1) {
+
+                            }
+                        });
+                        builderN.setView(linearLayout);
+                        builderN.create().show();
+                    }
                     break;
 
             }

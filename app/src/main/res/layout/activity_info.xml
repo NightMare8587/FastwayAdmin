@@ -105,7 +105,7 @@
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/checkBoxOptForFoodTable" />
+        app:layout_constraintTop_toBottomOf="@+id/checkBoxOptForServiceCharge" />
 
     <CheckBox
         android:id="@+id/checkBoxOptForTakeAway"
@@ -132,5 +132,17 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/checkBoxOptForTakeAway" />
 
+
+    <CheckBox
+        android:id="@+id/checkBoxOptForServiceCharge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:fontFamily="@font/inter"
+        android:text="Restaurant has service charge"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/checkBoxOptForFoodTable" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

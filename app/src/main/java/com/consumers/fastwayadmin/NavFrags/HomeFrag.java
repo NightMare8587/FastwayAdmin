@@ -234,6 +234,9 @@ public class HomeFrag extends Fragment {
         restaurantTrackRecords = view.getContext().getSharedPreferences("RestaurantTrackRecords",Context.MODE_PRIVATE);
         restaurantTrackRecordsEditor = restaurantTrackRecords.edit();
         restaurantTrackEditor = restaurantDailyTrack.edit();
+//        restaurantTrackEditor.remove("totalOrdersToday");
+//        restaurantTrackEditor.remove("totalTransactionsToday");
+//        restaurantTrackEditor.apply();
         try {
             dailyRestaurantTrackUpdate();
         } catch (IOException e) {
@@ -726,8 +729,10 @@ public class HomeFrag extends Fragment {
                 DateFormat formatter = new SimpleDateFormat("EEEE");
                 String dayOfWeekString = formatter.format(cal.getTime());
                 restaurantTrackEditor.putString("currentDay",dayOfWeekString);
-                restaurantTrackEditor.putString("totalOrdersToday","0");
-                restaurantTrackEditor.putString("totalTransactionsToday","0");
+                restaurantTrackEditor.remove("totalOrdersToday");
+                restaurantTrackEditor.remove("totalTransactionsToday");
+                totalOrdersToday.setText("0");
+                totalTransactionsToday.setText("\u20b90");
                 restaurantTrackEditor.apply();
             }
         }else{
