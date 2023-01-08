@@ -23,6 +23,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.consumers.fastwayadmin.Info.ChangeResLocation.NewLocationRestaurant;
+import com.consumers.fastwayadmin.Info.FoodDeliveryIntegration;
 import com.consumers.fastwayadmin.Info.Info;
 import com.consumers.fastwayadmin.Info.RestaurantDocuments.ReUploadDocuments.ViewAndReuploadDocuments;
 import com.consumers.fastwayadmin.ListViewActivity.LeaveFastwayPackage.LeaveFastway;
@@ -68,7 +69,7 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
     ModalBottomSheetDialog modalBottomSheetDialog;
     SharedPreferences.Editor editor;
     TextView textView;
-    String[] names = {"Change Credentials (Admin)","Change Credentials (Restaurants)","Restaurant Images","Delete Account","Change Bank Credentials","Restaurant Documents","Restaurant Staff Details","Leave Ordinalo","Initiate Payouts","Transfer Ownership","Service Charge"};
+    String[] names = {"Change Credentials (Admin)","Change Credentials (Restaurants)","Restaurant Images","Delivery Integration","Change Bank Credentials","Restaurant Documents","Restaurant Staff Details","Leave Ordinalo","Initiate Payouts","Transfer Ownership","Service Charge"};
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -149,20 +150,21 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
                     break;
 
                 case 3:
-                    new KAlertDialog(MyAccount.this,KAlertDialog.WARNING_TYPE)
-                            .setTitleText("Delete Account")
-                            .setContentText("Do you sure wanna delete your account!!! All of your data will be removed\n"+"This action can't be revert")
-                            .setConfirmText("Yes, Delete")
-                            .setConfirmClickListener(kAlertDialog -> {
-
-                                try {
-                                    new removeAll().execute();
-                                }
-                                catch (Exception e){
-                                    Log.i("logs",e.getLocalizedMessage());
-                                }
-                            }).setCancelText("No, Wait")
-                            .setCancelClickListener(KAlertDialog::dismissWithAnimation).show();
+                    startActivity(new Intent(MyAccount.this, FoodDeliveryIntegration.class));
+//                    new KAlertDialog(MyAccount.this,KAlertDialog.WARNING_TYPE)
+//                            .setTitleText("Delete Account")
+//                            .setContentText("Do you sure wanna delete your account!!! All of your data will be removed\n"+"This action can't be revert")
+//                            .setConfirmText("Yes, Delete")
+//                            .setConfirmClickListener(kAlertDialog -> {
+//
+//                                try {
+//                                    new removeAll().execute();
+//                                }
+//                                catch (Exception e){
+//                                    Log.i("logs",e.getLocalizedMessage());
+//                                }
+//                            }).setCancelText("No, Wait")
+//                            .setCancelClickListener(KAlertDialog::dismissWithAnimation).show();
                     break;
                 case 4:
                     Intent intent = new Intent(MyAccount.this, EditVendorDetails.class);

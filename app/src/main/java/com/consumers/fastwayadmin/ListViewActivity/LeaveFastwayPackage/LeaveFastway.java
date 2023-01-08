@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.InputType;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -20,8 +21,14 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDialog;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.consumers.fastwayadmin.ListViewActivity.InitiatePayoutForAdminNEFT;
 import com.consumers.fastwayadmin.NavFrags.CashCommission.CashFreeGateway;
+import com.consumers.fastwayadmin.NavFrags.CashCommission.CashTransactionCommissionActivity;
+import com.consumers.fastwayadmin.NavFrags.CashCommission.CommissionGWordinalo;
 import com.consumers.fastwayadmin.R;
 import com.consumers.fastwayadmin.SplashAndIntro.SplashScreen;
 import com.developer.kalert.KAlertDialog;
@@ -34,6 +41,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.razorpay.Checkout;
 
 import java.text.DecimalFormat;
 import java.util.Objects;
@@ -45,6 +53,9 @@ public class LeaveFastway extends AppCompatActivity {
     GoogleSignInClient googleSignInClient;
     Button submitAndLeave;
     boolean pendingDue = false;
+    String getApiKeyTest = "https://intercellular-stabi.000webhostapp.com/razorpay/returnApiKey.php";
+    String getApiKeyLive = "https://intercellular-stabi.000webhostapp.com/razorpay/returnLiveApiKey.php";
+    String testKey;
     double totalCash,totalMonth,platformFee,totalPayoutAmount;
     RadioButton radioButton;
     boolean stopCode = false;
@@ -58,6 +69,24 @@ public class LeaveFastway extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_leave_fastway);
         initialise();
+        AsyncTask.execute(() -> {
+            String requestKey;
+            if(Objects.equals(auth.getUid(), "scfmpDeOKFMW0HNJps0F6T4A2j82"))
+                requestKey = getApiKeyTest;
+            else
+                requestKey = getApiKeyLive;
+            RequestQueue requestQueue = Volley.newRequestQueue(LeaveFastway.this);
+            StringRequest stringRequest = new StringRequest(Request.Method.GET, requestKey, response -> runOnUiThread(() -> {
+                Checkout.preload(LeaveFastway.this);
+//                        Checkout checkout = new Cas();
+                // ...
+                testKey = response;
+                String[] arr = response.split(",");
+                Log.i("responseKey",response);
+//                        checkout.setKeyID(arr[0]);
+            }), error -> Log.i("responseError",error.toString()));
+            requestQueue.add(stringRequest);
+        });
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
@@ -66,21 +95,18 @@ public class LeaveFastway extends AppCompatActivity {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         if(snapshot.hasChild("totalPayoutAmount")){
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    new KAlertDialog(LeaveFastway.this,KAlertDialog.WARNING_TYPE)
-                                            .setTitleText("Payout").setContentText("You have payout amount left. Withdraw that first")
-                                            .setConfirmText("Withdraw").setCancelText("Exit")
-                                            .setConfirmClickListener(click -> {
-                                                click.dismissWithAnimation();
-                                                startActivity(new Intent(LeaveFastway.this, InitiatePayoutForAdminNEFT.class));
-                                            }).setCancelClickListener(click -> {
-                                                click.dismissWithAnimation();
-                                                finish();
-                                            }).show();
-                                    stopCode = true;
-                                }
+                            runOnUiThread(() -> {
+                                new KAlertDialog(LeaveFastway.this,KAlertDialog.WARNING_TYPE)
+                                        .setTitleText("Payout").setContentText("You have payout amount left. Withdraw that first")
+                                        .setConfirmText("Withdraw").setCancelText("Exit")
+                                        .setConfirmClickListener(click -> {
+                                            click.dismissWithAnimation();
+                                            startActivity(new Intent(LeaveFastway.this, InitiatePayoutForAdminNEFT.class));
+                                        }).setCancelClickListener(click -> {
+                                            click.dismissWithAnimation();
+                                            finish();
+                                        }).show();
+                                stopCode = true;
                             });
                         }
 
@@ -134,9 +160,9 @@ public class LeaveFastway extends AppCompatActivity {
                         }).create().show();
             }else{
                 if(pendingDue) {
-                    double commAmount = (totalCash * 3) / 100;
+                    double commAmount = (totalCash * 1.5) / 100;
                     double gst = (totalCash * 5) / 100;
-                    double platformFee = (totalMonth * 4) / 100;
+                    double platformFee = (totalMonth * 3) / 100;
                     AlertDialog.Builder builder = new AlertDialog.Builder(LeaveFastway.this);
                     builder.setTitle("Pending Due's").setMessage("You need to pay off pending amount to leave Ordinalo\n\nCash Commission: \u20b9" + commAmount + "\nGST: \u20b9" + gst + "\nPlatform Fee: " + platformFee + "\nTotal: \u20b9" + decimalFormat.format(gst + commAmount + platformFee));
                     builder.setPositiveButton("Pay Now", new DialogInterface.OnClickListener() {
@@ -144,8 +170,9 @@ public class LeaveFastway extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
                             SharedPreferences sharedPreferences = getSharedPreferences("loginInfo",MODE_PRIVATE);
                             if(sharedPreferences.contains("number")) {
-                                Intent intent = new Intent(LeaveFastway.this, CashFreeGateway.class);
+                                Intent intent = new Intent(LeaveFastway.this, CommissionGWordinalo.class);
                                 intent.putExtra("amount", "" + decimalFormat.format((commAmount + gst + platformFee)));
+                                intent.putExtra("keys",testKey);
                                 startActivityForResult(intent, 2);
                             }else{
                                 AlertDialog.Builder getNum = new AlertDialog.Builder(LeaveFastway.this);
@@ -371,8 +398,10 @@ public class LeaveFastway extends AppCompatActivity {
             auth.signOut();
                                     googleSignInClient.signOut().addOnCompleteListener(task -> {
                                     });
-                                    SharedPreferences settings = getSharedPreferences("loginInfo", MODE_PRIVATE);
-                                    settings.edit().clear().apply();
+
+
+            SharedPreferences settings = getSharedPreferences("loginInfo", MODE_PRIVATE);
+            settings.edit().clear().apply();
 
             SharedPreferences res = getSharedPreferences("RestaurantInfo", MODE_PRIVATE);
             res.edit().clear().apply();
@@ -380,14 +409,42 @@ public class LeaveFastway extends AppCompatActivity {
             SharedPreferences intro = getSharedPreferences("IntroAct", MODE_PRIVATE);
             intro.edit().clear().apply();
 
+            SharedPreferences current = getSharedPreferences("locations current", MODE_PRIVATE);
+            current.edit().clear().apply();
+
+            SharedPreferences AdminPremiumDetails = getSharedPreferences("AdminPremiumDetails", MODE_PRIVATE);
+            AdminPremiumDetails.edit().clear().apply();
+
+            SharedPreferences CalenderForExcel = getSharedPreferences("CalenderForExcel", MODE_PRIVATE);
+            CalenderForExcel.edit().clear().apply();
+
+            SharedPreferences resDailyStore = getSharedPreferences("RestaurantDailyStoreForAnalysis", MODE_PRIVATE);
+            resDailyStore.edit().clear().apply();
+
+
+            SharedPreferences last7days = getSharedPreferences("last7daysReport", MODE_PRIVATE);
+            last7days.edit().clear().apply();
+
             SharedPreferences storeOrders = getSharedPreferences("StoreOrders", MODE_PRIVATE);
             storeOrders.edit().clear().apply();
 
             SharedPreferences location = getSharedPreferences("LocationMaps", MODE_PRIVATE);
             location.edit().clear().apply();
 
+            SharedPreferences storeImages = getSharedPreferences("storeImages", MODE_PRIVATE);
+            storeImages.edit().clear().apply();
+
+            SharedPreferences StoreDataForPayInEnd = getSharedPreferences("StoreDataForPayInEnd", MODE_PRIVATE);
+            StoreDataForPayInEnd.edit().clear().apply();
+
             SharedPreferences cashCommission = getSharedPreferences("CashCommission", MODE_PRIVATE);
             cashCommission.edit().clear().apply();
+
+            SharedPreferences DailyUserTrackingFor7days = getSharedPreferences("DailyUserTrackingFor7days", MODE_PRIVATE);
+            DailyUserTrackingFor7days.edit().clear().apply();
+
+            SharedPreferences DailyAverageOrderMonthly = getSharedPreferences("DailyAverageOrderMonthly", MODE_PRIVATE);
+            DailyAverageOrderMonthly.edit().clear().apply();
 
             SharedPreferences RestaurantTrackingDaily = getSharedPreferences("RestaurantTrackingDaily", MODE_PRIVATE);
             RestaurantTrackingDaily.edit().clear().apply();
@@ -395,8 +452,18 @@ public class LeaveFastway extends AppCompatActivity {
             SharedPreferences RestaurantTrackRecords = getSharedPreferences("RestaurantTrackRecords", MODE_PRIVATE);
             RestaurantTrackRecords.edit().clear().apply();
 
+            SharedPreferences UserFrequencyPerMonth = getSharedPreferences("UserFrequencyPerMonth", MODE_PRIVATE);
+            UserFrequencyPerMonth.edit().clear().apply();
+
+            SharedPreferences DishOrderedWithOthers = getSharedPreferences("DishOrderedWithOthers", MODE_PRIVATE);
+            DishOrderedWithOthers.edit().clear().apply();
+
             SharedPreferences DishAnalysis = getSharedPreferences("DishAnalysis", MODE_PRIVATE);
             DishAnalysis.edit().clear().apply();
+            SharedPreferences trackTake = getSharedPreferences("TrackingOfTakeAway", MODE_PRIVATE);
+            trackTake.edit().clear().apply();
+            SharedPreferences trackFood = getSharedPreferences("TrackingOfFoodDining", MODE_PRIVATE);
+            trackFood.edit().clear().apply();
 
                                     new Handler().postDelayed(() -> {
                                         kAlertDialog.dismissWithAnimation();

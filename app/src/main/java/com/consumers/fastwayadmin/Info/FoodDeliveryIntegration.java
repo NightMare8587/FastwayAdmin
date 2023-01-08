@@ -69,6 +69,9 @@ public class FoodDeliveryIntegration extends AppCompatActivity {
             if(default1.equals("no")){
                 editor.putString("foodDelivery","no");
                 editor.apply();
+                FirebaseAuth auth = FirebaseAuth.getInstance();
+                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(auth.getUid())).child("FoodDelivery");
+                databaseReference.removeValue();
                 finish();
                 return;
             }
