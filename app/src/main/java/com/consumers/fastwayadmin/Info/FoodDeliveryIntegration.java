@@ -64,7 +64,7 @@ public class FoodDeliveryIntegration extends AppCompatActivity {
                     break;
             }
         });
-        
+
 
         proceed.setOnClickListener(click -> {
             if(default1.equals("no")){
@@ -77,6 +77,7 @@ public class FoodDeliveryIntegration extends AppCompatActivity {
                 return;
             }
 
+            
 
             if(own){
                 if(distance.getText().toString().equals("0") || distance.getText().toString().equals("")){
