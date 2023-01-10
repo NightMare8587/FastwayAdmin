@@ -107,6 +107,8 @@ public class HomeScreen extends AppCompatActivity {
     String subRefID;
     SharedPreferences calenderForExcel;
     SharedPreferences trackOfAllGeneratedFiles;
+    SharedPreferences dishDailyTrackForReports;
+    SharedPreferences.Editor dailyReportTrackDish;
     FirebaseStorage storage;
     StorageReference storageReference;
     SharedPreferences.Editor editorToTrackFiles;
@@ -160,6 +162,8 @@ public class HomeScreen extends AppCompatActivity {
         premEditor = adminPrem.edit();
         ConnectivityManager cm =
                 (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+        dishDailyTrackForReports = getSharedPreferences("DishDailyTrackForReports",MODE_PRIVATE);
+        dailyReportTrackDish = dishDailyTrackForReports.edit();
         FirebaseMessaging.getInstance().subscribeToTopic("FastwayQueryDB");
         trackOfAllGeneratedFiles= getSharedPreferences("TrackOfAllInsights",MODE_PRIVATE);
         editorToTrackFiles = trackOfAllGeneratedFiles.edit();
@@ -485,7 +489,7 @@ public class HomeScreen extends AppCompatActivity {
 
                         PdfDocument pdfDocument = new PdfDocument();
                         Paint myPaint = new Paint();
-                        PdfDocument.PageInfo myPage = new PdfDocument.PageInfo.Builder(2080, 2040, 1).create();
+                        PdfDocument.PageInfo myPage = new PdfDocument.PageInfo.Builder(2080, 2640, 1).create();
                         PdfDocument.Page page = pdfDocument.startPage(myPage);
 
                         Paint text = new Paint();
@@ -570,6 +574,30 @@ public class HomeScreen extends AppCompatActivity {
                         canvas.drawText("Contact Ordinalo", 1200, 1360, text);
                         canvas.drawText("Phone: +91-8076531395", 1200, 1410, text);
                         canvas.drawText("Email: ordinalo.services@gmail.com", 1200, 1480, text);
+
+                        java.lang.reflect.Type dailyDish = new TypeToken<HashMap<Integer, HashMap<String, Integer>>>() {
+                        }.getType();
+                        Gson dishGson = new Gson();
+
+                        if(dishDailyTrackForReports.contains(month)) {
+                            HashMap<Integer, HashMap<String, Integer>> mainMapDish = dishGson.fromJson(dishDailyTrackForReports.getString("month",""),dailyDish);
+
+                            if(mainMapDish.containsKey(day)){
+                                HashMap<String,Integer> innerMapDish = new HashMap<>(mainMapDish.get(day));
+                                text.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+                                text.setTextSize(54);
+                                canvas.drawText("Ordered Dish List",100,1370,text);
+                                text.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.NORMAL));
+                                text.setTextSize(52);
+
+                                int dist = 1420;
+                                for(Map.Entry<String,Integer> loopMap : innerMapDish.entrySet()){
+                                    canvas.drawText(loopMap.getKey() + " : " + loopMap.getValue(),100,dist,text);
+                                    dist += 70;
+                                }
+                            }
+                        }
+
 
 
                         HashMap<String,String> latestAnalysis = new HashMap<>();
@@ -668,7 +696,7 @@ public class HomeScreen extends AppCompatActivity {
 
                                     PdfDocument pdfDocument = new PdfDocument();
                                     Paint myPaint = new Paint();
-                                    PdfDocument.PageInfo myPage = new PdfDocument.PageInfo.Builder(2080, 2040, 1).create();
+                                    PdfDocument.PageInfo myPage = new PdfDocument.PageInfo.Builder(2080, 2640, 1).create();
                                     PdfDocument.Page page = pdfDocument.startPage(myPage);
 
                                     Paint text = new Paint();
@@ -745,6 +773,29 @@ public class HomeScreen extends AppCompatActivity {
                                     canvas.drawText("Contact Ordinalo", 1200, 1260, text);
                                     canvas.drawText("Phone: +91-8076531395", 1200, 1340, text);
                                     canvas.drawText("Email: ordinalo.services@gmail.com", 1200, 1420, text);
+
+                                    java.lang.reflect.Type dailyDish = new TypeToken<HashMap<Integer, HashMap<String, Integer>>>() {
+                                    }.getType();
+                                    Gson dishGson = new Gson();
+
+                                    if(dishDailyTrackForReports.contains(month)) {
+                                        HashMap<Integer, HashMap<String, Integer>> mainMapDish = dishGson.fromJson(dishDailyTrackForReports.getString("month",""),dailyDish);
+
+                                        if(mainMapDish.containsKey(day)){
+                                            HashMap<String,Integer> innerMapDish = new HashMap<>(mainMapDish.get(day));
+                                            text.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+                                            text.setTextSize(54);
+                                            canvas.drawText("Ordered Dish List",100,1220,text);
+                                            text.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.NORMAL));
+                                            text.setTextSize(52);
+
+                                            int dist = 1290;
+                                            for(Map.Entry<String,Integer> loopMap : innerMapDish.entrySet()){
+                                                canvas.drawText(loopMap.getKey() + " : " + loopMap.getValue(),100,dist,text);
+                                                dist += 70;
+                                            }
+                                        }
+                                    }
 
 
                                     HashMap<String,String> latestAnalysis = new HashMap<>();

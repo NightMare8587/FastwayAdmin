@@ -40,9 +40,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.consumers.fastwayadmin.CancelClass;
 import com.consumers.fastwayadmin.HomeScreen.ReportSupport.RequestRefundClass;
-import com.consumers.fastwayadmin.NavFrags.CurrentTakeAwayOrders.ApproveCurrentTakeAway;
 import com.consumers.fastwayadmin.NavFrags.CurrentTakeAwayOrders.MyClass;
-import com.consumers.fastwayadmin.PaymentClass;
 import com.consumers.fastwayadmin.R;
 import com.google.common.reflect.TypeToken;
 import com.google.firebase.auth.FirebaseAuth;
@@ -86,6 +84,8 @@ public class ApproveCurrentOrder extends AppCompatActivity {
     Gson gson;
     String json;
     SharedPreferences trackingOfTakeAway;
+    SharedPreferences dishDailyTrackForReports;
+    SharedPreferences.Editor dailyReportTrackDish;
     SharedPreferences.Editor user7daysEdit;
     SharedPreferences dailyUserTrackingFor7days;
     SharedPreferences dailyAverageOrder;
@@ -172,6 +172,8 @@ public class ApproveCurrentOrder extends AppCompatActivity {
         trackingOfTakeAway = getSharedPreferences("TrackingOfFoodDining",MODE_PRIVATE);
         trackingDineAndWay = trackingOfTakeAway.edit();
         restaurantTrackRecordsEditor = restaurantTrackRecords.edit();
+        dishDailyTrackForReports = getSharedPreferences("DishDailyTrackForReports",MODE_PRIVATE);
+        dailyReportTrackDish = dishDailyTrackForReports.edit();
         restaurantTrackEditor = restaurantDailyTrack.edit();
         StrictMode.VmPolicy.Builder builders = new StrictMode.VmPolicy.Builder();
         StrictMode.setVmPolicy(builders.build());
@@ -632,6 +634,54 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                         }
 
 
+                        if(dishDailyTrackForReports.contains(month)){
+                            gson = new Gson();
+                            java.lang.reflect.Type type = new TypeToken<HashMap<Integer, HashMap<String, Integer>>>() {
+                            }.getType();
+
+                            HashMap<Integer , HashMap<String,Integer>> mainMap = gson.fromJson(dishDailyTrackForReports.getString(month,""),type);
+                            int day = calendar.get(Calendar.DAY_OF_MONTH);
+                            if(mainMap.containsKey(day)){
+                                HashMap<String, Integer> innerMap = new HashMap<>(mainMap.get(day));
+
+                                for(int l = 0;l< dishNames.size();l++){
+                                    if(innerMap.containsKey(dishNames.get(l))){
+                                        int prev = innerMap.get(dishNames.get(l));
+                                        prev += Integer.parseInt(dishQuantity.get(l));
+                                        innerMap.put(dishNames.get(l),prev);
+                                    }else
+                                        innerMap.put(dishNames.get(l),Integer.parseInt(dishQuantity.get(l)));
+                                }
+
+                                mainMap.put(day,innerMap);
+                            }else{
+                                HashMap<String, Integer> innerMap = new HashMap<>();
+                                for(int l=0;l < dishNames.size();l++){
+                                    innerMap.put(dishNames.get(l),Integer.parseInt(dishQuantity.get(l)));
+                                }
+
+                                mainMap.put(day,innerMap);
+                            }
+
+                            dailyReportTrackDish.putString(month,gson.toJson(mainMap));
+                            dailyReportTrackDish.apply();
+
+                        }else{
+                            int day = calendar.get(Calendar.DAY_OF_MONTH);
+                            HashMap<String, Integer> innerMap = new HashMap<>();
+                            gson = new Gson();
+                            for(int l=0;l < dishNames.size();l++){
+                                innerMap.put(dishNames.get(l),Integer.parseInt(dishQuantity.get(l)));
+                            }
+
+                            HashMap<Integer , HashMap<String,Integer>> mainMap = new HashMap<>();
+                            mainMap.put(day,innerMap);
+
+                            dailyReportTrackDish.putString(month,gson.toJson(mainMap));
+                            dailyReportTrackDish.apply();
+                        }
+
+
                         if (storeForDishAnalysis.contains("DishAnalysisMonthBasis")) {
                             try {
                                 gson = new Gson();
@@ -647,55 +697,29 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                                         if (map.containsKey(dishNames.get(k))) {
                                             String currDishName = dishNames.get(k);
                                             int val = map.get(dishNames.get(k));
-                                            val++;
+                                            val += Integer.parseInt(dishQuantity.get(k));
                                             map.put(dishNames.get(k), val);
 
                                         } else {
-                                            map.put(dishNames.get(k), 1);
+                                            map.put(dishNames.get(k), Integer.parseInt(dishQuantity.get(k)));
                                         }
                                     }
                                 } else {
                                     map = new HashMap<>();
                                     for (int i = 0; i < dishNames.size(); i++) {
-                                        map.put(dishNames.get(i), 1);
+                                        map.put(dishNames.get(i), Integer.parseInt(dishQuantity.get(i)));
                                     }
                                 }
                                 myMap.put(month, map);
                                 dishAnalysis.putString("DishAnalysisMonthBasis", gson.toJson(myMap));
                             }catch (Exception e){
 
-                                gson = new Gson();
-                                Type type = new TypeToken<HashMap<String, HashMap<String, Integer>>>() {
-                                }.getType();
-                                String storedHash = storeForDishAnalysis.getString("DishAnalysisMonthBasis", "");
-                                HashMap<String, HashMap<String, Integer>> myMap = gson.fromJson(storedHash, type);
-                                HashMap<String, Integer> map;
-                                if (myMap.containsKey(month)) {
-                                    map = new HashMap<>(myMap.get(month));
-                                    Log.i("checking", map.toString());
-                                    for (int k = 0; k < dishNames.size(); k++) {
-                                        if (map.containsKey(dishNames.get(k))) {
-                                            int val = map.get(dishNames.get(k));
-                                            val++;
-                                            map.put(dishNames.get(k), val);
-                                        } else {
-                                            map.put(dishNames.get(k), 1);
-                                        }
-                                    }
-                                } else {
-                                    map = new HashMap<>();
-                                    for (int i = 0; i < dishNames.size(); i++) {
-                                        map.put(dishNames.get(i), 1);
-                                    }
-                                }
-                                myMap.put(month, map);
-                                dishAnalysis.putString("DishAnalysisMonthBasis", gson.toJson(myMap));
                             }
                         } else {
                             HashMap<String, HashMap<String, Integer>> map = new HashMap<>();
                             HashMap<String, Integer> myMap = new HashMap<>();
                             for (int j = 0; j < dishNames.size(); j++) {
-                                myMap.put(dishNames.get(j), 1);
+                                myMap.put(dishNames.get(j), Integer.parseInt(dishQuantity.get(j)));
                             }
                             map.put(month, myMap);
                             gson = new Gson();
@@ -1572,6 +1596,54 @@ public class ApproveCurrentOrder extends AppCompatActivity {
 
                     SharedPreferences checkPrem = getSharedPreferences("AdminPremiumDetails", MODE_PRIVATE);
                     if (checkPrem.contains("status") && checkPrem.getString("status", "").equals("active")) {
+
+                        if(dishDailyTrackForReports.contains(month)){
+                            gson = new Gson();
+                            java.lang.reflect.Type type = new TypeToken<HashMap<Integer, HashMap<String, Integer>>>() {
+                            }.getType();
+
+                            HashMap<Integer , HashMap<String,Integer>> mainMap = gson.fromJson(dishDailyTrackForReports.getString(month,""),type);
+                            int day = calendar.get(Calendar.DAY_OF_MONTH);
+                            if(mainMap.containsKey(day)){
+                                HashMap<String, Integer> innerMap = new HashMap<>(mainMap.get(day));
+
+                                for(int l = 0;l< dishNames.size();l++){
+                                    if(innerMap.containsKey(dishNames.get(l))){
+                                        int prev = innerMap.get(dishNames.get(l));
+                                        prev += Integer.parseInt(dishQuantity.get(l));
+                                        innerMap.put(dishNames.get(l),prev);
+                                    }else
+                                        innerMap.put(dishNames.get(l),Integer.parseInt(dishQuantity.get(l)));
+                                }
+
+                                mainMap.put(day,innerMap);
+                            }else{
+                                HashMap<String, Integer> innerMap = new HashMap<>();
+                                for(int l=0;l < dishNames.size();l++){
+                                    innerMap.put(dishNames.get(l),Integer.parseInt(dishQuantity.get(l)));
+                                }
+
+                                mainMap.put(day,innerMap);
+                            }
+
+                            dailyReportTrackDish.putString(month,gson.toJson(mainMap));
+                            dailyReportTrackDish.apply();
+
+                        }else{
+                            int day = calendar.get(Calendar.DAY_OF_MONTH);
+                            HashMap<String, Integer> innerMap = new HashMap<>();
+                            gson = new Gson();
+                            for(int l=0;l < dishNames.size();l++){
+                                innerMap.put(dishNames.get(l),Integer.parseInt(dishQuantity.get(l)));
+                            }
+
+                            HashMap<Integer , HashMap<String,Integer>> mainMap = new HashMap<>();
+                            mainMap.put(day,innerMap);
+
+                            dailyReportTrackDish.putString(month,gson.toJson(mainMap));
+                            dailyReportTrackDish.apply();
+                        }
+
                         if (storeForDishAnalysis.contains("DishAnalysisMonthBasis")) {
                             try {
                                 gson = new Gson();
