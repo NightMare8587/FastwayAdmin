@@ -203,7 +203,7 @@ public class UploadRequiredDocuments extends AppCompatActivity {
                     uploadGST.setPositiveButton("Proceed", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            if(editText.getText().toString().equals("") || editText.length() != 15){
+                            if(editText.getText().toString().equals("")){
                                 Toast.makeText(UploadRequiredDocuments.this, "Invalid Input", Toast.LENGTH_SHORT).show();
                                 haveGST = false;
                                 RadioButton radioButton = findViewById(R.id.noIdontHavrGSTIN);

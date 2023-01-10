@@ -87,6 +87,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
     String deliveryInformation;
     List<String> image;
     List<String> type;
+    boolean isGstAvailable = false;
     List<String> dishPrice;
     String amountPaidByUser;
     int veg = 0,nonVeg = 0,vegan = 0;
@@ -176,6 +177,21 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
         }
         user7daysEdit = dailyUserTrackingFor7days.edit();
         trackingDineAndWay = trackingOfTakeAway.edit();
+        AsyncTask.execute(() -> {
+            DatabaseReference admin = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(auth.getUid()).child("Restauran Documents");
+            admin.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if(snapshot.hasChild("gstinNum"))
+                        isGstAvailable = true;
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+        });
         userFedit = userFrequency.edit();
         restaurantTrackRecordsEditor = restaurantTrackRecords.edit();
         restaurantTrackEditor = restaurantDailyTrack.edit();
@@ -3004,8 +3020,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
 
         @Override
         protected Void doInBackground(Void... voids) {
-
-
+            
 
             String[] monthName = {"January", "February",
                     "March", "April", "May", "June", "July",
@@ -3015,23 +3030,25 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
             Calendar calendar = Calendar.getInstance();
             String month = monthName[calendar.get(Calendar.MONTH)];
             String yearCurrent = calendar.get(Calendar.YEAR) + "";
-            DatabaseReference trackAmountForGST = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("AmountTrackingDB").child(state).child(yearCurrent).child(month);
-            trackAmountForGST.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    if(snapshot.hasChild("amountEarned")){
-                        double prev = Double.parseDouble(snapshot.child("amountEarned").getValue(String.class));
-                        prev += Double.parseDouble(orderAmount);
-                        trackAmountForGST.child("amountEarned").setValue(prev + "");
-                    }else
-                        trackAmountForGST.child("amountEarned").setValue(orderAmount + "");
-                }
+            if(isGstAvailable) {
+                DatabaseReference trackAmountForGST = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("AmountTrackingDB").child(state).child(yearCurrent).child(month);
+                trackAmountForGST.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (snapshot.hasChild("amountEarned")) {
+                            double prev = Double.parseDouble(snapshot.child("amountEarned").getValue(String.class));
+                            prev += Double.parseDouble(orderAmount);
+                            trackAmountForGST.child("amountEarned").setValue(prev + "");
+                        } else
+                            trackAmountForGST.child("amountEarned").setValue(orderAmount + "");
+                    }
 
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
 
-                }
-            });
+                    }
+                });
+            }
             SharedPreferences dish = getSharedPreferences("DishAnalysis",Context.MODE_PRIVATE);
 
             if(dish.contains("DishAnalysisMonthBasis")){
