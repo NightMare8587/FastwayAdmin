@@ -17,10 +17,10 @@
             app:title="My Transactions"
             app:summary=""/>
 
-        <Preference
-            app:key="commisionAndFee"
-            app:title="Commision And Platform Fee"
-            app:summary=""/>
+<!--        <Preference-->
+<!--            app:key="commisionAndFee"-->
+<!--            app:title="Commision And Platform Fee"-->
+<!--            app:summary=""/>-->
 
         <Preference
             app:key="logoutNow"

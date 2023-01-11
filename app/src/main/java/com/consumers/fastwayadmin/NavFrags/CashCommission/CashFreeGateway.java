@@ -176,7 +176,7 @@ public class CashFreeGateway extends AppCompatActivity implements PaymentResultW
                 RazorpayClient razorpay = new RazorpayClient(arr[0], arr[1]);
 
                 JSONObject orderRequest = new JSONObject();
-                orderRequest.put("amount", 59900); // amount in the smallest currency unit
+                orderRequest.put("amount", 79900); // amount in the smallest currency unit
                 orderRequest.put("currency", "INR");
                 orderRequest.put("receipt", "order_rcptid_11");
 
@@ -200,7 +200,7 @@ public class CashFreeGateway extends AppCompatActivity implements PaymentResultW
                     options.put("theme.color", "#3399cc");
                     options.put("currency", "INR");
                     options.put("payment_capture", "1");
-                    options.put("amount", 59900);//pass amount in currency subunits
+                    options.put("amount", 79900);//pass amount in currency subunits
                     options.put("prefill.email", "" + acc.getString("email",""));
                     options.put("prefill.contact","" + acc.getString("number",""));
                     JSONObject retryObj = new JSONObject();

@@ -131,7 +131,7 @@ public class FastwayPremiums extends AppCompatActivity {
                     if(System.currentTimeMillis() > time){
                         setContentView(R.layout.isfreetraialrunning);
                         TextView textView = findViewById(R.id.freeTrailUpdateTextView);
-                        textView.setText("Your free trial is over. Subscribe now \u20b9599 per month");
+                        textView.setText("Your free trial is over. Subscribe now \u20b9799 per month");
                         Button button = findViewById(R.id.subscribePremFreeTrialEnded);
                         button.setVisibility(View.VISIBLE);
                         button.setText("Subscribe Now");
@@ -164,7 +164,7 @@ public class FastwayPremiums extends AppCompatActivity {
                                             acEdit.apply();
                                             freeTrial = true;
                                             Intent intent = new Intent(FastwayPremiums.this, CashFreeGateway.class);
-                                            intent.putExtra("amount","59900");
+                                            intent.putExtra("amount","79900");
                                             intent.putExtra("keys",testKey);
                                             startActivityForResult(intent,2);
                                         }else
@@ -198,7 +198,7 @@ public class FastwayPremiums extends AppCompatActivity {
                                 return;
                             }
                             Intent intent = new Intent(FastwayPremiums.this, CashFreeGateway.class);
-                            intent.putExtra("amount","59900");
+                            intent.putExtra("amount","79900");
                             intent.putExtra("keys",testKey);
                             startActivityForResult(intent,2);
                         });
@@ -207,7 +207,7 @@ public class FastwayPremiums extends AppCompatActivity {
                         if(System.currentTimeMillis() > subTime){
                             setContentView(R.layout.isfreetraialrunning);
                             TextView textView = findViewById(R.id.freeTrailUpdateTextView);
-                            textView.setText("Your subscription is over. Subscribe now \u20b9599 per month");
+                            textView.setText("Your subscription is over. Subscribe now \u20b9799 per month");
                             Button button = findViewById(R.id.subscribePremFreeTrialEnded);
                             button.setVisibility(View.VISIBLE);
                             button.setText("Subscribe Now");
@@ -218,7 +218,7 @@ public class FastwayPremiums extends AppCompatActivity {
                                     return;
                                 }
                                 Intent intent = new Intent(FastwayPremiums.this, CashFreeGateway.class);
-                                intent.putExtra("amount","59900");
+                                intent.putExtra("amount","79900");
                                 intent.putExtra("keys",testKey);
                                 startActivityForResult(intent,2);
                             });

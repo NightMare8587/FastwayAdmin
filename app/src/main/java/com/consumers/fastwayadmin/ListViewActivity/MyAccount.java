@@ -69,7 +69,7 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
     ModalBottomSheetDialog modalBottomSheetDialog;
     SharedPreferences.Editor editor;
     TextView textView;
-    String[] names = {"Change Credentials (Admin)","Change Credentials (Restaurants)","Restaurant Images","Delivery Integration","Change Bank Credentials","Restaurant Documents","Restaurant Staff Details","Leave Ordinalo","Initiate Payouts","Transfer Ownership","Service Charge"};
+    String[] names = {"Change Credentials (Admin)","Change Credentials (Restaurants)","Restaurant Images","Delivery Integration","Change Bank Credentials","Restaurant Documents","Restaurant Staff Details","Leave Ordinalo","Transfer Ownership","Service Charge"};
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -180,9 +180,6 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
                     startActivity(new Intent(MyAccount.this, LeaveFastway.class));
                     break;
                 case 8:
-                    startActivity(new Intent(MyAccount.this, InitiatePayoutForAdminNEFT.class));
-                    break;
-                case 9:
                     AlertDialog.Builder builder = new AlertDialog.Builder(MyAccount.this);
                     builder.setTitle("Transfer Ownership")
                             .setMessage("Transfer Ownerships means giving other person all admin rights ( in simple words transferring account access to another person)\nDo you sure wanna proceed?\nAn executive from ordinalo will visit and will start the transfer process")
@@ -210,7 +207,7 @@ public class MyAccount extends AppCompatActivity implements ModalBottomSheetDial
                     builder.show();
                     break;
 
-                case 10:
+                case 9:
                     if(sharedPreferences.contains("serviceCharge")){
                         AlertDialog.Builder builderS = new AlertDialog.Builder(MyAccount.this);
                         builderS.setTitle("Service Charge").setMessage("Choose one option from below buttons")

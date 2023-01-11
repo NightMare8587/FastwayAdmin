@@ -101,7 +101,7 @@ public class AccountSettingsFragment extends PreferenceFragmentCompat {
         Preference logout = findPreference("logoutNow");
         Preference premium = findPreference("premium");
         Preference terms = findPreference("termsConditions");
-        Preference comFee = findPreference("commisionAndFee");
+//        Preference comFee = findPreference("commisionAndFee");
         SwitchPreferenceCompat takeaway = findPreference("TakeAwaySwitch");
         SwitchPreferenceCompat tableOrder = findPreference("tableBookingAllowedSwitch");
 
@@ -293,10 +293,10 @@ public class AccountSettingsFragment extends PreferenceFragmentCompat {
             return  true;
         });
 
-        comFee.setOnPreferenceClickListener(preference -> {
-            startActivity(new Intent(requireContext(), CashTransactionCommissionActivity.class));
-            return true;
-        });
+//        comFee.setOnPreferenceClickListener(preference -> {
+//            startActivity(new Intent(requireContext(), CashTransactionCommissionActivity.class));
+//            return true;
+//        });
 
         SharedPreferences sharedPreferences = requireContext().getSharedPreferences("loginInfo",MODE_PRIVATE);
         SharedPreferences.Editor sharedEdit = sharedPreferences.edit();

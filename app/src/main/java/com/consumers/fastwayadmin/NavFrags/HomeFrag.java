@@ -11,7 +11,6 @@ import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -40,12 +39,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.consumers.fastwayadmin.CreateShowCampaign.CampaignActivity;
-import com.consumers.fastwayadmin.DiscountCombo.ComboAndOffers;
-import com.consumers.fastwayadmin.DiscountCombo.DiscountActivity;
 import com.consumers.fastwayadmin.NavFrags.CurrentTakeAwayOrders.CurrentTakeAway;
-import com.consumers.fastwayadmin.NavFrags.Events.OrganiseEvents;
-import com.consumers.fastwayadmin.NavFrags.PromotionAdsPack.CreateViewPromotions;
 import com.consumers.fastwayadmin.NavFrags.ResEarningTracker.ResEarningTrackerActivity;
 import com.consumers.fastwayadmin.NavFrags.homeFrag.homeFragClass;
 import com.consumers.fastwayadmin.R;
@@ -53,7 +47,6 @@ import com.elconfidencial.bubbleshowcase.BubbleShowCase;
 import com.elconfidencial.bubbleshowcase.BubbleShowCaseBuilder;
 import com.elconfidencial.bubbleshowcase.BubbleShowCaseListener;
 import com.elconfidencial.bubbleshowcase.BubbleShowCaseSequence;
-import com.example.flatdialoglibrary.dialog.FlatDialog;
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 import com.google.android.gms.common.api.ApiException;
@@ -89,12 +82,9 @@ import com.opencsv.CSVWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.URL;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -344,37 +334,44 @@ public class HomeFrag extends Fragment {
 //            createLocationRequest();
         new retriveTable().execute();
         comboImage.setOnClickListener(view1 -> {
-//                startActivity(new Intent(getContext(),CreateDiscountCombo.class));
-            final FlatDialog flatDialog = new FlatDialog(getContext());
-            flatDialog.setCanceledOnTouchOutside(true);
-            flatDialog.setTitle("Choose One Option")
-                    .setTitleColor(Color.BLACK)
-                    .setBackgroundColor(Color.parseColor("#f9fce1"))
-                    .setFirstButtonColor(Color.parseColor("#d3f6f3"))
-                    .setFirstButtonTextColor(Color.parseColor("#000000"))
-                    .setFirstButtonText("CREATE/SHOW CAMPAIGN")
-                    .setSecondButtonColor(Color.parseColor("#fee9b2"))
-                    .setSecondButtonTextColor(Color.parseColor("#000000"))
-                    .setSecondButtonText("PROMOTION ADS")
-                    .setThirdButtonText("Events")
-                    .setThirdButtonColor(Color.parseColor("#b3b3ff"))
-                    .setThirdButtonTextColor(Color.parseColor("#000000"))
-                    .withFirstButtonListner(view11 -> {
-                        startActivity(new Intent(getContext(), CampaignActivity.class));
-                        flatDialog.dismiss();
-                    })
-                    .withSecondButtonListner(view112 -> {
-                        startActivity(new Intent(getContext(), CreateViewPromotions.class));
-                        flatDialog.dismiss();
-                    })
-                    .withThirdButtonListner(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            startActivity(new Intent(getContext(), OrganiseEvents.class));
-                            flatDialog.dismiss();
-                        }
-                    })
-                    .show();
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+            builder.setTitle("Under Development").setMessage("This feature is currently under development and will be available in future updates")
+                    .setPositiveButton("Exit", (dialogInterface, i) -> dialogInterface.dismiss()).create().show();
+
+
+//            return;
+////                startActivity(new Intent(getContext(),CreateDiscountCombo.class));
+//            final FlatDialog flatDialog = new FlatDialog(getContext());
+//            flatDialog.setCanceledOnTouchOutside(true);
+//            flatDialog.setTitle("Choose One Option")
+//                    .setTitleColor(Color.BLACK)
+//                    .setBackgroundColor(Color.parseColor("#f9fce1"))
+//                    .setFirstButtonColor(Color.parseColor("#d3f6f3"))
+//                    .setFirstButtonTextColor(Color.parseColor("#000000"))
+//                    .setFirstButtonText("CREATE/SHOW CAMPAIGN")
+//                    .setSecondButtonColor(Color.parseColor("#fee9b2"))
+//                    .setSecondButtonTextColor(Color.parseColor("#000000"))
+//                    .setSecondButtonText("PROMOTION ADS")
+//                    .setThirdButtonText("Events")
+//                    .setThirdButtonColor(Color.parseColor("#b3b3ff"))
+//                    .setThirdButtonTextColor(Color.parseColor("#000000"))
+//                    .withFirstButtonListner(view11 -> {
+//                        startActivity(new Intent(getContext(), CampaignActivity.class));
+//                        flatDialog.dismiss();
+//                    })
+//                    .withSecondButtonListner(view112 -> {
+//                        startActivity(new Intent(getContext(), CreateViewPromotions.class));
+//                        flatDialog.dismiss();
+//                    })
+//                    .withThirdButtonListner(new View.OnClickListener() {
+//                        @Override
+//                        public void onClick(View view) {
+//                            startActivity(new Intent(getContext(), OrganiseEvents.class));
+//                            flatDialog.dismiss();
+//                        }
+//                    })
+//                    .show();
         });
 
         new MyTask().execute();
