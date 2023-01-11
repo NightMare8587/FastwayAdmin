@@ -2401,7 +2401,7 @@ public class HomeScreen extends AppCompatActivity {
             String t1 = intent.getStringExtra("value2");
 
             AlertDialog.Builder builder = new AlertDialog.Builder(HomeScreen.this);
-            builder.setTitle("Collect Cash").setMessage(t + "\n" + t1)
+            builder.setTitle("Collect Payment").setMessage(t + "\n" + t1)
                     .setPositiveButton("Okay", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {

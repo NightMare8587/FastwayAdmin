@@ -419,7 +419,7 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
                         String month = monthName[calendar.get(Calendar.MONTH)];
                         new KAlertDialog(ApproveCurrentTakeAway.this, KAlertDialog.WARNING_TYPE)
                                 .setTitleText("Warning")
-                                .setContentText("Approve order only after you received cash payment")
+                                .setContentText("Approve order only after you received payment")
                                 .setConfirmText("Confirm Order")
                                 .setConfirmClickListener(kAlertDialog -> {
                                     kAlertDialog.dismissWithAnimation();

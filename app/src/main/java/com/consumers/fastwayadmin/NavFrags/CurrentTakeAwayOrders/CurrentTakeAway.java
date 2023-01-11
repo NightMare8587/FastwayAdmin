@@ -70,7 +70,7 @@ public class CurrentTakeAway extends RecyclerView.Adapter<CurrentTakeAway.Holder
         if(finalPayment.get(position).equals("online"))
         holder.paymentMode.setText("Mode: " + finalPayment.get(position));
         else{
-            holder.paymentMode.setText("Mode: " + finalPayment.get(position) + " (\u20B9" + orderAmount.get(position) + ")");
+            holder.paymentMode.setText("\u20B9" + orderAmount.get(position));
         }
         holder.chatWithCustomer.setOnClickListener(view -> {
             Intent intent = new Intent(view.getContext(), ChatWithCustomer.class);
