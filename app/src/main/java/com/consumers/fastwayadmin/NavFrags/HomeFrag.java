@@ -785,32 +785,32 @@ public class HomeFrag extends Fragment {
                         bubbleShowCase.dismiss();
                     }
                 });
-        bubbleShowCaseBuilder2 = new BubbleShowCaseBuilder(requireActivity());
-        bubbleShowCaseBuilder2.title("Create Combo And Offer's")
-                .description("Here you can create different offer's and combo's")
-                .targetView(comboImage).listener(new BubbleShowCaseListener() {
-                    @Override
-                    public void onTargetClick(@NonNull BubbleShowCase bubbleShowCase) {
-
-                    }
-
-                    @Override
-                    public void onCloseActionImageClick(@NonNull BubbleShowCase bubbleShowCase) {
-
-                    }
-
-                    @Override
-                    public void onBackgroundDimClick(@NonNull BubbleShowCase bubbleShowCase) {
-                        bubbleShowCase.dismiss();
-                    }
-
-                    @Override
-                    public void onBubbleClick(@NonNull BubbleShowCase bubbleShowCase) {
-                        bubbleShowCase.dismiss();
-                    }
-                });
+//        bubbleShowCaseBuilder2 = new BubbleShowCaseBuilder(requireActivity());
+//        bubbleShowCaseBuilder2.title("Create Combo And Offer's")
+//                .description("Here you can create different offer's and combo's")
+//                .targetView(comboImage).listener(new BubbleShowCaseListener() {
+//                    @Override
+//                    public void onTargetClick(@NonNull BubbleShowCase bubbleShowCase) {
+//
+//                    }
+//
+//                    @Override
+//                    public void onCloseActionImageClick(@NonNull BubbleShowCase bubbleShowCase) {
+//
+//                    }
+//
+//                    @Override
+//                    public void onBackgroundDimClick(@NonNull BubbleShowCase bubbleShowCase) {
+//                        bubbleShowCase.dismiss();
+//                    }
+//
+//                    @Override
+//                    public void onBubbleClick(@NonNull BubbleShowCase bubbleShowCase) {
+//                        bubbleShowCase.dismiss();
+//                    }
+//                });
         BubbleShowCaseSequence bubbleShowCaseSequence = new BubbleShowCaseSequence();
-        bubbleShowCaseSequence.addShowCase(bubbleShowCaseBuilder5).addShowCase(bubbleShowCaseBuilder1).addShowCase(bubbleShowCaseBuilder2);
+        bubbleShowCaseSequence.addShowCase(bubbleShowCaseBuilder5).addShowCase(bubbleShowCaseBuilder1);
 
 
         if(totalOrdersToday.isShown()) {

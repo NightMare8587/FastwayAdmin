@@ -46,7 +46,6 @@ import com.consumers.fastwayadmin.Info.RestaurantDocuments.UploadRemainingDocs;
 import com.consumers.fastwayadmin.NavFrags.AccountSettingsFragment;
 import com.consumers.fastwayadmin.NavFrags.BankVerification.SelectPayoutMethodType;
 import com.consumers.fastwayadmin.NavFrags.BankVerification.VendorDetailsActivity;
-import com.consumers.fastwayadmin.NavFrags.CashCommission.CashTransactionCommissionActivity;
 import com.consumers.fastwayadmin.NavFrags.FastwayPremiumActivites.FastwayPremiums;
 import com.consumers.fastwayadmin.NavFrags.FastwayPremiumActivites.NotifyAdminSubscribePremium;
 import com.consumers.fastwayadmin.NavFrags.HomeFrag;
@@ -150,6 +149,7 @@ public class HomeScreen extends AppCompatActivity {
             myEditor.putString("currentYear",year + "");
         }
         storage = FirebaseStorage.getInstance();
+
         storageReference = storage.getReference();
         SharedPreferences storeImages = getSharedPreferences("storeImages",MODE_PRIVATE);
         SharedPreferences.Editor imageEdit = storeImages.edit();
@@ -580,20 +580,20 @@ public class HomeScreen extends AppCompatActivity {
                         Gson dishGson = new Gson();
 
                         if(dishDailyTrackForReports.contains(month)) {
-                            HashMap<Integer, HashMap<String, Integer>> mainMapDish = dishGson.fromJson(dishDailyTrackForReports.getString("month",""),dailyDish);
+                            HashMap<Integer, HashMap<String, Integer>> mainMapDish = dishGson.fromJson(dishDailyTrackForReports.getString(month,""),dailyDish);
 
                             if(mainMapDish.containsKey(day)){
                                 HashMap<String,Integer> innerMapDish = new HashMap<>(mainMapDish.get(day));
                                 text.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
                                 text.setTextSize(54);
-                                canvas.drawText("Ordered Dish List",100,1370,text);
+                                canvas.drawText("Ordered Dish List",100,1470,text);
                                 text.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.NORMAL));
                                 text.setTextSize(52);
 
-                                int dist = 1420;
+                                int dist = 1560;
                                 for(Map.Entry<String,Integer> loopMap : innerMapDish.entrySet()){
                                     canvas.drawText(loopMap.getKey() + " : " + loopMap.getValue(),100,dist,text);
-                                    dist += 70;
+                                    dist += 60;
                                 }
                             }
                         }
@@ -2124,143 +2124,143 @@ public class HomeScreen extends AppCompatActivity {
 
 
 
-            DatabaseReference checkIfCommissionNeeded = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(UID));
-            checkIfCommissionNeeded.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    if(dataSnapshot.hasChild("lastCommissionPaid")){
-                            long lastPaidDate = Long.parseLong(Objects.requireNonNull(dataSnapshot.child("lastCommissionPaid").getValue(String.class)));
-                        if(currentTime - lastPaidDate >= 2678400000L){
-                            checkIfNeededToAddToQuery();
-                            SharedPreferences sharedPreferences = getSharedPreferences("CashCommission",MODE_PRIVATE);
-                             SharedPreferences.Editor editor = sharedPreferences.edit();
-                             editor.putString("fine","10");
-                             editor.apply();
-                            AlertDialog.Builder alert = new AlertDialog.Builder(HomeScreen.this);
-                            alert.setTitle("Cash Transaction").setMessage("It's time for payment of cash transaction commission, since you have exceeded time limit fine of 10% will be applied\nDo you wanna pay now or you can pay later!")
-                                    .setPositiveButton("Pay Now", (dialogInterface, i) -> {
-                                        dialogInterface.dismiss();
-                                        startActivity(new Intent(HomeScreen.this, CashTransactionCommissionActivity.class));
-                                    }).setNegativeButton("Later", (dialogInterface, i) -> dialogInterface.dismiss()).create();
-                            alert.setCancelable(false);
-                            alert.show();
-                        } else if(currentTime - lastPaidDate >= 2592000000L){
-                            checkIfNeededToAddToQuery();
-                            AlertDialog.Builder alert = new AlertDialog.Builder(HomeScreen.this);
-                            alert.setTitle("Cash Transaction").setMessage("It's time for payment of cash transaction commission, today is last day for else fine of 10% will be applied\nDo you wanna pay now or you can pay later!")
-                                    .setPositiveButton("Pay Now", (dialogInterface, i) -> {
-                                        dialogInterface.dismiss();
-                                        startActivity(new Intent(HomeScreen.this, CashTransactionCommissionActivity.class));
-                                    }).setNegativeButton("Later", (dialogInterface, i) -> dialogInterface.dismiss()).create();
-                            alert.setCancelable(false);
-                            alert.show();
-                        }
-                        else if(currentTime - lastPaidDate >= 2505600000L){
-                            checkIfNeededToAddToQuery();
-                            AlertDialog.Builder alert = new AlertDialog.Builder(HomeScreen.this);
-                            alert.setTitle("Cash Transaction").setMessage("It's time for payment of cash transaction commission, tomorrow is last day after that fine will be applied\nDo you wanna pay now or you can pay later!")
-                                    .setPositiveButton("Pay Now", (dialogInterface, i) -> {
-                                        dialogInterface.dismiss();
-                                        startActivity(new Intent(HomeScreen.this, CashTransactionCommissionActivity.class));
-                                    }).setNegativeButton("Later", (dialogInterface, i) -> dialogInterface.dismiss()).create();
-                            alert.setCancelable(false);
-                            alert.show();
-                        }
-                        else if(currentTime - lastPaidDate >= 2419200000L){
-                            checkIfNeededToAddToQuery();
-                            AlertDialog.Builder alert = new AlertDialog.Builder(HomeScreen.this);
-                            alert.setTitle("Cash Transaction").setMessage("It's time for payment of cash transaction commission\nDo you wanna pay now or you can pay later!")
-                                    .setPositiveButton("Pay Now", (dialogInterface, i) -> {
-                                        dialogInterface.dismiss();
-                                        startActivity(new Intent(HomeScreen.this, CashTransactionCommissionActivity.class));
-//                                        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Fines");
-//                                        CashCommissionClass cashCommissionClass = new CashCommissionClass("","Cash Commission & Platform Fee",System.currentTimeMillis() + "","Admin");
-//                                        databaseReference.child(Objects.requireNonNull(auth.getUid())).setValue(cashCommissionClass);
-                                    }).setNegativeButton("Later", (dialogInterface, i) -> dialogInterface.dismiss()).create();
-                            alert.setCancelable(false);
-                            alert.show();
-                        }
-                    }else{
-                        if(dataSnapshot.hasChild("registrationDate")){
-                            long registerTime = Long.parseLong(Objects.requireNonNull(dataSnapshot.child("registrationDate").getValue(String.class)));
-
-                            if(currentTime - registerTime >= 2678400000L){
-                                checkIfNeededToAddToQuery();
-                                SharedPreferences sharedPreferences = getSharedPreferences("CashCommission",MODE_PRIVATE);
-                                SharedPreferences.Editor editor = sharedPreferences.edit();
-                                editor.putString("fine","10");
-                                editor.apply();
-                                AlertDialog.Builder alert = new AlertDialog.Builder(HomeScreen.this);
-                                alert.setTitle("Cash Transaction").setMessage("It's time for payment of cash transaction commission, since you have exceeded time limit fine of 10% will be applied\nDo you wanna pay now or you can pay later!")
-                                        .setPositiveButton("Pay Now", (dialogInterface, i) -> {
-                                            dialogInterface.dismiss();
-                                            startActivity(new Intent(HomeScreen.this, CashTransactionCommissionActivity.class));
-
-                                        }).setNegativeButton("Later", (dialogInterface, i) -> dialogInterface.dismiss()).create();
-                                alert.setCancelable(false);
-                                alert.show();
-                            }
-                           else if(currentTime - registerTime >= 2592000000L){
-                                checkIfNeededToAddToQuery();
-                                AlertDialog.Builder alert = new AlertDialog.Builder(HomeScreen.this);
-                                alert.setTitle("Cash Transaction").setMessage("It's time for payment of cash transaction commission, today is last day for else fine of 10% will be applied\nDo you wanna pay now or you can pay later!")
-                                        .setPositiveButton("Pay Now", (dialogInterface, i) -> {
-                                            dialogInterface.dismiss();
-                                            startActivity(new Intent(HomeScreen.this, CashTransactionCommissionActivity.class));
-                                        }).setNegativeButton("Later", (dialogInterface, i) -> dialogInterface.dismiss()).create();
-                                alert.setCancelable(false);
-                                alert.show();
-                            }
-                            else if(currentTime - registerTime >= 2505600000L){
-                                checkIfNeededToAddToQuery();
-                                AlertDialog.Builder alert = new AlertDialog.Builder(HomeScreen.this);
-                                alert.setTitle("Cash Transaction").setMessage("It's time for payment of cash transaction commission, tomorrow is last day after that fine will be applied\nDo you wanna pay now or you can pay later!")
-                                        .setPositiveButton("Pay Now", (dialogInterface, i) -> {
-                                            dialogInterface.dismiss();
-                                            startActivity(new Intent(HomeScreen.this, CashTransactionCommissionActivity.class));
-                                        }).setNegativeButton("Later", (dialogInterface, i) -> dialogInterface.dismiss()).create();
-                                alert.setCancelable(false);
-                                alert.show();
-                            }
-                            else if(currentTime - registerTime >= 2419200000L){
-                                checkIfNeededToAddToQuery();
-                                AlertDialog.Builder alert = new AlertDialog.Builder(HomeScreen.this);
-                                alert.setTitle("Cash Transaction").setMessage("It's time for payment of cash transaction commission\nDo you wanna pay now or you can pay later!")
-                                        .setPositiveButton("Pay Now", (dialogInterface, i) -> {
-                                            dialogInterface.dismiss();
-                                            startActivity(new Intent(HomeScreen.this, CashTransactionCommissionActivity.class));
-
-                                        }).setNegativeButton("Later", (dialogInterface, i) -> dialogInterface.dismiss()).create();
-                                alert.setCancelable(false);
-                                alert.show();
-                            }
-                        }else{
-                            DatabaseReference checkIfApproved = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Registered Restaurants").child(sharedPreferences.getString("state",""));
-                            checkIfApproved.addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                    if(snapshot.hasChild(Objects.requireNonNull(auth.getUid()))){
-
-                                    }else
-                                        checkIfCommissionNeeded.child("registrationDate").setValue(System.currentTimeMillis() + "");
-                                }
-
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError error) {
-
-                                }
-                            });
-
-                        }
-                    }
-                }
-
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                }
-            });
+//            DatabaseReference checkIfCommissionNeeded = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(UID));
+//            checkIfCommissionNeeded.addListenerForSingleValueEvent(new ValueEventListener() {
+//                @Override
+//                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                    if(dataSnapshot.hasChild("lastCommissionPaid")){
+//                            long lastPaidDate = Long.parseLong(Objects.requireNonNull(dataSnapshot.child("lastCommissionPaid").getValue(String.class)));
+//                        if(currentTime - lastPaidDate >= 2678400000L){
+//                            checkIfNeededToAddToQuery();
+//                            SharedPreferences sharedPreferences = getSharedPreferences("CashCommission",MODE_PRIVATE);
+//                             SharedPreferences.Editor editor = sharedPreferences.edit();
+//                             editor.putString("fine","10");
+//                             editor.apply();
+//                            AlertDialog.Builder alert = new AlertDialog.Builder(HomeScreen.this);
+//                            alert.setTitle("Cash Transaction").setMessage("It's time for payment of cash transaction commission, since you have exceeded time limit fine of 10% will be applied\nDo you wanna pay now or you can pay later!")
+//                                    .setPositiveButton("Pay Now", (dialogInterface, i) -> {
+//                                        dialogInterface.dismiss();
+//                                        startActivity(new Intent(HomeScreen.this, CashTransactionCommissionActivity.class));
+//                                    }).setNegativeButton("Later", (dialogInterface, i) -> dialogInterface.dismiss()).create();
+//                            alert.setCancelable(false);
+//                            alert.show();
+//                        } else if(currentTime - lastPaidDate >= 2592000000L){
+//                            checkIfNeededToAddToQuery();
+//                            AlertDialog.Builder alert = new AlertDialog.Builder(HomeScreen.this);
+//                            alert.setTitle("Cash Transaction").setMessage("It's time for payment of cash transaction commission, today is last day for else fine of 10% will be applied\nDo you wanna pay now or you can pay later!")
+//                                    .setPositiveButton("Pay Now", (dialogInterface, i) -> {
+//                                        dialogInterface.dismiss();
+//                                        startActivity(new Intent(HomeScreen.this, CashTransactionCommissionActivity.class));
+//                                    }).setNegativeButton("Later", (dialogInterface, i) -> dialogInterface.dismiss()).create();
+//                            alert.setCancelable(false);
+//                            alert.show();
+//                        }
+//                        else if(currentTime - lastPaidDate >= 2505600000L){
+//                            checkIfNeededToAddToQuery();
+//                            AlertDialog.Builder alert = new AlertDialog.Builder(HomeScreen.this);
+//                            alert.setTitle("Cash Transaction").setMessage("It's time for payment of cash transaction commission, tomorrow is last day after that fine will be applied\nDo you wanna pay now or you can pay later!")
+//                                    .setPositiveButton("Pay Now", (dialogInterface, i) -> {
+//                                        dialogInterface.dismiss();
+//                                        startActivity(new Intent(HomeScreen.this, CashTransactionCommissionActivity.class));
+//                                    }).setNegativeButton("Later", (dialogInterface, i) -> dialogInterface.dismiss()).create();
+//                            alert.setCancelable(false);
+//                            alert.show();
+//                        }
+//                        else if(currentTime - lastPaidDate >= 2419200000L){
+//                            checkIfNeededToAddToQuery();
+//                            AlertDialog.Builder alert = new AlertDialog.Builder(HomeScreen.this);
+//                            alert.setTitle("Cash Transaction").setMessage("It's time for payment of cash transaction commission\nDo you wanna pay now or you can pay later!")
+//                                    .setPositiveButton("Pay Now", (dialogInterface, i) -> {
+//                                        dialogInterface.dismiss();
+//                                        startActivity(new Intent(HomeScreen.this, CashTransactionCommissionActivity.class));
+////                                        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Fines");
+////                                        CashCommissionClass cashCommissionClass = new CashCommissionClass("","Cash Commission & Platform Fee",System.currentTimeMillis() + "","Admin");
+////                                        databaseReference.child(Objects.requireNonNull(auth.getUid())).setValue(cashCommissionClass);
+//                                    }).setNegativeButton("Later", (dialogInterface, i) -> dialogInterface.dismiss()).create();
+//                            alert.setCancelable(false);
+//                            alert.show();
+//                        }
+//                    }else{
+//                        if(dataSnapshot.hasChild("registrationDate")){
+//                            long registerTime = Long.parseLong(Objects.requireNonNull(dataSnapshot.child("registrationDate").getValue(String.class)));
+//
+//                            if(currentTime - registerTime >= 2678400000L){
+//                                checkIfNeededToAddToQuery();
+//                                SharedPreferences sharedPreferences = getSharedPreferences("CashCommission",MODE_PRIVATE);
+//                                SharedPreferences.Editor editor = sharedPreferences.edit();
+//                                editor.putString("fine","10");
+//                                editor.apply();
+//                                AlertDialog.Builder alert = new AlertDialog.Builder(HomeScreen.this);
+//                                alert.setTitle("Cash Transaction").setMessage("It's time for payment of cash transaction commission, since you have exceeded time limit fine of 10% will be applied\nDo you wanna pay now or you can pay later!")
+//                                        .setPositiveButton("Pay Now", (dialogInterface, i) -> {
+//                                            dialogInterface.dismiss();
+//                                            startActivity(new Intent(HomeScreen.this, CashTransactionCommissionActivity.class));
+//
+//                                        }).setNegativeButton("Later", (dialogInterface, i) -> dialogInterface.dismiss()).create();
+//                                alert.setCancelable(false);
+//                                alert.show();
+//                            }
+//                           else if(currentTime - registerTime >= 2592000000L){
+//                                checkIfNeededToAddToQuery();
+//                                AlertDialog.Builder alert = new AlertDialog.Builder(HomeScreen.this);
+//                                alert.setTitle("Cash Transaction").setMessage("It's time for payment of cash transaction commission, today is last day for else fine of 10% will be applied\nDo you wanna pay now or you can pay later!")
+//                                        .setPositiveButton("Pay Now", (dialogInterface, i) -> {
+//                                            dialogInterface.dismiss();
+//                                            startActivity(new Intent(HomeScreen.this, CashTransactionCommissionActivity.class));
+//                                        }).setNegativeButton("Later", (dialogInterface, i) -> dialogInterface.dismiss()).create();
+//                                alert.setCancelable(false);
+//                                alert.show();
+//                            }
+//                            else if(currentTime - registerTime >= 2505600000L){
+//                                checkIfNeededToAddToQuery();
+//                                AlertDialog.Builder alert = new AlertDialog.Builder(HomeScreen.this);
+//                                alert.setTitle("Cash Transaction").setMessage("It's time for payment of cash transaction commission, tomorrow is last day after that fine will be applied\nDo you wanna pay now or you can pay later!")
+//                                        .setPositiveButton("Pay Now", (dialogInterface, i) -> {
+//                                            dialogInterface.dismiss();
+//                                            startActivity(new Intent(HomeScreen.this, CashTransactionCommissionActivity.class));
+//                                        }).setNegativeButton("Later", (dialogInterface, i) -> dialogInterface.dismiss()).create();
+//                                alert.setCancelable(false);
+//                                alert.show();
+//                            }
+//                            else if(currentTime - registerTime >= 2419200000L){
+//                                checkIfNeededToAddToQuery();
+//                                AlertDialog.Builder alert = new AlertDialog.Builder(HomeScreen.this);
+//                                alert.setTitle("Cash Transaction").setMessage("It's time for payment of cash transaction commission\nDo you wanna pay now or you can pay later!")
+//                                        .setPositiveButton("Pay Now", (dialogInterface, i) -> {
+//                                            dialogInterface.dismiss();
+//                                            startActivity(new Intent(HomeScreen.this, CashTransactionCommissionActivity.class));
+//
+//                                        }).setNegativeButton("Later", (dialogInterface, i) -> dialogInterface.dismiss()).create();
+//                                alert.setCancelable(false);
+//                                alert.show();
+//                            }
+//                        }else{
+//                            DatabaseReference checkIfApproved = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("Registered Restaurants").child(sharedPreferences.getString("state",""));
+//                            checkIfApproved.addListenerForSingleValueEvent(new ValueEventListener() {
+//                                @Override
+//                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                                    if(snapshot.hasChild(Objects.requireNonNull(auth.getUid()))){
+//
+//                                    }else
+//                                        checkIfCommissionNeeded.child("registrationDate").setValue(System.currentTimeMillis() + "");
+//                                }
+//
+//                                @Override
+//                                public void onCancelled(@NonNull DatabaseError error) {
+//
+//                                }
+//                            });
+//
+//                        }
+//                    }
+//                }
+//
+//
+//                @Override
+//                public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//                }
+//            });
 
 
             checkForBank = FirebaseDatabase.getInstance().getReference().getRoot().child("Admin").child(Objects.requireNonNull(UID));
