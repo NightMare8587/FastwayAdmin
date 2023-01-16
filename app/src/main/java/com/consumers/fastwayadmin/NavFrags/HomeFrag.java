@@ -695,28 +695,28 @@ public class HomeFrag extends Fragment {
                     java.lang.reflect.Type type = new TypeToken<List<List<String>>>() {
                     }.getType();
                     Gson gson = new Gson();
-                    if(restaurantDailyTrack.getString("totalOrdersToday","").equals("0"))
-                        return;
-                    if(restaurantDailyStoreTrack.contains(month)){
-                        String json = restaurantDailyStoreTrack.getString(month, "");
-                        List<List<String>> mainList = gson.fromJson(json, type);
-                        List<String> days = new ArrayList<>(mainList.get(0));
-                        List<String> totalAmounts = new ArrayList<>(mainList.get(1));
-                        List<String> totalOrdersPlaced = new ArrayList<>(mainList.get(2));
+                    if(restaurantDailyTrack.contains("totalOrdersToday")) {
+                        if (restaurantDailyStoreTrack.contains(month)) {
+                            String json = restaurantDailyStoreTrack.getString(month, "");
+                            List<List<String>> mainList = gson.fromJson(json, type);
+                            List<String> days = new ArrayList<>(mainList.get(0));
+                            List<String> totalAmounts = new ArrayList<>(mainList.get(1));
+                            List<String> totalOrdersPlaced = new ArrayList<>(mainList.get(2));
 
-                        File file = new File(requireContext().getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS),"RestaurantDailyStoringData.csv");
-                        try{
-                            CSVWriter csvWriter = new CSVWriter(new FileWriter(file.getAbsoluteFile(),true));
-                            String[] record = new String[5];
-                            record[0] = month;
-                            record[1] = days.get(days.size()-1);
-                            record[2] = restaurantDailyTrack.getString("currentDay","");
-                            record[3] = totalAmounts.get(totalAmounts.size()-1);
-                            record[4] = totalOrdersPlaced.get(totalOrdersPlaced.size()-1);
-                            csvWriter.writeNext(record,false);
-                            csvWriter.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
+                            File file = new File(requireContext().getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "RestaurantDailyStoringData.csv");
+                            try {
+                                CSVWriter csvWriter = new CSVWriter(new FileWriter(file.getAbsoluteFile(), true));
+                                String[] record = new String[5];
+                                record[0] = month;
+                                record[1] = days.get(days.size() - 1);
+                                record[2] = restaurantDailyTrack.getString("currentDay", "");
+                                record[3] = totalAmounts.get(totalAmounts.size() - 1);
+                                record[4] = totalOrdersPlaced.get(totalOrdersPlaced.size() - 1);
+                                csvWriter.writeNext(record, false);
+                                csvWriter.close();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
                 }

@@ -57,6 +57,8 @@ import com.consumers.fastwayadmin.R;
 import com.consumers.fastwayadmin.RandomChatNoww;
 import com.gauravk.bubblenavigation.BubbleNavigationConstraintView;
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.common.reflect.TypeToken;
 import com.google.firebase.auth.FirebaseAuth;
@@ -1009,6 +1011,29 @@ public class HomeScreen extends AppCompatActivity {
                                         }
 
                                     String nameOfFile = startDate + "-" + endDate + " " + month;
+                                        String trackFileName = "/RestaurantDailyStoringData" + ".csv";
+                                        File trackingFile = new File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS) + trackFileName);
+
+                                        try{
+                                            StorageReference reference1 = storageReference.child(auth.getUid() + "/" + "TrackingReports" + "/" + trackFileName);
+                                            reference1.putFile(Uri.fromFile(trackingFile)).addOnCompleteListener(task -> {
+                                                Task<Uri> getUrl = storageReference.child(auth.getUid() + "/" + "TrackingReports" + "/" + trackFileName).getDownloadUrl()
+                                                        .addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                                            @Override
+                                                            public void onSuccess(Uri uri) {
+                                                                HashMap<String,String> map = new HashMap<>();
+                                                                map.put("state",sharedPreferences.getString("state",""));
+                                                                map.put("uri",uri + "");
+                                                                map.put("resName",resInfo.getString("hotelName",""));
+                                                                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("TrackingReports").child(auth.getUid());
+                                                                databaseReference.setValue(map);
+                                                            }
+                                                        });
+
+                                            });
+                                        }catch (Exception e){
+
+                                        }
 
                                     try {
                                         StorageReference reference = storageReference.child(auth.getUid() + "/" + "InsightsReports" + "/"  + "Weekly" + "/" + nameOfFile);
