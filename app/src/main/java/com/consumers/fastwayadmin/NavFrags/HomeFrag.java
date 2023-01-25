@@ -214,6 +214,7 @@ public class HomeFrag extends Fragment {
         toolbar = view.findViewById(R.id.homeFragToolBar);
         calendar = Calendar.getInstance();
         currentDay = calendar.get(Calendar.DAY_OF_MONTH);
+        
 //        Toast.makeText(view.getContext(), "" + currentDay, Toast.LENGTH_SHORT).show();
         ((AppCompatActivity) requireActivity()).setSupportActionBar(toolbar);
         inAppUpdateInfo();
@@ -323,16 +324,13 @@ public class HomeFrag extends Fragment {
         }
 
         if(restaurantStatus.contains("resOrdersAccepting")){
-            if(restaurantStatus.getString("resOrdersAccepting","").equals("no")){
-                acceptOrders.setChecked(false);
-            }else
-                acceptOrders.setChecked(true);
+            acceptOrders.setChecked(!restaurantStatus.getString("resOrdersAccepting", "").equals("no"));
         }
         if(ContextCompat.checkSelfPermission(requireActivity(),Manifest.permission.CAMERA) + ContextCompat.checkSelfPermission(requireActivity(),Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
             requestPermissions(new String[]{Manifest.permission.CAMERA,Manifest.permission.ACCESS_COARSE_LOCATION},1);
-        }else
-//            createLocationRequest();
-        new retriveTable().execute();
+        }else {
+            new retriveTable().execute();
+        }
         comboImage.setOnClickListener(view1 -> {
 
             AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
