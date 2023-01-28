@@ -81,6 +81,11 @@ import java.util.Random;
 public class ApproveCurrentOrder extends AppCompatActivity {
     List<String> dishNamePdf;
     List<String> type = new ArrayList<>();
+    String contactNum;
+    SharedPreferences databaseForContactNum;
+    SharedPreferences lastOrderDetailsCustomer;
+    SharedPreferences.Editor lastOrderEditor;
+    SharedPreferences.Editor databaseEditor;
     Gson gson;
     String json;
     SharedPreferences trackingOfTakeAway;
@@ -173,6 +178,10 @@ public class ApproveCurrentOrder extends AppCompatActivity {
         trackingDineAndWay = trackingOfTakeAway.edit();
         restaurantTrackRecordsEditor = restaurantTrackRecords.edit();
         dishDailyTrackForReports = getSharedPreferences("DishDailyTrackForReports",MODE_PRIVATE);
+        databaseForContactNum = getSharedPreferences("DatabaseForContactNum",MODE_PRIVATE);
+        databaseEditor = databaseForContactNum.edit();
+        lastOrderDetailsCustomer = getSharedPreferences("lastOrderDetailsCustomer",MODE_PRIVATE);
+        lastOrderEditor = lastOrderDetailsCustomer.edit();
         dailyReportTrackDish = dishDailyTrackForReports.edit();
         restaurantTrackEditor = restaurantDailyTrack.edit();
         StrictMode.VmPolicy.Builder builders = new StrictMode.VmPolicy.Builder();
@@ -225,6 +234,8 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                     totalPrice = totalPrice + Integer.parseInt(String.valueOf(dataSnapshot.child("price").getValue()));
                     customisation = String.valueOf(dataSnapshot.child("customisation").getValue());
                     type.add(String.valueOf(dataSnapshot.child("type").getValue()));
+                    String[] currArr = dataSnapshot.child("locality").getValue(String.class).split(",");
+                    contactNum = currArr[1];
                 }
                 String[] arr = paymentType.split(",");
                 paymentType = arr[2];
@@ -280,14 +291,14 @@ public class ApproveCurrentOrder extends AppCompatActivity {
                     String approveTime = String.valueOf(System.currentTimeMillis());
                     DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Users").child(id).child("Recent Orders").child(time);
                     for(int i=0;i<dishNames.size();i++){
-                        MyClass myClass = new MyClass(dishNames.get(i),dishPrices.get(i),image.get(i),type.get(i),""+approveTime,dishQuantity.get(i),dishHalfOr.get(i),state,String.valueOf(orderAmount),orderID,orderAndPayment.get(i),"Order Declined",sharedPreferences.getString("locality",""));
+                        MyClass myClass = new MyClass(dishNames.get(i),dishPrices.get(i),image.get(i),type.get(i),""+approveTime,dishQuantity.get(i),dishHalfOr.get(i),state,String.valueOf(orderAmount),orderID,orderAndPayment.get(i),"Order Declined",sharedPreferences.getString("locality","") + "," + contactNum);
                         databaseReference.child(Objects.requireNonNull(auth.getUid())).child(dishNames.get(i)).setValue(myClass);
                     }
 
 
                     databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid()));
                     for(int i=0;i<dishNames.size();i++){
-                        MyClass myClass = new MyClass(dishNames.get(i),dishPrices.get(i),image.get(i),type.get(i),""+approveTime,dishQuantity.get(i),dishHalfOr.get(i),state,String.valueOf(orderAmount),orderID,orderAndPayment.get(i),"Order Declined",sharedPreferences.getString("locality",""));
+                        MyClass myClass = new MyClass(dishNames.get(i),dishPrices.get(i),image.get(i),type.get(i),""+approveTime,dishQuantity.get(i),dishHalfOr.get(i),state,String.valueOf(orderAmount),orderID,orderAndPayment.get(i),"Order Declined",sharedPreferences.getString("locality","") + "," + contactNum);
                         databaseReference.child("Recent Orders").child("" + time).child(auth.getUid()).child(dishNames.get(i)).setValue(myClass);
                     }
                     DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(state).child(sharedPreferences.getString("locality","")).child(Objects.requireNonNull(auth.getUid())).child("Tables").child(table);
@@ -348,6 +359,25 @@ public class ApproveCurrentOrder extends AppCompatActivity {
 
         approve.setOnClickListener(v -> {
             try {
+                if(!databaseForContactNum.contains(auth.getUid())){
+                    databaseEditor.putString(auth.getUid(),contactNum);
+                    databaseEditor.apply();
+                }
+
+                    Gson myGson = new Gson();
+
+                    HashMap<String,List<String>> mapMineIs = new HashMap<>();
+                mapMineIs.put(auth.getUid(),dishNames);
+                    lastOrderEditor.putString("details",myGson.toJson(mapMineIs));
+                    lastOrderEditor.apply();
+
+                SharedPreferences lastVisitOfCustomerData = getSharedPreferences("lastVisitOfCustomer",MODE_PRIVATE);
+                SharedPreferences.Editor lastVisit = lastVisitOfCustomerData.edit();
+
+                lastVisit.putString(auth.getUid(),System.currentTimeMillis() + "");
+                lastVisit.apply();
+
+
                 new hugeBackgroundWork().execute();
                 AsyncTask.execute(() -> {
                     DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Complaints").child("ResAnalysis").child(state).child(sharedPreferences.getString("locality", ""));

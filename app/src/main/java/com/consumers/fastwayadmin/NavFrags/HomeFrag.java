@@ -102,6 +102,7 @@ public class HomeFrag extends Fragment {
     Calendar calendar;
     int currentOrderCount = 0;
     int currentDay;
+
     TextView currentTablesText;
     Button seeMoreDetails;
     DecimalFormat decimalFormat = new DecimalFormat("0.00");
@@ -519,6 +520,8 @@ public class HomeFrag extends Fragment {
 
 
         refreshTakeAway.setOnClickListener(click -> {
+            List<String> contact = new ArrayList<>();
+            final String[] contactStr = new String[1];
             FirebaseAuth auth = FirebaseAuth.getInstance();
             DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(resInfoShared.getString("state","")).child(resInfoShared.getString("locality","")).child(Objects.requireNonNull(UID)).child("Current TakeAway");
             databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -539,6 +542,7 @@ public class HomeFrag extends Fragment {
                         finalPayment.clear();
                         orderAndPayment.clear();
                         time.clear();
+                        contact.clear();
                         finalUserNames.clear();
                         finalHalfOr.clear();
                         finalDishNames.clear();
@@ -556,13 +560,16 @@ public class HomeFrag extends Fragment {
                                 image.add(String.valueOf(dataSnapshot1.child("image").getValue()));
                                 type.add(String.valueOf(dataSnapshot1.child("type").getValue()));
                                 userNameTakeAway.add(String.valueOf(dataSnapshot1.child("nameOfUser").getValue()));
-                                usernameOfTakeAway = String.valueOf(dataSnapshot1.child("nameOfUser").getValue());
+                                String[] emptArr = String.valueOf(dataSnapshot1.child("nameOfUser").getValue()).split(",");
+                                usernameOfTakeAway = emptArr[0];
+                                contactStr[0] = emptArr[1];
                                 currentTime = String.valueOf(dataSnapshot1.child("time").getValue());
                                 if(dataSnapshot1.hasChild("deliveryInformation"))
                                     deliveryInformation.add(dataSnapshot1.child("deliveryInformation").getValue(String.class));
                                 else
                                     deliveryInformation.add("");
                                 cus = String.valueOf(dataSnapshot.child("customisation").getValue());
+
                             }
                             time.add(currentTime);
                             customisationList.add(cus);
@@ -573,6 +580,7 @@ public class HomeFrag extends Fragment {
                             finalUserNames.add(usernameOfTakeAway);
                             dishNameCurrentTakeAway.clear();
                             finalDishPrices.add(new ArrayList<>(price));
+                            contact.add(contactStr[0]);
                             price.clear();
                             dishQuantityCurrentTakeAway.clear();
                             finalTypes.add(new ArrayList<>(type));
@@ -590,7 +598,8 @@ public class HomeFrag extends Fragment {
                         homeFragTakeAwayRecucler.setLayoutManager(anotherHori);
                         Log.i("message",finalDishNames.toString() + "\n" + finalPayment.toString() + "\n" + finalDishQuantity.toString());
 //                        homeFragTakeAwayRecucler.setAdapter(new CurrentTakeAway(currentTakeAwayAuth,dishNameCurrentTakeAway,dishQuantityCurrentTakeAway,userNameTakeAway,halfOr,paymentMode));
-                        homeFragTakeAwayRecucler.setAdapter(new CurrentTakeAway(finalDishNames,finalDishQuantity,finalHalfOr,finalUserNames,finalPayment,orderIDs,orderAmounts,currentTakeAwayAuth,time,customisationList,finalOrderAndPayments,finalDishPrices,finalImages,finalTypes,deliveryInformation));
+                        homeFragTakeAwayRecucler.setAdapter(new CurrentTakeAway(finalDishNames,finalDishQuantity,finalHalfOr,finalUserNames,finalPayment,orderIDs,orderAmounts,currentTakeAwayAuth,time,customisationList,
+                                finalOrderAndPayments,finalDishPrices,finalImages,finalTypes,deliveryInformation,contact));
                     }else
                     {
                         currentTakeAwayAuth.clear();
@@ -608,10 +617,12 @@ public class HomeFrag extends Fragment {
                         orderAmounts.clear();
                         customisationList.clear();
                         time.clear();
+                        contact.clear();
                         finalHalfOr.clear();
                         dishQuantityCurrentTakeAway.clear();
                         homeFragTakeAwayRecucler.setLayoutManager(anotherHori);
-                        homeFragTakeAwayRecucler.setAdapter(new CurrentTakeAway(finalDishNames,finalDishQuantity,finalHalfOr,finalUserNames,finalPayment,orderIDs,orderAmounts,currentTakeAwayAuth,time,customisationList,finalOrderAndPayments,finalDishPrices,finalImages,finalTypes,deliveryInformation));
+                        homeFragTakeAwayRecucler.setAdapter(new CurrentTakeAway(finalDishNames,finalDishQuantity,finalHalfOr,finalUserNames,finalPayment,orderIDs,orderAmounts,currentTakeAwayAuth,
+                                time,customisationList,finalOrderAndPayments,finalDishPrices,finalImages,finalTypes,deliveryInformation,contact));
 
                     }
                 }
@@ -1313,7 +1324,8 @@ public class HomeFrag extends Fragment {
 
         @Override
         protected Void doInBackground(Void... voids) {
-
+            List<String> contact = new ArrayList<>();
+            final String[] contactStr = new String[1];
             FirebaseAuth auth = FirebaseAuth.getInstance();
             DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().getRoot().child("Restaurants").child(resInfoShared.getString("state","")).child(resInfoShared.getString("locality","")).child(Objects.requireNonNull(UID)).child("Current TakeAway");
             databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -1333,6 +1345,7 @@ public class HomeFrag extends Fragment {
                         finalImages.clear();
                         finalTypes.clear();
                         customisationList.clear();
+                        contact.clear();
                         finalPayment.clear();
                         price.clear();
                         time.clear();
@@ -1351,15 +1364,19 @@ public class HomeFrag extends Fragment {
                                 image.add(String.valueOf(dataSnapshot1.child("image").getValue()));
                                 type.add(String.valueOf(dataSnapshot1.child("type").getValue()));
                                 price.add(String.valueOf(dataSnapshot1.child("price").getValue()));
-                                userNameTakeAway.add(String.valueOf(dataSnapshot1.child("nameOfUser").getValue()));
+//                                userNameTakeAway.add(String.valueOf(dataSnapshot1.child("nameOfUser").getValue()));
                                 orderAndPayment.add(String.valueOf(dataSnapshot1.child("orderAndPayment").getValue()));
-                                usernameOfTakeAway = String.valueOf(dataSnapshot1.child("nameOfUser").getValue());
+//                                usernameOfTakeAway = String.valueOf(dataSnapshot1.child("nameOfUser").getValue());
+                                String[] emptArr = String.valueOf(dataSnapshot1.child("nameOfUser").getValue()).split(",");
+                                usernameOfTakeAway = emptArr[0];
+                                contactStr[0] = emptArr[1];
                                 currentTime = String.valueOf(dataSnapshot1.child("time").getValue());
                                 cus = String.valueOf(dataSnapshot1.child("customisation").getValue());
                                 if(dataSnapshot1.hasChild("deliveryInformation"))
                                     deliveryInformation.add(dataSnapshot1.child("deliveryInformation").getValue(String.class));
                                 else
                                     deliveryInformation.add("");
+
                             }
                             customisationList.add(cus);
                             time.add(currentTime);
@@ -1370,6 +1387,7 @@ public class HomeFrag extends Fragment {
                             finalUserNames.add(usernameOfTakeAway);
                             finalImages.add(new ArrayList<>(image));
                             finalTypes.add(new ArrayList<>(type));
+                            contact.add(contactStr[0]);
                             image.clear();
                             type.clear();
                             finalOrderAndPayments.add(new ArrayList<>(orderAndPayment));
@@ -1402,6 +1420,7 @@ public class HomeFrag extends Fragment {
                         finalUserNames.clear();
                         orderIDs.clear();
                         deliveryInformation.clear();
+                        contact.clear();
                         finalImages.clear();
                         finalTypes.clear();
                         orderAmounts.clear();
@@ -1412,7 +1431,8 @@ public class HomeFrag extends Fragment {
                         homeFragTakeAwayRecucler.setLayoutManager(anotherHori);
 
                     }
-                    homeFragTakeAwayRecucler.setAdapter(new CurrentTakeAway(finalDishNames,finalDishQuantity,finalHalfOr,finalUserNames,finalPayment,orderIDs,orderAmounts,currentTakeAwayAuth,time,customisationList,finalOrderAndPayments,finalDishPrices,finalImages,finalTypes,deliveryInformation));
+                    homeFragTakeAwayRecucler.setAdapter(new CurrentTakeAway(finalDishNames,finalDishQuantity,finalHalfOr,finalUserNames,finalPayment,orderIDs,
+                            orderAmounts,currentTakeAwayAuth,time,customisationList,finalOrderAndPayments,finalDishPrices,finalImages,finalTypes,deliveryInformation,contact));
                 }
 
                 @Override

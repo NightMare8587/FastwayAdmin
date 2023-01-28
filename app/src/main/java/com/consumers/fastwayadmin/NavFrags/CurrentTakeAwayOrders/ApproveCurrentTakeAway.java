@@ -84,7 +84,12 @@ import karpuzoglu.enes.com.fastdialog.Type;
 public class ApproveCurrentTakeAway extends AppCompatActivity {
     List<String> quantity;
     List<String> dishName;
+    String contactNum;
     String deliveryInformation;
+    SharedPreferences databaseForContactNum;
+    SharedPreferences lastOrderDetailsCustomer;
+    SharedPreferences.Editor lastOrderEditor;
+    SharedPreferences.Editor databaseEditor;
     List<String> image;
     List<String> type;
     boolean isGstAvailable = false;
@@ -166,17 +171,17 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
         trackingOfTakeAway = getSharedPreferences("TrackingOfTakeAway",MODE_PRIVATE);
         dailyUserTrackingFor7days = getSharedPreferences("DailyUserTrackingFor7days",MODE_PRIVATE);
         deliveryInformation = getIntent().getStringExtra("deliveryInformation");
+        contactNum = getIntent().getStringExtra("contact");
         if(!deliveryInformation.equals("no")){
             AlertDialog.Builder builder = new AlertDialog.Builder(ApproveCurrentTakeAway.this);
             builder.setTitle("Delivery Information").setMessage("Below are the delivery information\n\n" + deliveryInformation)
-                    .setPositiveButton("Exit", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            dialogInterface.dismiss();
-                        }
-                    }).create();
+                    .setPositiveButton("Exit", (dialogInterface, i) -> dialogInterface.dismiss()).create();
             builder.show();
         }
+        databaseForContactNum = getSharedPreferences("DatabaseForContactNum",MODE_PRIVATE);
+        databaseEditor = databaseForContactNum.edit();
+        lastOrderDetailsCustomer = getSharedPreferences("lastOrderDetailsCustomer",MODE_PRIVATE);
+        lastOrderEditor = lastOrderDetailsCustomer.edit();
         user7daysEdit = dailyUserTrackingFor7days.edit();
         trackingDineAndWay = trackingOfTakeAway.edit();
         AsyncTask.execute(() -> {
@@ -406,6 +411,24 @@ public class ApproveCurrentTakeAway extends AppCompatActivity {
 
         approve.setOnClickListener(view -> {
             try {
+
+
+                    databaseEditor.putString(auth.getUid(),contactNum);
+                    databaseEditor.apply();
+
+
+                Gson myGson = new Gson();
+
+                HashMap<String,List<String>> mapMyMain = new HashMap<>();
+                mapMyMain.put(auth.getUid(),dishName);
+                lastOrderEditor.putString("details",myGson.toJson(mapMyMain));
+                lastOrderEditor.apply();
+
+                SharedPreferences lastVisitOfCustomerData = getSharedPreferences("lastVisitOfCustomer",MODE_PRIVATE);
+                SharedPreferences.Editor lastVisit = lastVisitOfCustomerData.edit();
+
+                lastVisit.putString(auth.getUid(),System.currentTimeMillis() + "");
+                lastVisit.apply();
 
                 approve.setEnabled(false);
                 if (paymentMode.equals("cash")) {

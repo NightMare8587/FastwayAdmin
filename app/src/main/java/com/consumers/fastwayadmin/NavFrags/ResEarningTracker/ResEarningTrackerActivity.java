@@ -28,6 +28,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.consumers.fastwayadmin.NavFrags.FastwayPremiumActivites.FastwayPremiums;
 import com.consumers.fastwayadmin.NavFrags.ResDishTracker.RecyclerClassView;
 import com.consumers.fastwayadmin.NavFrags.ResDishTracker.seeAllDishAnalysis;
+import com.consumers.fastwayadmin.NavFrags.ResEarningTracker.NotifyUserPackage.NotifyUsers;
 import com.consumers.fastwayadmin.NavFrags.ResEarningTracker.OrdersNotFromOrdinalo.OtherOrdersNotFromOrdinalo;
 import com.consumers.fastwayadmin.NavFrags.ResEarningTracker.RestaurantAnalysis.RestaurantEarningAnalysis;
 import com.consumers.fastwayadmin.R;
@@ -117,6 +118,7 @@ public class ResEarningTrackerActivity extends AppCompatActivity{
             "December"};
     List<String> allMonthsNames;
     int currentDay;
+    TextView notifyUsers;
     @RequiresApi(api = Build.VERSION_CODES.N)
     @SuppressLint("SetTextI18n")
     @Override
@@ -204,16 +206,35 @@ public class ResEarningTrackerActivity extends AppCompatActivity{
             HashMap<String,String> map = gson.fromJson(json,types);
 
             totalCustomers.setText("Total Customer's: " + map.size() + "");
-
+            List<String> userIdToNotify = new ArrayList<>();
             int count = 0;
             int otherCount = 0;
             for(String i : map.keySet()){
                 int value = Integer.parseInt(map.get(i));
-                if(value == 1)
+                if(value == 1) {
                     count++;
+                    userIdToNotify.add(map.get(i));
+                }
                 else
                     otherCount++;
             }
+
+            if(count == 0)
+                notifyUsers.setVisibility(View.INVISIBLE);
+            else
+                notifyUsers.setVisibility(View.VISIBLE);
+
+
+            int finalCount = count;
+            notifyUsers.setOnClickListener(click -> {
+                if(finalCount == 0){
+                    Toast.makeText(this, "0 notify", Toast.LENGTH_SHORT).show();
+                }else{
+                    Intent intent = new Intent(ResEarningTrackerActivity.this, NotifyUsers.class);
+                    intent.putStringArrayListExtra("list",(ArrayList<String>) userIdToNotify );
+                    startActivity(intent);
+                }
+            });
 
             oneTime.setText("One Time Customer: " + count);
             Recuuring.setText("Recurring Customers: " + otherCount);
@@ -538,6 +559,7 @@ public class ResEarningTrackerActivity extends AppCompatActivity{
         overallVegan = findViewById(R.id.overallVegan);
         overallVeg = findViewById(R.id.overallVeg);
         overallNon = findViewById(R.id.overallNon);
+        notifyUsers = findViewById(R.id.textView54);
         overallHeading = findViewById(R.id.textViewShowingDishTracker);
         resVeg = findViewById(R.id.resVeg);
         resNon = findViewById(R.id.resNon);
@@ -652,11 +674,16 @@ public class ResEarningTrackerActivity extends AppCompatActivity{
                         otherCount++;
                 }
 
+                if(count == 0)
+                    notifyUsers.setVisibility(View.INVISIBLE);
+
+
                 oneTime.setText("One Time Customer: " + count);
                 Recuuring.setText("Recurring Customers: " + otherCount);
             }else{
                 totalCustomers.setText("0");
                 oneTime.setText("0");
+                notifyUsers.setVisibility(View.INVISIBLE);
                 Recuuring.setText("0");
             }
 

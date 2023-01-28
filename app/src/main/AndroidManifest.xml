@@ -49,6 +49,9 @@
         tools:replace="android:icon,android:allowBackup"
         tools:targetApi="r">
         <activity
+            android:name=".NavFrags.ResEarningTracker.NotifyUserPackage.NotifyUsers"
+            android:exported="false" />
+        <activity
             android:name=".NavFrags.CurrentTakeAwayOrders.ApproveCurrentTakeAway"
             android:exported="false">
             <meta-data
@@ -215,7 +218,6 @@
         <activity
             android:name=".ListViewActivity.MyOrdersTransactions"
             android:exported="true" />
-
         <activity
             android:name=".Dish.SearchDishFastway.SearchFastwayDatabase"
             android:exported="true" />
@@ -419,8 +421,6 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-
-
     </application>
 
 </manifest>

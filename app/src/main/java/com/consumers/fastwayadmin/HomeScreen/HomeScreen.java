@@ -1784,6 +1784,7 @@ public class HomeScreen extends AppCompatActivity {
                     SharedPreferences RestaurantTrackRecords = getSharedPreferences("RestaurantTrackRecords", MODE_PRIVATE);
                     RestaurantTrackRecords.edit().clear().apply();
 
+
 //                    SharedPreferences UserFrequencyPerMonth = getSharedPreferences("UserFrequencyPerMonth", MODE_PRIVATE);
 //                    UserFrequencyPerMonth.edit().clear().apply();
 

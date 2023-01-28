@@ -33,15 +33,17 @@ public class CurrentTakeAway extends RecyclerView.Adapter<CurrentTakeAway.Holder
     List<String> orderAmount;
     List<String> deliveryInformation;
     List<String> time;
+    List<String> contact;
 
     public CurrentTakeAway(List<List<String>> finalDishNames, List<List<String>> finalDishQuantity, List<List<String>> finalHalfOr, List<String> finalUserNames,
                            List<String> finalPayment,List<String> orderId,List<String> orderAmount,List<String> currentTakeAwayAuth,List<String> time,List<String> customisationList,
-                           List<List<String>> finalOrderAndPayments,List<List<String>> finalDishPrices,List<List<String>> finalImages,List<List<String>> finalTypes,List<String> deliveryInformation) {
+                           List<List<String>> finalOrderAndPayments,List<List<String>> finalDishPrices,List<List<String>> finalImages,List<List<String>> finalTypes,List<String> deliveryInformation,List<String> contact) {
         this.finalDishNames = finalDishNames;
         this.finalDishQuantity = finalDishQuantity;
         this.finalHalfOr = finalHalfOr;
         this.finalDishPrices = finalDishPrices;
         this.deliveryInformation = deliveryInformation;
+        this.contact = contact;
         this.finalImages = finalImages;
         this.finalTypes = finalTypes;
         this.finalOrderAndPayments = finalOrderAndPayments;
@@ -103,6 +105,7 @@ public class CurrentTakeAway extends RecyclerView.Adapter<CurrentTakeAway.Holder
             intent.putExtra("orderID",orderId.get(position));
             intent.putExtra("payment",finalPayment.get(position));
             intent.putExtra("time",time.get(position));
+            intent.putExtra("contact",contact.get(position));
             intent.putExtra("orderAmount",orderAmount.get(position));
             intent.putExtra("customisation",customisationList.get(position));
             if(deliveryInformation.get(position).equals(""))

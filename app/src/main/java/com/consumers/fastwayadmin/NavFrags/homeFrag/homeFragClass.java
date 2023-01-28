@@ -3,6 +3,7 @@ package com.consumers.fastwayadmin.NavFrags.homeFrag;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.view.LayoutInflater;
@@ -10,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -20,15 +22,19 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.consumers.fastwayadmin.R;
 import com.consumers.fastwayadmin.Tables.ChatWithCustomer;
+import com.google.common.reflect.TypeToken;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 public class homeFragClass extends RecyclerView.Adapter<homeFragClass.ViewHolder> {
@@ -84,6 +90,40 @@ public class homeFragClass extends RecyclerView.Adapter<homeFragClass.ViewHolder
                 intent.putExtra("id",resId.get(position));
                 v.getContext().startActivity(intent);
             }
+        });
+
+        holder.cardView.setOnLongClickListener(view -> {
+            SharedPreferences lastOrder = view.getContext().getSharedPreferences("lastOrderDetailsCustomer",Context.MODE_PRIVATE);
+            if(lastOrder.contains("details")){
+                Gson myGson = new Gson();
+                java.lang.reflect.Type type = new TypeToken<HashMap<String,List<String>>>() {
+                }.getType();
+
+                HashMap<String,List<String>> myMap = new HashMap<>(myGson.fromJson(lastOrder.getString("details",""),type));
+                if(!myMap.containsKey(resId.get(position))){
+                    Toast.makeText(view.getContext(), "No Record", Toast.LENGTH_SHORT).show();
+                }else {
+                    List<String> dishList = new ArrayList<>(myMap.get(resId.get(position)));
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
+                    builder.setTitle("Last Order Made");
+                    builder.setMessage("Below is the last order details of user");
+                    LinearLayout linearLayout = new LinearLayout(view.getContext());
+                    linearLayout.setOrientation(LinearLayout.VERTICAL);
+                    ListView listView = new ListView(view.getContext());
+                    ArrayAdapter<String> adapter = new ArrayAdapter<>(view.getContext(), android.R.layout.simple_list_item_1, dishList);
+                    listView.setAdapter(adapter);
+
+                    linearLayout.addView(listView);
+                    builder.setView(linearLayout);
+                    builder.setPositiveButton("Exit", (dialogInterface, i) -> dialogInterface.dismiss());
+                    builder.create().show();
+                }
+
+            }else{
+                Toast.makeText(view.getContext(), "No Record", Toast.LENGTH_SHORT).show();
+            }
+            return true;
         });
 
         if(isCurrentOrder.get(position).equals("1"))
