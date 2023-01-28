@@ -12,9 +12,9 @@ android {
         applicationId "com.consumers.fastwayadmin"
         minSdkVersion 21
         targetSdkVersion 33
-        versionCode 27
+        versionCode 28
         multiDexEnabled true
-        versionName "1.10"
+        versionName "1.101"
         android.defaultConfig.vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
